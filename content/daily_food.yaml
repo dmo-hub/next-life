@@ -32,12 +32,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: food_somtam_contest_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว ตัวแทนแผนกของโรงงานหรือออฟฟิศ"
     type: A
     category: society
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [factory, clerk, technician, professional, manager]}
+    when: {age: [31, 45], occupation: [factory, clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ตัวแทนแผนกลงแข่งตำส้ม"
     text: "งานประจำจังหวัดปีนี้มีแข่งตำส้ม ครกไม้เรียงบนเวที กรรมการถือช้อนรอชิมทีละจาน หัวหน้าส่งชื่อคุณเป็นตัวแทนแผนก เพราะเคยคุยในวงข้าวว่ามือหนัก ทั้งที่ปีนี้ทั้งปีคุณตำแต่น้ำพริกถ้วยเล็ก"
     choices:
@@ -68,7 +69,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "พักเที่ยงเหลือสิบห้านาที"
     text: "ประชุมลากยาวจนเหลือพักสิบห้านาที หน้าร้านข้าวแกงคนต่อแถวถึงตู้น้ำ ถาดแกงเหลือครึ่ง ป้าถือทัพพีรอคำตอบจากคนข้างหน้าที่ยังชี้ไปชี้มาเหมือนกำลังซื้อบ้าน"
     choices:
@@ -430,7 +431,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [46, 59], occupation: [clerk, technician, professional, manager]}
+    when: {age: [46, 59], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ขายแค่วันละสามชั่วโมง"
     text: "ร้านขนมครกโบราณที่คุณกินมาตั้งแต่เด็กยังโม่แป้งเอง เปิดวันละแค่สามชั่วโมง ตรงเวลางานพอดี แถวยาวตั้งแต่เตายังไม่ร้อน อาทิตย์นี้เพื่อนเก่าจากต่างจังหวัดจะมาเยี่ยม และเขาพูดถึงขนมครกถาดนี้มาสามปีแล้ว"
     choices:

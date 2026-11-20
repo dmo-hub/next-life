@@ -211,6 +211,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: med_intern_01
+    office_ok: "ใบลาออกเป็นของเพื่อนร่วมรุ่นแพทย์ ไม่ใช่ของผู้เล่น (ธง med_doctor)"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -273,6 +274,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: med_offer_01
+    office_ok: "เงินเดือนของโรงพยาบาลเอกชนที่ทาบทามแพทย์ (ธง med_doctor)"
     type: A
     category: work_money
     stage: ทำงาน
@@ -302,6 +304,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: med_burnout_01
+    office_ok: "ลาพักร้อนของแพทย์ที่หมดไฟ (ธง med_doctor)"
     type: A
     category: health
     stage: ทำงาน
@@ -331,6 +334,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: med_resident_01
+    office_ok: "ประชุมเช้าและเงินเดือนของแพทย์ประจำบ้าน (ธง med_specialist)"
     type: A
     category: study
     stage: ทำงาน
@@ -394,6 +398,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: med_clinic_01
+    office_ok: "เงินเดือนเป็นตัวเทียบค่าเช่าคลินิกของแพทย์ (ธง med_doctor)"
     type: A
     category: work_money
     stage: กลางคน

@@ -6,7 +6,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [22, 30], occupation: [clerk, technician, manager]}
+    when: {age: [22, 30], occupation: [clerk, technician, manager], flags: {not: [own_business]}}
     title: "ฉลากเบอร์สิบเจ็ด"
     text: "งานเลี้ยงปีใหม่บริษัทตั้งงบของขวัญสามร้อยบาท คุณจับฉลากได้กล่องห่อกระดาษทอง แกะออกมาเป็นกระติกน้ำเก็บความเย็น ใบที่สามของปีนี้ อีกฝั่งโต๊ะ น้องฝ่ายบัญชีกำลังมองหม้อทอดไร้น้ำมันในมือตัวเองด้วยสีหน้าเดียวกัน"
     choices:
@@ -37,7 +37,7 @@ events:
     stage: ทำงาน
     years: [2540, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [clerk, technician, manager]}
+    when: {age: [31, 45], occupation: [clerk, technician, manager], flags: {not: [own_business]}}
     title: "วันลาเหลือเจ็ดวัน"
     text: "ต้นเดือนพฤศจิกา ฝ่ายบุคคลส่งอีเมลเตือนว่าวันลาพักร้อนที่ไม่ได้ใช้ทบไปปีหน้าได้แค่สามวัน คุณเหลือเจ็ด งานปิดงบสิ้นปีเริ่มกองบนโต๊ะ คนในแผนกจองลาไปแล้วสองคน ปฏิทินช่วงหยุดยาวปีใหม่ก็เต็มไปด้วยชื่อคนอื่นแล้ว"
     choices:
@@ -68,7 +68,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [46, 59], occupation: [clerk, technician, factory, manager], family: [{role: parent, sex: หญิง, alive: true}]}
+    when: {age: [46, 59], occupation: [clerk, technician, factory, manager], family: [{role: parent, sex: หญิง, alive: true}], flags: {not: [own_business]}}
     title: "บัตรหายวันพุธ"
     text: "บัตรประชาชนของแม่หายไปพร้อมกระเป๋าสตางค์ที่ตลาด ทำใหม่ต้องไปสำนักงานเขตด้วยตัวเองในเวลาราชการ ถ่ายรูปและพิมพ์ลายนิ้วมือ คุณเหลือวันลากิจอีกสามวัน แต่วันพุธนี้มีตรวจงานประจำไตรมาส ญาติที่ว่างที่สุดในบ้านขับรถไม่เป็น"
     choices:
@@ -79,7 +79,7 @@ events:
       - id: half_day
         text: "ขอหัวหน้าเข้างานสายครึ่งวัน"
         outcomes:
-          - {weight: 1, ok: true, text: "คิวที่เขตสั้นกว่าที่คิด ถึงออฟฟิศสิบโมงครึ่ง พร้อมเรื่องเล่าว่าแม่ขอถ่ายรูปบัตรใหม่สามรอบ", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "คิวที่เขตสั้นกว่าที่คิด ถึง{ที่ทำงาน}สิบโมงครึ่ง พร้อมเรื่องเล่าว่าแม่ขอถ่ายรูปบัตรใหม่สามรอบ", effects: {relations: 1, network: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลายนิ้วมือแม่จางจนเจ้าหน้าที่ต้องลองถึงรอบที่เก้า ครึ่งวันกลายเป็นทั้งวัน", effects: {relations: 1, network: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: relative
@@ -87,10 +87,10 @@ events:
         effects: {relations: -1, network: 1}
         merit: [{cat: neutral}]
       - id: bring_office
-        text: "พาแม่มารอที่ออฟฟิศ เที่ยงค่อยไป"
+        text: "พาแม่มาที่ทำงาน เที่ยงค่อยไป"
         outcomes:
           - {weight: 1, ok: true, text: "แม่นั่งโต๊ะรับแขก แจกขนมทั้งชั้น ทีมตรวจงานถามว่าบ้านคุณขายขนมหรือเปล่า", effects: {relations: 1, happiness: 2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "แม่นั่งรอห้าชั่วโมงแล้วบ่นยาวทั้งทางไปเขต ว่าห้องแอร์ออฟฟิศหนาวกว่าหน้าหนาวที่บ้าน", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่นั่งรอห้าชั่วโมงแล้วบ่นยาวทั้งทางไปเขต ว่าห้องแอร์{ที่ทำงาน}หนาวกว่าหน้าหนาวที่บ้าน", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: workday_sick_cert_01
@@ -99,7 +99,7 @@ events:
     stage: หนุ่มสาว
     years: [2555, 2650]
     weight: 0.0625
-    when: {age: [22, 30], occupation: [clerk, technician, factory, service, manager]}
+    when: {age: [22, 30], occupation: [clerk, technician, factory, service, manager], flags: {not: [own_business]}}
     title: "ไข้วันที่สาม"
     text: "ไข้ขึ้นตั้งแต่วันจันทร์ ลาป่วยไปสองวันด้วยข้อความสั้น ๆ ในกลุ่มแชตงาน เช้าวันพุธยังลุกจากเตียงไม่ไหว ฝ่ายบุคคลทักมาสุภาพว่าถ้าลาวันที่สามขอใบรับรองแพทย์ด้วยนะคะ คลินิกหน้าซอยเปิดห้าโมงเย็น"
     choices:
@@ -115,7 +115,7 @@ events:
         text: "ฝืนเข้างาน ไม่ต้องใช้ใบ"
         outcomes:
           - {weight: 1, ok: true, text: "นั่งทำงานในหน้ากากทั้งวัน งานเสร็จ ไข้ก็ลดตอนเย็น", effects: {network: 1, health: -1}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "ไข้กลับมาตอนบ่าย คนข้างโต๊ะเริ่มไอตาม สัปดาห์หน้าแผนกลาป่วยกันสามคน", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "ไข้กลับมาตอนบ่าย คนข้างโต๊ะเริ่มไอตาม สัปดาห์หน้าทีมลาป่วยกันสามคน", effects: {health: -2, relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: thermometer
         text: "ส่งรูปปรอทวัดไข้แทนใบหมอ"
@@ -125,12 +125,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: workday_ot_dayoff_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว บริษัทและสลิปเงินเดือนของผู้ถูกจ้าง"
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 40], occupation: [clerk, technician, factory]}
+    when: {age: [31, 40], occupation: [clerk, technician, factory], flags: {not: [own_business]}}
     title: "ค่าโอทีกลายเป็นวันหยุด"
     text: "เดือนนี้อยู่ดึกไปสิบสองคืน รวมวันเสาร์อีกสอง สลิปเงินเดือนออกมาไม่มีบรรทัดค่าล่วงเวลา ฝ่ายบุคคลอธิบายว่าปีนี้ให้เก็บเป็นวันหยุดชดเชยแทน ใช้ได้ภายในสามเดือน เพื่อนข้างโต๊ะยังกดเครื่องคิดเลขว่าหายไปเท่าไร"
     choices:
@@ -163,7 +164,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [32, 45], occupation: [clerk, technician, manager]}
+    when: {age: [32, 45], occupation: [clerk, technician, manager], flags: {not: [own_business]}}
     title: "ช่างภาพไม่รับสาย"
     text: "บริษัทจ้างช่างภาพอิสระมาถ่ายรูปสินค้าทำแคตตาล็อกปีใหม่ รับงานเป็นชิ้น จ่ายเมื่อส่งงาน คุณเป็นคนประสาน พรุ่งนี้เช้าต้องส่งโรงพิมพ์ รูปมาไม่ถึงครึ่ง โทรไปสามสาย ไม่มีใครรับ หัวหน้าเดินผ่านโต๊ะคุณเป็นรอบที่สี่"
     choices:
@@ -225,7 +226,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [46, 58], occupation: [clerk, technician, manager]}
+    when: {age: [46, 58], occupation: [clerk, technician, manager], flags: {not: [own_business]}}
     title: "แบบประเมินตัวเองสิบสองข้อ"
     text: "ฤดูประเมินผลปลายปีมาถึง แบบฟอร์มให้คะแนนตัวเองหนึ่งถึงห้าในสิบสองหัวข้อ ปีก่อนคุณให้สามทุกข้อเพราะเกรงใจ หัวหน้าก็ให้สามตาม โบนัสตามผลงานผูกกับคะแนนนี้ น้องใหม่ในทีมให้ตัวเองห้าทุกข้อพร้อมแนบรูป"
     choices:
@@ -251,12 +252,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: workday_payday_wait_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว เงินเดือนออกสิ้นเดือนของผู้ถูกจ้าง"
     type: A
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [22, 26], occupation: [clerk, technician, factory, service]}
+    when: {age: [22, 26], occupation: [clerk, technician, factory, service], flags: {not: [own_business]}}
     title: "อีกสามวันเงินเดือนออก"
     text: "วันที่ยี่สิบเจ็ด ยอดในบัญชีเหลือสองร้อยสิบสามบาท ค่ารถเหลือพอไปกลับสองวัน บะหมี่ซองในลิ้นชักโต๊ะทำงานเหลือซองเดียว รสที่ไม่มีใครชอบ เพื่อนในแผนกชวนไปกินชาบูวันศุกร์ เงินเดือนออกวันที่สามสิบ"
     choices:
@@ -282,12 +284,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: workday_car_break_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว ป้อมยามบริษัทและเงินเดือนของผู้ถูกจ้าง"
     type: A
     category: work_money
     stage: ทำงาน
     years: [2540, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [clerk, technician, factory, manager]}
+    when: {age: [31, 45], occupation: [clerk, technician, factory, manager], flags: {not: [own_business]}}
     title: "รถดับหน้าไม้กั้น"
     text: "ปลายเดือน รถคันเดียวที่ใช้ขับไปทำงานดับสนิทตรงไม้กั้นหน้าป้อมยามบริษัท อู่โทรมาบอกว่าไดชาร์จพัง ค่าซ่อมราวครึ่งเดือนของเงินเดือน บัญชีออมที่ตั้งใจหยอดเดือนละหนึ่งในสิบของรายได้ ทั้งปีหยอดได้ไม่ถึงที่ตั้งไว้"
     choices:
@@ -316,7 +319,7 @@ events:
     stage: กลางคน
     years: [2535, 2650]
     weight: 0.0625
-    when: {age: [46, 55], occupation: [clerk, technician, manager]}
+    when: {age: [46, 55], occupation: [clerk, technician, manager], flags: {not: [own_business]}}
     title: "สไลด์ห้าสิบหน้าตามสั่ง"
     text: "พรุ่งนี้นำเสนอลูกค้าเจ้าใหญ่ หัวหน้าสั่งให้ใส่ตัวเลขทุกตัวของทั้งปีให้ครบห้าสิบหน้า คุณรู้จากประสบการณ์ยี่สิบปีว่าลูกค้าคนนี้ฟังได้ไม่เกินสิบนาที ทุกคนในห้องประชุมพยักหน้าพร้อมกันตอนหัวหน้าพูดจบ"
     choices:
@@ -349,7 +352,7 @@ events:
     stage: หนุ่มสาว
     years: [2550, 2650]
     weight: 0.0625
-    when: {age: [24, 30], occupation: [clerk, technician, manager]}
+    when: {age: [24, 30], occupation: [clerk, technician, manager], flags: {not: [own_business]}}
     title: "น้ำพริกใต้โต๊ะคุณ"
     text: "เพื่อนร่วมแผนกขายน้ำพริกทำเองหลังเลิกงาน โต๊ะคุณอยู่ติดลิฟต์ สามสิบกระปุกเลยมากองใต้โต๊ะคุณ คนทั้งตึกแวะมารับทั้งวัน เมื่อคืนตีหนึ่งเพื่อนส่งข้อความมาขอให้ช่วยตอบลูกค้าที่ถามว่ามีแบบไม่เผ็ดไหม เช้านี้ประชุมเจ็ดโมงครึ่ง"
     choices:
@@ -379,12 +382,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: workday_desk_clear_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว เก็บโต๊ะวันสุดท้ายก่อนเกษียณของผู้ถูกจ้าง"
     type: A
     category: work_money
     stage: กลางคน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [59, 59], occupation: [clerk, technician, factory, manager]}
+    when: {age: [59, 59], occupation: [clerk, technician, factory, manager], flags: {not: [own_business]}}
     title: "ลิ้นชักสามสิบปี"
     text: "อีกเดือนเดียวจะเกษียณ ฝ่ายบุคคลขอให้เคลียร์โต๊ะก่อนวันสุดท้าย เงินก้อนสุดท้ายจะเข้าบัญชีปลายเดือนหน้า คุณเปิดลิ้นชักเจอปากกาหมึกแห้งสี่สิบด้าม สลิปเงินเดือนใบแรก และกุญแจห้องที่รื้อไปแล้วตอนปรับปรุงตึก"
     choices:
@@ -441,12 +445,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: workday_weekend_ot_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว หัวหน้าขอให้ทั้งทีมมาทำงานวันเสาร์"
     type: A
     category: work_money
     stage: กลางคน
     years: [2555, 2650]
     weight: 0.0625
-    when: {age: [46, 59], occupation: [clerk, technician, factory, manager]}
+    when: {age: [46, 59], occupation: [clerk, technician, factory, manager], flags: {not: [own_business]}}
     title: "เสาร์นี้สองเท่า เลยหกโมงสาม"
     text: "ปิดงบสิ้นเดือนไม่ทัน หัวหน้าขอให้ทั้งแผนกมาวันเสาร์ ค่าทำงานวันหยุดได้สองเท่า ถ้าเลยหกโมงเย็นได้สามเท่า เสาร์นี้ตรงกับงานบวชลูกพี่ลูกน้องที่บ้านเกิด ห่างไปสามร้อยกิโล คนในแผนกเริ่มลงชื่อในกลุ่มแชตแล้ว"
     choices:

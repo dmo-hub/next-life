@@ -117,6 +117,7 @@ events:
         merit: [{cat: greed_harm, level: 1}]
 
   - id: echo_spoke_up_01
+    office_ok: "ห้องประชุมของที่ทำงานเก่าในอดีตที่ธง spoke_up บันทึกไว้ ไม่ใช่ที่ทำงานปัจจุบัน"
     away_block: [abroad, monk]
     type: A
     category: work_money

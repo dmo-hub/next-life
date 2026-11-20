@@ -1,6 +1,7 @@
 # กลุ่มหนี้ · ช่วงหนุ่มสาว/ทำงาน/กลางคน (19–59) + การ์ดทวงหนี้นอกระบบช่วงชรา · กยศ. บ้าน รถ ค้ำประกัน หนี้นอกระบบ — ใช้ธง loan_shark · guarantor · home_owner · has_car
 events:
   - id: debt_student_loan_01
+    office_ok: "สลิปเงินเดือนงานแรกหลังจบการศึกษา ไม่ใช่ที่ทำงานเดิม"
     away_block: [monk]
     type: A
     category: study
@@ -403,7 +404,7 @@ events:
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
-    when: {flags: {has: [home_owner]}}
+    when: {flags: {has: [home_owner], not: [own_business]}, occupation: [clerk, professional, manager, technician, officer, senior_officer]}
     weight: 1
     title: "จดหมายรีไฟแนนซ์"
     text: "ผ่อนบ้านมาหลายปี ดอกลอยขึ้นทุกปีจนงวดหนักกว่าวันแรก ธนาคารอีกแห่งส่งจดหมายมาเสนอดอกต่ำกว่า แถมให้กู้เพิ่มได้อีกก้อนถ้าย้ายมาตอนนี้"
@@ -564,6 +565,7 @@ events:
           - {weight: 1, text: "แจ้งแล้วเรื่องเงียบ คืนนั้นมีคนเตะประตูห้องจนกลอนหลุด", effects: {happiness: -2}, next: debt_shark_young_deadline_01, merit: [{cat: neutral}]}
 
   - id: debt_shark_young_deadline_01
+    office_ok: "ผู้เล่นเพิ่งเริ่มงานจึงยังไม่มีสลิปเงินเดือนพอ ใช้ได้ทุกอาชีพที่รับเป็นรอบ"
     away_block: [abroad, monk]
     type: A
     category: work_money

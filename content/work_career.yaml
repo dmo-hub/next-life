@@ -37,8 +37,8 @@ events:
         effects: {relations: 1, network: 1}
         merit: [{cat: neutral}]
 
-    office_ok: "ต่อเนื่องจากใบที่กรองอาชีพออฟฟิศแล้ว ไม่ออกเดี่ยว"
   - id: career_poach_cornered_01
+    when: {occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -183,8 +183,8 @@ events:
           - {weight: 2, ok: true, text: "ยอดพุ่ง ผู้บริหารปลื้ม แต่ในทีมไม่มีใครยิ้มให้อีก", effects: {job: manager, relations: -2}, merit: [{cat: oppress_subjects, level: 1}]}
           - {weight: 2, text: "ลูกน้องลาออกยกทีมในเดือนเดียว ถูกถอดจากตำแหน่งกลางที่ประชุม", effects: {happiness: -3, income_mult: 0.85, relations: -1}, merit: [{cat: neutral}]}
 
-    office_ok: "ต่อเนื่องจากใบที่กรองอาชีพออฟฟิศแล้ว ไม่ออกเดี่ยว"
   - id: career_lead_mutiny_01
+    when: {occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     away_block: [abroad, monk]
     type: A
     category: work_money

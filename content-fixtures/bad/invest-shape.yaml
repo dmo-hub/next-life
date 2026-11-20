@@ -1,6 +1,7 @@
 # invest อ้างสินทรัพย์ที่ไม่มี และสัดส่วนเกิน 1
 events:
   - id: invest_bad_shape
+    office_ok: "ตัวอย่างทดสอบรูปแบบลงทุน โบนัสไม่เกี่ยวกับกติกานี้"
     type: A
     category: work_money
     stage: ทำงาน

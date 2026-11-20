@@ -87,6 +87,7 @@ events:
         merit: [{cat: care_parents, level: 1}]
 
   - id: stats_high_network_01
+    office_ok: "รุ่นพี่ชวนไปคุมงานบริษัทใหม่ ผู้เล่นทุกอาชีพที่มีคอนเนกชันสูงเจอได้"
     away_block: [abroad, monk]
     type: A
     category: work_money

@@ -225,11 +225,11 @@ events:
           - {weight: 1, text: "ทุกคนเงียบ คุณกินข้าวเร็วเท่าที่จะเร็วได้ แต่วันรุ่งขึ้นคนฝั่งนั้นพยักหน้าให้คุณก่อน", effects: {relations: 1, happiness: -1}, merit: [{cat: help_others, level: 1}]}
         merit: [{cat: help_others, level: 1}]
       - id: inmate_fv_stand_01
-        text: "ยืนกินข้างโต๊ะแผนกตัวเอง"
+        text: "ยืนกินข้างโต๊ะทีมตัวเอง"
         effects: {health: -1, network: 1}
         merit: [{cat: neutral}]
       - id: inmate_fv_invite_01
-        text: "ขยับโต๊ะแผนกให้นั่งรวมกัน"
+        text: "ขยับโต๊ะทีมให้นั่งรวมกัน"
         effects: {relations: 2, network: 1, happiness: -1}
         merit: [{cat: help_others, level: 1}]
       - id: inmate_fv_ask_work_01
@@ -239,7 +239,7 @@ events:
       - id: inmate_fv_box_race_01
         text: "ท้าแข่งพับกล่องกันตอนพัก"
         outcomes:
-          - {weight: 1, ok: true, text: "สองฝั่งโต๊ะรุมเชียร์จนลืมว่าใครมาจากไหน แผนกคุณแพ้ยับ และต้องเลี้ยงน้ำแข็งเปล่าทั้งโต๊ะ", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "สองฝั่งโต๊ะรุมเชียร์จนลืมว่าใครมาจากไหน ทีมคุณแพ้ยับ และต้องเลี้ยงน้ำแข็งเปล่าทั้งโต๊ะ", effects: {happiness: 2, relations: 2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "หัวหน้าเดินมาเห็นกล่องพับค้างเป็นกอง เลยสั่งให้ทั้งโต๊ะนับกล่องจนหมดพัก", effects: {happiness: -1, knowledge: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 

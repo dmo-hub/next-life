@@ -98,6 +98,7 @@ events:
 
   # หนุ่มสาว — ใบผ่านงานปลอม
   - id: young_risky_cert_01
+    office_ok: "บริษัทที่ผู้เล่นสมัครงานใหม่ ไม่ใช่ที่ทำงานเดิม"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -130,6 +131,7 @@ events:
 
   # ← young_risky_cert_01 "ซื้อใบผ่านงานปลอม" (ทางโดน)
   - id: risky_cert_caught_01
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -197,7 +199,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "เก้าอี้หัวหน้าแผนก"
     text: "ตำแหน่งหัวหน้าแผนกว่างลง คุณกับเพื่อนร่วมงานอีกคนมีสิทธิ์เท่ากัน แต่เขาทำงานนานกว่าและเก่งกว่า เพื่อนเก่าของคุณเป็นกรรมการบริษัท บอกว่ายกหูโทรศัพท์ครั้งเดียวเรื่องก็จบ"
     choices:
@@ -242,14 +244,14 @@ events:
         hint: "ราคา: บาปหนัก"
         merit: [{cat: greed_harm, level: 2}]
         outcomes:
-          - {weight: 1, ok: true, text: "เขารับเงินแล้วถอนเรื่อง ลาออกไปอยู่บริษัทคู่แข่ง", effects: {money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เขารับเงินแล้วถอนเรื่อง ลาออกไปอยู่กับคู่แข่ง", effects: {money: {unit: income_x, amount: -1.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เขาไม่รับเงิน อัดเสียงไว้เป็นหลักฐานอีกกระทง คุณถูกไล่ออก", effects: {income_mult: 0.8, happiness: -3}, sets_flags: [caught_fraud], merit: [{cat: neutral}]}
       - id: ask_family
         text: "ขอพ่อแม่ช่วยหาทนาย"
         requires: {family: [{role: parent, alive: true}], reason: "ไม่มีพ่อแม่ช่วยหาทนาย"}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ทนายที่ที่บ้านหามาเจรจาจนเรื่องจบที่ย้ายแผนก", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "ทนายที่ที่บ้านหามาเจรจาจนเรื่องจบที่ย้ายทีม", effects: {money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทนายช่วยได้แค่ไม่ให้เป็นคดี ตำแหน่งยังหลุด", effects: {money: {unit: income_x, amount: -0.5}, income_mult: 0.9}, merit: [{cat: neutral}]}
       - id: deny
         text: "บอกว่าไม่รู้เรื่อง"
@@ -266,7 +268,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     title: "กรรมการคนนั้น"
-    text: "กรรมการที่ฝากชื่อให้คุณเกษียณไปแล้ว เพื่อนร่วมงานคนนั้นลาออกไปเงียบ ๆ ไม่มีใครในบริษัทถามว่าคุณได้ตำแหน่งมายังไง เรื่องเงียบไปแล้ว คุณรู้ดีว่าที่รอดมาไม่ใช่เพราะเก่ง แค่จังหวะดี"
+    text: "กรรมการที่ฝากชื่อให้คุณเกษียณไปแล้ว เพื่อนร่วมงานคนนั้นลาออกไปเงียบ ๆ ไม่มีใครใน{ที่ทำงาน}ถามว่าคุณได้ตำแหน่งมายังไง เรื่องเงียบไปแล้ว คุณรู้ดีว่าที่รอดมาไม่ใช่เพราะเก่ง แค่จังหวะดี"
     choices:
       - id: relief
         text: "โล่งใจ ไม่คิดถึงอีก"

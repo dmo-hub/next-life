@@ -192,6 +192,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: localvote_committee_hand_01
+    office_ok: "ประชุมหมู่บ้านเลือกกรรมการ"
     type: A
     category: society
     stage: ทำงาน
@@ -303,6 +304,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: localvote_age_limit_01
+    office_ok: "ประชุมหมู่บ้านเรื่องอายุผู้ใหญ่บ้าน"
     type: A
     category: society
     stage: กลางคน
@@ -340,6 +342,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: localvote_road_width_01
+    office_ok: "ประชุมหมู่บ้านเรื่องความกว้างถนน"
     type: A
     category: society
     stage: กลางคน

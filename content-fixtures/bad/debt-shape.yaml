@@ -1,6 +1,7 @@
 # debt อ้างชนิดหนี้ที่ไม่มี · ยอดกู้ไม่เป็นบวก · ปิดหนี้ชนิดที่ไม่มี · complain ไม่ใช่ true
 events:
   - id: debt_bad_shape
+    office_ok: "ตัวอย่างทดสอบรูปแบบหนี้ เงินเดือนไม่เกี่ยวกับกติกานี้"
     type: A
     category: work_money
     stage: ทำงาน

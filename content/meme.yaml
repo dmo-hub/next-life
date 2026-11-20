@@ -182,7 +182,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 0.25
-    when: {age: [22, 30]}
+    when: {age: [22, 30], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
     title: "ขอสโลว์ไลฟ์ก่อนเงินเดือนออก"
     text: "รุ่นน้องเพิ่งเรียนจบโพสต์รูปจิบกาแฟริมหน้าต่าง บอกว่าจะใช้ชีวิตสโลว์ไลฟ์ นักเล่าเรื่องดังเตือนว่าอย่าเพิ่งรีบช้า คุณเลื่อนดูรูปนี้ในเวลางานพอดี"
     choices:
@@ -313,7 +313,7 @@ events:
       - id: ancient_email
         text: "ตอบแชตงานด้วยภาษาโบราณ"
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกค้าส่งต่อกันขำทั้งบริษัท ยอดสั่งซื้อมาเงียบ ๆ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "ลูกค้าส่งต่อกันขำทั้ง{ที่ทำงาน} ยอดสั่งซื้อมาเงียบ ๆ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลูกค้าอีกฝั่งคิดว่าคุณไม่สบาย ถามหาคนรับผิดชอบคนใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: skip_trend

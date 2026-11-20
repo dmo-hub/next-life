@@ -672,7 +672,7 @@ try {
   rows.push(['เตือน: การ์ดไม่มีตัวเลือกปั่น (silly)', `${gap.missing.length}/${gap.total} ใบ (ไม่ตก · ใบ 158 เปลี่ยนเป็นตก · ค่าเริ่มคือทุกใบ)`]);
 }
 
-// ---- ใบ 182 คำออฟฟิศในการ์ดวัยทำงาน: คำเตือนนับใบค้าง (ไม่ตก · ใบ 184 สลับเป็นตก) + ป้ายยกเว้น office_ok ต้องมีเหตุผล (ตก) ----
+// ---- ใบ 182 คำออฟฟิศในการ์ดวัยทำงาน: ด่านตก office-filter + ป้ายยกเว้น office_ok ต้องมีเหตุผล (ตก) ----
 {
   const card = (extra = {}) => ({ id: 'of_case', type: 'A', category: 'work', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว', choices: [1, 2, 3, 4].map((i) => ({ text: `ทางเลือก ${i}`, merit: [{ cat: 'neutral' }] })), ...extra });
   const cases = [
@@ -698,9 +698,14 @@ try {
     const ps = lintDocs([{ file: `office-exempt:${name}`, doc: { events: [card({ office_ok: 'ที่ประชุมหมู่บ้าน', ...extra })] } }], ctx).filter((p) => p.rule === 'office-exempt');
     if (!ps.length) fails.push(`office-exempt "${name}": ป้ายยกเว้นที่ไม่จำเป็นต้องตก`);
   }
-  rows.push(['คำออฟฟิศ ตัวควบคุม', `${cases.length + 6} เคส`]);
+  for (const [name, extra, want] of cases) {
+    const ps = lintDocs([{ file: `office-filter:${name}`, doc: { events: [card(extra)] } }], ctx).filter((p) => p.rule === 'office-filter');
+    if (ps.length !== want) fails.push(`office-filter "${name}": ต้องตก ${want} ได้ ${ps.length}`);
+  }
+  rows.push(['คำออฟฟิศ ตัวควบคุม', `${cases.length * 2 + 6} เคส`]);
   const og = officeGaps(dir('content/').map((f) => load('content/', f)));
-  rows.push(['เตือน: การ์ดวัยทำงานคำออฟฟิศไม่กรองอาชีพ', `${og.missing.length}/${og.total} ใบ ยกเว้น ${og.exempt} (ไม่ตก · ใบ 184 เปลี่ยนเป็นตก)`]);
+  if (og.missing.length) fails.push(`office-filter: ของจริงค้าง ${og.missing.length} ใบ (${og.missing.slice(0, 5).map((m) => m.id).join(' ')})`);
+  rows.push(['คำออฟฟิศ การ์ดจริง', `${og.total} ใบมีคำ · ยกเว้น ${og.exempt} · ค้าง ${og.missing.length}`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

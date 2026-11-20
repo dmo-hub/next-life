@@ -206,12 +206,13 @@ events:
 
   # มุมใหม่ (ใบ 217): คนงานบริการ · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
   - id: era_dis_sars_service_01
+    office_ok: "ใบกรองอาชีพ service แล้ว ลูกจ้างร้านที่ถูกเรียกประชุมให้ลาไม่รับเงินเดือน"
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     era: sars
-    when: {age: [19, 59], occupation: [service]}
+    when: {age: [19, 59], occupation: [service], flags: {not: [own_business]}}
     title: "แขกยกเลิกทั้งกรุ๊ป"
     text: "ทัวร์จากต่างประเทศยกเลิกติดกันทั้งเดือน ห้องพักว่างเกินครึ่ง หัวหน้าเรียกประชุมแล้วบอกว่าใครอยากลาไม่รับเงินเดือน ให้ยกมือ"
     choices:
@@ -241,6 +242,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: era_dis_sars_adult_01
+    office_ok: "เงินเดือนเป็นตัวเทียบกำไรขายหน้ากาก ผู้เล่นทุกอาชีพอ่านได้"
     type: A
     category: society
     stage: หนุ่มสาว
@@ -601,7 +603,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     era: covid19
-    when: {age: [19, 59], occupation: [clerk, technician, professional, manager]}
+    when: {age: [19, 59], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ประชุมจากโต๊ะกินข้าว"
     text: "บริษัทสั่งทำงานจากบ้านไม่มีกำหนด โต๊ะกินข้าวกลายเป็นโต๊ะทำงาน ประชุมออนไลน์ติดกันจนค่ำ คนในบ้านต้องเดินผ่านหลังกล้องแบบก้มหัว"
     choices:
@@ -712,6 +714,7 @@ events:
         merit: [{cat: dana, level: 2}]
 
   - id: era_dis_covid_shop_boom_01
+    office_ok: "เงินเดือนเป็นตัวเทียบรายได้เสริมจากขายของ ผู้เล่นทุกอาชีพอ่านได้"
     away_block: [abroad, monk]
     type: A
     category: work_money

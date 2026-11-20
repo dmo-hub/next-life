@@ -170,6 +170,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: crop_coop_shop_01
+    office_ok: "ประชุมตั้งชื่อร้านสหกรณ์ของหมู่บ้าน"
     type: A
     category: society
     stage: ทำงาน
@@ -302,6 +303,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: crop_tower_call_01
+    office_ok: "ผู้ใหญ่บ้านนัดประชุมแบ่งเวรน้ำ ไม่ใช่ประชุมที่ทำงาน"
     type: A
     category: society
     stage: กลางคน
@@ -399,6 +401,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: crop_friend_quits_01
+    office_ok: "ใบลาออกเป็นของเพื่อนที่เคยเป็นผู้บริหาร ไม่ใช่ของผู้เล่น"
     type: A
     category: society
     stage: กลางคน

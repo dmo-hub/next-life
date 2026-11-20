@@ -92,6 +92,7 @@ events:
         merit: [{cat: dana, level: 1}]
 
   - id: pet_breed_buy_01
+    office_ok: "เงินเดือนเป็นตัวเทียบราคาสุนัขพันธุ์แท้ ไม่ผูกกับออฟฟิศ"
     away_block: [abroad, monk]
     type: A
     category: family

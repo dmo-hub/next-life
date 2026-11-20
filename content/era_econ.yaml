@@ -173,7 +173,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     era: tom_yum_kung
-    when: {age: [22, 59], occupation: [clerk, professional, manager]}
+    when: {age: [22, 59], occupation: [clerk, professional, manager], flags: {not: [own_business]}}
     title: "กล่องกระดาษใบเดียว"
     text: "บริษัทการเงินที่คุณทำงานถูกสั่งปิด ทุกคนได้กล่องกระดาษคนละใบเก็บของบนโต๊ะ ยามยืนเฝ้าประตู หน้าตึกมีคนถ่ายรูปพนักงานที่เดินออกมา"
     choices:
@@ -335,6 +335,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: era_econ_gfc_adult_01
+    office_ok: "โบนัสเป็นข่าวที่ทำงานงดจ่ายช่วงวิกฤต ไม่ใช่ที่ทำงานของผู้เล่นโดยตรง"
     type: A
     category: society
     stage: ทำงาน

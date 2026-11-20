@@ -1,6 +1,7 @@
 # กลางคน (46–59) · การ์ดเงิน/ครอบครัว — กองสุ่ม
 events:
   - id: mid_debt_spiral_01
+    office_ok: "เงินเดือนเป็นตัวเทียบรายได้ประจำกับดอกเบี้ย (ธง in_debt)"
     type: A
     category: work_money
     stage: กลางคน
@@ -116,6 +117,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_parent_care_01
+    office_ok: "ประชุมญาติแบ่งเวรดูแลพ่อแม่ ไม่ใช่ประชุมที่ทำงาน"
     away_call: {text: "ตีสองโทรศัพท์จากบ้านเกิดดังขึ้น คนที่บ้านล้มในห้องน้ำ หมอบอกว่าต่อไปต้องมีคนดูแลตลอด ญาติถามว่าคุณจะกลับไหม"}
     type: A
     category: family
@@ -208,6 +210,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_risky_bet_01
+    office_ok: "บริษัทของรุ่นน้องที่ร่วมทุน ไม่ใช่ที่ทำงานของผู้เล่น"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -362,6 +365,7 @@ events:
 
   # เรื่องต่อ (next) — ไม่มี weight · อายุเดียวกับการ์ดต้นทาง
   - id: mid_online_empire_01
+    office_ok: "ผู้เล่นตั้งบริษัทของตัวเอง ไม่ใช่ลูกจ้าง"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -466,6 +470,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_scam_victims_01
+    office_ok: "ประชุมกลุ่มผู้เสียหายจากการหลอกลวง ไม่ใช่ประชุมที่ทำงาน"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -497,6 +502,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ mid_parent_care_01 (ประชุมแบ่งเวรล่ม งานตกที่เราคนเดียว) — ออกทาง next เท่านั้น
   - id: mid_care_alone_01
+    office_ok: "ประชุมนัดใหม่ของญาติเรื่องดูแลพ่อแม่ มีทนายนั่งกลาง"
     away_block: [abroad]
     type: A
     category: family

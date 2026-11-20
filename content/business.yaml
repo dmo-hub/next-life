@@ -198,6 +198,7 @@ events:
           - {weight: 1, text: "ราคาข้าวดิ่งตั้งแต่ปีแรก ได้ที่เพิ่มแต่งานหนักเป็นสองเท่า", effects: {health: -1, income_mult: 0.9}, merit: [{cat: neutral}]}
 
   - id: biz_farm_buyer_01
+    office_ok: "ประชุมกับพ่อค้ารับซื้อผลผลิต ไม่ใช่ประชุมที่ทำงาน"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -231,6 +232,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: biz_franchise_01
+    office_ok: "บริษัทแม่ของแฟรนไชส์เป็นคู่สัญญาของผู้ซื้อ ไม่ใช่ที่ทำงาน"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -304,6 +306,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: biz_ponzi_01
+    office_ok: "เงินเดือนเป็นตัวเทียบกับปันผลแชร์ลูกโซ่ ไม่ผูกกับออฟฟิศ"
     away_block: [abroad, monk]
     type: A
     category: work_money
