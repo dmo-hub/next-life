@@ -663,6 +663,8 @@ function makeHeir(af, r) {
     pets: heirPets(st, birthYear, tier),
     // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
     ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
+    // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
+    ...(tier && st.nature && { nature: st.nature }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
