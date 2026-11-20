@@ -843,15 +843,16 @@ export const rules = [
   },
   {
     id: 'spouse',
-    desc: 'when.spouse = {status?: together|apart, bond?: [lo,hi] 0–100, together?: [lo,hi] ปีที่อยู่ด้วยกัน, apart?: [lo,hi] ปีที่แยกทางมาแล้ว} — คู่ปัจจุบันที่ยังไม่หย่า · bond ต่ำสุดในเกม = 38 (BOND_FLOOR) เกณฑ์ต่ำกว่านั้นการ์ดไม่เคยออก',
+    desc: 'when.spouse = {status?: together|apart, bond?: [lo,hi] 0–100, together?: [lo,hi] ปีที่อยู่ด้วยกัน, apart?: [lo,hi] ปีที่แยกทางมาแล้ว, wed?: [lo,hi] ปี พ.ศ. ที่แต่ง} — คู่ปัจจุบันที่ยังไม่หย่า · bond ต่ำสุดในเกม = 38 (BOND_FLOOR) เกณฑ์ต่ำกว่านั้นการ์ดไม่เคยออก',
     event(e, ctx, r) {
       const w = isObj(e.when) ? e.when.spouse : undefined;
       if (w === undefined) return;
-      if (!isObj(w) || Object.keys(w).some((k) => !['status', 'bond', 'together', 'apart'].includes(k))) return r('.when.spouse', 'spouse ต้องเป็น {status?, bond?, together?, apart?}');
+      if (!isObj(w) || Object.keys(w).some((k) => !['status', 'bond', 'together', 'apart', 'wed'].includes(k))) return r('.when.spouse', 'spouse ต้องเป็น {status?, bond?, together?, apart?, wed?}');
       if (w.status !== undefined && !['together', 'apart'].includes(w.status)) r('.when.spouse.status', 'status ต้องเป็น together หรือ apart');
       if (w.bond !== undefined && !isRange(w.bond, 0, 100)) r('.when.spouse.bond', 'bond ต้องเป็น [lo, hi] ใน 0–100');
       if (w.bond !== undefined && isRange(w.bond, 0, 100) && w.bond[1] < 38) r('.when.spouse.bond', 'bond สูงสุดต่ำกว่า BOND_FLOOR 38 การ์ดไม่เคยออก');
       for (const k of ['together', 'apart']) if (w[k] !== undefined && !isRange(w[k], 0, 99)) r(`.when.spouse.${k}`, `${k} ต้องเป็น [lo, hi] ปี 0–99`);
+      if (w.wed !== undefined && !isRange(w.wed, 2400, 2700)) r('.when.spouse.wed', 'wed ต้องเป็น [lo, hi] ปี พ.ศ. 2400–2700');
       if (w.apart !== undefined && w.status === 'together') r('.when.spouse.apart', 'apart ใช้กับ status: apart เท่านั้น');
       if (w.together !== undefined && w.status === 'apart') r('.when.spouse.together', 'together ใช้กับ status: together เท่านั้น');
     },

@@ -206,7 +206,7 @@ function conditions(e, L) {
   }
   if (w.spouse) {
     const s = w.spouse;
-    out.push(`มีคู่${s.status === 'apart' ? 'ที่แยกทางกันอยู่' : s.status === 'together' ? 'ที่อยู่ด้วยกัน' : ''}${s.bond ? ` ผูกพัน ${range(s.bond, '')}` : ''}${s.together ? ` อยู่ด้วยกัน ${range(s.together, ' ปี')}` : ''}${s.apart ? ` แยกทางมา ${range(s.apart, ' ปี')}` : ''}`);
+    out.push(`มีคู่${s.status === 'apart' ? 'ที่แยกทางกันอยู่' : s.status === 'together' ? 'ที่อยู่ด้วยกัน' : ''}${s.bond ? ` ผูกพัน ${range(s.bond, '')}` : ''}${s.together ? ` อยู่ด้วยกัน ${range(s.together, ' ปี')}` : ''}${s.apart ? ` แยกทางมา ${range(s.apart, ' ปี')}` : ''}${s.wed ? ` แต่งปี ${range(s.wed, '')}` : ''}`);
   }
   if (w.filial) {
     const n = w.filial.n ?? [1, 99];

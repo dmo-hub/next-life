@@ -155,13 +155,14 @@ function splitMarital(st, m) {
   const grew = st.money - Math.max(0, at.money);
   if (st.money > 0 && grew > 0) st.money -= grew * DIVORCE_SPLIT;
 }
-// เงื่อนไขการ์ดตามคู่ปัจจุบัน (when.spouse): status = together|apart · bond [lo,hi] · together [lo,hi] ปีที่อยู่ด้วยกัน · apart [lo,hi] ปีที่แยกทางมาแล้ว
+// เงื่อนไขการ์ดตามคู่ปัจจุบัน (when.spouse): status = together|apart · bond [lo,hi] · together [lo,hi] ปีที่อยู่ด้วยกัน · apart [lo,hi] ปีที่แยกทางมาแล้ว · wed [lo,hi] ปี พ.ศ. ที่แต่งกับคู่นี้ (birthYear + since)
 // คู่ที่หย่าแล้วไม่นับ · เซฟเก่าไม่มี since/leftAge = เงื่อนไขช่วงปีไม่ผ่าน
 export function spouseOk(st, w) {
   const m = (st.kin ?? []).findLast((x) => x.role === 'spouse' && x.alive && spouseStatus(x) !== 'divorced');
   if (!m) return false;
   if (w.status && spouseStatus(m) !== w.status) return false;
   if (w.bond && !kinInRange(m.bond ?? BOND_START.spouse, w.bond)) return false;
+  if (w.wed && (m.since === undefined || !kinInRange(st.birthYear + m.since, w.wed))) return false;
   if (w.together && (m.left || m.since === undefined || !kinInRange(st.age - m.since, w.together))) return false;
   if (w.apart && (spouseStatus(m) !== 'apart' || m.leftAge === undefined || !kinInRange(st.age - m.leftAge, w.apart))) return false;
   return true;
