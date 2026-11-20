@@ -413,6 +413,7 @@ export function newLife(seed, content, heir = null) {
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
   lifeTreeBorn(st, heir?.treeParent);
+  naturePoint(st, heir?.nature, st.content.nature?.heir_nature);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
   driftPlan(st);
@@ -2133,7 +2134,7 @@ function lifeTreeYear(st) {
 }
 
 // นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
-// ทายาทไม่ได้นิสัยพ่อแม่ต่อโดยตรงแล้ว (ft15 ตัดโฟกัส · heir_nature ไม่มีผู้ใช้) — ค้างเคาะว่าจะสร้างทางสืบทอดทางต้นไม้หรือไม่
+// ทายาทรับแต้มนิสัยพ่อแม่ครั้งเดียวตอนเกิด (ft15 · heir.nature × heir_nature · แต้มเงียบ) ที่เหลือเหมือนคนทั่วไป
 // ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
 const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
 // โหนดเด็กที่ผูกนิสัยปลดถึงอายุ nature_age: ป้อนแต้ม node_pts เข้ากองเดียวกับทุ่มเทเด็ก + จดนิสัยที่มีโหนดปลดไว้ (ใบ ft07 ข้อ 16 19 51) · นิสัยเด่นยังเป็นตัวแต้มสูงสุดตัวเดียว ตัวอื่นเปิดแค่ตัวเลือก
