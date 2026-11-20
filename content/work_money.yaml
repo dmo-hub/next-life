@@ -7,10 +7,10 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private]}
+    when: {occupation: [clerk, technician, professional, manager, factory], ladder: [none, private, trade]}
     multipliers: {flags: {in_debt: 1.5}, occupation: {factory: 1.5, clerk: 1.3}}
     title: "กล่องกระดาษใบนั้น"
-    text: "เช้าวันจันทร์ HR เรียกเข้าห้องประชุม บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
+    text: "เช้าวันจันทร์ ฝ่ายบุคคลเรียกเข้าไปคุย บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
     choices:
       - id: open_shop
         text: "เอาเงินชดเชยเปิดร้านเอง"
@@ -33,8 +33,8 @@ events:
         effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "คลิปไวรัล บริษัทคู่แข่งทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "บริษัทเก่าส่งทนายมาฟ้องหมิ่นประมาท ต้องจ่ายค่าไกล่เกลี่ย", effects: {relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "คลิปไวรัล นายจ้างเจ้าอื่นทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "นายจ้างเก่าส่งทนายมาฟ้องหมิ่นประมาท ต้องจ่ายค่าไกล่เกลี่ย", effects: {relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: use_savings
         text: "ใช้เงินสำรองระหว่างหางานใหม่"
         requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
