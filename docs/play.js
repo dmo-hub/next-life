@@ -4146,7 +4146,6 @@ function pastFromLineage(lineage, realmId) {
 
 
 
-
 const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
 // ชื่อเดิม 3 ระดับ (ยากจน · ชนชั้นกลาง · ร่ำรวย) คงไว้ที่ระดับ 3 · 6 · 9 เนื้อหาที่อ้างชื่อเดิมจึงยังใช้ได้
@@ -4538,8 +4537,8 @@ function newLife(seed, content, heir = null) {
   st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
-  lifeFocusBorn(st, heir?.focus);
   lifeTreeBorn(st, heir?.treeParent);
+  naturePoint(st, heir?.nature, st.content.nature?.heir_nature);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
   driftPlan(st);
@@ -4765,8 +4764,6 @@ function faceDeath(st, cause, opts = {}) {
   if (st.pact?.survive === true) {
     // สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำทันที
     st.pact.survive = 'used';
-    // เสี่ยงของโฟกัสที่ทอยตายไว้ต้องหายด้วย ไม่งั้นรอดปีนี้แล้วปีถัดไปตายด้วยเหตุเดิมทันที
-    st.focusDoom = undefined;
     st.health = Math.max(st.health, st.healthNatural, 1);
     return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText, tag: 'survive' } };
   }
@@ -5302,7 +5299,6 @@ const HEIR_UNI_KNOW = 55;
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
-  lifeFocusYear(st);
   lifeTreeYear(st);
   natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
@@ -5945,7 +5941,7 @@ function drawCard(st) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
-      const cause = st.focusDoom ?? (st.health <= 0 ? healthCause(st) : deathRoll(st));
+      const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
       const d = cause && faceDeath(st, cause);
       if (d?.fate === 'survive') {
         st.queue.push(d.card);
@@ -6139,73 +6135,27 @@ function drawPool(st, year) {
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
 }
 
-// โฟกัสชีวิตโลกหลัก (B163): เนื้ออยู่ content.focus · กติกากลางอยู่ focus.mjs · เนื้อหาชุดทดสอบที่ไม่มี focus = ตามน้ำเสมอ
-// need = สถานะที่ when ของการ์ดเขียนไม่ได้ (หรือ · ไม่มี · ช่วงไว้ทุกข์) — ทะเบียนอ้างชื่อ lint ตรวจชื่อกับรายการนี้
-const alive = (role, age) => (st) => familyOk(st, { role, alive: true, ...(age && { age }) });
-const hasSpouse = alive('spouse');
-const hasChild = alive('child');
-// ไว้ทุกข์ = คู่จากไปปีนี้หรือปีก่อน
-const mourning = (st) => (st.kinLoss ?? []).some((l) => l.role === 'spouse' && st.birthYear + st.age - l.year <= FOCUS_MOURN);
-const FOCUS_MOURN = 1;
-const FOCUS_NEEDS = {
-  working: (st) => isWorking(st),
-  single: (st) => !hasSpouse(st) && !mourning(st),
-  partnered_or_kids: (st) => hasSpouse(st) || hasChild(st),
-  has_kids: hasChild,
-  kids_or_grandkids: (st) => hasChild(st) || alive('grandchild')(st),
-  old_parent: alive('parent', [60, 200]),
-  savings_or_credit: (st) => st.money > 0 || isWorking(st),
-};
-const lifeFocusOk = (st) => (w, def) => whenOk(st, w) && (def?.need ?? []).every((k) => FOCUS_NEEDS[k](st));
-const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
-// ตามน้ำอยู่หัวรายการเสมอ แล้วตามลำดับในเนื้อหา
-const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
-function setLifeFocus(st, id) {
-  if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
-  // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
-  if ((st.focus ?? FOCUS_FLOW) !== id) delete st.focusBorn;
-  focusSet(st, id, st.age);
-  delete st.focusHeir;
-}
-// ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
-// ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
-const goalTail = (defs, id) => Object.values(defs).find((d) => d.after === id)?.name;
-// ชื่อปณิธานที่สำเร็จของชีวิตนี้ "ต้นสาย → ปลายสาย" — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
-const goalNames = (st) => (st.goalsDone ?? []).map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
-function lifeFocusYear(st) {
-  const c = st.content.focus;
-  // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
-  if (!st.focus && st.focusHeir && focusOpen(c.focuses[st.focusHeir], stageOf(st.age), lifeFocusOk(st), st)) {
-    focusSet(st, st.focusHeir, st.age - 1);
-    delete st.focusHeir;
-  }
-  if (!st.focus) return;
-  const full = st.focusAt < st.age;
-  const metBefore = st.focusMet?.[st.focus] !== undefined;
-  const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
-  if (!id) return;
-  const def = c.focuses[id];
-  // ปณิธานสำเร็จ = ต้นสายที่มีปลายสายต่อ ชำนาญครบ chain_years (ตัวเดียวกับป้าย "ชำนาญแล้ว" บนจอ): ได้ความสุขครั้งเดียวต่อสาย (focusMet ตั้งครั้งแรกเท่านั้น) · จดไว้ให้การ์ดตายเล่า
-  if (!metBefore && st.focusMet?.[id] !== undefined && c.goal_joy && goalTail(c.focuses, id)) {
+// ชื่อปณิธานที่สำเร็จของชีวิตนี้ — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
+// รูปใหม่ (ft15): id = แขนงของต้นไม้ · ชื่อ = โหนดใหญ่/keystone ที่ปลดเป็นตัวแรกของแขนง (st.goalNode) · รูปเก่า (เซฟก่อน ft15): id ต้นสายโฟกัส "ต้นสาย → ปลายสาย"
+const goalNames = (st) => (st.goalsDone ?? []).map((id) => {
+  const node = st.goalNode?.[id];
+  if (node) return st.content.tree.nodes[node].name;
+  return null;
+}).filter(Boolean);
+// เป้าชีวิต (ft15 · เจ้าของเคาะข้อ 1 = B): ปลดโหนดใหญ่ (size b) หรือ keystone (size k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง (สูงสุดเท่าจำนวนแขนง · จำกัดต่อแขนงกันความสุขล้นจากโหนดใหญ่ 18 ตัว) · จดไว้ให้การ์ดตายเล่า
+// ไม่ดึงเลขสุ่ม · เรียกหลังปลดโหนดทุกทาง (ปีเต็ม · การ์ดด่านของโหนดใหญ่)
+const GOAL_SIZES = ['b', 'k'];
+function lifeTreeGoals(st) {
+  const c = st.content.tree;
+  if (!st.tree || !c?.goal_joy) return;
+  for (const id of Object.keys(st.tree.done).sort((a, b) => st.tree.done[a] - st.tree.done[b])) {
+    const def = c.nodes[id];
+    if (!GOAL_SIZES.includes(def.size) || def.branch === 'mid' || st.goalsDone?.includes(def.branch)) continue;
     st.happiness = clamp(st.happiness + levelValue(c.goal_joy));
-    (st.goalsDone ??= []).push(id);
+    (st.goalsDone ??= []).push(def.branch);
+    (st.goalNode ??= {})[def.branch] = id;
   }
-  if (full) naturePoint(st, def.nature, st.focusBorn ? st.content.nature.heir_nature : 1);
-  // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
-  // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
-  const { money, ...rest } = def.fx;
-  applyEffects(st, rest, c.year_scale);
-  if (money && isWorking(st)) {
-    const v = moneyValue(st, money) * c.year_scale;
-    st.money += v < 0 ? Math.max(v * c.spend_scale, -FOCUS_SPEND_CAP * Math.max(0, st.money)) : v;
-  }
-  if (def.career && isWorking(st)) {
-    if (st.ladder) st.ladder.prog = Math.max(0, st.ladder.prog + def.career.rank);
-    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * (1 + def.career.raise)));
-  }
-  (def.risk ?? []).forEach((r, i) => lifeFocusRisk(st, id, r, i));
 }
-
 // ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
 // ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
 const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
@@ -6234,6 +6184,20 @@ function lifeTreeBorn(st, parentBranch) {
   st.tree = { cur: null, done: { [node]: 0 }, yrs: {}, cards: {}, hist: [] };
 }
 // เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
+// เซฟก่อน ft15: ประตูเคยเปิดจากชื่อโฟกัสเดิม (focusYears ครบ chain_years · st.gates เก็บชื่อโฟกัส · ธง gate:<ชื่อโฟกัส>) → แปลงเป็นรหัสโหนดประตูตอนโหลดแล้วตัด focusYears · ไม่ปลดโหนด ไม่ผุดผลติดตัว (decisions ข้อ 99 · เจ้าของเคาะ C′)
+const LEGACY_CHAIN_YEARS = 3;
+const LEGACY_GATE = { business: 'mo5', shortcut_money: 'mo7', politics_base: 'r5', ordain: 'o5', occult: 'm4' };
+function lifeGatesMigrate(st) {
+  const chain = LEGACY_CHAIN_YEARS;
+  const open = new Set(st.gates ?? []);
+  for (const [old, id] of Object.entries(LEGACY_GATE)) {
+    if ((st.focusYears?.[old] ?? 0) >= chain || open.has(old)) open.add(id);
+    open.delete(old);
+    if (st.flags?.[GATE_FLAG + old]) { st.flags[GATE_FLAG + id] = true; delete st.flags[GATE_FLAG + old]; }
+  }
+  if (open.size) st.gates = [...open];
+  delete st.focusYears;
+}
 function lifeTreeMigrate(st) {
   const t = st.content.tree, f = st.content.nature;
   if (!t || st.treeV) return;
@@ -6257,6 +6221,7 @@ function lifeTreeYear(st) {
   const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age, c.pace);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
   if (r?.unlocked) treeNature(st, r.id);
+  lifeTreeGoals(st);
   if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size] * treeRustMul(st, id, st.age, c.rust));
   // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้
   for (const id of light) if (c.nodes[id].cost) applyEffects(st, c.nodes[id].cost, c.light_unit[c.nodes[id].size]);
@@ -6264,38 +6229,8 @@ function lifeTreeYear(st) {
   if (r?.gate) st.due.push({ kind: 'eraEvent', ev: treeGateEvent(c.nodes, r.id), age: st.age });
 }
 
-// เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
-// เสี่ยงตาย (cause): ครั้งแรกเป็นการ์ดเตือน (ผลเจ็บตาม fx) · โดนซ้ำหลังเตือน = ตายต้นปีถัดไปด้วยสาเหตุนั้น — ไม่มีใครตายจากโฟกัสโดยไม่ได้เห็นสัญญาณก่อน
-const FOCUS_RISK_SALT = 0x6f0c5a17;
-const FOCUS_SPEND_CAP = 0.1;
-function lifeFocusRisk(st, id, r, i) {
-  if (makeRng(mixSeed(st.seed ^ FOCUS_RISK_SALT, st.age * 8 + i)).next() >= r.chance) return;
-  const key = `${id}:${i}`;
-  if (r.cause && st.focusWarn?.[key] !== undefined) {
-    st.focusDoom = r.cause;
-    return;
-  }
-  if (r.cause) (st.focusWarn ??= {})[key] = st.age;
-  applyEffects(st, r.fx ?? {});
-  for (const f of r.flags ?? []) raiseFlag(st, f);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key, tag: r.cause ? 'sick' : fxTag(r.fx) });
-}
-
-// ทายาททางสายเลือด (โฟกัสใบ 03): เริ่มชาติด้วยตัวเด็กของหมวดโฟกัสหลักของพ่อแม่ (kid ในทะเบียน) · ไม่มีหมวด/ไม่มีตัวเด็ก = ตามน้ำ
-function lifeFocusKid(st) {
-  const defs = lifeFocusDefs(st);
-  const main = focusMain(st, defs);
-  return (main && defs[main].kid) || null;
-}
-function lifeFocusBorn(st, kid) {
-  if (!kid || !lifeFocusDefs(st)[kid]) return;
-  if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
-  else st.focusHeir = kid;
-  st.focusBorn = true;
-}
-
 // นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
-// ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
+// ทายาทรับแต้มนิสัยพ่อแม่ครั้งเดียวตอนเกิด (ft15 · heir.nature × heir_nature · แต้มเงียบ) ที่เหลือเหมือนคนทั่วไป
 // ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
 const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
 // โหนดเด็กที่ผูกนิสัยปลดถึงอายุ nature_age: ป้อนแต้ม node_pts เข้ากองเดียวกับทุ่มเทเด็ก + จดนิสัยที่มีโหนดปลดไว้ (ใบ ft07 ข้อ 16 19 51) · นิสัยเด่นยังเป็นตัวแต้มสูงสุดตัวเดียว ตัวอื่นเปิดแค่ตัวเลือก
@@ -6324,7 +6259,6 @@ function natureLock(st) {
   let id = null;
   for (const [k, v] of Object.entries(pts)) if (v > 0 && (!id || v >= pts[id])) id = k;
   delete st.naturePts;
-  delete st.focusBorn;
   if (id) st.nature = id;
   // นิสัยที่มีโหนดปลดแต่ไม่ใช่ตัวเด่น = ปลดตัวเลือกวัยโต ไม่ได้ผลคูณ
   const also = (st.natureNodes ?? []).filter((k) => k !== id);
@@ -6343,14 +6277,13 @@ function natureBoost(st, ev) {
 }
 // ประตูเข้าสาย (ใบ 04 → ใบ 10): id = โหนดประตูใน tree.yaml gates · เปิดเมื่อปลดโหนดนั้น · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โหนด>) เปิดให้ได้โดยไม่ต้องปลด เช่น นักธุรกิจถูกชวนลงการเมือง
-// · โฟกัสเดิมที่ผูกกับโหนด (gates.<โหนด>) ยังเปิดประตูเดียวกันได้ทั้งสะสมครบ chain_years · ธง · ทายาท (เซฟเก่าเก็บชื่อโฟกัส) จนถอดตอนใบ 15
+// · เซฟเก่าที่เก็บชื่อโฟกัส แปลงเป็นรหัสโหนดใน lifeGatesMigrate ตอนโหลด (ใบ 15)
 const GATE_FLAG = 'gate:';
 const lifeGateOpen = (st, id) => {
   if (st.tree?.done?.[id] !== undefined) return true;
-  const names = [id, st.content.tree?.gates?.[id]].filter(Boolean);
-  return names.some((n) => (st.focusYears?.[n] ?? 0) >= (st.content.focus?.chain_years ?? Infinity) || !!st.gates?.includes(n) || !!st.flags[GATE_FLAG + n]);
+  return !!st.gates?.includes(id) || !!st.flags[GATE_FLAG + id];
 };
-const lifeGatesOpen = (st) => Object.keys(st.content.tree?.gates ?? {}).filter((id) => lifeGateOpen(st, id));
+const lifeGatesOpen = (st) => (st.content.tree?.gates ?? []).filter((id) => lifeGateOpen(st, id));
 // การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง (โหนดเสียงของชุมชน)
 const OFFICE_GATE = 'r5';
 const gateShut = (st, c) => !!c.gate && ![c.gate].flat().some((id) => lifeGateOpen(st, id));
@@ -6360,8 +6293,7 @@ const sexShut = (st, c) => !!c.only_sex && !c.only_sex.includes(st.sex);
 const SEX_LOCK = 'ไม่ใช่ทางของคุณ';
 function lifeFocusMul(st, e) {
   const t = st.tree && st.content.tree ? treeCardMul(st, st.content.tree.nodes, st.content.tree.card_mul, e.category) : 1;
-  if (!st.focus) return t;
-  return t * focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
+  return t;
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
@@ -6650,7 +6582,10 @@ function choose(st, idx, loan) {
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category, st.age);
-  if (ev.treeGate) treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
+  if (ev.treeGate) {
+    treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
+    lifeTreeGoals(st);
+  }
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
@@ -7001,8 +6936,6 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
-    // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
-    if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
     if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
     // บอทที่ประกาศนโยบายใช้จ่ายเลือกระดับบนการ์ดทบทวนเงิน · บอทที่ไม่ประกาศไม่แตะ ⇒ ชีวิตเท่าเดิม
     if (pickChoice.spend && card.spend) chooseSpend(st, pickChoice.spend(card, st));
@@ -9952,13 +9885,11 @@ function thaiEarn(st) {
   const map = st.content.skillMap;
   if (!map || Object.values(map).every((m) => !Object.keys(m).length)) return [];
   const t = titlesOf(st);
-  const chain = st.content.focus?.chain_years ?? Infinity;
   const src = {
     job: st.occupation ? [st.occupation] : [],
     title: t.titles.map((x) => x.id),
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
-    focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
     lifeGoal: st.goalsDone ?? [],
   };
   const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
@@ -10442,10 +10373,10 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
-    // เกิดในตระกูล = รับหมวดโฟกัสหลักของรุ่นก่อนเป็นตัวเด็ก · เกิดที่อื่น/ไม่เคยโฟกัส = ตามน้ำ (ไม่มีฟิลด์ heir จึงเท่าเดิม)
-    ...(tier && lifeFocusKid(st) && { focus: lifeFocusKid(st) }),
     // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
     ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
+    // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
+    ...(tier && st.nature && { nature: st.nature }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
@@ -11058,6 +10989,9 @@ function repairLife(st, card) {
     if (past) st.past = past;
   }
   lifeTreeMigrate(st);
+  lifeGatesMigrate(st);
+  // เซฟก่อน ft15: กลไกโฟกัสรายปีถูกตัดแล้ว — ล้างสถานะค้าง (focusYears แปลงเป็น st.gates ใน lifeGatesMigrate แล้วตัด)
+  for (const k of ['focus', 'focusAt', 'focusMet', 'focusDoom', 'focusBorn', 'focusHeir', 'focusWarn']) delete st[k];
   return stale;
 }
 
@@ -12504,42 +12438,13 @@ function meterLi(label, v, low, shown = String(v), icon = null) {
 
 // แท็บโฟกัสชาติไทย (ui-redo 50 · ข้อ 65 68 69 · JSON 47 แบบ ก รายการเดียว): ตอนนี้ · เปลี่ยนเป็น · ปณิธาน
 // ไม่ใช่ตัวเลือกของการ์ด (ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
-const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
-const focusFx = (id) => (id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : focusWords(lifeFocusDefs(st)[id], STAT_LABELS));
 // ปีสะสมเป็นคำ ไม่บอกเลขเกณฑ์ (ข้อ 68) · ชำนาญแล้ว = ครบปีที่ต่อสายได้ ตัวเดียวกับที่แกนใช้เปิดปลายสาย
 function focusWord(id, h = st) {
   const n = h.focusYears?.[id] ?? 0;
   if (!n) return null;
-  return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
+  return n >= ISEKAI_CAREER_T.years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
 }
 const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
-// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
-// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
-function focusGoals(offers) {
-  const defs = lifeFocusDefs(st);
-  const stage = stageOf(st.age);
-  const now = stageIdx(stage);
-  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
-  const rows = [];
-  for (const [id, d] of Object.entries(defs)) {
-    if (!d.after) continue;
-    const from = d.after;
-    const met = st.focusMet?.[from];
-    const tried = (st.focusYears?.[from] ?? 0) > 0;
-    let cls = '', text;
-    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
-    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
-    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
-    else if (!later(d)) continue;
-    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
-    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
-    else continue;
-    const li = el('li', cls || null);
-    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
-    rows.push(li);
-  }
-  return rows;
-}
 // จอต้นไม้โฟกัส (ใบ 12 · ข้อ 88 แบบ 4 กลุ่มดาว) แทนรายการปณิธาน · ผังกับตัววาดอยู่ treeview.mjs
 // สถานะหน้าจอ (แขนงที่ดู ซูม โหนดที่เลือก) อยู่ในหน่วยความจำ ไม่ลงเซฟ · ทุ่ม/เปลี่ยนโหนดเซฟทันทีเหมือนโฟกัสเดิม
 const tvUi = { view: 'branch', br: null, z: 100, sel: null };
@@ -12720,49 +12625,12 @@ function focusRows(wrap, now, rows, pick, draw) {
 function focusPanel(card) {
   const wrap = el('div', 'ft');
   if (st.dead || card.kind === 'death') {
-    wrap.append(...focusSummary());
+    wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), el('p', 'ft-note', 'ชาตินี้จบแล้ว'));
     return wrap;
   }
-  const cur = st.focus ?? FOCUS_FLOW;
-  const defs = lifeFocusDefs(st);
-  const offers = lifeFocusOffers(st);
-  const tagsOf = (id) => [focusWord(id)].filter(Boolean);
-  const rows = offers.map((id) => ({ id, name: focusName(id), fx: focusFx(id), on: id === cur, tags: [...tagsOf(id), ...(defs[id]?.after ? [el('span', 'ft-new', 'ปลายสาย')] : [])] }));
-  focusRows(wrap, { name: focusName(cur), fx: focusFx(cur), tags: tagsOf(cur) }, rows, (id) => {
-    setLifeFocus(st, id);
-    saveWrite(card);
-  }, () => focusPanel(card));
   wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), treeScreen(card));
-  // ปณิธานของระบบทุ่มเทเดิม (life-goal 01) คงไว้ใต้ต้นไม้จนใบ 15 ย้ายเป้าไปผูกต้นไม้
-  const goals = focusGoals(offers);
-  const chain = el('ul', 'ft-chain');
-  chain.append(...goals);
-  wrap.append(el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
   return wrap;
 }
-// ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
-function focusSummary() {
-  const defs = lifeFocusDefs(st);
-  const main = focusMain(st, defs);
-  const head = el('h3', null, af ? 'ชาติที่แล้วทุ่มเทมากสุด' : 'ชาตินี้ทุ่มเทมากสุด');
-  if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
-  const box = el('div', 'ft-now');
-  box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
-  const kid = defs[main].kid;
-  if (kid && defs[kid]) box.append(el('span', 'ft-fx', `ทายาทในตระกูลเริ่มชาติด้วย${defs[kid].name}`));
-  const ys = st.focusYears ?? {};
-  const rest = Object.keys(defs).filter((id) => id !== main && ys[id] > 0).sort((a, b) => ys[b] - ys[a]);
-  if (!rest.length) return [head, box];
-  const ul = el('ul', 'ft-ro ft-list');
-  for (const id of rest) {
-    const li = el('li', null, `${focusName(id)} `);
-    const w = focusWord(id);
-    if (w) li.append(w);
-    ul.append(li);
-  }
-  return [head, box, el('h3', null, 'เรื่องอื่นที่เคยทุ่ม'), ul];
-}
-
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
 // โฟกัสแยกแท็บถัดจากตัวฉัน (ui-redo 50 51) · ทุกปุ่มทุกโลกมีไอคอนคู่ป้าย (ข้อ 260)
@@ -13781,7 +13649,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'ปณิธาน' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', lifeGoal: 'ปณิธาน' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
