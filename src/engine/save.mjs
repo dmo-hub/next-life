@@ -5,7 +5,7 @@ import { makeRng } from './rng.mjs';
 import { pickRealName } from './birth.mjs';
 import { REALMS } from './afterlife.mjs';
 import { pastFromLineage } from './past.mjs';
-import { lifeTreeMigrate } from './life.mjs';
+import { lifeTreeMigrate, lifeGatesMigrate } from './life.mjs';
 
 export const SNAP_V = 1;
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
@@ -90,5 +90,6 @@ export function repairLife(st, card) {
     if (past) st.past = past;
   }
   lifeTreeMigrate(st);
+  lifeGatesMigrate(st);
   return stale;
 }

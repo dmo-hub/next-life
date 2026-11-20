@@ -8,7 +8,7 @@
 // ตัวควบคุม (รันทุกครั้ง): ตัด id 1 ตัว → ก ต้องเห็น · ตัดการ์ดที่เซฟค้าง → ค ต้องเห็น stale · เซฟรูปแบบอื่น → restore ต้องพัง
 // --save (ผู้รวมงานรันหลัง bump): เขียนฐานใหม่ทั้งสองไฟล์จากเวอร์ชันนี้ · ไม่มีฐาน = ตก ไม่ใช่ผ่านเงียบ
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { newLife, nextCard, choose, makeRng, mixSeed, TITLES, FAMILY_TITLES, startAfterlife, nextAfterCard, chooseAfter, nextLife } from '../src/engine/index.mjs';
+import { newLife, nextCard, choose, makeRng, mixSeed, TITLES, FAMILY_TITLES, startAfterlife, nextAfterCard, chooseAfter, nextLife, lifeGateOpen } from '../src/engine/index.mjs';
 import { snapshot, restore, repairLife, SNAP_V } from '../src/engine/save.mjs';
 import { ERA_PICS } from '../src/ui/art.mjs';
 import { loadContent } from '../src/node/load.mjs';
@@ -203,6 +203,25 @@ check(`  เซฟฐานไม่เกิน ${SNAPS_MAX_KB} KB`, kb > SNAPS
   const rs = old.snaps.map((s, i) => replay(s, content, mixSeed(SEED, 200 + i)));
   const bad = rs.reduce((n, r) => n + r.restoreFail + r.keptBad + r.playFail + r.stale + (r.loopCards ? 1 : 0), 0);
   check(`ค″ เซฟระหว่างชาติก่อนมีวงของ ${old.version} (${old.snaps.length} เซฟ) เล่นแบบเดิมจนเกิด`, bad + (ok && old.snaps.length ? 0 : 1), rs.find((r) => r.err) ? ` · ${rs.find((r) => r.err).err}` : '');
+}
+
+// เซฟสังเคราะห์ (ft15 C′): ทุ่มประตู business ครบ chain_years แต่ไม่มี st.gates → โหลดแล้วประตูต้องยังเปิดและจดไว้ใน st.gates ไม่ปลดโหนด · ตัวควบคุม: ทุ่ม chain_years-1 ปี = ประตูไม่เปิด
+{
+  const chain = content.focus.chain_years;
+  const load = (years) => {
+    const st = newLife(mixSeed(0x6b656570, 77), content);
+    let card = nextCard(st);
+    for (let k = 0; k < 20 && card.kind !== 'death'; k++) { if (card.choices?.length) choose(st, firstOpen(card)); card = nextCard(st); }
+    st.focusYears = { business: years };
+    delete st.gates;
+    const root = restore(snapshot({ st, af: null, card, ui: {} }, content), content);
+    const done = JSON.stringify(root.st.tree?.done ?? {});
+    repairLife(root.st, root.card);
+    return { st: root.st, treeSame: done === JSON.stringify(root.st.tree?.done ?? {}) };
+  };
+  const on = load(chain), off = load(chain - 1);
+  const bad = (lifeGateOpen(on.st, 'business') && on.st.gates?.includes('business') && on.treeSame ? 0 : 1) + (lifeGateOpen(off.st, 'business') || off.st.gates?.includes('business') ? 1 : 0);
+  check(`ง. เซฟที่ focusYears.business=${chain} ไม่มี st.gates โหลดแล้วประตูยังเปิด (จด st.gates · ไม่ปลดโหนด) · ตัวควบคุม ${chain - 1} ปี = ปิด`, bad);
 }
 
 // ตัวควบคุม: ตัววัดต้องเห็นของพังที่ทำขึ้นเอง ไม่งั้นด่านนี้ผ่านเงียบได้
