@@ -1,7 +1,7 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
 import { treePace, treePaceCtl, treeInvest, treeYearEnd } from '../src/engine/index.mjs';
-import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
+import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
 import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE, withSpend, SPEND_WAY } from '../harness/bots.mjs';
@@ -211,35 +211,38 @@ const f2 = (v) => v.toFixed(2);
   check('lg01 ข้อ 4 ตั้งโฟกัสไม่เพิ่มการ์ด/บันทึกใด', st.focus === 'play_friends' && st.log.length === logLen && !st.pending, `${st.log.length} · ${logLen}`);
 }
 
-// รางวัลปณิธานสำเร็จ (life-goal ใบ 02): ต้นสายชำนาญครบ chain_years ได้ความสุขระดับ goal_joy ครั้งเดียวต่อสาย · การ์ดตายเล่ารายการ
+// เป้าชีวิต (life-goal ใบ 02 · ย้ายมาผูกต้นไม้ ft15): ปลดโหนดใหญ่ (b) หรือ keystone (k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง · การ์ดตายเล่ารายการ · สกิลจาก skillMap.lifeGoal (id = แขนง)
 {
   const base = loadContent();
-  const chain = base.focus.chain_years;
-  const joy = levelValue(base.focus.goal_joy);
-  const mk = (id) => { const s = newLife(11, base); s.age = 13; s.school = 'lower'; s.happiness = 40; setLifeFocus(s, id); s.focusAt = 12; return s; };
-  const run = (s, from, n) => { for (let a = from; a < from + n; a++) { s.age = a; lifeFocusYear(s); } return s; };
-  check('lg02 ค่า goal_joy = ระดับ 2 (+12)', base.focus.goal_joy === 2 && joy === 12, `${base.focus.goal_joy} · ${joy}`);
-  const s = mk('study_hard');
-  run(s, 13, chain - 1);
-  check('lg02 ต้นสายยังไม่ครบ = ไม่มีรางวัล ไม่มีรายการ', !s.goalsDone && s.focusMet?.study_hard === undefined, `${s.goalsDone}`);
-  run(s, 13 + chain - 1, 1);
-  check('lg02 ครบ chain_years = ความสุขขึ้น 12 จากผลรางวัล (ผลต่อปีของโฟกัสแยกออก)', s.goalsDone?.join() === 'study_hard', `${s.goalsDone}`);
-  // ตัวควบคุม: เนื้อเดียวกันแต่ goal_joy = 0 ⇒ ส่วนต่างความสุขปีที่ครบ = ผลรางวัลล้วน ๆ (ผลรายปีของโฟกัสหักกันออก)
-  const c0 = mk('study_hard'); c0.content = { ...base, focus: { ...base.focus, goal_joy: 0 } };
-  run(c0, 13, chain);
-  check('lg02 ปีที่ครบได้ความสุข +12 พอดีเทียบตัวควบคุม goal_joy 0', Math.abs(s.happiness - c0.happiness - joy) < 1e-9 && !c0.goalsDone, `${s.happiness - c0.happiness} · ${c0.goalsDone}`);
-  const hDone = s.happiness, nDone = s.goalsDone.length;
-  run(s, 13 + chain, 3);
-  check('lg02 ทุ่มต่อหลังครบ = ไม่ได้รางวัลซ้ำ ไม่มีรายการซ้ำ', s.goalsDone.length === nDone && s.happiness - hDone < joy, `${s.goalsDone} · ${s.happiness - hDone}`);
-  // ปลายสายครบเองไม่ใช่ปณิธาน (ไม่มีสายต่อจากมัน)
-  const t = mk('study_hard'); t.focus = 'scholarship'; t.focusMet = { study_hard: 'วัยรุ่น' }; t.age = 19; t.focusAt = 18;
-  run(t, 19, chain);
-  check('lg02 ปลายสายสะสมครบเอง = ไม่นับเป็นปณิธาน', !t.goalsDone, `${t.goalsDone}`);
-  const none = newLife(11, base);
-  check('lg02 ไม่สำเร็จเลย = ไม่มีรายการบนตัว', !none.goalsDone);
+  const tr = base.tree;
+  const joy = levelValue(tr.goal_joy);
+  const nodes = Object.entries(tr.nodes);
+  const pick = (branch, sizes) => nodes.filter(([, d]) => d.branch === branch && sizes.includes(d.size)).map(([id]) => id);
+  const mk = (done, content = base) => { const s = newLife(11, content); s.happiness = 40; s.tree = { cur: null, done: Object.fromEntries(done.map((id) => [id, 20])), yrs: {}, cards: {}, hist: [] }; return s; };
+  const [m1, m2] = pick('money', ['b', 'k']);
+  const [r1] = pick('rel', ['b', 'k']);
+  const [m0] = pick('money', ['s']);
+  check('lg02 ค่า goal_joy ใน tree.yaml = ระดับ 2 (+12)', tr.goal_joy === 2 && joy === 12, `${tr.goal_joy} · ${joy}`);
+  const none = mk([m0]);
+  lifeTreeGoals(none);
+  check('lg02 ปลดแต่โหนดเล็ก (s) = ไม่มีรางวัล ไม่มีรายการ', !none.goalsDone && none.happiness === 40, `${none.goalsDone}`);
+  const s = mk([m1]);
+  lifeTreeGoals(s);
+  check('lg02 ปลดโหนดใหญ่/keystone = ความสุข +12 จดแขนง+โหนด', s.happiness === 40 + joy && s.goalsDone.join() === 'money' && s.goalNode.money === m1, `${s.happiness} · ${s.goalsDone} · ${JSON.stringify(s.goalNode)}`);
+  // ตัวควบคุม: เนื้อเดียวกันแต่ goal_joy = 0 ⇒ ไม่มีรางวัล ไม่มีรายการ
+  const c0 = mk([m1], { ...base, tree: { ...tr, goal_joy: 0 } });
+  lifeTreeGoals(c0);
+  check('lg02 ตัวควบคุม goal_joy 0 = ไม่ได้รางวัล ไม่มีรายการ', c0.happiness === 40 && !c0.goalsDone, `${c0.happiness} · ${c0.goalsDone}`);
+  s.tree.done[m2] = 21;
+  lifeTreeGoals(s);
+  check('lg02 โหนดใหญ่ตัวที่สองของแขนงเดิม = ไม่ได้รางวัลซ้ำ', s.happiness === 40 + joy && s.goalsDone.length === 1, `${s.happiness} · ${s.goalsDone}`);
+  s.tree.done[r1] = 22;
+  lifeTreeGoals(s);
+  check('lg02 โหนดใหญ่ของอีกแขนง = ได้รางวัลอีกครั้ง · เล่าครบสองรายการ', s.happiness === 40 + 2 * joy && s.goalsDone.join() === 'money,rel' && goalNames(s).join() === [tr.nodes[m1].name, tr.nodes[r1].name].join(), `${s.happiness} · ${goalNames(s)}`);
+  check('lg02 ไม่สำเร็จเลย = ไม่มีรายการบนตัว', !newLife(11, base).goalsDone);
 }
 
-// สกิลจากปณิธาน (life-goal ใบ 03): skillMap.lifeGoal เทียบ id ต้นสายที่มีปลายสายต่อ · thaiEarn ให้สกิลเมื่อ st.goalsDone มี id นั้น · ชื่อปณิธานชุดเดียวกับการ์ดตายกับสมุด
+// สกิลจากเป้าชีวิต (life-goal ใบ 03): skillMap.lifeGoal เทียบ id แขนงของต้นไม้ · thaiEarn ให้สกิลเมื่อ st.goalsDone มี id นั้น · ชื่อเป้าชุดเดียวกับการ์ดตายกับสมุด
 {
   const { writeFileSync, mkdtempSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
@@ -248,27 +251,27 @@ const f2 = (v) => v.toFixed(2);
   const dir = mkdtempSync(join(tmpdir(), 'lg03-'));
   const mapOf = (body) => { const f = join(dir, `m${Math.random().toString(36).slice(2)}.yaml`); writeFileSync(f, body); return pathToFileURL(f).href; };
   const base = loadContent();
-  const ok = loadSkillMap(mapOf('lifeGoal:\n  study_hard: [appraise]\n  family_care: [regen]\n'), base.focus);
-  check('lg03 skillMap.lifeGoal รับ id ต้นสายของปณิธาน', ok.lifeGoal.study_hard?.[0] === 'appraise' && ok.lifeGoal.family_care?.[0] === 'regen', JSON.stringify(ok.lifeGoal));
+  const ok = loadSkillMap(mapOf('lifeGoal:\n  money: [appraise]\n  rel: [regen]\n'), base.focus);
+  check('lg03 skillMap.lifeGoal รับ id แขนงของต้นไม้', ok.lifeGoal.money?.[0] === 'appraise' && ok.lifeGoal.rel?.[0] === 'regen', JSON.stringify(ok.lifeGoal));
   let threw = '';
-  try { loadSkillMap(mapOf('lifeGoal:\n  scholarship: [appraise]\n'), base.focus); } catch (e) { threw = String(e.message); }
-  check('lg03 id ปลายสาย (ไม่ใช่ต้นสาย) ใน lifeGoal ตกด่านโหลด', /lifeGoal\.scholarship/.test(threw), threw.slice(0, 80));
+  try { loadSkillMap(mapOf('lifeGoal:\n  mid: [appraise]\n'), base.focus); } catch (e) { threw = String(e.message); }
+  check('lg03 โหนดกลาง (mid) ไม่ใช่แขนง ใน lifeGoal ตกด่านโหลด', /lifeGoal\.mid/.test(threw), threw.slice(0, 80));
   threw = '';
   try { loadSkillMap(mapOf('lifeGoal:\n  nope_goal: [appraise]\n'), base.focus); } catch (e) { threw = String(e.message); }
   check('lg03 id ที่ไม่มีในทะเบียนใน lifeGoal ตกด่านโหลด', /lifeGoal\.nope_goal/.test(threw), threw.slice(0, 80));
   const mk = (goals) => { const s = newLife(11, { ...base, skillMap: ok }); if (goals) s.goalsDone = goals; return s; };
   const ids = (s) => thaiEarn(s).map((x) => x.id);
-  check('lg03 ปณิธานสำเร็จ = ได้สกิลตามตาราง', ids(mk(['study_hard'])).includes('appraise'), ids(mk(['study_hard'])).join());
-  const two = ids(mk(['study_hard', 'family_care']));
+  check('lg03 เป้าสำเร็จ = ได้สกิลตามตาราง', ids(mk(['money'])).includes('appraise'), ids(mk(['money'])).join());
+  const two = ids(mk(['money', 'rel']));
   check('lg03 สำเร็จสองอัน = ได้ทั้งสองสกิล', two.includes('appraise') && two.includes('regen'), two.join());
-  check('lg03 ไม่สำเร็จเลย = ไม่ได้สกิลจากปณิธาน', !ids(mk()).includes('appraise') && !ids(mk()).includes('regen'), ids(mk()).join());
-  check('lg03 ปณิธานที่ตารางไม่ให้สกิล = ไม่ได้ ไม่ตก', ids(mk(['work_hard'])).every((x) => x !== 'appraise' && x !== 'regen'));
-  const names = goalNames(mk(['study_hard']));
-  check('lg03 ชื่อปณิธานรูปต้นสาย → ปลายสาย', names.length === 1 && names[0] === 'ตั้งใจเรียน → สอบชิงทุนเรียนต่อ', names.join());
+  check('lg03 ไม่สำเร็จเลย = ไม่ได้สกิลจากเป้า', !ids(mk()).includes('appraise') && !ids(mk()).includes('regen'), ids(mk()).join());
+  check('lg03 เป้าที่ตารางไม่ให้สกิล = ไม่ได้ ไม่ตก', ids(mk(['know'])).every((x) => x !== 'appraise' && x !== 'regen'));
+  const old = goalNames(mk(['study_hard']));
+  check('lg03 เซฟเก่า (id ต้นสายโฟกัส) เล่ารูปต้นสาย → ปลายสาย', old.length === 1 && old[0] === 'ตั้งใจเรียน → สอบชิงทุนเรียนต่อ', old.join());
   check('lg03 ไม่มีรายการ = ชื่อว่าง', goalNames(mk()).length === 0);
-  // ตารางจริง (เจ้าของเคาะ): ทุกปณิธานมีสกิล ≥1 และสกิลมีจริง — ทะเบียนตกด่านโหลดอยู่แล้ว ข้อนี้กันตารางว่างกลับมา
+  // ตารางจริง (เจ้าของเคาะ): ทุกเป้ามีสกิล ≥1 และสกิลมีจริง — ทะเบียนตกด่านโหลดอยู่แล้ว ข้อนี้กันตารางว่างกลับมา
   const real = Object.keys(base.skillMap.lifeGoal ?? {});
-  check('lg03 ตารางจริงครบ 9 ปณิธาน', real.length === 9, real.join());
+  check('lg03 ตารางจริงครบ 5 แขนง', real.length === 5, real.join());
 }
 
 // ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อน (hidden + locked) จนประตูเปิด — ไม่ตัดออก เลขลำดับจึงตรงเนื้อหา · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน

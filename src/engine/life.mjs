@@ -2044,8 +2044,28 @@ export function setLifeFocus(st, id) {
 // ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
 // ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
 const goalTail = (defs, id) => Object.values(defs).find((d) => d.after === id)?.name;
-// ชื่อปณิธานที่สำเร็จของชีวิตนี้ "ต้นสาย → ปลายสาย" — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
-export const goalNames = (st) => (st.goalsDone ?? []).map((id) => `${st.content.focus.focuses[id].name} → ${goalTail(st.content.focus.focuses, id)}`);
+// ชื่อปณิธานที่สำเร็จของชีวิตนี้ — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
+// รูปใหม่ (ft15): id = แขนงของต้นไม้ · ชื่อ = โหนดใหญ่/keystone ที่ปลดเป็นตัวแรกของแขนง (st.goalNode) · รูปเก่า (เซฟก่อน ft15): id ต้นสายโฟกัส "ต้นสาย → ปลายสาย"
+export const goalNames = (st) => (st.goalsDone ?? []).map((id) => {
+  const node = st.goalNode?.[id];
+  if (node) return st.content.tree.nodes[node].name;
+  const fs = st.content.focus.focuses;
+  return `${fs[id].name} → ${goalTail(fs, id)}`;
+});
+// เป้าชีวิต (ft15 · เจ้าของเคาะข้อ 1 = B): ปลดโหนดใหญ่ (size b) หรือ keystone (size k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง (สูงสุดเท่าจำนวนแขนง · จำกัดต่อแขนงกันความสุขล้นจากโหนดใหญ่ 18 ตัว) · จดไว้ให้การ์ดตายเล่า
+// ไม่ดึงเลขสุ่ม · เรียกหลังปลดโหนดทุกทาง (ปีเต็ม · การ์ดด่านของโหนดใหญ่)
+const GOAL_SIZES = ['b', 'k'];
+export function lifeTreeGoals(st) {
+  const c = st.content.tree;
+  if (!st.tree || !c?.goal_joy) return;
+  for (const id of Object.keys(st.tree.done).sort((a, b) => st.tree.done[a] - st.tree.done[b])) {
+    const def = c.nodes[id];
+    if (!GOAL_SIZES.includes(def.size) || def.branch === 'mid' || st.goalsDone?.includes(def.branch)) continue;
+    st.happiness = clamp(st.happiness + levelValue(c.goal_joy));
+    (st.goalsDone ??= []).push(def.branch);
+    (st.goalNode ??= {})[def.branch] = id;
+  }
+}
 export function lifeFocusYear(st) {
   const c = st.content.focus;
   // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
@@ -2055,15 +2075,9 @@ export function lifeFocusYear(st) {
   }
   if (!st.focus) return;
   const full = st.focusAt < st.age;
-  const metBefore = st.focusMet?.[st.focus] !== undefined;
   const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
   if (!id) return;
   const def = c.focuses[id];
-  // ปณิธานสำเร็จ = ต้นสายที่มีปลายสายต่อ ชำนาญครบ chain_years (ตัวเดียวกับป้าย "ชำนาญแล้ว" บนจอ): ได้ความสุขครั้งเดียวต่อสาย (focusMet ตั้งครั้งแรกเท่านั้น) · จดไว้ให้การ์ดตายเล่า
-  if (!metBefore && st.focusMet?.[id] !== undefined && c.goal_joy && goalTail(c.focuses, id)) {
-    st.happiness = clamp(st.happiness + levelValue(c.goal_joy));
-    (st.goalsDone ??= []).push(id);
-  }
   if (full) naturePoint(st, def.nature, st.focusBorn ? st.content.nature.heir_nature : 1);
   // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
   // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
@@ -2108,6 +2122,14 @@ function lifeTreeBorn(st, parentBranch) {
   st.tree = { cur: null, done: { [node]: 0 }, yrs: {}, cards: {}, hist: [] };
 }
 // เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
+// เซฟก่อน ft15: ประตูที่ทุ่มโฟกัสครบ chain_years (focusYears) แต่ไม่เคยจดใน st.gates → จดตอนโหลด · ไม่ปลดโหนด ไม่ผุดผลติดตัว (decisions ข้อ 99) · ทำให้ตัดสะพาน focusYears ออกจาก lifeGateOpen ทีหลังได้โดยเซฟเก่าไม่เสียประตู
+export function lifeGatesMigrate(st) {
+  const chain = st.content.focus?.chain_years;
+  if (!chain || !st.focusYears) return;
+  for (const [id, def] of Object.entries(lifeFocusDefs(st))) {
+    if (def.group === 'gate' && st.focusYears[id] >= chain && !st.gates?.includes(id)) (st.gates ??= []).push(id);
+  }
+}
 export function lifeTreeMigrate(st) {
   const t = st.content.tree, f = st.content.nature;
   if (!t || st.treeV) return;
@@ -2131,6 +2153,7 @@ function lifeTreeYear(st) {
   const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age, c.pace);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
   if (r?.unlocked) treeNature(st, r.id);
+  lifeTreeGoals(st);
   if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size] * treeRustMul(st, id, st.age, c.rust));
   // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้
   for (const id of light) if (c.nodes[id].cost) applyEffects(st, c.nodes[id].cost, c.light_unit[c.nodes[id].size]);
@@ -2524,7 +2547,10 @@ export function choose(st, idx, loan) {
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
   if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category, st.age);
-  if (ev.treeGate) treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
+  if (ev.treeGate) {
+    treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
+    lifeTreeGoals(st);
+  }
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
