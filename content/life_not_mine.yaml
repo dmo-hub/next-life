@@ -1,0 +1,67 @@
+# ลูกไม่ใช่ลูก (ใบ 95 · B114 ข้อ 149 166): ละครหลังข่าว ไม่มีฉาก · คำทั่วไป (ผลตรวจ · สายเลือด)
+# เงื่อนไข: ผู้เล่นชายเท่านั้น · ลูกที่เกิดช่วงคู่นอกใจ (engine ทอยตอนเกิด · family.mjs NOT_MINE · st.kin[].notMine) · ปี ≥ ปีเริ่มตรวจพ่อ (data/paternity-test.json from)
+# ตัวเลือก: family paternity keep = ยังเป็นลูกเรา (ผูกพันขึ้น · ทายาทเท่าเดิม) · cut = ตัดขาด (ผูกพันตกแรง) · ทั้งสองทางทายาทที่เป็นลูกคนนี้ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา (afterlife.mjs NOT_BLOOD_DEATH)
+events:
+  - id: fam_not_mine_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2543, 2650]
+    weight: 3
+    when: {sex: [ชาย], family: [{role: child, alive: true}], child_not_mine: {age: [18, 45]}}
+    title: "ผลตรวจที่ไม่ได้ขอ"
+    text: "“{ชื่อลูก}”นัดคุณมานั่งที่ร้านกาแฟ วางกระดาษผลตรวจสายเลือดลงบนโต๊ะ ลูกทำเองเพราะแพทย์ถามประวัติครอบครัว ตัวเลขในนั้นบอกว่าสายเลือดของคุณไม่ตรงกับลูก ลูกไม่ได้โกรธ แต่มือที่จับแก้วสั่น"
+    choices:
+      - id: still_ours
+        text: "ยังเป็นลูกเราเหมือนเดิม"
+        family: [{paternity: keep}]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_mother
+        text: "ขอเวลา แล้วไปถามเรื่องเก่ากับคู่"
+        family: [{paternity: keep}, {bond: spouse, d: -6}]
+        effects: {happiness: -2}
+        merit: [{cat: neutral}]
+      - id: retest
+        text: "ขอตรวจซ้ำ ผลก็เหมือนเดิม"
+        family: [{paternity: keep}]
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: cut_tie
+        text: "บอกว่าจากนี้เลิกเรียกกันว่าลูก"
+        family: [{paternity: cut}]
+        effects: {happiness: -2, relations: -2}
+        merit: [{cat: neutral}]
+
+  - id: fam_not_mine_old_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ชรา
+    years: [2543, 2650]
+    weight: 3
+    when: {sex: [ชาย], family: [{role: child, alive: true}], child_not_mine: {age: [18, 60]}}
+    title: "ซองเอกสารจากโรงพยาบาล"
+    text: "ซองที่“{ชื่อลูก}”ถือมามีตราโรงพยาบาลและผลตรวจสายเลือดที่ทำตอนไปปรึกษาเรื่องโรคประจำตระกูล ลูกบอกเสียงเบาว่าอยากให้คุณรู้จากปากลูกเอง ก่อนที่จะรู้จากใครอื่น"
+    choices:
+      - id: still_ours
+        text: "ยังเป็นลูกเราเหมือนเดิม"
+        family: [{paternity: keep}]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: silent_keep
+        text: "เก็บซองไว้ ไม่พูดเรื่องนี้อีก"
+        family: [{paternity: keep}]
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: cut_tie
+        text: "บอกว่าจากนี้เลิกเรียกกันว่าลูก"
+        family: [{paternity: cut}]
+        effects: {happiness: -2, relations: -2}
+        merit: [{cat: neutral}]
+      - id: hug_child
+        text: "กอดลูก ไม่ถามอะไรอีก"
+        family: [{paternity: keep}, {bond: child, d: 3}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]

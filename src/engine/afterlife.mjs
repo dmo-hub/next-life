@@ -517,6 +517,8 @@ const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
+// ลูกที่ไม่ใช่ลูกทางสายเลือดของเรา (ใบ 95) ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา — สาเหตุที่ส่งต่อเป็น other (ไม่ถ่ายทอด ไม่นัดป่วย) · ปีตาย/ชื่อ/บทบาทเท่าเดิม
+const NOT_BLOOD_DEATH = { cause: 'other' };
 const deathOf = (st) => (isGone(st) ? { gone: true } : { cause: st.cause ?? 'other', ...illOf(st.cause, st.age, st.terminal?.cause === st.cause ? (st.terminal.toldAge ?? st.age - 1) : st.age) });
 const kinDeathOf = (m) => (m.cause ? { cause: m.cause, ...illOf(m.cause, m.diedAge, m.ill?.cause === m.cause ? (m.ill.toldAt ?? m.diedAge - 1) : m.diedAge) } : {});
 
@@ -576,7 +578,7 @@ function makeHeir(af, r) {
       // ลูกเรียกผู้เล่นตามอัตลักษณ์ (หญิงข้ามเพศ = แม่) · คู่ชายเป็นพ่อ ⇒ บ้านมีแม่และพ่อครบเหมือนชีวิตอื่น · ไม่มีอัตลักษณ์ = เพศกำเนิดเท่าเดิม
       const self = speechSex(st);
       parents = [
-        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
+        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...(me?.notMine && !isGone(st) ? NOT_BLOOD_DEATH : deathOf(st)) },
         spouse && spouse.born <= year0
           ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge, ...kinDeathOf(spouse) }), name: spouse.name }
           : { sex: otherSex(self), age: spouseAge(rng, self, kidAge), alive: true },
