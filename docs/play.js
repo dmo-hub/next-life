@@ -4146,6 +4146,7 @@ function pastFromLineage(lineage, realmId) {
 
 
 
+
 const SEXES = ['ชาย', 'หญิง'];
 // 10 ระดับตามเส้นแบ่ง decile ใน data/birthplace.json (rules.classes) — ต่ำไปสูง
 // ชื่อเดิม 3 ระดับ (ยากจน · ชนชั้นกลาง · ร่ำรวย) คงไว้ที่ระดับ 3 · 6 · 9 เนื้อหาที่อ้างชื่อเดิมจึงยังใช้ได้
@@ -4801,6 +4802,9 @@ const FILL = {
   ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
   ผีญาติบทบาท: (st) => pickKinGhost(st)?.word ?? 'ญาติ',
   แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
+  // คำแทนตามงาน (ใบ 181): ก่อนทำงาน/เกษียณ = คำกลาง · ทำงานอยู่ = ตามสาย/อาชีพ (jobwords.mjs)
+  ที่ทำงาน: (st) => jobWord('ที่ทำงาน', { working: isWorking(st), ladder: st.ladder?.id, occ: st.occupation }),
+  คนคุมงาน: (st) => jobWord('คนคุมงาน', { working: isWorking(st), ladder: st.ladder?.id, occ: st.occupation }),
   ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
   บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
   ชื่อคู่ลูก: (st) => childMate(st, focusOf(st, 'child')) ?? 'คู่ของลูก',
