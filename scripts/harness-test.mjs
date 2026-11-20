@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner } from '../src/engine/index.mjs';
+import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf } from '../src/engine/index.mjs';
 import { playLife, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -1249,6 +1249,43 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 90 becomePartner: คนนอกบ้าน (peer) ย้ายเข้าเป็นแฟน id/ชื่อ/ปีเกิด/เพศเดิม · เริ่มนับปีคบ · แต่งต่อเป็นคู่ได้', moved === peer && peer.role === 'partner' && [peer.id, peer.name, peer.born, peer.sex].join('|') === was && peer.since === 24 && (applyFamily(h, { sets_flags: ['married'] }), h.kin.find((m) => m.id === peer.id).role === 'spouse'));
   check('ใบ 90 becomePartner: คู่/แฟนอยู่แล้ว = ไม่ทำอะไร (null)', becomePartner(h, peer) === null && becomePartner(h, null) === null);
   check('ใบ 90 ชีวิตไม่มีแฟน: แต่งตามเดิม (ธง married เพิ่มคู่ ไม่ผ่านทางแปลงบท)', g.kin.filter((m) => m.role === 'spouse').length === 1 && g.kin.some((m) => m.role === 'partner'));
+}
+
+// จดพ่อ/แม่บนตัวลูก (ใบ 91 B114 ข้อ 149 154 166): ลูกจด by = คู่ปัจจุบันตอนเกิด · พ่อ/แม่ของลูกคือคู่คนนั้นแม้หย่าไปแล้ว · เซฟเก่าไม่มี by คิดย้อนจากปีเกิด
+{
+  const content = loadContent();
+  const st = newLife(7, content);
+  st.age = 22;
+  applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  const A = st.kin.find((m) => m.role === 'spouse');
+  st.age = 24;
+  applyFamily(st, { family: [{ add: 'child' }] });
+  const c1 = st.kin.filter((m) => m.role === 'child').at(-1);
+  st.age = 30;
+  applyFamily(st, { family: [{ divorce: 'spouse' }] });
+  st.age = 40;
+  applyFamily(st, { sets_flags: ['married'] });
+  const B = st.kin.filter((m) => m.role === 'spouse').at(-1);
+  st.age = 42;
+  applyFamily(st, { family: [{ add: 'child' }] });
+  const c2 = st.kin.filter((m) => m.role === 'child').at(-1);
+  check('ใบ 91 ลูกจดคู่ที่เป็นพ่อ/แม่ตอนเกิด: ลูกคนแรก = คู่แรก (หย่าไปแล้ว) · ลูกคนหลังแต่งใหม่ = คู่ใหม่', A.id !== B.id && c1.by === A.id && c2.by === B.id, `${c1.by} ${c2.by} ${A.id} ${B.id}`);
+  check('ใบ 91 parentSpouseOf: ลูกคู่แรกได้คู่แรกแม้หย่าแล้ว (ไม่ใช่คู่ล่าสุด) · spouseOf ปัจจุบัน = คู่ใหม่', parentSpouseOf(st, c1) === A && parentSpouseOf(st, c2) === B && spouseOf(st) === B);
+  delete c1.by;
+  delete c2.by;
+  check('ใบ 91 เซฟเก่า (ไม่มี by): คิดย้อนจากปีเกิด — ลูกเกิดตอนอายุ 24 = คู่ที่ since ไม่เกิน 24 · ลูกอายุ 42 = คู่ใหม่', parentSpouseOf(st, c1) === A && parentSpouseOf(st, c2) === B);
+  const s = newLife(7, content);
+  s.age = 25;
+  applyFamily(s, { family: [{ add: 'child' }] });
+  const kid = s.kin.find((m) => m.role === 'child');
+  check('ใบ 91 พ่อ/แม่เลี้ยงเดี่ยว (ไม่มีคู่ตอนลูกเกิด): by = null → parentSpouseOf null', kid.by === null && parentSpouseOf(s, kid) === null);
+  const o = newLife(7, content);
+  o.age = 30;
+  applyFamily(o, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  applyFamily(o, { family: [{ add: 'child' }] });
+  const ok = o.kin.find((m) => m.role === 'child');
+  delete ok.by;
+  check('ใบ 91 เซฟเก่าแต่งครั้งเดียว: ลูกไม่มี by ได้คู่คนเดียวนั้น (เท่าฐาน)', parentSpouseOf(o, ok) === o.kin.find((m) => m.role === 'spouse'));
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
