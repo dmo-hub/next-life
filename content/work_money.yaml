@@ -148,7 +148,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {flags: {has: [married], not: [has_kids, home_owner]}}
+    when: {spouse: {status: together}, flags: {has: [married], not: [has_kids, home_owner]}}
     multipliers: {flags: {guarantor: 0.5}}
     title: "บ้านหลังแรก"
     text: "คู่ชีวิตกระซิบข่าวดี กำลังจะมีเจ้าตัวเล็ก ห้องเช่าที่อยู่กันสองคนเริ่มแคบลงทุกวัน ถึงเวลาตัดสินใจเรื่องบ้าน"

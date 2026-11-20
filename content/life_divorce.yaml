@@ -1,5 +1,5 @@
 # แยกทาง → หย่า (ใบ 92 · B114 ข้อ 145 153 154 162 164): ทะเลาะ → แยกทาง → คืนดี | หย่า (แบ่งสินสมรสครึ่ง · ลูกเล็กเลือกอยู่กับใคร)
-# ทางเข้าแยกทาง: ความผูกพันต่ำนาน (bond ≤ 48 ตั้งแต่อยู่ด้วยกัน ≥ 3 ปี · พื้นของเกมคือ 38) · หนี้ท่วม (ธง in_debt) · นอกใจถูกจับได้ = ใบ 94 เติมเอง
+# ทางเข้าแยกทาง: ความผูกพันต่ำนาน (bond ≤ 48 ตั้งแต่อยู่ด้วยกัน ≥ 3 ปี · พื้นของเกมคือ 38) · หนี้ท่วม (ธง in_debt) · นอกใจถูกจับได้ = ใบ 94 เติมเอง · ห่างกันเอง ผูกยุค = ใบ 93 (fam_separate_far_*)
 # สายต่อเป็นนัดผลย้อน (schedules) ไม่ขึ้นกองสุ่ม · ใบหย่ามี weight กันคู่ที่แยกทางค้างเมื่อนัดหาย
 # แกน: แยกทางจดสถานะบนตัวคู่ (ธง married ไม่หาย) · หย่าหักเงินครึ่งของส่วนที่งอกหลังเริ่มอยู่ด้วยกัน · ลูกเล็กจด custody (other = ผูกพันจางเร็วกว่า · ยังเป็นทายาท)
 events:
@@ -132,6 +132,98 @@ events:
       - id: one_month
         text: "ขอให้เขาอยู่ต่ออีกเดือน"
         family: [{bond: spouse, d: 4}]
+        merit: [{cat: neutral}]
+
+  # ← ห่างกันเอง/ทำงานไกลกัน (ใบ 93 · ข้อ 167) · สามใบเรื่องเดียวกันตามยุค น้ำหนักขึ้นตามอัตราหย่า (data/divorce-rate.json) · ไม่ดูค่าผูกพัน
+  - id: fam_separate_far_old_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2539]
+    weight: 3
+    when: {spouse: {status: together, together: [4, 99]}}
+    title: "จดหมายที่ตอบห่างลงทุกฉบับ"
+    text: "งานของ“{ชื่อคู่}”พาไปอยู่ต่างจังหวัดเป็นปี ๆ จดหมายที่เคยยาวสามหน้าเหลือไม่กี่บรรทัด คราวนี้เขาเขียนมาว่าที่นั่นมีที่ให้อยู่ถาวรแล้ว และอยากให้คุณตัดสินใจว่าจะเอายังไงกับเรา"
+    choices:
+      - id: let_go
+        text: "ตอบไปว่าต่างคนต่างอยู่ก็ได้"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: stay_apart
+        text: "ไม่ตอบ ปล่อยให้เวลาตัดสิน"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: go_there
+        text: "ขอตามไปอยู่ด้วยที่นั่น"
+        family: [{bond: spouse, d: 5}]
+        merit: [{cat: neutral}]
+      - id: ask_back
+        text: "ขอให้กลับมาหาที่บ้านสักที"
+        family: [{bond: spouse, d: 3}]
+        merit: [{cat: neutral}]
+
+  - id: fam_separate_far_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2540, 2559]
+    weight: 4
+    when: {spouse: {status: together, together: [4, 99]}}
+    title: "บัตรโทรศัพท์ใบสุดท้าย"
+    text: "ปีที่สามที่“{ชื่อคู่}”ทำงานอยู่ห่างกันคนละฝั่งเมือง เสาร์อาทิตย์เหลือแค่โทรหากัน คืนนี้เขาบอกว่าชินกับการอยู่คนเดียวแล้ว และไม่แน่ใจว่าจะกลับมาอยู่ด้วยกันอีกไหม"
+    choices:
+      - id: let_go
+        text: "บอกว่าถ้าชินแล้วก็แยกกันอยู่"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: stay_apart
+        text: "วางสาย ไม่โทรกลับอีก"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: move_close
+        text: "ย้ายงานมาอยู่ใกล้กัน"
+        family: [{bond: spouse, d: 6}]
+        merit: [{cat: neutral}]
+      - id: visit
+        text: "ลางานไปหาเขาถึงที่"
+        family: [{bond: spouse, d: 4}]
+        merit: [{cat: neutral}]
+
+  - id: fam_separate_far_new_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2560, 2650]
+    weight: 26
+    when: {spouse: {status: together, together: [3, 20]}}
+    title: "แชตที่ไม่มีใครพิมพ์ต่อ"
+    text: "ตารางงานของคุณสองคนไม่เคยตรงกันมาหลายปี ห้องเช่าคนละที่ แชตกลุ่มครอบครัวมีแต่สติกเกอร์ คืนนี้“{ชื่อคู่}”พิมพ์มาว่าเขาคิดว่าคุณสองคนเหมือนเพื่อนร่วมบ้านมากกว่า"
+    choices:
+      - id: let_go
+        text: "ตอบว่าเข้าใจ แยกกันอยู่ดีกว่า"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: seen_only
+        text: "กดอ่านแล้วไม่ตอบ"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: video_call
+        text: "โทรวิดีโอไปคุยให้จบคืนนี้"
+        family: [{bond: spouse, d: 5}]
+        merit: [{cat: neutral}]
+      - id: own_place
+        text: "ถือโอกาสย้ายไปอยู่ห้องใกล้งาน"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
         merit: [{cat: neutral}]
 
   # ← เงินตึง/หนี้ท่วม
