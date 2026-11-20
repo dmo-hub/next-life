@@ -200,6 +200,7 @@ function conditions(e, L) {
     out.push(`${any((k.roles ?? ['parent', 'spouse', 'child', 'grandchild']).map((r) => FAMILY_ROLE_NAMES[r] ?? r))}รู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
   }
   if (w.child_far) out.push(`มีลูก${w.child_far.far ? 'อยู่ไกล' : 'อยู่ใกล้'}${w.child_far.age ? ` อายุ ${range(w.child_far.age, ' ปี')}` : ''}${w.child_far.grandkids ? ' มีหลานแล้ว' : ''}`);
+  if (w.child_not_mine) out.push(`มีลูกที่ไม่ใช่ลูกทางสายเลือดของเรา${w.child_not_mine.age ? ` อายุ ${range(w.child_not_mine.age, ' ปี')}` : ''}`);
   if (w.spouse) {
     const s = w.spouse;
     out.push(`มีคู่${s.status === 'apart' ? 'ที่แยกทางกันอยู่' : s.status === 'together' ? 'ที่อยู่ด้วยกัน' : ''}${s.bond ? ` ผูกพัน ${range(s.bond, '')}` : ''}${s.together ? ` อยู่ด้วยกัน ${range(s.together, ' ปี')}` : ''}${s.apart ? ` แยกทางมา ${range(s.apart, ' ปี')}` : ''}`);
