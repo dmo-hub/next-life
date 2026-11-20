@@ -1,0 +1,12 @@
+{
+ "title": "ปีเริ่มมีการตรวจพิสูจน์ความเป็นพ่อด้วยดีเอ็นเอในไทย (ใบ 95 · B114 ข้อ 149 166)",
+ "retrieved": "2026-11-20",
+ "from": 2543,
+ "assumption": true,
+ "note": "content/life_not_mine.yaml years[0] ต้องเท่ากับ from (scripts/harness-test.mjs ตรวจ) · การ์ด 'ลูกไม่ใช่ลูก' ออกไม่ก่อนปีนี้ · ค่า from เป็นกรอบที่เลนเลือกจากหลักฐานค้นเว็บ ยังไม่ได้เปิดต้นฉบับ — เจ้าของเปลี่ยนได้ที่ไฟล์นี้กับ years ของการ์ดพร้อมกัน",
+ "evidence": [
+  { "y": 2541, "what": "วิทยานิพนธ์ปริญญาโท 'DNA fingerprinting in paternity testing' คณะแพทยศาสตร์โรงพยาบาลรามาธิบดี มหาวิทยาลัยมหิดล (งานวิจัยเก่าสุดที่ลงวันที่ ยังไม่ใช่บริการ)", "source": "https://repository.li.mahidol.ac.th/handle/123456789/26063" },
+  { "y": 2543, "what": "บทความทบทวน 'Paternity testing by PCR-based STR analysis' Rerkamnuaychoke B และคณะ J Med Assoc Thai 83 (Suppl 1) 2000 — วิธีตรวจ STR ที่ใช้เป็นบริการได้", "source": "https://repository.li.mahidol.ac.th/entities/publication/31e93f9f-6c74-43b3-876f-4c83bae8d8f0/full" }
+ ],
+ "evidenceNote": "หลักฐานมาจากผลค้นเว็บ (หัวข้อ/ปีเท่านั้น) · ไม่พบแหล่งที่ระบุปีที่เริ่มให้บริการตรวจพ่อแก่ประชาชนโดยตรง จึงใช้ปีบทความทบทวน STR เป็นกรอบ (assumption)"
+}

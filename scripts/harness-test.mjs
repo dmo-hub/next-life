@@ -1,6 +1,7 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf, spouseOk, KIN_CUSTODY, DIVORCE_SPLIT, BOND_FLOOR } from '../src/engine/index.mjs';
+import { readFileSync } from "node:fs";
+import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf, spouseOk, KIN_CUSTODY, DIVORCE_SPLIT, BOND_FLOOR, NOT_MINE } from '../src/engine/index.mjs';
 import { playLife, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -1385,6 +1386,71 @@ const f2 = (v) => v.toFixed(2);
   j.kin.find((x) => x.role === 'child').born = j.birthYear + 20;
   const grownKid = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
   check('ใบ 92 การ์ดหย่า: ไม่มีลูกเล็ก = การ์ดไม่มีลูก · มีลูกเล็ก = การ์ดเลือกผู้ปกครอง · ลูกโตแล้ว = การ์ดไม่มีลูก (ไม่ซ้อนกัน)', !noKids[0] && noKids[1] && withKid[0] && !withKid[1] && !grownKid[0] && grownKid[1], `${noKids} ${withKid} ${grownKid}`);
+}
+
+// ลูกไม่ใช่ลูก (ใบ 95 B114 ข้อ 149 166): ทอยตอนลูกเกิดช่วงคู่นอกใจ · ผู้เล่นชายเท่านั้น · when.child_not_mine · op paternity keep/cut
+{
+  const content = loadContent();
+  const born = (seed, { sex = 'ชาย', flag = true, at = 28, age = 29 } = {}) => {
+    const st = newLife(seed, content);
+    st.sex = sex;
+    st.age = 25;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    if (flag) {
+      st.flags.spouse_cheated = true;
+      st.flagAge.spouse_cheated = at;
+    }
+    st.age = age;
+    applyFamily(st, { family: [{ add: 'child' }] });
+    return st;
+  };
+  const rate = (opt) => {
+    let n = 0;
+    const N = 400;
+    for (let i = 0; i < N; i++) if (born(9000 + i, opt).kin.find((m) => m.role === 'child').notMine) n++;
+    return n / N;
+  };
+  const r = rate({});
+  check('ใบ 95 ลูกเกิดช่วงคู่นอกใจ (ผู้เล่นชาย): สัดส่วนไม่ใช่ลูกเราใกล้ NOT_MINE.p', Math.abs(r - NOT_MINE.p) < 0.08, `${r}`);
+  check('ใบ 95 ไม่นับ: ผู้เล่นหญิง · ไม่มีธง spouse_cheated · ลูกเกิดนอกช่วง (ก่อน 2 ปี / หลัง 5 ปี)', rate({ sex: 'หญิง' }) === 0 && rate({ flag: false }) === 0 && rate({ age: 26 }) === 0 && rate({ age: 33 }) === 0);
+  const seed = Array.from({ length: 400 }, (_, i) => 9000 + i).find((x) => born(x).kin.find((m) => m.role === 'child').notMine);
+  const card = content.events.find((e) => e.id === 'fam_not_mine_mid_01');
+  const st = born(seed);
+  const kid = st.kin.find((m) => m.role === 'child');
+  st.birthYear = 2500;
+  kid.born = st.birthYear + 29;
+  st.age = 49;
+  check('ใบ 95 การ์ดเปิดความลับ: ออกเมื่อลูกโต 18+ และเป็นผู้ชาย · ผู้เล่นหญิงไม่ออก', whenOk(st, card.when) === true && (st.sex = 'หญิง', whenOk(st, card.when) === false));
+  st.sex = 'ชาย';
+  kid.bond = 80;
+  st.kinFocus = { child: kid.id };
+  applyFamily(st, { family: [{ paternity: 'keep' }] });
+  const kept = kid.bond;
+  check('ใบ 95 keep: จด kept · ผูกพันขึ้น NOT_MINE.keepBond · ลูกยังเป็นทายาท (alive ไม่ left) · การ์ดไม่ซ้ำ', kid.paternity === 'kept' && kept === 80 + NOT_MINE.keepBond && kid.alive && !kid.left && whenOk(st, card.when) === false);
+  const st2 = born(seed);
+  const kid2 = st2.kin.find((m) => m.role === 'child');
+  kid2.bond = 90;
+  applyFamily(st2, { family: [{ paternity: 'cut' }] });
+  check('ใบ 95 cut: จด cut · ผูกพันตกเหลือไม่เกิน NOT_MINE.cutTo · ตัดซ้ำไม่ขยับ', kid2.paternity === 'cut' && kid2.bond <= NOT_MINE.cutTo && (applyFamily(st2, { family: [{ paternity: 'keep' }] }), kid2.paternity === 'cut'));
+  // ทายาทสายเลือดที่เป็นลูกไม่ใช่ลูกเรา: ผู้เล่นตายด้วยโรคถ่ายทอด (มะเร็ง) → ลูกปกติได้ประวัติโรค · ลูกไม่ใช่ลูกไม่ได้ (seed ที่มีลูกให้เลือกทางสายเลือด)
+  const E = await import('../src/engine/index.mjs');
+  const heirHeredity = (notMine) => {
+    const { state: p } = playLife(mixSeed(1, 5314), content, BOTS.สุ่ม);
+    const c = E.heirCandidates(p).find((m) => m.role === 'child');
+    p.cause = 'cancer';
+    if (notMine) p.kin.find((m) => m.id === c.id).notMine = true;
+    const af = E.startAfterlife(p);
+    const P = E.PATHS.findIndex((x) => x.id === 'blood');
+    for (let card = E.nextAfterCard(af); !card.done; card = E.nextAfterCard(af)) {
+      if (card.kind === 'path') E.chooseAfter(af, P, c.id);
+      else if (card.choices?.length) E.chooseAfter(af, Math.max(0, (card.locked ?? []).findIndex((x) => !x)));
+    }
+    return E.nextLife(af).heredity;
+  };
+  const hn = heirHeredity(false), hy = heirHeredity(true);
+  check('ใบ 95 ทายาทจากลูกไม่ใช่ลูกเรา: ไม่ได้ประวัติโรคกรรมพันธุ์ของผู้ตาย (ลูกปกติ seed เดียวกันได้ cancer)', hn.includes('cancer') && !hy.includes('cancer'), `ปกติ ${hn} · ไม่ใช่ลูก ${hy}`);
+  const pt = JSON.parse(readFileSync('data/paternity-test.json', 'utf8'));
+  check('ใบ 95 ปีเริ่มตรวจพ่อ: years[0] ของการ์ดทั้งสองตรง data/paternity-test.json', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => content.events.find((e) => e.id === id).years[0] === pt.from));
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
