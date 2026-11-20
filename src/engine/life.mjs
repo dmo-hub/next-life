@@ -170,6 +170,41 @@ export function yearlySaving(st, year = st.birthYear + st.age) {
 // (ราคาการ์ด income_x/เงินติดตัวใช้ yearlySaving ตรง ๆ จึงเท่าเดิมทุกเกม) · normal = ×1 = ค่าเดิม
 export const spendMult = (st) => st.content.spending?.levels?.[st.spendLevel]?.save_mult ?? 1;
 
+// แถวเลือกระดับใช้จ่ายบนการ์ดทบทวนเงิน — ป้ายบอกแค่ทิศ ไม่บอกตัวเลข (ห้ามอ่านเป็นคำแนะนำการเงิน)
+// อยู่นอก choices จึงไม่ขยับเลขตัวเลือกของการ์ดทบทวนเงิน · บอท/ผู้เล่นที่ไม่แตะแถวนี้ = ชีวิตเดิมทุกบิต
+const dir = (v, up, down) => (v > 0 ? up : v < 0 ? down : null);
+function spendRow(st) {
+  const levels = st.content.spending?.levels;
+  if (!levels) return null;
+  return {
+    cur: st.spendLevel ?? 'normal',
+    levels: Object.entries(levels).map(([id, l]) => ({
+      id,
+      name: l.name,
+      fx: [dir(l.save_mult - 1, 'เงิน ↑', 'เงิน ↓'), dir(l.happy, 'ความสุข ↑', 'ความสุข ↓')].filter(Boolean).join(' · ') || 'เท่าเดิม',
+    })),
+  };
+}
+
+// เลือกระดับระหว่างการ์ดทบทวนเงินยังเปิดอยู่ · ผลลงตอนกดตัวเลือกของการ์ด (choose) — กดแถวซ้ำกี่ครั้งก็ได้ความสุขครั้งเดียว
+export function chooseSpend(st, id) {
+  if (!st.pending?.alloc) throw new Error('ยังไม่ถึงการ์ดทบทวนเงิน');
+  if (!st.content.spending?.levels?.[id]) throw new Error('ระดับการใช้จ่ายไม่ถูกต้อง');
+  st.pending.spend = id;
+}
+
+// หรูหราติดกันหลายช่วง สุขเพิ่มน้อยลงเรื่อย ๆ (luxury_decay ต่อครั้ง) · เปลี่ยนไประดับอื่น = เริ่มนับใหม่
+function applySpend(st, id) {
+  const sp = st.content.spending;
+  const l = sp.levels[id];
+  const streak = id === 'luxury' ? (st.luxuryStreak ?? 0) : 0;
+  st.happiness = clamp(st.happiness + l.happy * sp.luxury_decay ** streak);
+  st.luxuryStreak = id === 'luxury' ? streak + 1 : 0;
+  // ลงบันทึกเฉพาะตอนเปลี่ยนระดับ — คงระดับเดิมทุก 5 ปีไม่ใช่เรื่องที่ควรขึ้นในสรุปชีวิต
+  if (id !== (st.spendLevel ?? 'normal')) st.log.push({ id: 'spend', age: st.age, text: `ใช้จ่ายแบบ${l.name}` });
+  st.spendLevel = id;
+}
+
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างอาชีพ × ตัวคูณรายได้ถาวรจากเหตุการณ์
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างงาน (ขั้นในสายยศทับค่าจ้างอาชีพ) × ตัวคูณรายได้ถาวร
 // ตำแหน่งการเมือง: ท้องถิ่นได้ค่าตอบแทนบวกจากงาน · เต็มเวลาได้อย่างที่มากกว่า (ลาออกจากงานเดิมไปนั่งตำแหน่ง)
@@ -1751,6 +1786,8 @@ function drawCard(st) {
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
       card.choices = options.map((o) => o.label);
+      const spend = spendRow(st);
+      if (spend) card.spend = spend;
       st.pending = { alloc: options };
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
@@ -2392,6 +2429,7 @@ export function choose(st, idx, loan) {
     if (!opt) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     if (opt.alloc) st.alloc = opt.alloc;
+    if (ev.spend) applySpend(st, ev.spend);
     st.lastAllocYear = st.birthYear + st.age;
     st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
@@ -2836,6 +2874,8 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
     if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
     if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
+    // บอทที่ประกาศนโยบายใช้จ่ายเลือกระดับบนการ์ดทบทวนเงิน · บอทที่ไม่ประกาศไม่แตะ ⇒ ชีวิตเท่าเดิม
+    if (pickChoice.spend && card.spend) chooseSpend(st, pickChoice.spend(card, st));
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
     if (card.court) {
