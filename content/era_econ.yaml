@@ -520,7 +520,7 @@ events:
           - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "ร้านสาขาผุดขึ้นห้าจุดในปีเดียว ทุกร้านส่งค่าสูตรให้คุณทุกเดือน", effects: {network: 2, income_mult: 1.2}, merit: [{cat: neutral}]}
           - {weight: 1, text: "สาขาชงกาแฟจืดเหมือนน้ำล้างแก้ว ลูกค้าเหมาว่าร้านคุณก็จืดด้วย", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - text: "ปฏิเสธที่ทำงานเก่า ทุ่มให้ร้านเต็มตัว"
+      - text: "ปฏิเสธงานเก่า ทุ่มให้ร้านเต็มตัว"
         gate: business
         effects: {happiness: 2, health: 1, income_mult: 1.2}
         sets_flags: [own_business]
