@@ -1,10 +1,10 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
 import { treePace, treePaceCtl, treeInvest, treeYearEnd } from '../src/engine/index.mjs';
-import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
+import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
-import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
+import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE, withSpend, SPEND_WAY } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
 import { cadetCard, chooseCadet } from '../src/engine/cadet.mjs';
 import { newLedger } from '../src/engine/merit.mjs';
@@ -1151,6 +1151,29 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 237 กดกลับบ้าน: จบสถานะ', back.lives > 0 && back.awayAfterCall.length > 0 && back.awayAfterCall.every((a) => !a), `n ${back.awayAfterCall.length}`);
   check('ใบ 237 ใบที่เลื่อนออกปีแรกหลังกลับ (อายุ 25)', back.block.length > 0 && back.block.every((a) => a === 25), `อายุ ${[...new Set(back.block)]}`);
   check('ใบ 237 ตัวควบคุม: ไม่เข้าสถานะ ใบติดป้ายออกอายุเดิม 22 การ์ดโทรไม่แปลงร่าง', none.block.length > 0 && none.block.every((a) => a === 22) && none.call.every((c) => c.n === 4 && c.text === 'ข้อความ'), `อายุ ${[...new Set(none.block)]}`);
+}
+
+// ระดับใช้จ่าย (B29 · ใบ 52): ตัวคูณมีผลแค่เงินเก็บที่เข้ากระเป๋า — ราคาการ์ด income_x (ได้ · จ่าย · ค่าใช้จ่าย) ต้องเท่ากันทุกระดับ
+// บอทที่ประกาศนโยบายเลือกต่างกันจริง · บอทที่ไม่ประกาศไม่เคยแตะแถว (ตัวควบคุม: ไม่งั้นด่าน lifehash 0 ไม่ได้พิสูจน์อะไร)
+{
+  const content = loadContent();
+  const st = newLife(mixSeed(52, 1), content);
+  st.age = 30;
+  const price = () => [{ unit: 'income_x', amount: 2 }, { unit: 'income_x', amount: -1 }].flatMap((m) => [moneyValue(st, m), moneyValue(st, m, true)]);
+  const prices = ['frugal', 'normal', 'luxury'].map((id) => ((st.spendLevel = id), JSON.stringify(price())));
+  check('ใบ 52 ราคาการ์ด income_x เท่ากันทุกระดับใช้จ่าย', prices.every((p) => p === prices[0]) && JSON.parse(prices[0]).some((v) => v !== 0), prices[0]);
+  const levels = (bot) => Array.from({ length: 40 }, (_, i) => playLife(mixSeed(52, i), content, bot).state.spendLevel);
+  const rich = levels(withSpend(BOTS.สายเงิน, SPEND_WAY.สายเงิน));
+  const care = levels(withSpend(BOTS.สายสุขภาพ, SPEND_WAY.สายสุขภาพ));
+  check('ใบ 52 บอทสายเงินกับสายสุขภาพเลือกระดับต่างกัน', rich.includes('frugal') && care.includes('luxury') && !rich.includes('luxury') && !care.includes('frugal'), `เงิน ${rich.filter(Boolean).length}/40 · สุขภาพ ${care.filter(Boolean).length}/40`);
+  check('ใบ 52 ตัวควบคุม: บอทที่ไม่ประกาศนโยบายไม่แตะระดับใช้จ่าย', levels(BOTS.สายเงิน).every((l) => l === undefined));
+  let threw = false;
+  try {
+    chooseSpend(newLife(mixSeed(52, 2), content), 'frugal');
+  } catch {
+    threw = true;
+  }
+  check('ใบ 52 เลือกระดับนอกการ์ดทบทวนเงินไม่ได้', threw);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
