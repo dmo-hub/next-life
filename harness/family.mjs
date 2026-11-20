@@ -101,7 +101,9 @@ for (const [bot, pick] of Object.entries(BOTS)) {
         }
       }
       const has = (role) => st.kin.some((m) => m.role === role && m.alive && !m.left);
-      if (st.kin.some((m) => m.role === 'spouse') && !!st.flags.married !== has('spouse')) flagBad++;
+      // แยกทาง (ใบ 89/92) = ออกจากบ้านแต่ยังเป็นคู่ตามกฎหมาย ธง married คง
+      const spouseKept = has('spouse') || st.kin.some((m) => m.role === 'spouse' && m.alive && m.status === 'apart');
+      if (st.kin.some((m) => m.role === 'spouse') && !!st.flags.married !== spouseKept) flagBad++;
       if (st.kin.some((m) => m.role === 'child') && !!st.flags.has_kids !== has('child')) flagBad++;
     };
     const { state: st } = playLife(mixSeed(seed, i * 7 + 1), content, pick, check);

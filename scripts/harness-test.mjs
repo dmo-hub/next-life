@@ -1,6 +1,6 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf } from '../src/engine/index.mjs';
+import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf, spouseOk, KIN_CUSTODY, DIVORCE_SPLIT, BOND_FLOOR } from '../src/engine/index.mjs';
 import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -1301,6 +1301,104 @@ const f2 = (v) => v.toFixed(2);
   const ok = o.kin.find((m) => m.role === 'child');
   delete ok.by;
   check('ใบ 91 เซฟเก่าแต่งครั้งเดียว: ลูกไม่มี by ได้คู่คนเดียวนั้น (เท่าฐาน)', parentSpouseOf(o, ok) === o.kin.find((m) => m.role === 'spouse'));
+}
+
+// แยกทาง → คืนดี | หย่า (ใบ 92 B114 ข้อ 145 153 154 162): when.spouse · คืนดี · bond ลดไม่ทะลุพื้น · หย่าแบ่งสินสมรสครึ่ง · ลูกเล็กเลือกอยู่กับใคร (ยังเป็นทายาท)
+{
+  const content = loadContent();
+  const fresh = (age = 25) => {
+    const st = newLife(7, content);
+    st.age = age;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return st;
+  };
+  const sp = (st) => st.kin.find((m) => m.role === 'spouse');
+  const a = fresh();
+  a.age = 30;
+  sp(a).bond = 40;
+  check('ใบ 92 when.spouse: คู่อยู่ด้วยกัน 5 ปี bond 40 ผ่าน [38,48]/[3,99] · bond 60 ตก · อยู่ด้วยกันไม่ถึง 3 ปีตก', spouseOk(a, { status: 'together', bond: [38, 48], together: [3, 99] }) && (sp(a).bond = 60, !spouseOk(a, { bond: [38, 48] })) && (sp(a).bond = 40, !spouseOk({ ...a, age: 26 }, { together: [3, 99] })));
+  const sepCard = content.events.find((e) => e.id === 'fam_separate_work_01');
+  check('ใบ 92 การ์ดแยกทางด้วยผูกพันต่ำ: ขึ้นเมื่อ bond 40 อยู่ด้วยกันนาน · ไม่ขึ้นเมื่อ bond 70', whenOk(a, sepCard.when) === true && (sp(a).bond = 70, whenOk(a, sepCard.when) === false));
+  sp(a).bond = 40;
+  applyFamily(a, { family: [{ separate: 'spouse' }] });
+  check('ใบ 92 when.spouse apart: ปีที่แยกทางมาแล้ว 0 ไม่ผ่าน [1,6] · 2 ปีผ่าน · status together ตก', !spouseOk(a, { status: 'apart', apart: [1, 6] }) && spouseOk({ ...a, age: 32 }, { status: 'apart', apart: [1, 6] }) && !spouseOk({ ...a, age: 32 }, { status: 'together' }));
+  check('ใบ 92 แยกทางแล้ว: การ์ดแยกทางไม่ขึ้นซ้ำ (สถานะไม่ใช่ together)', whenOk({ ...a, age: 32 }, sepCard.when) === false);
+  const b = fresh(30);
+  sp(b).bond = 40;
+  applyFamily(b, { family: [{ separate: 'spouse' }] });
+  b.age = 32;
+  applyFamily(b, { family: [{ reconcile: 'spouse' }, { bond: 'spouse', d: 12 }] });
+  const sb = sp(b);
+  check('ใบ 92 คืนดี: กลับเป็น together · กลับเข้าบ้าน (left false · ไม่มี leftAge) · ธง married คง · bond +12', sb.status === 'together' && sb.left === false && sb.leftAge === undefined && b.flags.married === true && sb.bond === 52 && b.kin.filter((x) => x.role === 'spouse' && x.alive && !x.left).length === 1, `${sb.status} ${sb.left} ${sb.bond}`);
+  const c = fresh(30);
+  sp(c).bond = 40;
+  applyFamily(c, { family: [{ bond: 'spouse', d: -10 }] });
+  const lo = sp(c).bond;
+  sp(c).bond = 70;
+  applyFamily(c, { family: [{ bond: 'spouse', d: -10 }] });
+  check('ใบ 92 op bond ลบ: ไม่ทะลุพื้น 38 (40−10 → 38) · ที่สูงกว่าลดตรง ๆ (70−10 → 60)', lo === BOND_FLOOR && sp(c).bond === 60, `${lo} ${sp(c).bond}`);
+  const m = fresh(28);
+  m.trail = [{ year: m.birthYear + 28, money: 100000 }];
+  m.money = 300000;
+  m.age = 40;
+  applyFamily(m, { family: [{ separate: 'spouse' }] });
+  m.age = 42;
+  applyFamily(m, { family: [{ divorce: 'spouse' }] });
+  check('ใบ 92 หย่าแบ่งสินสมรส: เงินงอก 200000 หลังเริ่มอยู่ด้วยกัน เสียครึ่ง → เหลือ 200000', DIVORCE_SPLIT === 0.5 && m.money === 200000, `${m.money}`);
+  const flat = fresh(28);
+  flat.trail = [{ year: flat.birthYear + 28, money: 300000 }];
+  flat.money = 250000;
+  applyFamily(flat, { family: [{ divorce: 'spouse' }] });
+  const debt = fresh(28);
+  debt.trail = [{ year: debt.birthYear + 28, money: 100000 }];
+  debt.money = -50000;
+  applyFamily(debt, { family: [{ divorce: 'spouse' }] });
+  const oldSave = fresh(28);
+  oldSave.money = 400000;
+  delete sp(oldSave).since;
+  applyFamily(oldSave, { family: [{ divorce: 'spouse' }] });
+  check('ใบ 92 หย่าไม่แบ่ง: เงินไม่งอก · ติดลบ · เซฟเก่าไม่มี since = เงินเท่าเดิม', flat.money === 250000 && debt.money === -50000 && oldSave.money === 400000, `${flat.money} ${debt.money} ${oldSave.money}`);
+  // ลูกเล็กหลังหย่า
+  const k = fresh(30);
+  applyFamily(k, { family: [{ add: 'child' }] });
+  const kid = k.kin.find((x) => x.role === 'child');
+  k.age = 36;
+  applyFamily(k, { family: [{ separate: 'spouse' }, { custody: 'other' }] });
+  const beforeDivorce = kid.custody;
+  k.age = 38;
+  applyFamily(k, { family: [{ divorce: 'spouse' }, { custody: 'other' }] });
+  check('ใบ 92 ลูกเล็ก: ยังไม่หย่า (แยกทาง) op custody ไม่จด · หย่าแล้วจด other · ลูกยังเป็นทายาท (ไม่ left · ยังอยู่ในบ้าน)', beforeDivorce === undefined && kid.custody === 'other' && !kid.left && kid.alive && parentSpouseOf(k, kid) === sp(k) && sp(k).status === 'divorced');
+  const grown = fresh(30);
+  applyFamily(grown, { family: [{ add: 'child' }] });
+  const big = grown.kin.find((x) => x.role === 'child');
+  grown.age = 50;
+  applyFamily(grown, { family: [{ divorce: 'spouse' }, { custody: 'self' }] });
+  check('ใบ 92 ลูกโตแล้ว (≥ 18): custody ไม่จด', big.custody === undefined);
+  const decay = (way) => {
+    const st = fresh(30);
+    applyFamily(st, { family: [{ add: 'child' }] });
+    const ch = st.kin.find((x) => x.role === 'child');
+    st.age = 36;
+    applyFamily(st, { family: [{ divorce: 'spouse' }, { custody: way }] });
+    ch.bond = 80;
+    for (let y = 0; y < 3; y++) ageKin(st, st.birthYear + st.age + y);
+    return ch.alive ? ch.bond : null;
+  };
+  const other = decay('other');
+  const self = decay('self');
+  check('ใบ 92 ลูกอยู่กับอีกฝ่าย: ผูกพันจางเร็วกว่าเราเลี้ยงเอง 3 ปี (ต่างกัน KIN_CUSTODY.decay × 3) · ไม่ต่ำกว่าพื้น', other !== null && self !== null && self - other === KIN_CUSTODY.decay * 3 && other >= BOND_FLOOR, `other ${other} self ${self}`);
+  const kidsCard = content.events.find((e) => e.id === 'fam_divorce_kids_01');
+  const noKidCard = content.events.find((e) => e.id === 'fam_divorce_01');
+  const j = fresh(30);
+  applyFamily(j, { family: [{ separate: 'spouse' }] });
+  j.age = 33;
+  const noKids = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
+  applyFamily(j, { family: [{ add: 'child' }] });
+  const withKid = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
+  j.age = 40;
+  j.kin.find((x) => x.role === 'child').born = j.birthYear + 20;
+  const grownKid = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
+  check('ใบ 92 การ์ดหย่า: ไม่มีลูกเล็ก = การ์ดไม่มีลูก · มีลูกเล็ก = การ์ดเลือกผู้ปกครอง · ลูกโตแล้ว = การ์ดไม่มีลูก (ไม่ซ้อนกัน)', !noKids[0] && noKids[1] && withKid[0] && !withKid[1] && !grownKid[0] && grownKid[1], `${noKids} ${withKid} ${grownKid}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

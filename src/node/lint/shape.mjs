@@ -22,7 +22,7 @@ const KEYS = {
   event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
-  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
+  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'custody', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -30,7 +30,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'heredity', 'filial', 'spouse', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -731,8 +731,8 @@ export const rules = [
         if (!Array.isArray(node.family) || !node.family.length) { r(`${path}.family`, 'family ต้องเป็นรายการไม่ว่าง'); continue; }
         node.family.forEach((o, i) => {
           const p = `${path}.family[${i}]`;
-          const kinds = ['add', 'leave', 'separate', 'divorce', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
-          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce breakup marry far back die หรือ bond อย่างเดียว');
+          const kinds = ['add', 'leave', 'separate', 'divorce', 'reconcile', 'custody', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
+          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce reconcile custody breakup marry far back die หรือ bond อย่างเดียว');
           if (o.add !== undefined && !['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น partner spouse child grandchild pet herd peer');
           // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
           const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
@@ -747,7 +747,8 @@ export const rules = [
           if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
           for (const k of ['breakup', 'marry']) if (o[k] !== undefined && o[k] !== 'partner') r(`${p}.${k}`, `${k} ใช้ได้กับ partner`);
           if (o.by !== undefined && (o.breakup === undefined || !['us', 'them'].includes(o.by))) r(`${p}.by`, 'by ใช้กับ breakup เป็น us หรือ them');
-          for (const k of ['separate', 'divorce']) if (o[k] !== undefined && o[k] !== 'spouse') r(`${p}.${k}`, `${k} ใช้ได้กับ spouse`);
+          for (const k of ['separate', 'divorce', 'reconcile']) if (o[k] !== undefined && o[k] !== 'spouse') r(`${p}.${k}`, `${k} ใช้ได้กับ spouse`);
+          if (o.custody !== undefined && !['self', 'other'].includes(o.custody)) r(`${p}.custody`, 'custody ต้องเป็น self (เราเลี้ยง) หรือ other (อยู่กับอีกฝ่าย)');
           for (const k of ['far', 'back']) if (o[k] !== undefined && o[k] !== 'child') r(`${p}.${k}`, `${k} ใช้ได้กับ child`);
           if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
           // สาเหตุที่จอต้องพาสายด่วน (self_harm) ห้ามเนื้อหาสั่ง — เจ้าของไม่ให้มีการ์ดที่พาไปสู่การทำร้ายตัวเอง
@@ -826,6 +827,21 @@ export const rules = [
       if (!isObj(w) || Object.keys(w).some((k) => k !== 'way' && k !== 'n')) return r('.when.filial', 'filial ต้องเป็น {way?, n?}');
       if (w.way !== undefined && !(Array.isArray(w.way) && w.way.length && w.way.every((x) => FILIAL_WAYS.includes(x)))) r('.when.filial.way', `way ต้องเป็นรายการจาก ${FILIAL_WAYS.join(' ')}`);
       if (w.n !== undefined && !isRange(w.n, 1, 99)) r('.when.filial.n', 'n ต้องเป็น [lo, hi] ใน 1–99');
+    },
+  },
+  {
+    id: 'spouse',
+    desc: 'when.spouse = {status?: together|apart, bond?: [lo,hi] 0–100, together?: [lo,hi] ปีที่อยู่ด้วยกัน, apart?: [lo,hi] ปีที่แยกทางมาแล้ว} — คู่ปัจจุบันที่ยังไม่หย่า · bond ต่ำสุดในเกม = 38 (BOND_FLOOR) เกณฑ์ต่ำกว่านั้นการ์ดไม่เคยออก',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.spouse : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => !['status', 'bond', 'together', 'apart'].includes(k))) return r('.when.spouse', 'spouse ต้องเป็น {status?, bond?, together?, apart?}');
+      if (w.status !== undefined && !['together', 'apart'].includes(w.status)) r('.when.spouse.status', 'status ต้องเป็น together หรือ apart');
+      if (w.bond !== undefined && !isRange(w.bond, 0, 100)) r('.when.spouse.bond', 'bond ต้องเป็น [lo, hi] ใน 0–100');
+      if (w.bond !== undefined && isRange(w.bond, 0, 100) && w.bond[1] < 38) r('.when.spouse.bond', 'bond สูงสุดต่ำกว่า BOND_FLOOR 38 การ์ดไม่เคยออก');
+      for (const k of ['together', 'apart']) if (w[k] !== undefined && !isRange(w[k], 0, 99)) r(`.when.spouse.${k}`, `${k} ต้องเป็น [lo, hi] ปี 0–99`);
+      if (w.apart !== undefined && w.status === 'together') r('.when.spouse.apart', 'apart ใช้กับ status: apart เท่านั้น');
+      if (w.together !== undefined && w.status === 'apart') r('.when.spouse.together', 'together ใช้กับ status: together เท่านั้น');
     },
   },
   {

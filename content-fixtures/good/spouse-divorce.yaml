@@ -1,0 +1,26 @@
+# when.spouse และ op reconcile/custody ถูกรูป (ใบ 92)
+events:
+  - id: good_spouse_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {status: together, bond: [38, 48], together: [3, 99]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{separate: spouse}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{reconcile: spouse}, {bond: spouse, d: 5}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{divorce: spouse}, {custody: other}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", family: [{divorce: spouse}, {custody: self}], merit: [{cat: neutral}]}
+  - id: good_spouse_02
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {status: apart, apart: [1, 6]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
