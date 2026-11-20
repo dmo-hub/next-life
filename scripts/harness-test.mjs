@@ -1456,6 +1456,45 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 95 ปีตรวจพ่อ 2 ช่วง: การ์ดฐาน years[0] = pt.common · สำเนาหายาก years[0] = pt.from จบก่อน common และจำกัด กทม.', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => ev95(id).years[0] === pt.common) && ['fam_not_mine_mid_rare_01', 'fam_not_mine_old_rare_01'].every((id) => ev95(id).years[0] === pt.from && ev95(id).years[1] === pt.common - 1 && ev95(id).when.province?.join() === 'กรุงเทพมหานคร') && pt.from < pt.common);
 }
 
+// คืนดีกับคู่เก่าหลังหย่า (ใบ 97 B114 ข้อ 158 161 162): when.ex_spouse · op remarry · ครั้งเดียวต่อชีวิต
+{
+  const content = loadContent();
+  const cards = ['fam_reconcile_ex_work_01', 'fam_reconcile_ex_mid_01'].map((id) => content.events.find((e) => e.id === id));
+  const divorced = (seed = 7) => {
+    const st = newLife(seed, content);
+    st.age = 26;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    st.age = 32;
+    st.flags.ex_bitter = true;
+    applyFamily(st, { family: [{ divorce: 'spouse' }] });
+    return st;
+  };
+  const st = divorced();
+  const ex = st.kin.find((m) => m.role === 'spouse');
+  const at = (age) => { st.age = age; return cards.map((c) => whenOk(st, c.when)); };
+  check('ใบ 97 ออกเฉพาะหลังหย่า 1–5 ปี (ปีเดียวกับที่หย่า · 6 ปีผ่านไป = ไม่ออก)', at(32).every((x) => !x) && at(33).every(Boolean) && at(37).every(Boolean) && at(38).every((x) => !x));
+  const st2 = divorced(); st2.age = 34;
+  applyFamily(st2, { family: [{ add: 'partner' }] });
+  check('ใบ 97 ไม่ออกเมื่อมีแฟนคบอยู่ (ไม่โสด)', cards.every((c) => !whenOk(st2, c.when)));
+  const st3 = divorced(); st3.age = 34;
+  ex.alive; st3.kin.find((m) => m.role === 'spouse').alive = false;
+  check('ใบ 97 ไม่ออกเมื่อคู่เก่าตายแล้ว', cards.every((c) => !whenOk(st3, c.when)));
+  st.age = 34;
+  st.kinFocus = { spouse: ex.id };
+  const bondBefore = ex.bond;
+  applyFamily(st, { family: [{ remarry: 'spouse' }] });
+  check('ใบ 97 คืนดี: คนเดิม (id/ชื่อ) กลับเป็นคู่ · together · ไม่ left · ธง married กลับ', ex.status === 'together' && !ex.left && ex.leftAge === undefined && st.flags.married === true && st.kin.filter((m) => m.role === 'spouse').length === 1);
+  check('ใบ 97 คืนดี: อายุแต่งนับรอบใหม่ (since = อายุตอนนี้) · ผูกพันคงค่าที่ค้าง · ex_bitter จบ', ex.since === 34 && ex.bond === bondBefore && !st.flags.ex_bitter);
+  check('ใบ 97 คืนดีได้ครั้งเดียวต่อชีวิต: หย่าอีกรอบแล้วการ์ดไม่ออก · op ซ้ำไม่ทำอะไร', (applyFamily(st, { family: [{ divorce: 'spouse' }] }), st.age = 36, cards.every((c) => !whenOk(st, c.when))) && (applyFamily(st, { family: [{ remarry: 'spouse' }] }), ex.status === 'divorced'));
+  const st4 = divorced(8); st4.age = 34;
+  applyFamily(st4, { family: [{ add: 'spouse' }] });
+  const second = st4.kin.findLast((m) => m.role === 'spouse');
+  applyFamily(st4, { family: [{ remarry: 'spouse' }] });
+  check('ใบ 97 มีคู่ใหม่อยู่แล้ว = remarry ไม่ทำอะไร (คู่เก่ายังหย่า)', st4.kin.find((m) => m.role === 'spouse').status === 'divorced' && second.alive);
+  const lowered = cards.every((c) => c.multipliers?.flags?.we_cheated < 1);
+  check('ใบ 97 หย่าเพราะเรานอกใจ (we_cheated): น้ำหนักการ์ดคืนดีต่ำลง', lowered);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

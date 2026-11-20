@@ -50,6 +50,8 @@ const wedCohort = new Map();
 const divBands = JSON.parse(readFileSync(new URL('../data/divorce-rate.json', import.meta.url), 'utf8')).bands.map((x) => ({ ...x, wed: 0, div: 0 }));
 // ใบ 94 (B114 ข้อ 153): ชีวิตคู่ที่มีนอกใจ (เราหรือคู่) ต่อชีวิตที่เคยแต่ง · ราวครึ่งจบหย่า · วัดเฉพาะบอทสุ่ม (สายบุญไม่เคยรับ สายบาปรับทุกใบ)
 const CHEAT = { from: 0.10, to: 0.15, divFrom: 0.30, divTo: 0.70, wed: 0, cheat: 0, div: 0, us: 0, them: 0 };
+// ใบ 97 (B114 ข้อ 158 161 162): ชีวิตที่เคยหย่า → คืนดีกับคู่เก่า · ไม่เกิน 1 ครั้งต่อชีวิต · ไม่เกิน 5 ปีหลังหย่า · วัดบอทสุ่ม (ทางคืนดีเป็น 1 ใน 4 ตัวเลือก)
+const REUNION = { from: 0.03, to: 0.20, div: 0, back: 0, twice: 0, late: 0 };
 const wedAges = [];
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
@@ -160,6 +162,13 @@ for (const [bot, pick] of Object.entries(BOTS)) {
           if (first.status === 'divorced') CHEAT.div++;
         }
       }
+    }
+    if (bot === 'สุ่ม') {
+      const back = st.kin.filter((m) => m.reunited !== undefined);
+      if (back.length || st.kin.some((m) => m.status === 'divorced')) REUNION.div++;
+      if (back.length) REUNION.back++;
+      if (back.length > 1) REUNION.twice++;
+      if (back.some((m) => m.reunitedGap < 1 || m.reunitedGap > 5)) REUNION.late++;
     }
     if (wedAge !== undefined) wedAges.push(wedAge);
     if (st.age >= 45) {
@@ -300,6 +309,11 @@ for (const x of divBands) {
   const r = CHEAT.cheat / Math.max(1, CHEAT.wed), d = CHEAT.div / Math.max(1, CHEAT.cheat);
   check(`นอกใจ (ใบ 94) · ชีวิตคู่ที่มีนอกใจ ${CHEAT.from}–${CHEAT.to} (เรา ${CHEAT.us} · คู่ ${CHEAT.them})`, CHEAT.wed >= 200 && r >= CHEAT.from && r <= CHEAT.to ? 0 : 1, ` ${CHEAT.cheat}/${CHEAT.wed} = ${fmt(r)}`);
   check(`นอกใจ (ใบ 94) · จบหย่า ${CHEAT.divFrom}–${CHEAT.divTo}`, CHEAT.cheat >= 25 && d >= CHEAT.divFrom && d <= CHEAT.divTo ? 0 : 1, ` ${CHEAT.div}/${CHEAT.cheat} = ${fmt(d)}`);
+}
+{
+  const r = REUNION.back / Math.max(1, REUNION.div);
+  check(`คืนดีคู่เก่า (ใบ 97) · ชีวิตที่เคยหย่าแล้วคืนดี ${REUNION.from}–${REUNION.to}`, REUNION.div >= 100 && r >= REUNION.from && r <= REUNION.to ? 0 : 1, ` ${REUNION.back}/${REUNION.div} = ${fmt(r)}`);
+  check('คืนดีคู่เก่า (ใบ 97) · ไม่เกิน 1 ครั้งต่อชีวิต · อยู่ใน 1–5 ปีหลังหย่า', REUNION.twice + REUNION.late, ` ซ้ำ ${REUNION.twice} · นอกช่วง ${REUNION.late}`);
 }
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

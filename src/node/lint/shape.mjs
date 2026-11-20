@@ -22,7 +22,7 @@ const KEYS = {
   event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'run', 'arc', 'heavy', 'office_ok'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
-  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'custody', 'paternity', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
+  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -30,7 +30,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'child_not_mine', 'heredity', 'filial', 'spouse', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'child_not_mine', 'ex_spouse', 'heredity', 'filial', 'spouse', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -743,8 +743,8 @@ export const rules = [
         if (!Array.isArray(node.family) || !node.family.length) { r(`${path}.family`, 'family ต้องเป็นรายการไม่ว่าง'); continue; }
         node.family.forEach((o, i) => {
           const p = `${path}.family[${i}]`;
-          const kinds = ['add', 'leave', 'separate', 'divorce', 'reconcile', 'custody', 'paternity', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
-          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce reconcile custody paternity breakup marry far back die หรือ bond อย่างเดียว');
+          const kinds = ['add', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
+          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce reconcile remarry custody paternity breakup marry far back die หรือ bond อย่างเดียว');
           if (o.add !== undefined && !['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น partner spouse child grandchild pet herd peer');
           // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
           const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
@@ -759,7 +759,7 @@ export const rules = [
           if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
           for (const k of ['breakup', 'marry']) if (o[k] !== undefined && o[k] !== 'partner') r(`${p}.${k}`, `${k} ใช้ได้กับ partner`);
           if (o.by !== undefined && (o.breakup === undefined || !['us', 'them'].includes(o.by))) r(`${p}.by`, 'by ใช้กับ breakup เป็น us หรือ them');
-          for (const k of ['separate', 'divorce', 'reconcile']) if (o[k] !== undefined && o[k] !== 'spouse') r(`${p}.${k}`, `${k} ใช้ได้กับ spouse`);
+          for (const k of ['separate', 'divorce', 'reconcile', 'remarry']) if (o[k] !== undefined && o[k] !== 'spouse') r(`${p}.${k}`, `${k} ใช้ได้กับ spouse`);
           if (o.custody !== undefined && !['self', 'other'].includes(o.custody)) r(`${p}.custody`, 'custody ต้องเป็น self (เราเลี้ยง) หรือ other (อยู่กับอีกฝ่าย)');
           if (o.paternity !== undefined && !['keep', 'cut'].includes(o.paternity)) r(`${p}.paternity`, 'paternity ต้องเป็น keep (ยังเป็นลูกเรา) หรือ cut (ตัดขาด)');
           for (const k of ['far', 'back']) if (o[k] !== undefined && o[k] !== 'child') r(`${p}.${k}`, `${k} ใช้ได้กับ child`);
@@ -822,6 +822,16 @@ export const rules = [
       if (w === undefined) return;
       if (!isObj(w) || Object.keys(w).some((k) => k !== 'age')) return r('.when.child_not_mine', 'child_not_mine ต้องเป็น {age?}');
       if (w.age !== undefined && !isRange(w.age, 0, 120)) r('.when.child_not_mine.age', 'age ต้องเป็น [lo, hi]');
+    },
+  },
+  {
+    id: 'ex-spouse',
+    desc: 'when.ex_spouse = {within: [lo, hi]} — คู่เก่าที่หย่าแล้วและยังอยู่ หย่ามาแล้ว lo–hi ปี · เรายังโสด · ยังไม่เคยคืนดี (ใบ 97) · การ์ดเรียกคู่เก่าเป็น {ชื่อคู่} · ตัวเลือกคืนดีด้วย family: [{remarry: spouse}]',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.ex_spouse : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => k !== 'within')) return r('.when.ex_spouse', 'ex_spouse ต้องเป็น {within: [lo, hi]}');
+      if (!isRange(w.within, 0, 60)) r('.when.ex_spouse.within', 'within ต้องเป็น [lo, hi] ปีหลังหย่า');
     },
   },
   {
