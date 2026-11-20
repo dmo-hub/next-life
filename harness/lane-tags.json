@@ -27,7 +27,8 @@
         "none",
         "gov",
         "army",
-        "police"
+        "police",
+        "trade"
       ],
       "owner": false
     }
