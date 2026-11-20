@@ -1,6 +1,6 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
-import { exPartnerOf, childFarOk, focusChildFar, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
+import { exPartnerOf, childFarOk, focusChildFar, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, spouseOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -2263,6 +2263,7 @@ export function whenOk(st, when) {
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
   if (when.child_far && !childFarOk(st, when.child_far)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
+  if (when.spouse && !spouseOk(st, when.spouse)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(classNow(st))) return false;
