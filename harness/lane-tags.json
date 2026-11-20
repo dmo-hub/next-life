@@ -1,0 +1,79 @@
+{
+  "_doc": "ป้ายสายต่อใบของการ์ดวัยทำงาน (ทำงาน/กลางคน) ที่เรื่องผูกสายใดสายหนึ่งชัด — ใบ 180 · อ่านโดย harness/work-lane.mjs · ติดจากการอ่านเรื่อง ไม่ใช่รายการคำ · ใบไม่มีป้าย = ใช้ได้ทุกสาย",
+  "groups": {
+    "office": {
+      "fit": [
+        "private",
+        "none",
+        "gov"
+      ],
+      "owner": false
+    },
+    "shop": {
+      "fit": [
+        "trade"
+      ],
+      "owner": true
+    },
+    "hunter": {
+      "fit": [
+        "hunter"
+      ],
+      "owner": false
+    },
+    "workplace": {
+      "fit": [
+        "private",
+        "none",
+        "gov",
+        "army",
+        "police"
+      ],
+      "owner": false
+    }
+  },
+  "cards": {
+    "fraud_whistle_01": "workplace",
+    "echo_spoke_up_01": "office",
+    "echo_endured_01": "office",
+    "echo_debt_slip_audit_01": "office",
+    "echo_fraud_old_team_01": "office",
+    "echo_health_listener_01": "workplace",
+    "echo_fraud_witness_01": "workplace",
+    "fest_newyear_adult_01": "workplace",
+    "era_city_mobile_adult_01": "office",
+    "era_econ_gfc_adult_01": "office",
+    "era_health_pm25_adult_01": "workplace",
+    "love_office_funeral_01": "office",
+    "love_envelope_month_01": "office",
+    "money_app_contacts_01": "office",
+    "tech_group_dig_01": "office",
+    "meme_old_speech_01": "office",
+    "meme_cham_01": "office",
+    "midh_faint_work_01": "workplace",
+    "patient_far_hospital_01": "workplace",
+    "swindle_office_sample_01": "office",
+    "pali_tid_01": "office",
+    "risky_string_caught_01": "office",
+    "risky_string_quiet_01": "office",
+    "sex_pay_gap_01": "office",
+    "career_poach_cornered_01": "office",
+    "career_lead_mutiny_01": "office",
+    "career_factory_exam_01": "office",
+    "after_fest_work_01": "office",
+    "biz_grocery_rival_01": "shop",
+    "biz_credit_book_01": "shop",
+    "biz_politics_invite_01": "shop",
+    "fraud_scale_rumor_01": "shop",
+    "fraud_scale_gossip_01": "shop",
+    "tech_free_review_01": "shop",
+    "work_biz_boom_01": "shop",
+    "work_biz_bust_01": "shop",
+    "work_franchise_01": "shop",
+    "first_hunter_01": "hunter",
+    "dungeon_hunt_mid_01": "hunter",
+    "dungeon_hunt_boss_01": "hunter",
+    "dungeon_pull_mid_01": "hunter",
+    "dungeon_pull_out_01": "hunter"
+  }
+}
