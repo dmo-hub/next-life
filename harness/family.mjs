@@ -148,9 +148,11 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     const wedAge = st.flagAge?.married;
     if (wedAge !== undefined) {
       const wy = st.birthYear + wedAge, band = divBands.find((x) => wy >= x.from && wy <= x.to), first = st.kin.find((m) => m.role === 'spouse');
+      // คืนดีกับคู่เก่า (ใบ 97) สถานะกลับเป็น together แต่ชีวิตคู่นี้เคยจบด้วยการหย่าแล้ว — นับเป็นหย่า ไม่งั้นอัตราหย่าตามยุคต่ำเกินจริง
+      const ended = first?.status === 'divorced' || first?.reunited !== undefined;
       if (band && first) {
         band.wed++;
-        if (first.status === 'divorced') band.div++;
+        if (ended) band.div++;
       }
       if (bot === 'สุ่ม' && first) {
         CHEAT.wed++;
@@ -159,7 +161,7 @@ for (const [bot, pick] of Object.entries(BOTS)) {
           CHEAT.cheat++;
           if (us) CHEAT.us++;
           if (them) CHEAT.them++;
-          if (first.status === 'divorced') CHEAT.div++;
+          if (ended) CHEAT.div++;
         }
       }
     }
