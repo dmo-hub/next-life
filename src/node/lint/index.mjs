@@ -11,9 +11,10 @@ import { rules as belief } from './belief.mjs';
 import { rules as afterlife } from './afterlife.mjs';
 import { rules as kin } from './kin.mjs';
 import { rules as focus, focusTags } from './focus.mjs';
+import { rules as office } from './office.mjs';
 import { isObj } from './util.mjs';
 
-export const RULES = [...shape, ...merit, ...flags, ...systems, ...lore, ...belief, ...afterlife, ...kin, ...focus];
+export const RULES = [...shape, ...merit, ...flags, ...systems, ...lore, ...belief, ...afterlife, ...kin, ...focus, ...office];
 const root = new URL('../../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 

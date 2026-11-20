@@ -17,6 +17,7 @@ import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../s
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 import { checkTree } from '../src/node/lint/tree.mjs';
 import { sillyGaps } from '../src/node/lint/heavy.mjs';
+import { officeGaps } from '../src/node/lint/office.mjs';
 import { checkFocus } from '../src/node/lint/focus.mjs';
 import { checkNature } from '../src/node/lint/nature.mjs';
 
@@ -670,6 +671,37 @@ try {
   const real = dir('content/').map((f) => load('content/', f));
   const gap = sillyGaps(real);
   rows.push(['เตือน: การ์ดไม่มีตัวเลือกปั่น (silly)', `${gap.missing.length}/${gap.total} ใบ (ไม่ตก · ใบ 158 เปลี่ยนเป็นตก · ค่าเริ่มคือทุกใบ)`]);
+}
+
+// ---- ใบ 182 คำออฟฟิศในการ์ดวัยทำงาน: คำเตือนนับใบค้าง (ไม่ตก · ใบ 184 สลับเป็นตก) + ป้ายยกเว้น office_ok ต้องมีเหตุผล (ตก) ----
+{
+  const card = (extra = {}) => ({ id: 'of_case', type: 'A', category: 'work', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว', choices: [1, 2, 3, 4].map((i) => ({ text: `ทางเลือก ${i}`, merit: [{ cat: 'neutral' }] })), ...extra });
+  const cases = [
+    ['ไฟมอดกรองกว้าง service', { when: { occupation: ['service', 'clerk'] } }, 1],
+    ['ไฟมอดกรองสาย trade', { when: { occupation: ['clerk'], ladder: ['trade', 'private'] } }, 1],
+    ['ไม่มีตัวกรอง', {}, 1],
+    ['กรองอาชีพออฟฟิศ + สาย none private (การ์ดไฟมอดจริง)', { when: { occupation: ['clerk', 'professional', 'manager', 'technician'], ladder: ['none', 'private'] } }, 0],
+    ['กรองสาย gov อย่างเดียว', { when: { ladder: ['gov'] } }, 0],
+    ['ใช้คำแทน {คนคุมงาน}', { text: 'กลางประชุม {คนคุมงาน} เรียกคุณเข้าไปคุย' }, 0],
+    ['ยกเว้นพร้อมเหตุผล', { office_ok: 'ที่ประชุมหมู่บ้าน ไม่ใช่ออฟฟิศ' }, 0],
+    ['ช่วงเด็กไม่นับ', { stage: 'เด็ก', years: [2500, 2650] }, 0],
+    ['ไม่มีคำออฟฟิศ', { text: 'คุณเดินกลับบ้านตอนเย็น ฝนตกหนักจนรองเท้าเปียก' }, 0],
+  ];
+  for (const [name, extra, want] of cases) {
+    const g = officeGaps([{ file: `office-case:${name}`, doc: { events: [card(extra)] } }]);
+    if (g.missing.length !== want) fails.push(`office-gaps "${name}": ต้องค้าง ${want} ใบ ได้ ${g.missing.length}`);
+  }
+  for (const [name, ok, want] of [['เหตุผลปกติ', 'ที่ประชุมหมู่บ้าน', 0], ['สตริงว่าง', '', 1], ['สั้นเกิน', 'สั้น', 1], ['ไม่ใช่ข้อความ', true, 1]]) {
+    const ps = lintDocs([{ file: `office-exempt:${name}`, doc: { events: [card({ office_ok: ok })] } }], ctx).filter((p) => p.rule === 'office-exempt');
+    if ((ps.length > 0) !== (want > 0)) fails.push(`office-exempt "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.map((p) => p.msg).join(' | ') || 'ผ่าน'}]`);
+  }
+  for (const [name, extra] of [['ไม่มีคำออฟฟิศ', { text: 'คุณเดินกลับบ้านตอนเย็น' }], ['ช่วงเด็ก', { stage: 'เด็ก' }]]) {
+    const ps = lintDocs([{ file: `office-exempt:${name}`, doc: { events: [card({ office_ok: 'ที่ประชุมหมู่บ้าน', ...extra })] } }], ctx).filter((p) => p.rule === 'office-exempt');
+    if (!ps.length) fails.push(`office-exempt "${name}": ป้ายยกเว้นที่ไม่จำเป็นต้องตก`);
+  }
+  rows.push(['คำออฟฟิศ ตัวควบคุม', `${cases.length + 6} เคส`]);
+  const og = officeGaps(dir('content/').map((f) => load('content/', f)));
+  rows.push(['เตือน: การ์ดวัยทำงานคำออฟฟิศไม่กรองอาชีพ', `${og.missing.length}/${og.total} ใบ ยกเว้น ${og.exempt} (ไม่ตก · ใบ 184 เปลี่ยนเป็นตก)`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
