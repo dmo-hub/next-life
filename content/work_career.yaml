@@ -8,7 +8,7 @@ events:
     years: [2500, 2650]
     weight: 2
     repeat: {gap: 6, max: 2}
-    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {stats: {network: 1.5}, occupation: {technician: 1.3, professional: 1.3}}
     title: "สายลับจากบริษัทคู่แข่ง"
     text: "เบอร์แปลกโทรมาตอนพักเที่ยง เป็นบริษัทคู่แข่งที่แย่งลูกค้ากันมาตลอด เสนอเงินเดือนเพิ่มเกือบครึ่ง ขอคำตอบภายในสัปดาห์นี้"
@@ -37,6 +37,7 @@ events:
         effects: {relations: 1, network: 1}
         merit: [{cat: neutral}]
 
+    office_ok: "ต่อเนื่องจากใบที่กรองอาชีพออฟฟิศแล้ว ไม่ออกเดี่ยว"
   - id: career_poach_cornered_01
     away_block: [abroad, monk]
     type: A
@@ -117,7 +118,7 @@ events:
     years: [2500, 2650]
     weight: 2
     repeat: {gap: 7, max: 2}
-    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {flags: {married: 1.2}}
     title: "คำสั่งย้ายด่วน"
     text: "ประกาศติดบอร์ดเช้าวันจันทร์ ชื่อ{ชื่อ}อยู่บรรทัดแรก ย้ายไปประจำสาขาต่างจังหวัด มีผลต้นเดือนหน้า"
@@ -153,7 +154,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [clerk, technician, professional], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {stats: {network: 1.4}, flags: {good_student: 1.3}}
     title: "เก้าอี้ที่ว่างลง"
     text: "หัวหน้าแผนกลาออกกะทันหัน ผู้บริหารเรียก{ชื่อ}เข้าห้อง ถามสั้น ๆ ว่าพร้อมคุมคนยี่สิบคนหรือยัง"
@@ -182,6 +183,7 @@ events:
           - {weight: 2, ok: true, text: "ยอดพุ่ง ผู้บริหารปลื้ม แต่ในทีมไม่มีใครยิ้มให้อีก", effects: {job: manager, relations: -2}, merit: [{cat: oppress_subjects, level: 1}]}
           - {weight: 2, text: "ลูกน้องลาออกยกทีมในเดือนเดียว ถูกถอดจากตำแหน่งกลางที่ประชุม", effects: {happiness: -3, income_mult: 0.85, relations: -1}, merit: [{cat: neutral}]}
 
+    office_ok: "ต่อเนื่องจากใบที่กรองอาชีพออฟฟิศแล้ว ไม่ออกเดี่ยว"
   - id: career_lead_mutiny_01
     away_block: [abroad, monk]
     type: A
@@ -207,7 +209,8 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 1
-    when: {occupation: [factory, clerk, technician, manager, professional], ladder: [none, private, trade]}
+    when: {occupation: [factory, clerk, technician, manager, professional], ladder: [none, private], flags: {not: [own_business]}}
+    office_ok: "บริษัทในผลเป็นของลูกน้องเก่าที่รับเข้าทำงาน ใช้ได้ทุกอาชีพในใบ"
     multipliers: {flags: {took_bribe: 1.5, caught_fraud: 2}}
     title: "เริ่มนับหนึ่งตอนห้าสิบ"
     text: "ที่ทำงานปรับโครงสร้าง ชื่อ{ชื่อ}วัย {อายุ} อยู่ในรายชื่อชุดแรก ใบสมัครงานที่ยื่นไปสิบกว่าแห่งเงียบกริบ เพราะทุกที่อยากได้คนอายุน้อยกว่า"
@@ -248,6 +251,7 @@ events:
     years: [2500, 2650]
     weight: 2
     when: {occupation: [factory]}
+    office_ok: "ลูกจ้างโรงงานรับเงินเดือนจริง ใบกรองเฉพาะ factory แล้ว"
     title: "เครื่องจักรตัวที่สาม"
     text: "เครื่องจักรในไลน์ผลิตดับกลางกะดึก ช่างประจำลาป่วย หัวหน้ากะหันมามอง{ชื่อ}ซึ่งแอบดูช่างซ่อมมาหลายปี"
     choices:
@@ -346,7 +350,8 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 1
-    when: {occupation: [farmer, labor, factory, craft, service]}
+    when: {occupation: [farmer, labor, factory, craft, service], flags: {not: [own_business]}}
+    office_ok: "เงินเดือนในผลคือเก้าอี้ที่ญาติจัดให้ ไม่ใช่ออฟฟิศของผู้เล่น"
     multipliers: {stats: {network: 1.5}, class: {ร่ำรวย: 1.3}}
     title: "ตั๋วช้าง"
     text: "ญาติผู้ใหญ่ที่นั่งตำแหน่งสูงกระซิบว่า มีเก้าอี้ว่างหนึ่งที่ ถ้าอยากได้ ชื่อคนที่สอบได้ที่หนึ่งจะหายไปจากประกาศเอง"

@@ -157,6 +157,7 @@ events:
     years: [2500, 2650]
     weight: 8
     when: {ladder: [police], flags: {has: [badge_clean]}}
+    office_ok: "สายตำรวจ ที่ประชุมของผู้กำกับเป็นเรื่องจริง"
     title: "ข้อเสนอจากเจ้าของบ่อน"
     text: "เจ้าของบ่อนในเขตนัดเจอที่ร้านกาแฟ บอกว่ารู้ว่าคุณไม่รับซอง เลยไม่ให้ซอง แต่จะโอนค่าเทอมเรียนต่อปริญญาโทให้ แค่ตอนตรวจให้โทรบอกก่อนครึ่งชั่วโมง"
     choices:
@@ -184,6 +185,7 @@ events:
 
   # ราชการ — ใบเบิกล่วงเวลาที่ไม่ได้ทำ
   - id: first_gov_01
+    office_ok: "เงินเดือนข้าราชการ ใบเปิดทางสายราชการ"
     away_block: [abroad, monk]
     type: A
     category: work_money
@@ -359,6 +361,7 @@ events:
 
   # ทหาร — พลทหารรับใช้
   - id: first_army_01
+    office_ok: "ที่ประชุมกองพัน ใบเปิดทางสายทหาร"
     away_block: [abroad, monk]
     type: A
     category: work_money
