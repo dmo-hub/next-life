@@ -152,6 +152,7 @@ events:
         merit: [{cat: sila, level: 2}]
 
   - id: workh_fatty_liver_01
+    office_ok: "บริษัทในผลคือบริษัทประกัน ไม่ใช่ที่ทำงาน"
     type: A
     category: health
     stage: ทำงาน
@@ -234,6 +235,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_viral_offer_01
+    office_ok: "ต่อเนื่องจากใบไฟมอดกลางประชุมที่กรองอาชีพออฟฟิศแล้ว"
     away_block: [abroad, monk]
     type: A
     category: health
