@@ -7,7 +7,7 @@ events:
     type: A
     category: family
     stage: กลางคน
-    years: [2543, 2650]
+    years: [2550, 2650]
     weight: 3
     when: {sex: [ชาย], family: [{role: child, alive: true}], child_not_mine: {age: [18, 45]}}
     title: "ผลตรวจที่ไม่ได้ขอ"
@@ -34,16 +34,82 @@ events:
         effects: {happiness: -2, relations: -2}
         merit: [{cat: neutral}]
 
+
+  - id: fam_not_mine_mid_rare_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2543, 2549]
+    weight: 1
+    when: {province: [กรุงเทพมหานคร], sex: [ชาย], family: [{role: child, alive: true}], child_not_mine: {age: [18, 45]}}
+    title: "ผลตรวจที่ลูกเก็บเงินไปทำ"
+    text: "“{ชื่อลูก}”นัดคุณมานั่งที่ร้านกาแฟ วางใบผลตรวจจากโรงพยาบาลรัฐในกรุงเทพฯ ลงบนโต๊ะ ลูกเก็บเงินอยู่หลายเดือนกว่าจะจ่ายค่าตรวจไหว เพราะตอนนั้นคนทั่วไปแทบไม่มีใครรู้ว่าตรวจได้ ผลบอกว่าสายเลือดของคุณไม่ตรงกับลูก"
+    choices:
+      - id: still_ours
+        text: "ยังเป็นลูกเราเหมือนเดิม"
+        family: [{paternity: keep}]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: ask_mother
+        text: "ขอเวลา แล้วไปถามเรื่องเก่ากับคู่"
+        family: [{paternity: keep}, {bond: spouse, d: -6}]
+        effects: {happiness: -2}
+        merit: [{cat: neutral}]
+      - id: retest
+        text: "ขอตรวจซ้ำ ผลก็เหมือนเดิม"
+        family: [{paternity: keep}]
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: cut_tie
+        text: "บอกว่าจากนี้เลิกเรียกกันว่าลูก"
+        family: [{paternity: cut}]
+        effects: {happiness: -2, relations: -2}
+        merit: [{cat: neutral}]
+
+
   - id: fam_not_mine_old_01
     away_block: [abroad, monk]
     type: A
     category: family
     stage: ชรา
-    years: [2543, 2650]
+    years: [2550, 2650]
     weight: 3
     when: {sex: [ชาย], family: [{role: child, alive: true}], child_not_mine: {age: [18, 60]}}
     title: "ซองเอกสารจากโรงพยาบาล"
     text: "ซองที่“{ชื่อลูก}”ถือมามีตราโรงพยาบาลและผลตรวจสายเลือดที่ทำตอนไปปรึกษาเรื่องโรคประจำตระกูล ลูกบอกเสียงเบาว่าอยากให้คุณรู้จากปากลูกเอง ก่อนที่จะรู้จากใครอื่น"
+    choices:
+      - id: still_ours
+        text: "ยังเป็นลูกเราเหมือนเดิม"
+        family: [{paternity: keep}]
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: silent_keep
+        text: "เก็บซองไว้ ไม่พูดเรื่องนี้อีก"
+        family: [{paternity: keep}]
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: cut_tie
+        text: "บอกว่าจากนี้เลิกเรียกกันว่าลูก"
+        family: [{paternity: cut}]
+        effects: {happiness: -2, relations: -2}
+        merit: [{cat: neutral}]
+      - id: hug_child
+        text: "กอดลูก ไม่ถามอะไรอีก"
+        family: [{paternity: keep}, {bond: child, d: 3}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  - id: fam_not_mine_old_rare_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ชรา
+    years: [2543, 2549]
+    weight: 1
+    when: {province: [กรุงเทพมหานคร], sex: [ชาย], family: [{role: child, alive: true}], child_not_mine: {age: [18, 60]}}
+    title: "ซองที่ลูกเข้ากรุงเทพฯ ไปทำ"
+    text: "ซองที่“{ชื่อลูก}”ถือมามีตราโรงพยาบาลรัฐในกรุงเทพฯ ลูกบอกว่าไปตรวจเองเงียบ ๆ ทั้งที่ค่าตรวจแพงและต้องเข้ากรุงเทพฯ ไปทำ อยากให้คุณรู้จากปากลูกก่อนที่จะรู้จากใครอื่น"
     choices:
       - id: still_ours
         text: "ยังเป็นลูกเราเหมือนเดิม"
