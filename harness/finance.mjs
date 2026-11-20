@@ -3,7 +3,7 @@
 // — พิสูจน์ว่าตัววัดจับผลจุดเกิดได้จริง ไม่ใช่เรียงถูกเพราะบังเอิญ · รันซ้ำ seed เดิมต้องได้ผลเดิมทุกหลัก
 import { playLife, openChoices, mixSeed, makeRng, CLASSES, standingOf } from '../src/engine/index.mjs';
 import { loadContent } from '../src/node/load.mjs';
-import { BOTS } from './bots.mjs';
+import { BOTS, withSpend } from './bots.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, def) => {
@@ -208,6 +208,18 @@ const meanAge = (xs, ok) => {
   return ys.reduce((a, x) => a + x.age, 0) / ys.length;
 };
 console.log(`\nบอทสายสุขภาพ ${HEALTH_LIVES} ชีวิต (ไม่ตัดสิน · อายุตายเฉลี่ย ทรัพย์มัธยฐาน · วงเล็บ = บอทเดิม seed เดียวกัน): ` + BANDS.map(([b, ok]) => `${b} ${f(meanAge(care, ok))} ปี ${f(med(care, (x) => ok(x.d)), 0)} บาท (${f(meanAge(base, ok))} ปี ${f(med(base, (x) => ok(x.d)), 0)})`).join(' · '));
+
+// ระดับใช้จ่าย (B29 · ใบ 52): บอทสุ่มตัวเดิมที่เลือกประหยัดทุกการ์ดทบทวนเงิน — แถวนี้ไม่ดึงเลขบอท ชีวิตจึงแยกจากบอทเดิมแค่ผลของเงินเก็บ
+// ด่าน: คนตั้งใจเก็บเงินต้องไม่ลงเอยแย่กว่าคนไม่เลือก (ตายพร้อมหนี้ · ล้มละลาย ไม่สูงกว่า) และทรัพย์มัธยฐานต้องสูงกว่า ไม่งั้นตัวคูณไม่มีผลจริง
+const FRUGAL_LIVES = Math.min(n, 10000);
+const frugal = run(content, FRUGAL_LIVES, withSpend(randomBot, 'frugal'));
+const plain = real.slice(0, FRUGAL_LIVES);
+const rate = (xs, ok) => (xs.filter(ok).length / xs.length) * 100;
+const fr = { neg: rate(frugal, (x) => x.w < 0), bk: rate(frugal, (x) => x.bk > 0), med: median(frugal.map((x) => x.w)) };
+const pl = { neg: rate(plain, (x) => x.w < 0), bk: rate(plain, (x) => x.bk > 0), med: median(plain.map((x) => x.w)) };
+const frugalOk = fr.neg <= pl.neg && fr.bk <= pl.bk && fr.med > pl.med;
+console.log(`\nบอทประหยัด ${FRUGAL_LIVES} ชีวิต (วงเล็บ = บอทเดิม seed เดียวกัน): ตายพร้อมหนี้ ${f(fr.neg)}% (${f(pl.neg)}%) · ล้มละลาย ${f(fr.bk)}% (${f(pl.bk)}%) · ทรัพย์มัธยฐาน ${f(fr.med, 0)} (${f(pl.med, 0)}) บาท → ${frugalOk ? 'ผ่าน' : 'ตก'}`);
+if (!frugalOk) fails++;
 
 console.log(fails ? `\nไม่ผ่าน ${fails} ด่าน` : '\nผ่านทั้งหมด');
 if (fails) process.exitCode = 1;
