@@ -1450,7 +1450,8 @@ const f2 = (v) => v.toFixed(2);
   const hn = heirHeredity(false), hy = heirHeredity(true);
   check('ใบ 95 ทายาทจากลูกไม่ใช่ลูกเรา: ไม่ได้ประวัติโรคกรรมพันธุ์ของผู้ตาย (ลูกปกติ seed เดียวกันได้ cancer)', hn.includes('cancer') && !hy.includes('cancer'), `ปกติ ${hn} · ไม่ใช่ลูก ${hy}`);
   const pt = JSON.parse(readFileSync('data/paternity-test.json', 'utf8'));
-  check('ใบ 95 ปีเริ่มตรวจพ่อ: years[0] ของการ์ดทั้งสองตรง data/paternity-test.json', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => content.events.find((e) => e.id === id).years[0] === pt.from));
+  const ev95 = (id) => content.events.find((e) => e.id === id);
+  check('ใบ 95 ปีตรวจพ่อ 2 ช่วง: การ์ดฐาน years[0] = pt.common · สำเนาหายาก years[0] = pt.from จบก่อน common และจำกัด กทม.', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => ev95(id).years[0] === pt.common) && ['fam_not_mine_mid_rare_01', 'fam_not_mine_old_rare_01'].every((id) => ev95(id).years[0] === pt.from && ev95(id).years[1] === pt.common - 1 && ev95(id).when.province?.join() === 'กรุงเทพมหานคร') && pt.from < pt.common);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
