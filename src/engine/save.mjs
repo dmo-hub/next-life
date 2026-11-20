@@ -91,7 +91,7 @@ export function repairLife(st, card) {
   }
   lifeTreeMigrate(st);
   lifeGatesMigrate(st);
-  // เซฟก่อน ft15: กลไกโฟกัสรายปีถูกตัดแล้ว — ล้างสถานะค้าง (focusYears ยังอ่านโดยสะพานประตูจนกว่าจะตัด)
+  // เซฟก่อน ft15: กลไกโฟกัสรายปีถูกตัดแล้ว — ล้างสถานะค้าง (focusYears แปลงเป็น st.gates ใน lifeGatesMigrate แล้วตัด)
   for (const k of ['focus', 'focusAt', 'focusMet', 'focusDoom', 'focusBorn', 'focusHeir', 'focusWarn']) delete st[k];
   return stale;
 }
