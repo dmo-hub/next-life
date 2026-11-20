@@ -1,0 +1,226 @@
+# นอกใจทั้งสองฝ่าย + การ์ดล่อใจ (ใบ 94 · B114 ข้อ 153 · เจ้าของเคาะ 1 2 3): ละครหลังข่าว ไม่มีฉาก ไม่บรรยายร่างกาย · คำทั่วไป (นอกใจ · มีคนอื่น · มีกิ๊ก)
+# ฝั่งเรา: การ์ดล่อใจ (ปฏิเสธได้ทุกใบ · ทางรับลงหมวด adultery) → ธง we_cheated → ถูกจับได้ตามโอกาส (นัด fam_cheat_found_01 มี chance) → ทางออกบ้าน = fam_cheat_leave_01 → นัดคืนดี/หย่าของใบ 92
+# ฝั่งคู่: fam_strays_*_01 (กองสุ่ม) ธง spouse_cheated + ปีที่จดใน flagAge (ฐานใบ 95) · ป้ายบุญบาปเป็นกลางทุกทาง = คู่นอกใจไม่นับบาปเรา
+# ความถี่ปรับด้วยน้ำหนักการ์ด · ด่าน harness/family.mjs "นอกใจ" วัด % ชีวิตคู่ที่มีนอกใจ + % ที่จบหย่า
+events:
+  - id: fam_tempt_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.36
+    when: {spouse: {status: together, together: [2, 99]}, flags: {not: [we_cheated]}}
+    title: "ข้อความจากคนที่ไม่ใช่บ้าน"
+    text: "เพื่อนร่วมงานคนที่นั่งโต๊ะติดกันส่งข้อความมาตอนสามทุ่ม ถามว่าเลิกงานแล้วไปนั่งดื่มกันสองคนไหม พร้อมประโยคที่ทำให้คุณรู้ว่าเขาไม่ได้ชวนเพราะเรื่องงาน"
+    choices:
+      - id: decline_plain
+        text: "ตอบว่าไม่สะดวก แล้วปิดเครื่อง"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: tell_home
+        text: "เอาข้อความให้คู่ดูแล้วหัวเราะกัน"
+        family: [{bond: spouse, d: 4}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: go_once
+        text: "ไปนั่งด้วยครั้งเดียว ไม่บอกใคร"
+        sets_flags: [we_cheated]
+        effects: {happiness: 1, relations: -1}
+        schedules: [{event: fam_cheat_found_01, after_years: [1, 3], chance: 0.55}]
+        merit: [{cat: adultery, level: 1}]
+      - id: keep_seeing
+        text: "ตอบรับ แล้วนัดเจอกันต่อไป"
+        sets_flags: [we_cheated]
+        effects: {happiness: 2, relations: -2}
+        schedules: [{event: fam_cheat_found_01, after_years: [1, 3], chance: 0.8}]
+        merit: [{cat: adultery, level: 2}]
+
+  - id: fam_tempt_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.36
+    when: {spouse: {status: together, together: [2, 99]}, flags: {not: [we_cheated]}}
+    title: "คนที่ฟังคุณจนจบ"
+    text: "งานเลี้ยงรุ่นปีนี้มีเพื่อนเก่าคนหนึ่งที่นั่งฟังคุณบ่นเรื่องบ้านเรื่องงานจนจบโดยไม่เปิดมือถือเลย ก่อนแยกกัน เขาเขียนเบอร์ส่วนตัวใส่กระดาษแล้วบอกว่าถ้าอยากคุยอีก ไม่ต้องบอกใครก็ได้"
+    choices:
+      - id: tear_paper
+        text: "ขยำกระดาษทิ้งก่อนขึ้นรถ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: thank_only
+        text: "ขอบคุณ แล้วบอกว่ามีคนรออยู่บ้าน"
+        family: [{bond: spouse, d: 3}]
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: save_number
+        text: "เก็บเบอร์ไว้ ส่งข้อความหากันบ้าง"
+        sets_flags: [we_cheated]
+        effects: {happiness: 1, relations: -1}
+        schedules: [{event: fam_cheat_found_01, after_years: [1, 3], chance: 0.5}]
+        merit: [{cat: adultery, level: 1}]
+      - id: meet_secret
+        text: "นัดเจอกันลับหลังทุกสัปดาห์"
+        sets_flags: [we_cheated]
+        effects: {happiness: 2, relations: -2}
+        schedules: [{event: fam_cheat_found_01, after_years: [1, 3], chance: 0.8}]
+        merit: [{cat: adultery, level: 2}]
+
+  # ← เราเลือกรับการ์ดล่อใจแล้วถูกจับได้ (นัดจากตัวเลือกรับ · ไม่อยู่กองสุ่ม)
+  - id: fam_cheat_found_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {status: together}, flags: {has: [we_cheated], not: [cheat_found]}}
+    title: "ข้อความที่ไม่ได้ลบ"
+    text: "“{ชื่อคู่}”ถือมือถือของคุณมายืนหน้าห้อง ไม่ได้ตะโกน ไม่ได้ร้องไห้ แค่วางมันลงบนโต๊ะแล้วถามว่าคนที่ชื่ออยู่ในหน้าจอคือใคร"
+    choices:
+      - id: confess
+        text: "บอกความจริงทั้งหมด ขอโทษ"
+        sets_flags: [cheat_found]
+        family: [{bond: spouse, d: -8}]
+        effects: {happiness: -2, relations: -1}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.7}]
+        merit: [{cat: neutral}]
+      - id: deny
+        text: "บอกว่าเข้าใจผิด ไม่มีอะไร"
+        sets_flags: [cheat_found]
+        family: [{bond: spouse, d: -12}]
+        effects: {happiness: -2, relations: -2}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.95}]
+        merit: [{cat: neutral}]
+      - id: cut_off
+        text: "บล็อกคนนั้นต่อหน้า ขอเริ่มใหม่"
+        sets_flags: [cheat_found]
+        family: [{bond: spouse, d: -6}]
+        effects: {happiness: -1, relations: -1}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.65}]
+        merit: [{cat: neutral}]
+      - id: blame_back
+        text: "โทษว่าเขาไม่เคยใส่ใจกันเลย"
+        sets_flags: [cheat_found]
+        family: [{bond: spouse, d: -14}]
+        effects: {happiness: -3, relations: -2}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.95}]
+        merit: [{cat: neutral}]
+
+  # ← ฝั่งคู่นอกใจเรา (กองสุ่ม) · ธง spouse_cheated + ปีที่ตั้งจดอัตโนมัติใน flagAge
+  - id: fam_strays_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 0.31
+    when: {spouse: {status: together, together: [3, 99]}, flags: {not: [spouse_cheated]}}
+    title: "กลิ่นน้ำหอมที่ไม่ใช่ของบ้าน"
+    text: "หลายเดือนมานี้“{ชื่อคู่}”กลับบ้านดึกขึ้น คว่ำมือถือไว้ตลอด คืนนี้เสื้อที่แขวนอยู่มีกลิ่นน้ำหอมที่คุณไม่เคยซื้อ และเพื่อนที่ทำงานเดียวกับเขาเลี่ยงสบตาคุณตอนเจอกัน"
+    choices:
+      - id: confront
+        text: "ถามตรง ๆ ว่ามีคนอื่นหรือเปล่า"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{bond: spouse, d: -8}]
+        effects: {happiness: -3, relations: -1}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.85}]
+        merit: [{cat: neutral}]
+      - id: watch_silent
+        text: "เก็บไว้ในใจ แล้วจับตาดูต่อ"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{bond: spouse, d: -5}]
+        effects: {happiness: -3}
+        schedules: [{event: fam_cheat_leave_01, after_years: [1, 2], chance: 0.75}]
+        merit: [{cat: neutral}]
+      - id: ask_elder
+        text: "ไปปรึกษาผู้ใหญ่ที่เขาเคารพ"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{bond: spouse, d: -3}]
+        effects: {happiness: -2, relations: 1}
+        schedules: [{event: fam_cheat_leave_01, after_years: [1, 2], chance: 0.6}]
+        merit: [{cat: neutral}]
+      - id: pack_his_bag
+        text: "เก็บของเขาใส่กระเป๋าวางหน้าประตู"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{separate: spouse}]
+        effects: {happiness: -3, relations: -2}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+
+  - id: fam_strays_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 0.31
+    when: {spouse: {status: together, together: [3, 99]}, flags: {not: [spouse_cheated]}}
+    title: "ใบเสร็จร้านอาหารสองที่"
+    text: "ใบเสร็จร้านอาหารสองที่ตกอยู่ในกระเป๋าเสื้อของ“{ชื่อคู่}”ตอนคุณหยิบไปซัก วันที่ตรงกับคืนที่เขาบอกว่าอยู่โรงงานจนดึก และเช้านี้มีเสียงคนที่คุณไม่รู้จักโทรเข้ามือถือเขา"
+    choices:
+      - id: show_receipt
+        text: "วางใบเสร็จตรงหน้าเขาแล้วรอคำตอบ"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{bond: spouse, d: -9}]
+        effects: {happiness: -3, relations: -1}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.85}]
+        merit: [{cat: neutral}]
+      - id: put_back
+        text: "ใส่ใบเสร็จคืน ทำเหมือนไม่เห็น"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{bond: spouse, d: -5}]
+        effects: {happiness: -3}
+        schedules: [{event: fam_cheat_leave_01, after_years: [1, 2], chance: 0.75}]
+        merit: [{cat: neutral}]
+      - id: tell_family
+        text: "โทรหาพี่น้องของเขาให้มาคุยกัน"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{bond: spouse, d: -10}]
+        effects: {happiness: -2, relations: -2}
+        schedules: [{event: fam_cheat_leave_01, after_years: [0, 1], chance: 0.95}]
+        merit: [{cat: neutral}]
+      - id: leave_house
+        text: "ขอย้ายออกไปอยู่บ้านญาติสักพัก"
+        sets_flags: [spouse_cheated, cheat_found]
+        family: [{separate: spouse}]
+        effects: {happiness: -3}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+
+  # ← เหตุใดเหตุหนึ่งข้างบนพาไปถึงคนใดคนหนึ่งออกจากบ้าน (นัดจากตัวเลือก · ไม่อยู่กองสุ่ม) · ข้อความกลาง ใช้ได้ทั้งสองฝั่ง
+  - id: fam_cheat_leave_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {status: together}, flags: {has: [cheat_found]}}
+    title: "กระเป๋าใบเดียว"
+    text: "เรื่องนั้นผ่านมาพักใหญ่ แต่ทุกครั้งที่สบตากัน บ้านก็เงียบลงอีกชั้น เช้านี้“{ชื่อคู่}”บอกว่าอยู่ใต้หลังคาเดียวกันต่อไม่ไหว ขอไปอยู่ที่อื่นก่อน"
+    choices:
+      - id: let_go
+        text: "ให้เขาไป ไม่รั้ง"
+        family: [{separate: spouse}]
+        effects: {happiness: -2, relations: -1}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: pack_myself
+        text: "บอกว่าคุณเป็นฝ่ายออกเอง"
+        family: [{separate: spouse}]
+        effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: to_relatives
+        text: "ให้เขาไปอยู่บ้านญาติสักพัก"
+        family: [{separate: spouse}]
+        effects: {happiness: -2}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: counselling
+        text: "ขอผู้ใหญ่ที่เคารพมาช่วยคุย"
+        family: [{bond: spouse, d: 8}]
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
