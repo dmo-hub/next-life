@@ -14,9 +14,8 @@ import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_E
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
-import { NEED_TEXT } from '../src/site/focus.mjs';
 import { treeViewLayout, treeViewNeed, treeViewNeedText } from '../src/ui/treeview.mjs';
-import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
+import { focusWords, STAT_LABELS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
 import { cadetHtml, readCadet, schoolYears } from '../src/site/cadet-cards.mjs';
 import { matchItem, recentVersions } from '../src/site/catalog-filter.mjs';
@@ -908,21 +907,17 @@ check('.gitattributes merge=build ครบหน้าที่ build สร้
 // 12) หน้าโฟกัส: ทุกโฟกัสโลกนี้ขึ้นพร้อมป้ายเดียวกับปุ่มในเกม · ทุ่มเท/ทางลัด/อาชีพต่างโลกครบ · เงื่อนไข need มีคำครบ
 // · ระดับคู่มือ: ไม่มีข้อความเสี่ยง (ผลที่เกิดจริง) หรือตัวเลขโอกาส/ตัวคูณ · หน้าที่มีเมนูลิงก์มาที่หน้านี้
 const focusPage = read('focus.html');
-const fdefs = content.focus.focuses;
 const focusGap = (html) => [
-  ...Object.entries(fdefs).filter(([id, d]) => !new RegExp(`<tr id="f-${id}"><td[^>]*><b>${escHtml(d.name)}</b>[\\s\\S]*?${escHtml(focusWords(d, STAT_LABELS))}`).test(html)).map(([, d]) => d.name),
   ...[...Object.values(ISEKAI_FOCUS), ...Object.values(ISEKAI_KNOW).map((k) => k.focus), ...Object.values(ISEKAI_CAREERS)].filter((x) => !html.includes(`<b>${escHtml(x.name)}</b>`)).map((x) => x.name),
 ];
-const riskTexts = Object.values(fdefs).flatMap((d) => (d.risk ?? []).map((r) => r.text ?? r.warn));
-const focusLeak = (html) => [...riskTexts.filter((t) => html.includes(escHtml(t))), ...(/\d\s*%|×\s*\d|\d+\.\d+/.test(html.slice(html.indexOf('<main'))) ? ['ตัวเลขโอกาส/ตัวคูณ'] : [])];
-const needOff = [...Object.keys(FOCUS_NEEDS).filter((k) => !NEED_TEXT[k]), ...Object.keys(NEED_TEXT).filter((k) => !FOCUS_NEEDS[k])];
+const focusLeak = (html) => [...(/\d\s*%|×\s*\d|\d+\.\d+/.test(html.slice(html.indexOf('<main'))) ? ['ตัวเลขโอกาส/ตัวคูณ'] : [])];
 const noLink = !read('guide.html').includes('href="focus.html"');
-// ตัวควบคุม: ตัดโฟกัสแรกออก · แปะข้อความเสี่ยงตัวแรก ⇒ ต้องถูกจับทั้งคู่
-const f0 = Object.values(fdefs)[0];
-const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')).includes(f0.name) && focusLeak(`${focusPage}<p>${escHtml(riskTexts[0])}</p>`).length > 0;
+// ตัวควบคุม: ตัดทุ่มเทต่างโลกตัวแรกออก · แปะตัวเลขโอกาส ⇒ ต้องถูกจับทั้งคู่
+const f0 = Object.values(ISEKAI_FOCUS)[0];
+const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')).includes(f0.name) && focusLeak(`${focusPage}<main><p>50 %</p>`).length > 0;
 const fGap = focusGap(focusPage);
 const fLeak = focusLeak(focusPage);
-check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || needOff.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · need ${needOff.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
+check('หน้าโฟกัสครบทุ่มเทต่างโลกพร้อมป้ายเดียวกับเกม ไม่เผยตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
 
 // 12b) ต้นไม้โฟกัส: ป้ายชื่อโหนดไม่ถูกเส้น/โหนด/ป้ายอื่น/ป้ายแขนงทับ (ft12 เส้นทำบุญ→ถือศีลวิ่งผ่านป้าย "เข้าค่ายธรรมะ" · เส้นออกจากรากทับป้ายราก)
 // ตัวควบคุม: ต้นสามโหนดรากมีสองลูก บังคับป้ายใต้โหนดทุกตัว ⇒ ต้องจับได้ · เลือกเองแล้วต้องว่าง

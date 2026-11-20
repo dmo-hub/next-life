@@ -207,7 +207,7 @@ check(`  เซฟฐานไม่เกิน ${SNAPS_MAX_KB} KB`, kb > SNAPS
 
 // เซฟสังเคราะห์ (ft15 C′): ทุ่มประตู business ครบ chain_years แต่ไม่มี st.gates → โหลดแล้วแปลงเป็นรหัสโหนด mo5 ใน st.gates ประตูยังเปิด ตัด focusYears ไม่ปลดโหนด · ตัวควบคุม: ทุ่ม chain_years-1 ปี = ประตูไม่เปิด
 {
-  const chain = content.focus.chain_years;
+  const chain = 3;
   const load = (years) => {
     const st = newLife(mixSeed(0x6b656570, 77), content);
     let card = nextCard(st);

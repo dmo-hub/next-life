@@ -18,7 +18,6 @@ import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/
 import { checkTree } from '../src/node/lint/tree.mjs';
 import { sillyGaps } from '../src/node/lint/heavy.mjs';
 import { officeGaps } from '../src/node/lint/office.mjs';
-import { checkFocus } from '../src/node/lint/focus.mjs';
 import { checkNature } from '../src/node/lint/nature.mjs';
 
 const root = new URL('../', import.meta.url);
