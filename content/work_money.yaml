@@ -7,7 +7,8 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [clerk, technician, professional, manager, factory], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional, manager, factory], ladder: [none, private], flags: {not: [own_business]}}
+    office_ok: "ลูกจ้างโรงงานก็ถูกลดเงินเดือนได้ ใบกรองอาชีพแล้ว"
     multipliers: {flags: {in_debt: 1.5}, occupation: {factory: 1.5, clerk: 1.3}}
     title: "กล่องกระดาษใบนั้น"
     text: "เช้าวันจันทร์ ฝ่ายบุคคลเรียกเข้าไปคุย บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
@@ -49,7 +50,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [professional], ladder: [none, private, trade]}
+    when: {occupation: [professional], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {stats: {network: 1.3}, flags: {good_student: 1.5}}
     title: "เก้าอี้ผู้จัดการ"
     text: "หัวหน้าเกษียณ ผู้บริหารยื่นข้อเสนอให้ขึ้นเป็นผู้จัดการ เงินเดือนเกือบสองเท่า แต่มีเงื่อนไขเดียว ต้องย้ายไปประจำสาขาต่างจังหวัด"
@@ -389,6 +390,7 @@ events:
         merit: [{cat: help_others, level: 1}]
   # เรื่องต่อ work_online_shop_01 (ครีมค้างสต็อก) — ออกทาง next เท่านั้น
   - id: work_cream_stock_01
+    office_ok: "บริษัทในผลคือเจ้าของแบรนด์ครีมขายตรง ไม่ใช่ที่ทำงาน"
     away_block: [abroad, monk]
     type: A
     category: work_money
