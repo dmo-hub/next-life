@@ -15,8 +15,8 @@ const n = arg('--n', 300), seed = arg('--seed', 1);
 const drop = process.env.GATE_REACH_DROP;
 const base = loadContent();
 const defs = base.tree.nodes;
-const nodes = Object.keys(base.tree.gates);
-const content = { ...base, tree: { ...base.tree, gates: Object.fromEntries(nodes.map((id) => [id, '_none'])) } };
+const nodes = base.tree.gates;
+const content = base;
 
 // ทางไปโหนด: ตัวเองกับบรรพบุรุษทุกตัว · ทุกปีทุ่มโหนดแรกที่เปิดอยู่ในทาง (เร็วสุดที่เป็นไปได้ — พิสูจน์ว่าถึงได้ ไม่ใช่วัดว่าบอทเก่งแค่ไหน)
 const pathTo = (id) => { const s = new Set(); const walk = (x) => { if (s.has(x)) return; s.add(x); for (const p of defs[x].pre ?? []) walk(p); }; walk(id); return s; };

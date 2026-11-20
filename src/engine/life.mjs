@@ -2088,13 +2088,18 @@ function lifeTreeBorn(st, parentBranch) {
   st.tree = { cur: null, done: { [node]: 0 }, yrs: {}, cards: {}, hist: [] };
 }
 // เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
-// เซฟก่อน ft15: ประตูที่ทุ่มโฟกัสครบ chain_years (focusYears) แต่ไม่เคยจดใน st.gates → จดตอนโหลด · ไม่ปลดโหนด ไม่ผุดผลติดตัว (decisions ข้อ 99) · ทำให้ตัดสะพาน focusYears ออกจาก lifeGateOpen ทีหลังได้โดยเซฟเก่าไม่เสียประตู
+// เซฟก่อน ft15: ประตูเคยเปิดจากชื่อโฟกัสเดิม (focusYears ครบ chain_years · st.gates เก็บชื่อโฟกัส · ธง gate:<ชื่อโฟกัส>) → แปลงเป็นรหัสโหนดประตูตอนโหลดแล้วตัด focusYears · ไม่ปลดโหนด ไม่ผุดผลติดตัว (decisions ข้อ 99 · เจ้าของเคาะ C′)
+const LEGACY_GATE = { business: 'mo5', shortcut_money: 'mo7', politics_base: 'r5', ordain: 'o5', occult: 'm4' };
 export function lifeGatesMigrate(st) {
-  const chain = st.content.focus?.chain_years;
-  if (!chain || !st.focusYears) return;
-  for (const [id, def] of Object.entries(lifeFocusDefs(st))) {
-    if (def.group === 'gate' && st.focusYears[id] >= chain && !st.gates?.includes(id)) (st.gates ??= []).push(id);
+  const chain = st.content.focus?.chain_years ?? Infinity;
+  const open = new Set(st.gates ?? []);
+  for (const [old, id] of Object.entries(LEGACY_GATE)) {
+    if ((st.focusYears?.[old] ?? 0) >= chain || open.has(old)) open.add(id);
+    open.delete(old);
+    if (st.flags?.[GATE_FLAG + old]) { st.flags[GATE_FLAG + id] = true; delete st.flags[GATE_FLAG + old]; }
   }
+  if (open.size) st.gates = [...open];
+  delete st.focusYears;
 }
 export function lifeTreeMigrate(st) {
   const t = st.content.tree, f = st.content.nature;
@@ -2175,14 +2180,13 @@ function natureBoost(st, ev) {
 }
 // ประตูเข้าสาย (ใบ 04 → ใบ 10): id = โหนดประตูใน tree.yaml gates · เปิดเมื่อปลดโหนดนั้น · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
 // · การ์ดชวน (ธง gate:<โหนด>) เปิดให้ได้โดยไม่ต้องปลด เช่น นักธุรกิจถูกชวนลงการเมือง
-// · โฟกัสเดิมที่ผูกกับโหนด (gates.<โหนด>) ยังเปิดประตูเดียวกันได้ทั้งสะสมครบ chain_years · ธง · ทายาท (เซฟเก่าเก็บชื่อโฟกัส) จนถอดตอนใบ 15
+// · เซฟเก่าที่เก็บชื่อโฟกัส แปลงเป็นรหัสโหนดใน lifeGatesMigrate ตอนโหลด (ใบ 15)
 export const GATE_FLAG = 'gate:';
 export const lifeGateOpen = (st, id) => {
   if (st.tree?.done?.[id] !== undefined) return true;
-  const names = [id, st.content.tree?.gates?.[id]].filter(Boolean);
-  return names.some((n) => (st.focusYears?.[n] ?? 0) >= (st.content.focus?.chain_years ?? Infinity) || !!st.gates?.includes(n) || !!st.flags[GATE_FLAG + n]);
+  return !!st.gates?.includes(id) || !!st.flags[GATE_FLAG + id];
 };
-export const lifeGatesOpen = (st) => Object.keys(st.content.tree?.gates ?? {}).filter((id) => lifeGateOpen(st, id));
+export const lifeGatesOpen = (st) => (st.content.tree?.gates ?? []).filter((id) => lifeGateOpen(st, id));
 // การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง (โหนดเสียงของชุมชน)
 export const OFFICE_GATE = 'r5';
 const gateShut = (st, c) => !!c.gate && ![c.gate].flat().some((id) => lifeGateOpen(st, id));
