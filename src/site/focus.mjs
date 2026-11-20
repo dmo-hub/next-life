@@ -1,30 +1,8 @@
 // หน้าโฟกัสชีวิต: รายการโฟกัส ช่วงวัย เงื่อนไข และป้ายบนปุ่มอ่านจากชุดเดียวกับที่เกมใช้ — โฟกัสเพิ่ม/เปลี่ยน หน้านี้เปลี่ยนตามตอน build
 // ระดับคู่มือ ไม่ใช่เฉลย: ผลบอกเป็นคำเดียวกับป้ายบนปุ่มในเกม ไม่มีขนาดผล โอกาสเสี่ยง น้ำหนักการ์ด หรือบุญบาป
 import { STAGES, STAT_LABELS, focusWords, FOCUS_FLOW_NAME, ISEKAI_FOCUS, ISEKAI_STAGES, ISEKAI_KNOW, ISEKAI_CAREERS, ISEKAI_CAREER_T, ISEKAI_ROLES, CONT_MOVE, TRIP_QUEST, roleInfo, isekaiFocusFx } from '../engine/index.mjs';
-import { esc, CATEGORY } from './catalog.mjs';
+import { esc } from './catalog.mjs';
 import { treeViewSvg, treeViewBranches, TREE_VIEW_BRANCH } from '../ui/treeview.mjs';
-
-// หมวดโฟกัสโลกนี้ (group ใน content/rules/focus.yaml) — หมวดใหม่ที่ไม่มีชื่อที่นี่ build หยุด
-export const FOCUS_GROUPS = { work: 'งานและเงิน', people: 'คนและครอบครัว', body: 'กายและใจ', gate: 'ประตูเข้าสาย' };
-// need = สถานะที่ต้องมีก่อนโฟกัสโผล่ (FOCUS_NEEDS ในแกน) เป็นภาษาคน — site-check เทียบ key กับแกน
-export const NEED_TEXT = {
-  working: 'มีงานทำ',
-  single: 'ยังไม่มีคู่ และไม่อยู่ในช่วงไว้ทุกข์คู่',
-  partnered_or_kids: 'มีคู่หรือมีลูก',
-  has_kids: 'มีลูก',
-  kids_or_grandkids: 'มีลูกหรือหลาน',
-  old_parent: 'พ่อหรือแม่อายุ 60 ขึ้นไปยังอยู่',
-  savings_or_credit: 'มีเงินเก็บหรือมีงานทำ',
-};
-// when ของโฟกัสใช้ได้แค่ key ที่เขียนคำไว้ที่นี่ — key ใหม่ build หยุดแทนการตัดเงื่อนไขทิ้งเงียบ
-const WHEN_TEXT = {
-  school: (v) => (v.includes('primary') ? 'ยังเรียนอยู่' : 'เรียนตั้งแต่มัธยมขึ้นไป'),
-  age: ([lo]) => `อายุ ${lo} ปีขึ้นไป`,
-};
-const whenText = (w = {}) => Object.entries(w).map(([k, v]) => {
-  if (!WHEN_TEXT[k]) throw new Error(`หน้าโฟกัสยังไม่รู้จักเงื่อนไข when.${k} — เติมคำใน WHEN_TEXT (src/site/focus.mjs)`);
-  return WHEN_TEXT[k](v);
-});
 
 const stageOrder = (names) => STAGES.filter((s) => names.includes(s.name)).map((s) => s.name);
 const span = (names) => (names.length === STAGES.length ? 'ทุกช่วงวัย' : names.join(' · '));
@@ -56,46 +34,6 @@ ${treeViewSvg(defs, { interactive: false }).svg}
 ${table(['โหนด', 'แขนง', 'ทุ่มได้ช่วง', 'ป้ายระหว่างทุ่ม'], rows)}</section>`;
 }
 
-function thaiRows(defs, ids, chain) {
-  return ids.map((id) => {
-    const d = defs[id];
-    const cond = [...(d.after ? [`ทุ่มเท${defs[d.after].name}ครบ ${chain} ปีเต็มแล้ว โผล่ตั้งแต่ช่วงวัยถัดไป`] : []), ...whenText(d.when), ...(d.need ?? []).map((k) => {
-      if (!NEED_TEXT[k]) throw new Error(`หน้าโฟกัสยังไม่รู้จักเงื่อนไข need.${k} — เติมคำใน NEED_TEXT (src/site/focus.mjs)`);
-      return NEED_TEXT[k];
-    })];
-    const cards = [...new Set(d.cards.map((t) => CATEGORY[t] ?? t))].join(' · ');
-    return `<tr id="f-${esc(id)}"><td><b>${esc(d.name)}</b></td><td>${esc(span(stageOrder(d.stages ?? STAGES.map((s) => s.name))))}</td><td>${cond.length ? esc(cond.join(' · ')) : '<small>—</small>'}</td><td>${fxCell(focusWords(d, STAT_LABELS))}</td><td>${esc(cards)}</td></tr>`;
-  });
-}
-
-function thaiHtml(c) {
-  const defs = c.focuses;
-  const ids = Object.keys(defs);
-  for (const id of ids) if (!FOCUS_GROUPS[defs[id].group]) throw new Error(`หน้าโฟกัสยังไม่รู้จักหมวด ${defs[id].group} (${id}) — เติมชื่อใน FOCUS_GROUPS`);
-  const head = ['โฟกัส', 'เลือกได้ช่วง', 'ต้องมีก่อน', 'ป้ายบนปุ่ม', 'การ์ดที่ออกบ่อยขึ้น'];
-  const groups = Object.entries(FOCUS_GROUPS).map(([g, name]) => {
-    const mine = ids.filter((id) => defs[id].group === g);
-    return mine.length ? `<h3 id="g-${g}">${esc(name)} <small>${mine.length} โฟกัส</small></h3>${table(head, thaiRows(defs, mine, c.chain_years))}` : '';
-  }).join('');
-  const chains = ids.filter((id) => defs[id].after).map((id) => `<li>${esc(defs[defs[id].after].name)} → <b>${esc(defs[id].name)}</b></li>`).join('');
-  const gates = ids.filter((id) => defs[id].group === 'gate').map((id) => esc(defs[id].name)).join(' · ');
-  const kids = [...new Set(ids.map((id) => defs[id].kid).filter(Boolean))].map((k) => `<li>${ids.filter((id) => defs[id].kid === k).map((id) => esc(defs[id].name)).join(' · ')} → <b>${esc(defs[k].name)}</b></li>`).join('');
-  return `<section id="thai"><h2>โลกนี้ <small>${ids.length} โฟกัส</small></h2>
-<p>แท็บ <b>โฟกัส</b> ในเมนูเปิดแผงทับการ์ด บอกเรื่องที่ทุ่มเทอยู่กับรายการที่เลือกได้ในช่วงวัยนี้ กดเปลี่ยนได้ทุกเมื่อโดยไม่ต้องรอการ์ด ผลคิดตอนสิ้นปี · ตัวแรกในรายการคือ <b>${esc(FOCUS_FLOW_NAME)}</b></p>
-<p>ตารางนี้มีทุกโฟกัสในเกม ตอนเล่นจะเห็นเฉพาะตัวที่ช่วงวัยและเงื่อนไขตรงในปีนั้น</p>
-${groups}
-<h3 id="chain">ปลายสาย</h3>
-<p>บางโฟกัสซ่อนอยู่จนกว่าจะทุ่มเทกับตัวต้นสายครบ ${c.chain_years} ปีเต็ม แล้วจึงโผล่ตั้งแต่ช่วงวัยถัดไป ไม่ใช่ช่วงวัยที่เพิ่งครบ</p><ul>${chains}</ul>
-<h3 id="gate">ประตูเข้าสาย</h3>
-<p>โฟกัสหมวดประตู (${gates}) ทุ่มเทครบ ${c.chain_years} ปีเต็มแล้วจึงเปิดตัวเลือกของสายนั้นบนการ์ด เช่น เปิดกิจการ หรือลงสมัคร · ก่อนนั้นตัวเลือกพวกนี้ไม่ขึ้นบนการ์ด การ์ดยังออกด้วยตัวเลือกที่เหลือ · บางการ์ดชวนเข้าสายเองได้โดยไม่ต้องทุ่มเท</p>
-<h3 id="risk">โฟกัสที่มีเสี่ยง</h3>
-<p>ป้าย <span class="fx">มีเสี่ยง</span> บนปุ่มบอกว่าปีที่ทุ่มเทเรื่องนี้อาจมีเรื่องร้ายตามมา ไม่บอกว่าเรื่องอะไรหรือบ่อยแค่ไหน · เสี่ยงบางอย่างถึงตาย แต่ครั้งแรกจะมาเป็นการ์ดเตือนก่อนเสมอ ไม่มีใครตายจากโฟกัสโดยไม่เคยเห็นสัญญาณ</p>
-<h3 id="heir">ทายาทในตระกูล</h3>
-<p>ไปเกิดเป็นลูกหลานในตระกูลเดิม ชีวิตใหม่เริ่มด้วยโฟกัสวัยเด็กตามโฟกัสหลักของรุ่นก่อน (ตัวที่ทุ่มเทครบปีมากที่สุด) และรับประตูเข้าสายที่รุ่นก่อนเปิดไว้ · ถ้าโฟกัสวัยเด็กนั้นยังเลือกไม่ได้ เช่นยังไม่เข้าเรียน เกมรอจนเปิดได้ · เปลี่ยนเองได้ทันทีเหมือนโฟกัสอื่น · เกิดที่อื่นหรือรุ่นก่อนไม่เคยทุ่มเทอะไร เริ่มแบบตามน้ำ</p>
-<p>โฟกัสหลักของรุ่นก่อน → โฟกัสที่ทายาทเริ่ม · ตัวที่ไม่อยู่ในรายการ ทายาทเริ่มแบบตามน้ำ</p>
-<ul>${kids}</ul></section>`;
-}
-
 const iskName = (id) => (id.startsWith('k:') ? ISEKAI_KNOW[id.slice(2)].focus.name : ISEKAI_FOCUS[id].name);
 
 function isekaiHtml() {
@@ -123,27 +61,25 @@ ${table(['ทางลัด', 'หมวดความรู้', 'เลื�
 }
 
 export function focusHtml(content) {
-  const c = content.focus;
   // ตัวอย่างป้ายหยิบจากโฟกัสจริงตัวแรกที่มีทั้งขึ้นมากและลด — ป้ายในเกมเปลี่ยนคำ ตัวอย่างเปลี่ยนตาม
-  const ex = Object.values(c.focuses).map((d) => focusWords(d, STAT_LABELS)).find((w) => w.includes('ขึ้นมาก') && w.includes('ลด') && !w.includes('มีเสี่ยง'));
+  const ex = Object.values(content.tree?.nodes ?? {}).map((d) => focusWords({ fx: d.fx }, STAT_LABELS)).find((w) => w.includes('ขึ้นมาก') && w.includes('ลด') && !w.includes('มีเสี่ยง'));
   return `
-<nav class="toc" aria-label="สารบัญ"><a href="#what">โฟกัสคืออะไร</a><a href="#year">นับปียังไง</a><a href="#tree">ต้นไม้</a><a href="#thai">โลกนี้</a><a href="#chain">ปลายสาย</a><a href="#gate">ประตูเข้าสาย</a><a href="#heir">ทายาท</a><a href="#isekai">ต่างโลก</a><a href="#afterlife">ปรโลก</a></nav>
+<nav class="toc" aria-label="สารบัญ"><a href="#what">โฟกัสคืออะไร</a><a href="#year">นับปียังไง</a><a href="#tree">ต้นไม้</a><a href="#isekai">ต่างโลก</a><a href="#afterlife">ปรโลก</a></nav>
 <section id="what"><h2>โฟกัสคืออะไร</h2>
 <p>โฟกัสคือสิ่งที่ชีวิตนั้นทุ่มเทในแต่ละปี นอกจากตัวเลือกบนการ์ด เช่น ตั้งใจเรียน ทุ่มงาน หรือดูแลครอบครัว · ทุ่มเทเรื่องไหน ค่าสถานะขยับตามเรื่องนั้นทีละน้อยทุกปี และการ์ดเรื่องเดียวกันออกบ่อยขึ้น</p>
 <ul>
 <li>ป้ายบนปุ่มบอกแค่ค่าไหนขึ้นหรือลง เช่น <span class="fx">${esc(ex)}</span> ไม่บอกตัวเลข · <span class="fx">มาก</span> คือขยับแรงกว่าตัวอื่น</li>
 <li>ไม่ตั้งอะไรเลยคือ <b>${esc(FOCUS_FLOW_NAME)}</b> ไม่มีผล ไม่ถ่วงการ์ด ชีวิตเดินแบบเดียวกับไม่มีปุ่มนี้</li>
 <li>ผลเรื่องเงินคิดเฉพาะปีที่มีรายได้ของตัวเอง ค่าใช้จ่ายของโฟกัสหักจากเงินเก็บได้แค่ส่วนหนึ่งต่อปี ไม่กู้มาทุ่ม</li>
-<li>บางโฟกัสเปิดทางใหม่: ปลายสายที่ซ่อนอยู่ ตัวเลือกของสายอาชีพบนการ์ด และโฟกัสวัยเด็กของทายาท</li>
+<li>บางโหนดเปิดทางใหม่: ตัวเลือกของสายอาชีพบนการ์ด (ประตูเข้าสาย) และเป้าชีวิตที่ปลายแขนง</li>
 </ul></section>
 <section id="year"><h2>นับปียังไง</h2><ul>
 <li>ผลทั้งปีคิดตามโฟกัสที่ถืออยู่ตอนสิ้นปี ตัวเดียว · เปลี่ยนกลางปีกี่ครั้งก็ได้</li>
-<li>ปีที่เปลี่ยนโฟกัสไม่นับเป็น <b>ปีเต็ม</b> ของโฟกัสไหน · ปลายสาย ประตูเข้าสาย อาชีพต่างโลก และย้ายแคว้น นับเฉพาะปีเต็ม จึงต้องทุ่มเทต่อเนื่อง</li>
+<li>ปีที่เปลี่ยนโฟกัสไม่นับเป็น <b>ปีเต็ม</b> ของโฟกัสไหน · ประตูเข้าสาย อาชีพต่างโลก และย้ายแคว้น นับเฉพาะปีเต็ม จึงต้องทุ่มเทต่อเนื่อง</li>
 <li>เข้าช่วงวัยที่โฟกัสนั้นเลือกไม่ได้แล้ว หรือเงื่อนไขหมดไป เช่น เลิกงาน เกมเปลี่ยนกลับเป็นตามน้ำเอง ปีที่สะสมไว้ไม่หาย</li>
 </ul></section>
 ${treeHtml(content)}
-<details class="old" id="thai-old"><summary>รายการโฟกัสเดิม (ยังใช้อยู่ระหว่างย้ายไปต้นไม้)</summary>${thaiHtml(c)}</details>
 ${isekaiHtml()}
 <section id="afterlife"><h2>ปรโลก</h2>
-<p>ปรโลกมีแท็บ <b>โฟกัส</b> ไว้ดูว่าชาติที่แล้วทุ่มเทเรื่องไหน แต่เลือกใหม่ไม่ได้ ช่วงระหว่างชาติเดินด้วยการ์ดอย่างเดียว · สิ่งที่ปรโลกทำกับโฟกัสคือส่งต่อ: เกิดเป็นลูกหลานในตระกูลเดิมได้โฟกัสวัยเด็กกับประตูเข้าสายจากรุ่นก่อน (ดู<a href="#heir">ทายาทในตระกูล</a>)</p></section>`;
+<p>ปรโลกมีแท็บ <b>โฟกัส</b> ไว้ดูว่าชาติที่แล้วทุ่มเทเรื่องไหน แต่เลือกใหม่ไม่ได้ ช่วงระหว่างชาติเดินด้วยการ์ดอย่างเดียว · สิ่งที่ปรโลกทำกับโฟกัสคือส่งต่อ: เกิดเป็นลูกหลานในตระกูลเดิมได้ต้นแขนงหลักกับประตูเข้าสายจากรุ่นก่อน</p></section>`;
 }

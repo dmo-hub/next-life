@@ -176,41 +176,6 @@ const f2 = (v) => v.toFixed(2);
   check('B159 ถือธงตรง = การ์ดออก ป้าย [{flag, tier}] เฉพาะใบนั้น', smoker.probe.length > 0 && smoker.keyed.length === smoker.probe.length && JSON.stringify(smoker.probe[0].parentFrom) === '[{"flag":"smoker","tier":1}]');
 }
 
-// ปณิธาน = ปลายสายของทุ่มเท (life-goal ใบ 01 · ui-redo 50 ทำจอแล้ว): แกนกลางเป็นตัวเดียวที่ตัดสินว่าปลายสายขึ้นเมื่อไหร่ ไม่มีการ์ดเลือกเป้า
-// ข้อ 3 "ข้ามช่วงไม่ครบแล้วทำครบทีหลัง" ไม่ทำ (เจ้าของเคาะ) — เทสต์ล็อกพฤติกรรมปัจจุบันไว้ให้ใครแก้ต้องเปิดใบใหม่
-{
-  const base = loadContent();
-  const defs = base.focus.focuses;
-  const chain = base.focus.chain_years;
-  const ok = () => true;
-  const years = (h, stage, from, n) => { for (let a = from; a < from + n; a++) focusYearEnd(h, defs, stage, ok, a, chain); return h; };
-  const offered = (h, stage) => focusOffers(defs, stage, ok, h);
-  const tail = (id) => id === 'scholarship' && defs[id].after === 'study_hard';
-
-  check('lg01 ข้อ 1 ปลายสาย scholarship ต่อจาก study_hard ในทะเบียน', tail('scholarship'));
-  const h = { focus: 'study_hard', focusAt: 11 };
-  check('lg01 ข้อ 1 ทุ่มต้นสายยังไม่ครบ = ปลายสายยังซ่อน', !offered(years(h, 'วัยรุ่น', 12, chain - 1), 'วัยรุ่น').includes('scholarship') && h.focusMet?.study_hard === undefined);
-  years(h, 'วัยรุ่น', 12 + chain - 1, 1);
-  check('lg01 ข้อ 1 ครบ chain_years ปีช่วงวัยรุ่น = จดช่วงที่ครบ', h.focusMet?.study_hard === 'วัยรุ่น', `${h.focusMet?.study_hard}`);
-  check('lg01 ข้อ 1 ช่วงที่ครบยังไม่ขึ้นปลายสาย (ขึ้นตั้งแต่ช่วงถัดไป)', !offered(h, 'วัยรุ่น').includes('scholarship'));
-  check('lg01 ข้อ 2 ช่วงถัดไปปลายสายขึ้น เป้าค้างข้ามช่วงวัยได้', offered(h, 'หนุ่มสาว').includes('scholarship'));
-  check('lg01 ข้อ 2 ข้ามช่วงแล้ว focusMet ยังอยู่ (ปลายสายไม่หายเมื่อเปลี่ยนช่วง)', h.focusMet.study_hard === 'วัยรุ่น' && years({ ...h, focus: null }, 'หนุ่มสาว', 20, 1).focusMet.study_hard === 'วัยรุ่น');
-  check('lg01 ข้อ 2 ปลายสายอยู่นอกช่วงวัยของตัวเอง = ไม่ขึ้น (ช่วงวัยของปลายสายคุม)', !offered(h, 'ทำงาน').includes('scholarship'));
-
-  // ข้อ 3 ที่ไม่ทำ: ต้นสายที่ช่วงวัยจบก่อนครบ chain_years สะสมต่อช่วงถัดไปไม่ได้ (focus.mjs focusYearEnd หลุดช่วง = กลับตามน้ำ)
-  const p = { focus: 'play_friends', focusAt: 11 };
-  years(p, 'วัยรุ่น', 12, chain - 1);
-  const back = focusYearEnd(p, defs, 'หนุ่มสาว', ok, 12 + chain - 1, chain);
-  check('lg01 ข้อ 3 (ไม่ทำ) ต้นสายหลุดช่วงวัยก่อนครบ = กลับตามน้ำ ไม่นับปีต่อ', back === null && p.focus === null && p.focusYears.play_friends === chain - 1 && p.focusMet?.play_friends === undefined, `${back} · ${p.focusYears.play_friends}`);
-  check('lg01 ข้อ 3 (ไม่ทำ) ปลายสาย gang_lead ยังซ่อนในช่วงถัดไป', !offered(p, 'หนุ่มสาว').includes('gang_lead'));
-
-  // ข้อ 4: เลือกทุ่มเทเป็นสถานะบนตัวผู้เล่น ไม่ใช่การ์ด — ไม่มีรายการใหม่ในประวัติชีวิตและไม่มีการ์ดค้าง
-  const st = newLife(11, base);
-  const logLen = st.log.length;
-  setLifeFocus(st, 'play_friends');
-  check('lg01 ข้อ 4 ตั้งโฟกัสไม่เพิ่มการ์ด/บันทึกใด', st.focus === 'play_friends' && st.log.length === logLen && !st.pending, `${st.log.length} · ${logLen}`);
-}
-
 // เป้าชีวิต (life-goal ใบ 02 · ย้ายมาผูกต้นไม้ ft15): ปลดโหนดใหญ่ (b) หรือ keystone (k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง · การ์ดตายเล่ารายการ · สกิลจาก skillMap.lifeGoal (id = แขนง)
 {
   const base = loadContent();
@@ -251,13 +216,13 @@ const f2 = (v) => v.toFixed(2);
   const dir = mkdtempSync(join(tmpdir(), 'lg03-'));
   const mapOf = (body) => { const f = join(dir, `m${Math.random().toString(36).slice(2)}.yaml`); writeFileSync(f, body); return pathToFileURL(f).href; };
   const base = loadContent();
-  const ok = loadSkillMap(mapOf('lifeGoal:\n  money: [appraise]\n  rel: [regen]\n'), base.focus);
+  const ok = loadSkillMap(mapOf('lifeGoal:\n  money: [appraise]\n  rel: [regen]\n'));
   check('lg03 skillMap.lifeGoal รับ id แขนงของต้นไม้', ok.lifeGoal.money?.[0] === 'appraise' && ok.lifeGoal.rel?.[0] === 'regen', JSON.stringify(ok.lifeGoal));
   let threw = '';
-  try { loadSkillMap(mapOf('lifeGoal:\n  mid: [appraise]\n'), base.focus); } catch (e) { threw = String(e.message); }
+  try { loadSkillMap(mapOf('lifeGoal:\n  mid: [appraise]\n')); } catch (e) { threw = String(e.message); }
   check('lg03 โหนดกลาง (mid) ไม่ใช่แขนง ใน lifeGoal ตกด่านโหลด', /lifeGoal\.mid/.test(threw), threw.slice(0, 80));
   threw = '';
-  try { loadSkillMap(mapOf('lifeGoal:\n  nope_goal: [appraise]\n'), base.focus); } catch (e) { threw = String(e.message); }
+  try { loadSkillMap(mapOf('lifeGoal:\n  nope_goal: [appraise]\n')); } catch (e) { threw = String(e.message); }
   check('lg03 id ที่ไม่มีในทะเบียนใน lifeGoal ตกด่านโหลด', /lifeGoal\.nope_goal/.test(threw), threw.slice(0, 80));
   const mk = (goals) => { const s = newLife(11, { ...base, skillMap: ok }); if (goals) s.goalsDone = goals; return s; };
   const ids = (s) => thaiEarn(s).map((x) => x.id);
@@ -267,7 +232,7 @@ const f2 = (v) => v.toFixed(2);
   check('lg03 ไม่สำเร็จเลย = ไม่ได้สกิลจากเป้า', !ids(mk()).includes('appraise') && !ids(mk()).includes('regen'), ids(mk()).join());
   check('lg03 เป้าที่ตารางไม่ให้สกิล = ไม่ได้ ไม่ตก', ids(mk(['know'])).every((x) => x !== 'appraise' && x !== 'regen'));
   const old = goalNames(mk(['study_hard']));
-  check('lg03 เซฟเก่า (id ต้นสายโฟกัส) เล่ารูปต้นสาย → ปลายสาย', old.length === 1 && old[0] === 'ตั้งใจเรียน → สอบชิงทุนเรียนต่อ', old.join());
+  check('lg03 เซฟเก่า (id ต้นสายโฟกัสเดิม) ไม่ตก · ข้ามชื่อเป้าที่ไม่มีโหนดรองรับ', old.length === 0, old.join());
   check('lg03 ไม่มีรายการ = ชื่อว่าง', goalNames(mk()).length === 0);
   // ตารางจริง (เจ้าของเคาะ): ทุกเป้ามีสกิล ≥1 และสกิลมีจริง — ทะเบียนตกด่านโหลดอยู่แล้ว ข้อนี้กันตารางว่างกลับมา
   const real = Object.keys(base.skillMap.lifeGoal ?? {});
@@ -293,7 +258,7 @@ const f2 = (v) => v.toFixed(2);
     return n;
   };
   check('ใบ 04 ประตูปิด = ตัวเลือกติดประตูไม่ขึ้น (การ์ดยังออก 3 ตัวเลือก)', seen(() => {}) === 3, `${seen(() => {})}`);
-  check('ft15 focusYears ครบ chain_years ไม่เปิดประตูแล้ว (สะพานตัด · เซฟเก่าแปลงตอนโหลด)', seen((st) => (st.focusYears = { business: base.focus.chain_years })) === 3);
+  check('ft15 focusYears ครบ chain_years ไม่เปิดประตูแล้ว (สะพานตัด · เซฟเก่าแปลงตอนโหลด)', seen((st) => (st.focusYears = { business: 3 })) === 3);
   check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['mo5'])) === 4);
   check('ใบ 04 ธงชวน gate:<โหนด> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'mo5'] = true)) === 4);
   check('ใบ 10 ปลดโหนดประตู = ตัวเลือกขึ้น', seen((st) => { st.tree = { done: { mo5: 30 }, yrs: {}, cards: {} }; }) === 4);
