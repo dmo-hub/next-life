@@ -127,7 +127,11 @@ export function addMember(st, role, extra = {}) {
   }
   // อายุของเราตอนคู่เข้าบ้าน — ให้แผงบอก "อยู่ด้วยกัน N ปี" ของคู่เก่า · เซฟก่อนมีช่องนี้ไม่มี since
   if (mate) m.since = st.age;
-  if (role === 'child') m.order = st.kin.filter((x) => x.role === 'child').length + 1;
+  if (role === 'child') {
+    m.order = st.kin.filter((x) => x.role === 'child').length + 1;
+    // พ่อ/แม่อีกคน (ใบ 91 ข้อ 149 154 166): id ของคู่ปัจจุบันตอนลูกเกิด · null = ไม่มีคู่ (พ่อ/แม่เลี้ยงเดี่ยว) · ลูกจากเซฟเก่าไม่มีช่อง by = คิดย้อนจากปีเกิด (parentSpouseOf)
+    m.by = spouseOf(st)?.id ?? null;
+  }
   if (role === 'grandchild') {
     // หลานจากเนื้อหา (รับหลานมาเลี้ยง) เป็นลูกของลูกที่ยังอยู่ ถ้ามี — ไม่มีลูกเหลือ = ไม่ระบุพ่อแม่
     const kids = st.kin.filter((x) => x.role === 'child' && x.alive);
@@ -144,6 +148,14 @@ const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive &
 // ไม่มีช่อง = together (เซฟเก่า) · หย่าแล้วไม่นับเป็นคู่ในงานศพ/จดหมาย/ผู้ถูกหยิบเป็นพ่อแม่ทายาท และคู่ที่หย่าแล้วตายไม่ลงบันทึกสูญเสีย
 export const spouseStatus = (m) => m.status ?? 'together';
 export const isDivorced = (m) => m.role === 'spouse' && m.status === 'divorced';
+// พ่อ/แม่อีกคนของลูก (รวมคู่ที่หย่าไปแล้ว — เขายังเป็นพ่อ/แม่) · ลูกที่จด by ใช้ตามนั้น · เซฟเก่าไม่มี by = คู่ที่อยู่ตอนลูกเกิด (since ล่าสุดที่ไม่เกินอายุเราตอนลูกเกิด) ไม่เจอก็คู่ล่าสุด · ไม่มีคู่เลย = null
+export function parentSpouseOf(st, child) {
+  const rows = (st.kin ?? []).filter((m) => m.role === 'spouse');
+  if (child?.by !== undefined) return rows.find((m) => m.id === child.by) ?? null;
+  if (!rows.length) return null;
+  const at = child.born - st.birthYear;
+  return rows.findLast((m) => (m.since ?? 0) <= at) ?? rows.at(-1);
+}
 // บทแฟน (ใบ 90 ข้อ 146 165): partner = คนมีชื่อในบ้าน ไม่ใช่สถานะของคู่ · เลิกกัน = status ex (ออกจากบ้าน · ชื่อยังอ้างได้) · แต่งกับแฟน = คนเดิมเปลี่ยนบทเป็น spouse
 export const isEx = (m) => m.role === 'partner' && m.status === 'ex';
 export const exPartnerOf = (st) => (st.kin ?? []).findLast((m) => isEx(m)) ?? null;

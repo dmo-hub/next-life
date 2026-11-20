@@ -8,7 +8,7 @@ import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
-import { heirPets, letterTo, deadKinOf, speechSex, spouseOf } from './family.mjs';
+import { heirPets, letterTo, deadKinOf, speechSex, spouseOf, parentSpouseOf } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeTreeMain, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
@@ -556,7 +556,7 @@ function makeHeir(af, r) {
     const pickOne = (list) => (list.length ? list[st.kinRng.int(0, list.length - 1)] : null);
     const me = blood ?? (st.kin ? (tier.tier === 1 ? pickOne(kids) : tier.tier === 2 ? pickOne(grand) : null) : null);
     const link = me?.role === 'grandchild' ? st.kin.find((m) => m.id === me.of) ?? null : tier.tier > 1 ? pickOne(kids) : null;
-    const spouse = spouseOf(st);
+    const spouse = me?.role === 'child' ? parentSpouseOf(st, me) : spouseOf(st);
     if (me) ({ sex, name } = me);
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
