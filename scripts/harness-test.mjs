@@ -725,7 +725,7 @@ const f2 = (v) => v.toFixed(2);
 
   // ปุ่มผู้สืบสายเลือด (B76 · ทายาทอายุจริง) ข้ามวงเหมือนถูกเรียกตัว — หาชีวิตที่มีรายชื่อ แล้วกดปุ่มนั้นด้วย id คนแรก
   let blood = null;
-  for (let k = 10; k < 400 && !blood; k++) {
+  for (let k = 10; k < 2000 && !blood; k++) {
     const st = life(k);
     if (!E.heirCandidates(st).length) continue;
     const af = E.startAfterlife(st);

@@ -6,6 +6,7 @@
 // · สัตว์เลี้ยงตายตรงอายุขัย · เพื่อนรุ่นเกิดปีเดียวกับเรา · สองบทบาทนี้ไม่ตั้งธง
 // #9: %เคยแต่ง (อยู่ถึง 45) ต่างกันระหว่างช่วงปีเกิดไม่เกิน 3 pp · อายุแต่งครั้งแรกเฉลี่ย 24–28
 import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR, FILIAL, openChoices, meritId, MERIT_LEVELS } from '../src/engine/index.mjs';
+import { readFileSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, random } from './bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort, FAMILY_OPEN_MIN } from './kin.mjs';
@@ -45,6 +46,8 @@ let loveCards = 0, loveEarly = 0, rewed = 0, rewedBad = 0;
 // ช่วงเล็กสุดต่ำกว่า WED_MIN คน (อยู่ถึง 45) = ข้ามข้อส่วนต่าง: noise ของตัวอย่างเล็กเกิน 3 pp เอง (--n 1000 ช่วงเล็กสุด ~350–500 คน ตก 2 ใน 3 seed)
 const WED_SPREAD = 3, WED_AGE = [24, 28], WED_MIN = 2000;
 const wedCohort = new Map();
+// ใบ 93 (B114 ข้อ 153 167): สัดส่วนคู่แรกของชีวิตที่หย่า แยกตามปีที่แต่ง · กรอบอยู่ data/divorce-rate.json
+const divBands = JSON.parse(readFileSync(new URL('../data/divorce-rate.json', import.meta.url), 'utf8')).bands.map((x) => ({ ...x, wed: 0, div: 0 }));
 const wedAges = [];
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
@@ -139,6 +142,13 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     if (new Set(names).size !== names.length) nameDup++;
     if (st.age >= 50) kidsAt50.push(st.kin.filter((m) => m.role === 'child').length);
     const wedAge = st.flagAge?.married;
+    if (wedAge !== undefined) {
+      const wy = st.birthYear + wedAge, band = divBands.find((x) => wy >= x.from && wy <= x.to), first = st.kin.find((m) => m.role === 'spouse');
+      if (band && first) {
+        band.wed++;
+        if (first.status === 'divorced') band.div++;
+      }
+    }
     if (wedAge !== undefined) wedAges.push(wedAge);
     if (st.age >= 45) {
       const c = wedCohort.get(Math.floor(st.birthYear / 10) * 10) ?? { to45: 0, ever: 0 };
@@ -269,6 +279,10 @@ check('  การ์ดรักใหม่ขึ้นได้ · แต่�
   console.log(`  ญาติช่วยประคองหลัง ${FILIAL.at} ต่อชีวิต: กตัญญู ${fmt(g.aid)} · ละทิ้ง ${fmt(a.aid)} · step 0: ${fmt(g0.aid)} / ${fmt(a0.aid)}`);
   check(`  ส่วนต่าง bond ลูก (กตัญญู − ละทิ้ง) เกินตัวควบคุม ≥ 2×step`, g.cnt && a.cnt && dd >= 2 * FILIAL.step ? 0 : 1, ` ${fmt(dd)}`);
   check('  ญาติช่วยประคองตอนแก่: กตัญญูมากกว่าละทิ้ง และห่างกว่าตัวควบคุม', g.aid > a.aid && g.aid - a.aid > g0.aid - a0.aid ? 0 : 1);
+}
+for (const x of divBands) {
+  const r = x.div / Math.max(1, x.wed);
+  check(`หย่าตามยุค (ใบ 93) · แต่ง ${x.from}–${x.to} ใกล้ ${x.target} ±${x.tolerance}`, x.wed >= 300 && Math.abs(r - x.target) <= x.tolerance ? 0 : 1, ` ${x.div}/${x.wed} = ${fmt(r)}`);
 }
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;
