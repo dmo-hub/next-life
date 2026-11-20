@@ -458,8 +458,7 @@ const f2 = (v) => v.toFixed(2);
 }
 
 // B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50% (ใบ: สืบทอดโอกาสเล็กน้อย ไม่ใช่ได้แน่) · นับเฉพาะทายาทที่พ่อแม่มีนิสัยและถึงอายุล็อก
-// ตัวควบคุม heir_nature 0 ถอดแล้ว (ft15 commit 3): heir_nature มีผลทางเดียวผ่าน focusBorn (ทายาทรับโฟกัสพ่อแม่) ซึ่งบอทเลิกเลือกโฟกัสแล้ว · ตัดทิ้ง treeParent ก็ไม่ขยับ (356→360/856)
-// ค้าง: หลังตัดโฟกัส ทายาทไม่มีกลไกสืบนิสัยเหลือ — เจ้าของต้องเคาะว่าสร้างทางต้นไม้ใหม่หรือไม่ (ดู build/lane-b.md)
+// ตัวควบคุม heir_nature 0 (คืนใน ft15): ทายาทรับแต้มนิสัยพ่อแม่ตอนเกิด (heir.nature × heir_nature) · seed เดียวกัน ปิดแต้ม ⇒ ทายาทนิสัยเดียวกันลดลง
 {
   const content = loadContent();
   const heirs = (n) => {
@@ -482,6 +481,11 @@ const f2 = (v) => v.toFixed(2);
   };
   const real = heirs(160);
   check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
+  const keep = content.nature.heir_nature;
+  content.nature.heir_nature = 0;
+  const zero = heirs(160);
+  content.nature.heir_nature = keep;
+  check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
 }
 
 // ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง
