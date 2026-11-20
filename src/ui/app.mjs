@@ -2064,11 +2064,12 @@ const followIcon = (k) => {
 
 // แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): เลือกค้างไว้ ยังไม่เดินเกม — ลงผลตอนกดตัวเลือกเงินเก็บ · คืนตัวอ่านลำดับที่เลือก
 // เริ่มที่ระดับปัจจุบัน ผู้เล่นที่ไม่แตะจึงได้ระดับเดิมต่อ
+const SPEND_ASK = 'ช่วงนี้จะใช้เงินแบบไหน';
 function spendRowEl(spend, body) {
   let k = Math.max(0, spend.levels.findIndex((l) => l.id === spend.cur));
   const row = el('div', 'spend');
   row.setAttribute('role', 'group');
-  row.setAttribute('aria-label', 'ระดับการใช้จ่ายช่วงนี้');
+  row.setAttribute('aria-label', SPEND_ASK);
   const btns = spend.levels.map((l, j) => {
     const b = button(l.name, l.fx, () => {
       k = j;
@@ -2078,7 +2079,7 @@ function spendRowEl(spend, body) {
     return b;
   });
   row.append(...btns);
-  body.append(el('h4', null, 'ใช้จ่ายช่วงนี้'), row);
+  body.append(el('h4', null, SPEND_ASK), row);
   return () => k;
 }
 
