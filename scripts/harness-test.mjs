@@ -1304,6 +1304,7 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 92 when.spouse: คู่อยู่ด้วยกัน 5 ปี bond 40 ผ่าน [38,48]/[3,99] · bond 60 ตก · อยู่ด้วยกันไม่ถึง 3 ปีตก', spouseOk(a, { status: 'together', bond: [38, 48], together: [3, 99] }) && (sp(a).bond = 60, !spouseOk(a, { bond: [38, 48] })) && (sp(a).bond = 40, !spouseOk({ ...a, age: 26 }, { together: [3, 99] })));
   const sepCard = content.events.find((e) => e.id === 'fam_separate_work_01');
   check('ใบ 92 การ์ดแยกทางด้วยผูกพันต่ำ: ขึ้นเมื่อ bond 40 อยู่ด้วยกันนาน · ไม่ขึ้นเมื่อ bond 70', whenOk(a, sepCard.when) === true && (sp(a).bond = 70, whenOk(a, sepCard.when) === false));
+  check('ใบ 93 when.spouse wed: ปีแต่ง = birthYear + since ผ่านเฉพาะช่วง · ไม่มี since ตก', spouseOk(a, { wed: [a.birthYear + a.age - 20, a.birthYear + a.age] }) && !spouseOk(a, { wed: [a.birthYear - 50, a.birthYear + a.age - 6] }) && (delete sp(a).since, !spouseOk(a, { wed: [2400, 2700] })) && (sp(a).since = a.age - 5, true));
   sp(a).bond = 40;
   applyFamily(a, { family: [{ separate: 'spouse' }] });
   check('ใบ 92 when.spouse apart: ปีที่แยกทางมาแล้ว 0 ไม่ผ่าน [1,6] · 2 ปีผ่าน · status together ตก', !spouseOk(a, { status: 'apart', apart: [1, 6] }) && spouseOk({ ...a, age: 32 }, { status: 'apart', apart: [1, 6] }) && !spouseOk({ ...a, age: 32 }, { status: 'together' }));

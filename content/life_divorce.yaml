@@ -134,15 +134,15 @@ events:
         family: [{bond: spouse, d: 4}]
         merit: [{cat: neutral}]
 
-  # ← ห่างกันเอง/ทำงานไกลกัน (ใบ 93 · ข้อ 167) · สามใบเรื่องเดียวกันตามยุค น้ำหนักขึ้นตามอัตราหย่า (data/divorce-rate.json) · ไม่ดูค่าผูกพัน
+  # ← ห่างกันเอง/ทำงานไกลกัน (ใบ 93 · ข้อ 167) · สี่ใบเรื่องเดียวกันตามรุ่นที่แต่ง (when.spouse.wed) น้ำหนักตามอัตราหย่า (data/divorce-rate.json) · ไม่ดูค่าผูกพัน
   - id: fam_separate_far_old_01
     away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
-    years: [2500, 2539]
+    years: [2500, 2569]
     weight: 3
-    when: {spouse: {status: together, together: [4, 99]}}
+    when: {spouse: {status: together, together: [3, 20], wed: [2500, 2539]}}
     title: "จดหมายที่ตอบห่างลงทุกฉบับ"
     text: "งานของ“{ชื่อคู่}”พาไปอยู่ต่างจังหวัดเป็นปี ๆ จดหมายที่เคยยาวสามหน้าเหลือไม่กี่บรรทัด คราวนี้เขาเขียนมาว่าที่นั่นมีที่ให้อยู่ถาวรแล้ว และอยากให้คุณตัดสินใจว่าจะเอายังไงกับเรา"
     choices:
@@ -170,9 +170,9 @@ events:
     type: A
     category: family
     stage: ทำงาน
-    years: [2540, 2559]
-    weight: 4
-    when: {spouse: {status: together, together: [4, 99]}}
+    years: [2540, 2599]
+    weight: 10
+    when: {spouse: {status: together, together: [3, 20], wed: [2540, 2549]}}
     title: "บัตรโทรศัพท์ใบสุดท้าย"
     text: "ปีที่สามที่“{ชื่อคู่}”ทำงานอยู่ห่างกันคนละฝั่งเมือง เสาร์อาทิตย์เหลือแค่โทรหากัน คืนนี้เขาบอกว่าชินกับการอยู่คนเดียวแล้ว และไม่แน่ใจว่าจะกลับมาอยู่ด้วยกันอีกไหม"
     choices:
@@ -195,6 +195,36 @@ events:
         family: [{bond: spouse, d: 4}]
         merit: [{cat: neutral}]
 
+  - id: fam_separate_far_late_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2550, 2650]
+    weight: 18
+    when: {spouse: {status: together, together: [3, 20], wed: [2550, 2559]}}
+    title: "ข้อความที่ตอบช้าลงเรื่อย ๆ"
+    text: "สองสามปีมานี้“{ชื่อคู่}”กลับบ้านดึกขึ้นและพูดน้อยลง ข้อความที่เคยตอบทันทีกลายเป็นตอบข้ามวัน คืนนี้เขาบอกตรง ๆ ว่าไม่แน่ใจว่าสองคนยังอยากไปทางเดียวกันอยู่หรือเปล่า"
+    choices:
+      - id: let_go
+        text: "บอกว่าถ้าไม่แน่ใจก็แยกกันก่อน"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: stay_apart
+        text: "ไม่ตอบ ปล่อยให้เขาไปคิดเอง"
+        family: [{separate: spouse}]
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: talk_it_out
+        text: "ชวนนั่งคุยกันให้เต็มเสียง"
+        family: [{bond: spouse, d: 5}]
+        merit: [{cat: neutral}]
+      - id: take_trip
+        text: "ชวนไปเที่ยวแค่สองคน"
+        family: [{bond: spouse, d: 4}]
+        merit: [{cat: neutral}]
+
   - id: fam_separate_far_new_01
     away_block: [abroad, monk]
     type: A
@@ -202,7 +232,7 @@ events:
     stage: ทำงาน
     years: [2560, 2650]
     weight: 26
-    when: {spouse: {status: together, together: [3, 20]}}
+    when: {spouse: {status: together, together: [3, 20], wed: [2560, 2650]}}
     title: "แชตที่ไม่มีใครพิมพ์ต่อ"
     text: "ตารางงานของคุณสองคนไม่เคยตรงกันมาหลายปี ห้องเช่าคนละที่ แชตกลุ่มครอบครัวมีแต่สติกเกอร์ คืนนี้“{ชื่อคู่}”พิมพ์มาว่าเขาคิดว่าคุณสองคนเหมือนเพื่อนร่วมบ้านมากกว่า"
     choices:

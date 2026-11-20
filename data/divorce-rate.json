@@ -1,17 +1,39 @@
 {
  "title": "อัตราหย่าตามยุค (ใบ 93 · B114 ข้อ 153 167) — สัดส่วนคู่ที่หย่าสุดท้ายต่อคู่ที่แต่ง แยกตามปีที่แต่ง",
  "retrieved": "2026-11-20",
+ "toleranceNote": "tolerance ±0.06 ทุกช่วง: ตัวอย่างต่อช่วงในด่าน family อยู่ราว 150–400 คู่ ความคลาดมาตรฐานของสัดส่วน ~0.025–0.04 (2σ ≈ 0.05–0.08) ⇒ ±0.06 กันสัญญาณหลอกแต่ยังจับค่าที่เพี้ยนเกินครึ่งช่วงเป้า",
  "unit": "สัดส่วนของคู่ที่แต่ง (0–1)",
  "note": "harness/family.mjs อ่านไฟล์นี้: นับคู่แรกของชีวิตที่แต่งในช่วงปีนั้น แล้วดูว่าหย่าก่อนชีวิตจบกี่ส่วน · เกมจบด้วยการหย่า/แยกทางเท่านั้น (ไม่มีสุ่มไม่มีเหตุ ข้อ 153) · เป้าเกมเป็นกรอบของเจ้าของ (B114 เคาะ 1) ไม่ใช่ตัวเลขสถิติตรง ๆ เพราะสถิติทางการเป็นการหย่าต่อสมรสที่จดในปีเดียวกัน ไม่ใช่สัดส่วนตลอดชีวิตคู่",
  "bands": [
   {
-   "id": "old",
+   "id": "old_2500",
    "from": 2500,
-   "to": 2559,
+   "to": 2539,
+   "target": 0.1,
+   "tolerance": 0.06,
+   "assumption": false,
+   "source": "https://www.thairath.co.th/scoop/infographic/2836542",
+   "note": "เจ้าของเคาะ (ข้อ 488): แต่งก่อน 2540 หย่า ~1/10 · ตารางสถิติ สสช. 2504–2567 ใน family-era-research.md"
+  },
+  {
+   "id": "old_2540",
+   "from": 2540,
+   "to": 2549,
    "target": 0.2,
    "tolerance": 0.06,
-   "assumption": true,
-   "note": "เจ้าของเคาะ B114 1: ยุคเก่า ~1/5 · ไม่มีไฟล์ทางการที่เปิดอ่านได้ในรอบนี้ย้อนก่อน 2562 (ผลค้นพบเฉพาะ 2562–2566 ของมหาดไทย และอัตราต่อประชากรพันคนของ สสช. 2551–2567)"
+   "assumption": false,
+   "source": "https://www.thairath.co.th/scoop/infographic/2836542",
+   "note": "เจ้าของเคาะ (ข้อ 488): แต่ง 2540–2549 หย่า ~2/10"
+  },
+  {
+   "id": "old_2550",
+   "from": 2550,
+   "to": 2559,
+   "target": 0.3,
+   "tolerance": 0.06,
+   "assumption": false,
+   "source": "https://www.thairath.co.th/scoop/infographic/2836542",
+   "note": "เจ้าของเคาะ (ข้อ 488): แต่ง 2550–2559 หย่า ~3/10"
   },
   {
    "id": "after_2560",
@@ -25,9 +47,9 @@
   }
  ],
  "evidence": [
-  { "y": 2562, "marriages": 328875, "divorces": 128514, "ratio": 0.3908, "calc": "หารเอง", "source": "https://data.go.th/en/dataset/marriage" },
-  { "y": 2565, "marriages": 305487, "divorces": 146159, "ratio": 0.4784, "calc": "หารเอง", "source": "https://data.go.th/en/dataset/marriage" },
-  { "y": 2566, "marriages": 279748, "divorces": 147337, "ratio": 0.5267, "calc": "หารเอง", "source": "https://data.go.th/en/dataset/marriage" }
+  { "y": 2562, "marriages": 328875, "divorces": 128514, "ratio": 0.3908, "calc": "หารเอง", "source": "https://www.thairath.co.th/scoop/infographic/2836542" },
+  { "y": 2565, "marriages": 305487, "divorces": 146159, "ratio": 0.4784, "calc": "หารเอง", "source": "https://www.thairath.co.th/scoop/infographic/2836542" },
+  { "y": 2566, "marriages": 279748, "divorces": 147337, "ratio": 0.5267, "calc": "หารเอง", "source": "https://www.thairath.co.th/scoop/infographic/2836542" }
  ],
- "evidenceNote": "จำนวนคู่ในแถว evidence มาจากผลค้นเว็บ (รายงานกระทรวงมหาดไทย) ยังไม่ได้เปิดไฟล์ต้นฉบับของ data.go.th/กรมการปกครองตรวจ · ตัวเลขชุด สสช. ต่างชุดไม่ตรงกัน จึงไม่ใช้เป็นหลักฐานตัวเลข · อัตราหย่าต่อพันคน สสช.: 1.48 (2560) · 1.79 (2565) · 1.91 (2566) https://www.nso.go.th/nsoweb/downloadFile/stat_main_nso/FgF6/file_th"
+ "evidenceNote": "จำนวนคู่ในแถว evidence มาจากผลค้นเว็บ (รายงานกระทรวงมหาดไทย) ยังไม่ได้เปิดไฟล์ต้นฉบับของ data.go.th/กรมการปกครองตรวจ · ฝั่งหย่า: https://www.tcijthai.com/news/2023/07/watch/12875 · ตัวเลขชุด สสช. ต่างชุดไม่ตรงกัน จึงไม่ใช้เป็นหลักฐานตัวเลข"
 }
