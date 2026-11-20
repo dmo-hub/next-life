@@ -13,7 +13,7 @@ import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './cou
 import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { FOCUS_FLOW, focusOffers, focusOpen, focusSet, focusYearEnd, focusCardMul, focusMain } from './focus.mjs';
+import { FOCUS_FLOW, focusOffers, focusSet } from './focus.mjs';
 import { treeStartBranch, treeStartNode, treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone, treeRespec, treeRusty, treeRustMul, treeMainBranch } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
@@ -412,7 +412,6 @@ export function newLife(seed, content, heir = null) {
   st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
-  lifeFocusBorn(st, heir?.focus);
   lifeTreeBorn(st, heir?.treeParent);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
@@ -639,8 +638,6 @@ function faceDeath(st, cause, opts = {}) {
   if (st.pact?.survive === true) {
     // สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำทันที
     st.pact.survive = 'used';
-    // เสี่ยงของโฟกัสที่ทอยตายไว้ต้องหายด้วย ไม่งั้นรอดปีนี้แล้วปีถัดไปตายด้วยเหตุเดิมทันที
-    st.focusDoom = undefined;
     st.health = Math.max(st.health, st.healthNatural, 1);
     return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText, tag: 'survive' } };
   }
@@ -1176,7 +1173,6 @@ const HEIR_UNI_KNOW = 55;
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
-  lifeFocusYear(st);
   lifeTreeYear(st);
   natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
@@ -1819,7 +1815,7 @@ function drawCard(st) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
-      const cause = st.focusDoom ?? (st.health <= 0 ? healthCause(st) : deathRoll(st));
+      const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
       const d = cause && faceDeath(st, cause);
       if (d?.fate === 'survive') {
         st.queue.push(d.card);
@@ -2037,9 +2033,7 @@ export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs
 export function setLifeFocus(st, id) {
   if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
   // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
-  if ((st.focus ?? FOCUS_FLOW) !== id) delete st.focusBorn;
   focusSet(st, id, st.age);
-  delete st.focusHeir;
 }
 // ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
 // ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
@@ -2066,34 +2060,6 @@ export function lifeTreeGoals(st) {
     (st.goalNode ??= {})[def.branch] = id;
   }
 }
-export function lifeFocusYear(st) {
-  const c = st.content.focus;
-  // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
-  if (!st.focus && st.focusHeir && focusOpen(c.focuses[st.focusHeir], stageOf(st.age), lifeFocusOk(st), st)) {
-    focusSet(st, st.focusHeir, st.age - 1);
-    delete st.focusHeir;
-  }
-  if (!st.focus) return;
-  const full = st.focusAt < st.age;
-  const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
-  if (!id) return;
-  const def = c.focuses[id];
-  if (full) naturePoint(st, def.nature, st.focusBorn ? st.content.nature.heir_nature : 1);
-  // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
-  // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
-  const { money, ...rest } = def.fx;
-  applyEffects(st, rest, c.year_scale);
-  if (money && isWorking(st)) {
-    const v = moneyValue(st, money) * c.year_scale;
-    st.money += v < 0 ? Math.max(v * c.spend_scale, -FOCUS_SPEND_CAP * Math.max(0, st.money)) : v;
-  }
-  if (def.career && isWorking(st)) {
-    if (st.ladder) st.ladder.prog = Math.max(0, st.ladder.prog + def.career.rank);
-    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * (1 + def.career.raise)));
-  }
-  (def.risk ?? []).forEach((r, i) => lifeFocusRisk(st, id, r, i));
-}
-
 // ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
 // ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
 export const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
@@ -2161,38 +2127,8 @@ function lifeTreeYear(st) {
   if (r?.gate) st.due.push({ kind: 'eraEvent', ev: treeGateEvent(c.nodes, r.id), age: st.age });
 }
 
-// เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
-// เสี่ยงตาย (cause): ครั้งแรกเป็นการ์ดเตือน (ผลเจ็บตาม fx) · โดนซ้ำหลังเตือน = ตายต้นปีถัดไปด้วยสาเหตุนั้น — ไม่มีใครตายจากโฟกัสโดยไม่ได้เห็นสัญญาณก่อน
-const FOCUS_RISK_SALT = 0x6f0c5a17;
-const FOCUS_SPEND_CAP = 0.1;
-function lifeFocusRisk(st, id, r, i) {
-  if (makeRng(mixSeed(st.seed ^ FOCUS_RISK_SALT, st.age * 8 + i)).next() >= r.chance) return;
-  const key = `${id}:${i}`;
-  if (r.cause && st.focusWarn?.[key] !== undefined) {
-    st.focusDoom = r.cause;
-    return;
-  }
-  if (r.cause) (st.focusWarn ??= {})[key] = st.age;
-  applyEffects(st, r.fx ?? {});
-  for (const f of r.flags ?? []) raiseFlag(st, f);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key, tag: r.cause ? 'sick' : fxTag(r.fx) });
-}
-
-// ทายาททางสายเลือด (โฟกัสใบ 03): เริ่มชาติด้วยตัวเด็กของหมวดโฟกัสหลักของพ่อแม่ (kid ในทะเบียน) · ไม่มีหมวด/ไม่มีตัวเด็ก = ตามน้ำ
-export function lifeFocusKid(st) {
-  const defs = lifeFocusDefs(st);
-  const main = focusMain(st, defs);
-  return (main && defs[main].kid) || null;
-}
-function lifeFocusBorn(st, kid) {
-  if (!kid || !lifeFocusDefs(st)[kid]) return;
-  if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
-  else st.focusHeir = kid;
-  st.focusBorn = true;
-}
-
 // นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
-// ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
+// ทายาทไม่ได้นิสัยพ่อแม่ต่อโดยตรงแล้ว (ft15 ตัดโฟกัส · heir_nature ไม่มีผู้ใช้) — ค้างเคาะว่าจะสร้างทางสืบทอดทางต้นไม้หรือไม่
 // ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
 const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
 // โหนดเด็กที่ผูกนิสัยปลดถึงอายุ nature_age: ป้อนแต้ม node_pts เข้ากองเดียวกับทุ่มเทเด็ก + จดนิสัยที่มีโหนดปลดไว้ (ใบ ft07 ข้อ 16 19 51) · นิสัยเด่นยังเป็นตัวแต้มสูงสุดตัวเดียว ตัวอื่นเปิดแค่ตัวเลือก
@@ -2221,7 +2157,6 @@ function natureLock(st) {
   let id = null;
   for (const [k, v] of Object.entries(pts)) if (v > 0 && (!id || v >= pts[id])) id = k;
   delete st.naturePts;
-  delete st.focusBorn;
   if (id) st.nature = id;
   // นิสัยที่มีโหนดปลดแต่ไม่ใช่ตัวเด่น = ปลดตัวเลือกวัยโต ไม่ได้ผลคูณ
   const also = (st.natureNodes ?? []).filter((k) => k !== id);
@@ -2257,8 +2192,7 @@ const sexShut = (st, c) => !!c.only_sex && !c.only_sex.includes(st.sex);
 const SEX_LOCK = 'ไม่ใช่ทางของคุณ';
 function lifeFocusMul(st, e) {
   const t = st.tree && st.content.tree ? treeCardMul(st, st.content.tree.nodes, st.content.tree.card_mul, e.category) : 1;
-  if (!st.focus) return t;
-  return t * focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
+  return t;
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
@@ -2901,8 +2835,6 @@ export function playLife(seed, content, pickChoice, onCard, st = newLife(seed, c
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
-    // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
-    if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
     if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
     // บอทที่ประกาศนโยบายใช้จ่ายเลือกระดับบนการ์ดทบทวนเงิน · บอทที่ไม่ประกาศไม่แตะ ⇒ ชีวิตเท่าเดิม
     if (pickChoice.spend && card.spend) chooseSpend(st, pickChoice.spend(card, st));
