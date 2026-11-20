@@ -67,7 +67,7 @@ events:
     stage: หนุ่มสาว
     years: [2560, 2650]
     weight: 0.0625
-    when: {age: [21, 30], year: [2564, 2650], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {age: [21, 30], year: [2564, 2650], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     title: "ยอดเข้าไม่เท่ายอดกู้"
     text: "อีกห้าวันเงินเดือนออก เงินในบัญชีเหลือสามร้อย โฆษณาในมือถือบอกกู้ได้ในห้านาทีไม่ต้องใช้เอกสาร กดขอสองพัน หน้าจอยืนยันบอกว่าจะได้รับพันสอง ที่เหลือเป็นค่าดำเนินการ ครบเจ็ดวันคืนเต็มสองพัน"
     choices:

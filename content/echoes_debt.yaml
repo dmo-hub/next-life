@@ -171,7 +171,7 @@ events:
 
   # ← debt_refinance_01 "แต่งสลิปเงินเดือนกู้เพิ่ม" (ผ่านฉลุย)
   - id: echo_debt_slip_audit_01
-    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     away_block: [abroad, monk]
     type: A
     category: work_money

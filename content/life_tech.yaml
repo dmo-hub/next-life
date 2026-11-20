@@ -78,7 +78,7 @@ events:
     stage: ทำงาน
     years: [2552, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {age: [31, 45], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     title: "โพสต์ระบายที่ไปไกลเกินบ้าน"
     text: "เมื่อคืนคุณโพสต์เล่าว่าลูกค้าเรียกแก้งานตอนตีหนึ่ง ตั้งใจให้เพื่อนสิบกว่าคนอ่าน เช้านี้ยอดแชร์เกินสองหมื่น คนแปลกหน้าเข้ามาเถียงกันว่าคุณผิดหรือลูกค้าผิด บางคนเริ่มเดาชื่อบริษัทถูก"
     choices:
@@ -497,7 +497,7 @@ events:
     stage: หนุ่มสาว
     years: [2545, 2650]
     weight: 0.0625
-    when: {age: [22, 30], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {age: [22, 30], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     title: "นัดตีบอสตีสอง"
     text: "ทีมในเกมออนไลน์นัดตีบอสใหญ่ตอนตีสอง บอสเกิดเดือนละครั้ง ขาดตัวรักษาไม่ได้ และตัวรักษามีคุณคนเดียว พรุ่งนี้แปดโมงมีประชุมกับหัวหน้า ในแชตทีมมีเลขนับถอยหลังเด้งขึ้นทุกห้านาที"
     choices:

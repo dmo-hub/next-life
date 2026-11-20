@@ -7,7 +7,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     era: mobile_phone_boom
-    when: {age: [19, 59], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {age: [19, 59], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     title: "เครื่องโทรศัพท์เท่าอิฐ"
     text: "เพื่อนร่วมงานคนหนึ่งถือโทรศัพท์มือถือเครื่องเท่าอิฐเข้าที่ทำงาน เสียงดังกลางประชุม ทุกคนหันไปมองพร้อมกัน เขาบอกว่าไปไหนก็ติดต่อได้ แต่ค่าโทรนาทีละหลายบาท"
     choices:

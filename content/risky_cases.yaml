@@ -131,7 +131,7 @@ events:
 
   # ← young_risky_cert_01 "ซื้อใบผ่านงานปลอม" (ทางโดน)
   - id: risky_cert_caught_01
-    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     away_block: [abroad, monk]
     type: A
     category: work_money

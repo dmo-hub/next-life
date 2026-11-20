@@ -182,7 +182,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 0.25
-    when: {age: [22, 30], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {age: [22, 30], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     title: "ขอสโลว์ไลฟ์ก่อนเงินเดือนออก"
     text: "รุ่นน้องเพิ่งเรียนจบโพสต์รูปจิบกาแฟริมหน้าต่าง บอกว่าจะใช้ชีวิตสโลว์ไลฟ์ นักเล่าเรื่องดังเตือนว่าอย่าเพิ่งรีบช้า คุณเลื่อนดูรูปนี้ในเวลางานพอดี"
     choices:
@@ -298,7 +298,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.25
-    when: {age: [31, 45]}
+    when: {age: [31, 45], occupation: [clerk, professional, manager, technician, officer, senior_officer], ladder: [none, private, gov], flags: {not: [own_business]}}
     title: "ออเจ้าทั้งที่ทำงาน"
     text: "ละครย้อนยุคดังจนคนทั้งเมืองพูดคำโบราณ เจ้านายสั่งให้ศุกร์นี้ใส่ชุดไทยมาทำงาน แม่ค้าข้าวแกงยังถามคุณว่าออเจ้ารับอะไร"
     choices:
@@ -356,7 +356,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.25
-    when: {age: [31, 45]}
+    when: {age: [31, 45], occupation: [clerk, professional, manager, technician, officer, senior_officer], ladder: [none, private, gov], flags: {not: [own_business]}}
     title: "งานฉ่ำ"
     text: "รุ่นน้องในทีมพิมพ์ว่าเดือนนี้งานฉ่ำ เจ้านายรุ่นเก่าอ่านแล้วเดินไปดูหลังคาว่ารั่วตรงไหน ทั้งห้องหันมาให้คุณอธิบาย"
     choices:
