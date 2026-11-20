@@ -13,7 +13,6 @@ import { nearMiss, summonsCourt, courtCard, chooseCourt, courtPick } from './cou
 import { cadetActive, cadetCard, chooseCadet, cadetAfterChoice } from './cadet.mjs';
 import { introCard, eraStory } from './intro.mjs';
 import { poolRounds, poolEffectScale, poolStatScale } from './pace.mjs';
-import { FOCUS_FLOW, focusOffers, focusSet } from './focus.mjs';
 import { treeStartBranch, treeStartNode, treeCtl, treeOffers, treeInvest, treeCard, treeYearEnd, treeRollMul, treeCardMul, treeGateEvent, treeGateDone, treeRespec, treeRusty, treeRustMul, treeMainBranch } from './tree.mjs';
 import { entryCard, ENTRY, lifeEndWord, isGone, GONE_SEARCH, TRIP, tripRoll, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, tripCarry, tripLineage, isekaiWorldLore, isekaiWorldLegends, SKILL, SKILL_UP, skillUp, upgradeOffer, skillsBack, thaiSkillMul } from './isekai.mjs';
 import { WARN, crossedLow, warnCard, warnPick } from './warn.mjs';
@@ -2010,43 +2009,13 @@ function drawPool(st, year) {
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
 }
 
-// โฟกัสชีวิตโลกหลัก (B163): เนื้ออยู่ content.focus · กติกากลางอยู่ focus.mjs · เนื้อหาชุดทดสอบที่ไม่มี focus = ตามน้ำเสมอ
-// need = สถานะที่ when ของการ์ดเขียนไม่ได้ (หรือ · ไม่มี · ช่วงไว้ทุกข์) — ทะเบียนอ้างชื่อ lint ตรวจชื่อกับรายการนี้
-const alive = (role, age) => (st) => familyOk(st, { role, alive: true, ...(age && { age }) });
-const hasSpouse = alive('spouse');
-const hasChild = alive('child');
-// ไว้ทุกข์ = คู่จากไปปีนี้หรือปีก่อน
-const mourning = (st) => (st.kinLoss ?? []).some((l) => l.role === 'spouse' && st.birthYear + st.age - l.year <= FOCUS_MOURN);
-const FOCUS_MOURN = 1;
-export const FOCUS_NEEDS = {
-  working: (st) => isWorking(st),
-  single: (st) => !hasSpouse(st) && !mourning(st),
-  partnered_or_kids: (st) => hasSpouse(st) || hasChild(st),
-  has_kids: hasChild,
-  kids_or_grandkids: (st) => hasChild(st) || alive('grandchild')(st),
-  old_parent: alive('parent', [60, 200]),
-  savings_or_credit: (st) => st.money > 0 || isWorking(st),
-};
-const lifeFocusOk = (st) => (w, def) => whenOk(st, w) && (def?.need ?? []).every((k) => FOCUS_NEEDS[k](st));
-export const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
-// ตามน้ำอยู่หัวรายการเสมอ แล้วตามลำดับในเนื้อหา
-export const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
-export function setLifeFocus(st, id) {
-  if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
-  // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
-  focusSet(st, id, st.age);
-}
-// ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
-// ปลายสายที่ต่อจากต้นสาย id (ชื่อบนจอ) · ไม่มี = ต้นสายนี้ไม่ใช่ปณิธาน
-const goalTail = (defs, id) => Object.values(defs).find((d) => d.after === id)?.name;
 // ชื่อปณิธานที่สำเร็จของชีวิตนี้ — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
 // รูปใหม่ (ft15): id = แขนงของต้นไม้ · ชื่อ = โหนดใหญ่/keystone ที่ปลดเป็นตัวแรกของแขนง (st.goalNode) · รูปเก่า (เซฟก่อน ft15): id ต้นสายโฟกัส "ต้นสาย → ปลายสาย"
 export const goalNames = (st) => (st.goalsDone ?? []).map((id) => {
   const node = st.goalNode?.[id];
   if (node) return st.content.tree.nodes[node].name;
-  const fs = st.content.focus.focuses;
-  return `${fs[id].name} → ${goalTail(fs, id)}`;
-});
+  return null;
+}).filter(Boolean);
 // เป้าชีวิต (ft15 · เจ้าของเคาะข้อ 1 = B): ปลดโหนดใหญ่ (size b) หรือ keystone (size k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง (สูงสุดเท่าจำนวนแขนง · จำกัดต่อแขนงกันความสุขล้นจากโหนดใหญ่ 18 ตัว) · จดไว้ให้การ์ดตายเล่า
 // ไม่ดึงเลขสุ่ม · เรียกหลังปลดโหนดทุกทาง (ปีเต็ม · การ์ดด่านของโหนดใหญ่)
 const GOAL_SIZES = ['b', 'k'];
@@ -2090,9 +2059,10 @@ function lifeTreeBorn(st, parentBranch) {
 }
 // เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
 // เซฟก่อน ft15: ประตูเคยเปิดจากชื่อโฟกัสเดิม (focusYears ครบ chain_years · st.gates เก็บชื่อโฟกัส · ธง gate:<ชื่อโฟกัส>) → แปลงเป็นรหัสโหนดประตูตอนโหลดแล้วตัด focusYears · ไม่ปลดโหนด ไม่ผุดผลติดตัว (decisions ข้อ 99 · เจ้าของเคาะ C′)
+const LEGACY_CHAIN_YEARS = 3;
 const LEGACY_GATE = { business: 'mo5', shortcut_money: 'mo7', politics_base: 'r5', ordain: 'o5', occult: 'm4' };
 export function lifeGatesMigrate(st) {
-  const chain = st.content.focus?.chain_years ?? Infinity;
+  const chain = LEGACY_CHAIN_YEARS;
   const open = new Set(st.gates ?? []);
   for (const [old, id] of Object.entries(LEGACY_GATE)) {
     if ((st.focusYears?.[old] ?? 0) >= chain || open.has(old)) open.add(id);

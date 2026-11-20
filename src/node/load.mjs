@@ -11,7 +11,6 @@ import { DEBTS } from '../engine/finance.mjs';
 import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
 import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
-import { checkFocus } from './lint/focus.mjs';
 import { checkNature } from './lint/nature.mjs';
 import { checkTree, checkTreePace } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
@@ -442,17 +441,6 @@ export function loadNearHints(p = 'content/rules/near-hints.yaml') {
   return doc;
 }
 
-// โฟกัสชีวิตโลกหลัก (B163): ทะเบียนผิดรูป = หยุด build ไม่ปล่อยให้แกนอ่านค่าครึ่ง ๆ
-function loadFocus() {
-  const doc = parse(read('content/rules/focus.yaml'));
-  const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
-  const jobs = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
-  const treeNodes = Object.keys(parse(read('content/rules/tree.yaml')).nodes);
-  const bad = checkFocus(doc, { causes, jobs, treeNodes, natures: parse(read('content/rules/nature.yaml')).natures, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
-  if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses };
-}
-
 // นิสัยจากวัยเด็ก (B41 · ใบ ft07): ทะเบียนผิดรูป = หยุด build · แยกจาก focus.yaml (ใบ ft15a) เพื่อให้ลบโฟกัสเดิมได้โดยไม่ลากนิสัยไปด้วย
 function loadNature() {
   const doc = parse(read('content/rules/nature.yaml'));
@@ -476,14 +464,13 @@ function loadTree() {
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
 // lifeGoal = id แขนงของต้นไม้ (เป้าชีวิต ft15 · st.goalsDone จดตัวนี้ · เซฟก่อน ft15 จด id ต้นสายโฟกัสเดิม ไม่ได้สกิลจากตาราง)
-export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFocus()) {
+export function loadSkillMap(p = 'content/rules/skill-map.yaml') {
   const doc = parse(read(p)) ?? {};
   const known = {
     job: json('data/finance.json').occupations.list.map((o) => o.id),
     title: TITLES.map((t) => t.id),
     cause: Object.keys(json('data/death-causes.json').groups),
     goal: FAMILY_GOALS.map((g) => g.id),
-    focus: Object.keys(focus.focuses),
     lifeGoal: [...new Set(Object.values(parse(read('content/rules/tree.yaml')).nodes).map((n) => n.branch).filter((b) => b !== 'mid'))],
   };
   const bad = Object.keys(doc).filter((k) => !(k in known)).map((k) => `คีย์ ${k} ไม่มีในแกน (${Object.keys(known).join(' ')})`);
@@ -605,9 +592,8 @@ export function checkCadetHeirText(cadet) {
 
 export function loadContent() {
   const events = loadEvents();
-  const focus = loadFocus();
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), focus, nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
 }
