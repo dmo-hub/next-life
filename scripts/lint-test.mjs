@@ -16,6 +16,7 @@ import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenTex
 import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 import { checkTree } from '../src/node/lint/tree.mjs';
+import { sillyGaps } from '../src/node/lint/heavy.mjs';
 import { checkFocus } from '../src/node/lint/focus.mjs';
 import { checkNature } from '../src/node/lint/nature.mjs';
 
@@ -607,6 +608,31 @@ try {
     }
   }
   rows.push(['ui-imports (src/ui ← import)', `${n} ชื่อ`]);
+}
+
+// ---- B64 ป้ายเรื่องหนัก (heavy: turning/sad) + ตัวเลือกปั่น (silly: true): ตัวควบคุมทีละแบบ · คำเตือนนับการ์ดไม่มีตัวเลือกปั่น (ไม่ตก) ----
+{
+  const card = (extra = {}, silly) => ({ id: 'hv_case', type: 'A', category: 'family', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'ญาติมาถามว่าปีนี้จะกลับบ้านไหม', choices: [1, 2, 3, 4].map((i) => ({ text: `ทางเลือก ${i}`, merit: [{ cat: 'neutral' }], ...(silly !== undefined && i === 4 ? { silly } : {}) })), ...extra });
+  const heavyCases = [
+    ['turning', { heavy: ['turning'] }, 0], ['sad', { heavy: ['sad'] }, 0], ['ทั้งคู่', { heavy: ['turning', 'sad'] }, 0],
+    ['ค่านอกรายการ', { heavy: ['funny'] }, 1], ['ซ้ำ', { heavy: ['sad', 'sad'] }, 1], ['ไม่ใช่รายการ', { heavy: 'sad' }, 1], ['รายการว่าง', { heavy: [] }, 1],
+    ['การ์ดแกนสร้าง promo_', { id: 'promo_x', heavy: ['sad'] }, 1], ['การ์ดแกนสร้าง recruit_gov', { id: 'recruit_gov', heavy: ['sad'] }, 1],
+  ];
+  for (const [name, extra, want] of heavyCases) {
+    const ps = lintDocs([{ file: `heavy-case:${name}`, doc: { events: [card(extra)] } }], ctx).filter((p) => p.rule === 'heavy-tag');
+    if ((ps.length > 0) !== (want > 0)) fails.push(`heavy-tag "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.map((p) => p.msg).join(' | ') || 'ผ่าน'}]`);
+  }
+  for (const [name, silly, want] of [['silly true', true, 0], ['silly false', false, 1], ['silly "yes"', 'yes', 1]]) {
+    const ps = lintDocs([{ file: `silly-case:${name}`, doc: { events: [card({}, silly)] } }], ctx).filter((p) => p.rule === 'heavy-tag');
+    if ((ps.length > 0) !== (want > 0)) fails.push(`silly "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.map((p) => p.msg).join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['heavy-tag/silly ตัวควบคุม', `${heavyCases.length + 3} เคส`]);
+  // ตัวนับ: sad ข้าม · silly ผ่าน · ที่เหลือนับ · การ์ดไม่มีตัวเลือก (เล่าเรื่อง) ไม่นับ
+  const g = sillyGaps([{ file: 'gap-case', doc: { events: [card({ id: 'a' }), card({ id: 'b' }, true), card({ id: 'c', heavy: ['sad'] }), card({ id: 'd', heavy: ['turning'] }), card({ id: 'e', choices: [] })] } }]);
+  if (g.total !== 4 || g.missing.map((m) => m.id).join() !== 'a,d') fails.push(`silly-gaps: ต้องนับ 4 ขาด a,d ได้ total ${g.total} ขาด [${g.missing.map((m) => m.id)}]`);
+  const real = dir('content/').map((f) => load('content/', f));
+  const gap = sillyGaps(real);
+  rows.push(['เตือน: การ์ดไม่มีตัวเลือกปั่น (silly)', `${gap.missing.length}/${gap.total} ใบ (ไม่ตก · ใบ 158 เปลี่ยนเป็นตก · ค่าเริ่มคือทุกใบ)`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

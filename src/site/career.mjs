@@ -3,12 +3,12 @@
 // การ์ดที่ไม่มีในไฟล์ผล (ใหม่กว่าผลจำลอง) ขึ้นว่ายังไม่มีผลจำลอง ไม่เดาเลข · สร้างไฟล์ผลด้วย node harness/career-sim.mjs
 import { existsSync, readFileSync } from 'node:fs';
 import { esc, text, spoilSlot } from './catalog.mjs';
+import { ENGINE_CARD } from '../node/lint/vocab.mjs';
 
 export const OFFICE_UNIT = 'office';
 export const unitKey = (ladder, occ) => `${ladder}|${occ}`;
 export const SIM_FILE = 'data/career-sim.json';
 // การ์ดเลือกที่แกนสร้างตอนอยู่ในงาน — ไม่อยู่ใน content จึงนับจาก prefix ของ id
-const ENGINE_CARD = /^(promo_|office_|recruit_gov$|early_retire$)/;
 export const isCareerCard = (id) => ENGINE_CARD.test(id);
 // ต่ำกว่านี้รวบเป็นบรรทัดเดียว — การ์ดเกี่ยวกับงานมีหลายสิบใบต่ออาชีพ ใบที่แทบไม่มีใครเจอดันใบหลักตกจอ
 export const RARE_PCT = 1;

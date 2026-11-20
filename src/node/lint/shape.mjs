@@ -1,7 +1,7 @@
 // กติกาโครงข้อมูล: ฟิลด์บังคับ · ชนิด · key นอกรายการ · ระดับผล · หน่วยเงิน · ช่องแทนค่า
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
-  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
+  HEAVY_TAGS, ENGINE_CARD, ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
   meritCat, AFTERLIFE_STAGE,
 } from './vocab.mjs';
 import { INCOME_MULT, MONEY_KEYS, PACT, OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
@@ -19,8 +19,8 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex'],
+  event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc', 'heavy'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
@@ -545,6 +545,18 @@ export const rules = [
       if (e.herald_of === undefined) return;
       if (typeof e.herald_of !== 'string' || !ctx.eras.has(e.herald_of)) r('.herald_of', `ไม่มีเหตุการณ์บ้านเมือง "${e.herald_of}" (${[...ctx.eras].join(' ')})`);
       if (['weight', 'at_age', 'era', 'repeat', 'prelude', 'first_of'].some((k) => e[k] !== undefined)) r('.herald_of', 'ใบลางห้ามมี weight/at_age/era/repeat/prelude/first_of — ออกได้ทางเดียวคือปีก่อนภัย');
+    },
+  },
+  {
+    id: 'heavy-tag',
+    desc: 'heavy = รายการป้ายเรื่องหนักของการ์ด · ค่าได้แค่ turning (จุดเปลี่ยน โหมดด่วน) กับ sad (เรื่องเศร้า ยกเว้นมุก) · มีได้ทั้งคู่ ห้ามซ้ำ · ห้ามใส่บนการ์ดที่แกนสร้างเอง · silly (ตัวเลือกปั่น) = true เท่านั้น',
+    event(e, ctx, r) {
+      for (const { c, path } of choicesOf(e)) if (c.silly !== undefined && c.silly !== true) r(`${path}.silly`, `silly ต้องเป็น true (ได้ ${JSON.stringify(c.silly)}) — ไม่ใช่ตัวเลือกปั่นให้ลบช่องออก`);
+      if (e.heavy === undefined) return;
+      if (!Array.isArray(e.heavy) || !e.heavy.length) { r('.heavy', 'heavy ต้องเป็นรายการไม่ว่าง เช่น [sad]'); return; }
+      for (const v of e.heavy) if (!HEAVY_TAGS.includes(v)) r('.heavy', `ป้าย "${v}" ไม่มี — มีแค่ ${HEAVY_TAGS.join(' ')}`);
+      if (new Set(e.heavy).size !== e.heavy.length) r('.heavy', 'ป้ายซ้ำในรายการเดียวกัน');
+      if (typeof e.id === 'string' && ENGINE_CARD.test(e.id)) r('.heavy', 'การ์ดที่แกนสร้างเอง (promo_ office_ recruit_gov early_retire) ไม่ใส่ป้ายในไฟล์เนื้อหา');
     },
   },
   {

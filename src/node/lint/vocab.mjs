@@ -116,6 +116,9 @@ export const BELIEF_KINDS = ['fortune', 'auspicious_time', 'lottery_numen', 'vow
 export const TRADITIONS = ['พุทธ', 'ผี', 'พราหมณ์', 'ผสม'];
 // กลไกนอกคัมภีร์ที่ต้องประกาศ (ใบ 12 ป้ายที่มา)
 export const OUTSIDE_CANON = ['odds_by_merit', 'vow_broken', 'intent_merit'];
+// การ์ดเลือกที่แกนสร้างตอนอยู่ในงาน — ไม่อยู่ใน content จึงรู้จากคำนำหน้า id
+export const ENGINE_CARD = /^(promo_|office_|recruit_gov$|early_retire$)/;
+export const HEAVY_TAGS = ['turning', 'sad'];
 export const INTENTS = ['sincere', 'wish_for_gain'];
 export const REDEEM = ['full', 'light', 'defer', 'none'];
 // ผลที่กิจกรรมสายลี้ลับให้ได้ (ใบ 12 ข้อ ข) — เงินต้องเป็นจ่ายออกเท่านั้น
