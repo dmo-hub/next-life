@@ -4,6 +4,7 @@
 // ไม่ครบ = ตก พิมพ์โหนดแรกที่ค้างกับอายุตอนตาย แล้วส่งเจ้าของเคาะ — ห้ามผ่อนเกณฑ์เองในไฟล์นี้
 import { newLife, CLASSES, lifeTreeStart, treeStartWeights, treeStartBranch, playLife, mixSeed, treeInvestNode, treeCtl, snapshot, restore, successP, treeRollLevel, treeRollMul, treeCardMul, choiceHidden } from '../src/engine/index.mjs';
 import { treeBudgetSpent } from '../src/node/lint/tree.mjs';
+import { readFileSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { random, withTree, botTree, withGate } from './bots.mjs';
 
@@ -39,6 +40,7 @@ const stageName = stageOf;
 const reach = (st, id) => { const p = defs[id].pre ?? []; return !p.length || p.some((x) => st.tree?.done?.[x] !== undefined); };
 
 const fails = [];
+const crit = {};
 function beliefByStage(c) {
   const by = {};
   for (const e of c.events) if (e.category === 'belief') by[e.stage] = (by[e.stage] ?? 0) + 1;
@@ -154,6 +156,7 @@ treeCtl.anyCat = false;
 // 1) งบ (ข้อ 93): ผลเบาถาวรรวมทั้งต้น/ปี ≤ เพดานในทะเบียน · แสดงเทียบโฟกัสเดิมตัวแรงสุดเพื่อประกอบการเคาะ
 const spent = treeBudgetSpent(T);
 console.log(`งบผลเบาถาวรรวม ${spent.toFixed(3)} / เพดาน ${T.budget} (ระดับการ์ด/ปี · ข้อ 93) · เทียบโฟกัสเดิมตัวแรงสุด: รวมทุกค่า ${T.budget_ref.sum.toFixed(2)} · ค่าเดียว ${T.budget_ref.one.toFixed(2)}`);
+crit.budget = { spent, cap: T.budget };
 if (spent > T.budget) fails.push(`งบผลเบารวม ${spent.toFixed(3)} เกินเพดาน ${T.budget}`);
 
 // ตัวควบคุมงบ: ปิดผลติดตัว (passive) → ทุกชีวิตที่มีโหนดปลด ตัวคูณทอย/ถ่วงการ์ดต้องเป็น 1 พอดี (ต่างจากฐาน 0) · เปิด → ต้องมีชีวิตที่ต่างจาก 1
@@ -210,6 +213,7 @@ if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติ
   console.log(`ข้อ 58: ชีวิตที่โหนดเดียวเอียงต่ำกว่าขั้น 5% ${belowStep}/${lives} (เอียงสูงสุด ${(maxOne * 100).toFixed(1)} จุด) · โอกาสสำเร็จสูงสุดเมื่อปลดครบ ${maxP.toFixed(3)} (เพดาน 0.95) · ${hits} คู่ ชีวิต×ตัวเลือก`);
   if (belowStep < lives) fails.push(`ข้อ 58: ชีวิต ${lives - belowStep}/${lives} ที่โหนดเดียวเอียงถึงขั้นป้าย 5% (เอียงสูงสุด ${(maxOne * 100).toFixed(1)} จุด)`);
   if (maxP > 0.95 + 1e-9) fails.push(`ข้อ 58: โอกาสสำเร็จ ${maxP.toFixed(3)} เกินเพดาน 0.95`);
+  crit.p58 = { belowStep, lives, maxOne, maxP };
   if (!hits) fails.push('ข้อ 58: ไม่มีตัวเลือกหมวดความเชื่อที่มีทางสำเร็จให้วัด');
 }
 
@@ -388,6 +392,7 @@ if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติ
   const zeroSeen = zero.filter((id) => !defs[id].hidden);
   console.log(`ปลดได้ 0 ครั้ง (ข้อ 49): ${zero.length}/${Object.keys(defs).length} โหนด${zero.length ? ' → ' + zero.map((id) => `${id}${defs[id].hidden ? ' (ซ่อน บอทไม่แตะ)' : ''}`).join(' · ') : ''}`);
   console.log(`  ที่เห็นแล้วยังปลดไม่ได้เลย ${zeroSeen.length} โหนด · ส่งเจ้าของเคาะ (ห้ามผ่อนเกณฑ์เอง)`);
+  crit.zero = { zero, zeroSeen, total: Object.keys(defs).length, hit };
   // เกณฑ์ลึกลับครบ (ข้อ 86) ต้องใช้ปีทุ่มขั้นต่ำเท่าไร เทียบอายุขัย: เลือกแม่ในแขนงที่ปีสะสมถูกสุด
   const chain = (id, memo = {}) => memo[id] ??= defs[id].years + (defs[id].pre.length ? (defs[id].and ? defs[id].pre.reduce((a, q) => a + chain(q, memo), 0) : Math.min(...defs[id].pre.map((q) => chain(q, memo)))) : 0);
   const need = new Set();
@@ -528,6 +533,27 @@ if (devOff !== 0) fails.push(`ตัวควบคุม: ปิดผลติ
   if (!none) fails.push('ล้างโหนด: ล้างโหนดที่ยังไม่ปลดได้');
 }
 Object.assign(treeCtl, { cards: true, anyCat: false, cardsFree: false, passive: true, rust: true });
+
+// สรุปเกณฑ์ต้นทุนที่เจ้าของรับ (ข้อ 36 41 49 57 58 + งบข้อ 42 · ใบ ft15) · ไม่ใช่ด่าน: พิมพ์ตัวเลขจากที่วัดข้างบนให้ส่งเจ้าของ · ข้อที่ยังไม่มีตัววัดบอกตรง ๆ
+if (!(crit.zero && crit.p58 && crit.budget)) console.log('\nสรุปเกณฑ์ต้นทุน: ข้าม (บางด่านไม่ได้รันรอบนี้)');
+else {
+  const src = readFileSync(new URL('./bots.mjs', import.meta.url), 'utf8');
+  const botLeft = ['HEALTH_FOCUS', 'botFocus', 'botFlows'].filter((k) => src.includes(k));
+  const ids = new Set(T.gates ?? []);
+  const gated = content.events.flatMap((e) => (e.choices ?? []).map((c) => c.gate)).filter((g) => g !== undefined).flat();
+  const stray = [...new Set(gated.filter((g) => !ids.has(g)))];
+  const z = crit.zero;
+  const p = crit.p58;
+  console.log('\n── สรุปเกณฑ์ต้นทุน (ส่งเจ้าของ) ──');
+  console.log(`ข้อ 36 ทุ่มได้แค่โหนดที่ยังไม่ปลด: บอทสายสุขภาพเดิมเหลือ ${botLeft.length ? botLeft.join(',') : '0 ตัว'} · ด่าน 3b (ข้อ 335) ยังไม่วัดที่นี่ (ต้อง n≥1000 qwen)`);
+  console.log(`ข้อ 41 ตัวเลือกติดประตู: ${gated.length} จุดอ้างโหนดประตู ${ids.size} ตัว · ชื่อที่ไม่ใช่โหนดประตูเหลือ ${stray.length ? stray.join(',') : '0'}`);
+  console.log(`ข้อ 49 โหนดทั้งต้น ${z.total} (ตั้งต้น 40) · ปลดได้ 0 ครั้งในชีวิตบอท ${z.zero.length} (ที่เห็นแล้วปลดไม่ได้ ${z.zeroSeen.length})`);
+  console.log('ข้อ 57 (ฐานะซ้อนข้อ 39 · ใฝ่รู้ชนะนิสัยอื่น · แก่แล้วช้า · สเกลอายุ ~75): ด่านนี้ไม่มีตัววัดรวม — ตัวเลขอยู่ที่ตารางเร่งปลดด้านบน ยังไม่ผูกเป็นเกณฑ์เดียว');
+  console.log(`ข้อ 58 โหนดเดียวเอียงต่ำกว่าขั้น 5%: ${p.belowStep}/${p.lives} ชีวิต (เอียงสูงสุด ${(p.maxOne * 100).toFixed(1)} จุด · เพดานสำเร็จ ${p.maxP.toFixed(3)})`);
+  console.log(`งบข้อ 42 ผลเบาถาวรรวม ${crit.budget.spent.toFixed(3)} / เพดาน ${crit.budget.cap}`);
+  const cut = z.zero.filter((id) => !defs[id].hidden && !defs[id].keystone);
+  console.log(`ช่อง 24–35 เสนอตัด: ปลดได้ 0 ครั้งและไม่ใช่โหนดซ่อน/keystone ${cut.length} โหนด${cut.length ? ' → ' + cut.join(' ') : ''} (ผูกกับเลขช่องในร่างไม่ได้จากข้อมูล — ให้เจ้าของเทียบกับร่าง)`);
+}
 
 console.log(fails.length ? `\nไม่ผ่าน ${fails.length} ข้อ\n${fails.map((f) => `  ✗ ${f}`).join('\n')}` : '\nผ่านทั้งหมด');
 process.exitCode = fails.length ? 1 : 0;
