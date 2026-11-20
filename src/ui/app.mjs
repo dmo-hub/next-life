@@ -1,4 +1,4 @@
-import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, chooseSpend, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusDefs, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, lifeTreeStart, lifeTreeRespec, lifeTreeRusty, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
+import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, chooseSpend, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, ISEKAI_CAREER_T, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, lifeTreeStart, lifeTreeRespec, lifeTreeRusty, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
@@ -190,12 +190,11 @@ function meterLi(label, v, low, shown = String(v), icon = null) {
 
 // แท็บโฟกัสชาติไทย (ui-redo 50 · ข้อ 65 68 69 · JSON 47 แบบ ก รายการเดียว): ตอนนี้ · เปลี่ยนเป็น · ปณิธาน
 // ไม่ใช่ตัวเลือกของการ์ด (ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
-const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
 // ปีสะสมเป็นคำ ไม่บอกเลขเกณฑ์ (ข้อ 68) · ชำนาญแล้ว = ครบปีที่ต่อสายได้ ตัวเดียวกับที่แกนใช้เปิดปลายสาย
 function focusWord(id, h = st) {
   const n = h.focusYears?.[id] ?? 0;
   if (!n) return null;
-  return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
+  return n >= ISEKAI_CAREER_T.years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
 }
 const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
 // จอต้นไม้โฟกัส (ใบ 12 · ข้อ 88 แบบ 4 กลุ่มดาว) แทนรายการปณิธาน · ผังกับตัววาดอยู่ treeview.mjs
@@ -378,35 +377,12 @@ function focusRows(wrap, now, rows, pick, draw) {
 function focusPanel(card) {
   const wrap = el('div', 'ft');
   if (st.dead || card.kind === 'death') {
-    wrap.append(...focusSummary());
+    wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), el('p', 'ft-note', 'ชาตินี้จบแล้ว'));
     return wrap;
   }
   wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), treeScreen(card));
   return wrap;
 }
-// ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
-function focusSummary() {
-  const defs = lifeFocusDefs(st);
-  const main = focusMain(st, defs);
-  const head = el('h3', null, af ? 'ชาติที่แล้วทุ่มเทมากสุด' : 'ชาตินี้ทุ่มเทมากสุด');
-  if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
-  const box = el('div', 'ft-now');
-  box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
-  const kid = defs[main].kid;
-  if (kid && defs[kid]) box.append(el('span', 'ft-fx', `ทายาทในตระกูลเริ่มชาติด้วย${defs[kid].name}`));
-  const ys = st.focusYears ?? {};
-  const rest = Object.keys(defs).filter((id) => id !== main && ys[id] > 0).sort((a, b) => ys[b] - ys[a]);
-  if (!rest.length) return [head, box];
-  const ul = el('ul', 'ft-ro ft-list');
-  for (const id of rest) {
-    const li = el('li', null, `${focusName(id)} `);
-    const w = focusWord(id);
-    if (w) li.append(w);
-    ul.append(li);
-  }
-  return [head, box, el('h3', null, 'เรื่องอื่นที่เคยทุ่ม'), ul];
-}
-
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
 // โฟกัสแยกแท็บถัดจากตัวฉัน (ui-redo 50 51) · ทุกปุ่มทุกโลกมีไอคอนคู่ป้าย (ข้อ 260)
@@ -1425,7 +1401,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'ปณิธาน' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', lifeGoal: 'ปณิธาน' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';

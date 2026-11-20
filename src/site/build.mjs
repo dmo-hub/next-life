@@ -26,7 +26,7 @@ export const GEN_PAGES = [
   ['catalog', '<!--__CATALOG__-->', (content) => catalogHtml(content, demoHtml(content))],
   // คู่มือสั้น (B121) ป้ายปุ่มดึงจาก src/ui/labels.mjs ที่เกมใช้
   ['guide', '<!--__GUIDE__-->', guideHtml],
-  // โฟกัสชีวิต: รายการ/เงื่อนไข/ป้ายดึงจาก content.focus กับโมดูลต่างโลก ระดับคู่มือ ไม่เฉลยตัวเลข
+  // โฟกัสชีวิต: รายการ/เงื่อนไข/ป้ายดึงจาก content.tree กับโมดูลต่างโลก ระดับคู่มือ ไม่เฉลยตัวเลข
   ['focus', '<!--__FOCUS__-->', focusHtml],
 ];
 
