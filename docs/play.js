@@ -4292,6 +4292,45 @@ function yearlySaving(st, year = st.birthYear + st.age) {
   return monthlyIncome(st, year) * 12 * era.birth.saveRate;
 }
 
+// ตัวคูณระดับการใช้จ่าย (B29 · ใบ 52): คูณเฉพาะเงินเก็บที่เข้ากระเป๋าแต่ละปี — ไม่แตะ yearlySaving
+// (ราคาการ์ด income_x/เงินติดตัวใช้ yearlySaving ตรง ๆ จึงเท่าเดิมทุกเกม) · normal = ×1 = ค่าเดิม
+const spendMult = (st) => st.content.spending?.levels?.[st.spendLevel]?.save_mult ?? 1;
+
+// แถวเลือกระดับใช้จ่ายบนการ์ดทบทวนเงิน — ป้ายบอกแค่ทิศ ไม่บอกตัวเลข (ห้ามอ่านเป็นคำแนะนำการเงิน)
+// อยู่นอก choices จึงไม่ขยับเลขตัวเลือกของการ์ดทบทวนเงิน · บอท/ผู้เล่นที่ไม่แตะแถวนี้ = ชีวิตเดิมทุกบิต
+const dir = (v, up, down) => (v > 0 ? up : v < 0 ? down : null);
+function spendRow(st) {
+  const levels = st.content.spending?.levels;
+  if (!levels) return null;
+  return {
+    cur: st.spendLevel ?? 'normal',
+    levels: Object.entries(levels).map(([id, l]) => ({
+      id,
+      name: l.name,
+      fx: [dir(l.save_mult - 1, 'เงิน ↑', 'เงิน ↓'), dir(l.happy, 'ความสุข ↑', 'ความสุข ↓')].filter(Boolean).join(' · ') || 'เท่าเดิม',
+    })),
+  };
+}
+
+// เลือกระดับระหว่างการ์ดทบทวนเงินยังเปิดอยู่ · ผลลงตอนกดตัวเลือกของการ์ด (choose) — กดแถวซ้ำกี่ครั้งก็ได้ความสุขครั้งเดียว
+function chooseSpend(st, id) {
+  if (!st.pending?.alloc) throw new Error('ยังไม่ถึงการ์ดทบทวนเงิน');
+  if (!st.content.spending?.levels?.[id]) throw new Error('ระดับการใช้จ่ายไม่ถูกต้อง');
+  st.pending.spend = id;
+}
+
+// หรูหราติดกันหลายช่วง สุขเพิ่มน้อยลงเรื่อย ๆ (luxury_decay ต่อครั้ง) · เปลี่ยนไประดับอื่น = เริ่มนับใหม่
+function applySpend(st, id) {
+  const sp = st.content.spending;
+  const l = sp.levels[id];
+  const streak = id === 'luxury' ? (st.luxuryStreak ?? 0) : 0;
+  st.happiness = clamp(st.happiness + l.happy * sp.luxury_decay ** streak);
+  st.luxuryStreak = id === 'luxury' ? streak + 1 : 0;
+  // ลงบันทึกเฉพาะตอนเปลี่ยนระดับ — คงระดับเดิมทุก 5 ปีไม่ใช่เรื่องที่ควรขึ้นในสรุปชีวิต
+  if (id !== (st.spendLevel ?? 'normal')) st.log.push({ id: 'spend', age: st.age, text: `ใช้จ่ายแบบ${l.name}` });
+  st.spendLevel = id;
+}
+
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างอาชีพ × ตัวคูณรายได้ถาวรจากเหตุการณ์
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างงาน (ขั้นในสายยศทับค่าจ้างอาชีพ) × ตัวคูณรายได้ถาวร
 // ตำแหน่งการเมือง: ท้องถิ่นได้ค่าตอบแทนบวกจากงาน · เต็มเวลาได้อย่างที่มากกว่า (ลาออกจากงานเดิมไปนั่งตำแหน่ง)
@@ -5310,8 +5349,10 @@ function stepYear(st) {
   if (st.money > 0) {
     st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
-  if (isWorking(st)) st.money += yearlySaving(st, year);
-  else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;
+  if (isWorking(st)) st.money += yearlySaving(st, year) * spendMult(st);
+  // เกษียณยังเลือกได้ (เจ้าของเคาะ): ระดับใช้จ่ายมีผลกับรายจ่ายเกษียณ — ประหยัดใช้เงินเก็บช้าลง หรูหราใช้เร็วขึ้น
+  // (ทิศเดียวกับตัวคูณเงินเก็บ: save_mult สูง = ออมมาก = รายจ่ายน้อย) · ค่าเริ่ม normal = ÷1 = ค่าเดิม
+  else if (st.retireBase !== null) st.money -= retireSpend(st, year) / spendMult(st) - st.pension * st.price;
   let paid = 0;
   for (const d of st.debts) {
     const p = payDebt(era, st.seed, d, year);
@@ -5871,6 +5912,8 @@ function drawCard(st) {
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
       card.choices = options.map((o) => o.label);
+      const spend = spendRow(st);
+      if (spend) card.spend = spend;
       st.pending = { alloc: options };
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
@@ -6512,6 +6555,7 @@ function choose(st, idx, loan) {
     if (!opt) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     if (opt.alloc) st.alloc = opt.alloc;
+    if (ev.spend) applySpend(st, ev.spend);
     st.lastAllocYear = st.birthYear + st.age;
     st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
@@ -6956,6 +7000,8 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
     // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
     if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
     if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
+    // บอทที่ประกาศนโยบายใช้จ่ายเลือกระดับบนการ์ดทบทวนเงิน · บอทที่ไม่ประกาศไม่แตะ ⇒ ชีวิตเท่าเดิม
+    if (pickChoice.spend && card.spend) chooseSpend(st, pickChoice.spend(card, st));
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
     if (card.court) {
@@ -14326,6 +14372,27 @@ const followIcon = (k) => {
   return s;
 };
 
+// แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): เลือกค้างไว้ ยังไม่เดินเกม — ลงผลตอนกดตัวเลือกเงินเก็บ · คืนตัวอ่านลำดับที่เลือก
+// เริ่มที่ระดับปัจจุบัน ผู้เล่นที่ไม่แตะจึงได้ระดับเดิมต่อ
+const SPEND_ASK = 'ช่วงนี้จะใช้เงินแบบไหน';
+function spendRowEl(spend, body) {
+  let k = Math.max(0, spend.levels.findIndex((l) => l.id === spend.cur));
+  const row = el('div', 'spend');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', SPEND_ASK);
+  const btns = spend.levels.map((l, j) => {
+    const b = button(l.name, l.fx, () => {
+      k = j;
+      btns.forEach((x, m) => x.setAttribute('aria-pressed', String(m === k)));
+    });
+    b.setAttribute('aria-pressed', String(j === k));
+    return b;
+  });
+  row.append(...btns);
+  body.append(el('h4', null, SPEND_ASK), row);
+  return () => k;
+}
+
 function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
@@ -14894,6 +14961,7 @@ function render(card) {
         body.append(ul);
       }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
+      const spendAt = card.spend ? spendRowEl(card.spend, body) : null;
       let n = 0;
       card.choices.forEach((c, i) => {
         // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
@@ -14903,7 +14971,7 @@ function render(card) {
         const fx = why ?? card.fx?.[i];
         const b = numbered(button(c, fx, () => {
           veil(card, i);
-          play(lifePick(i));
+          play(spendAt ? spendPick(spendAt(), i) : lifePick(i));
           if (card.kind === 'upgrade') upgradeFx(card, i);
         }, card.hints?.[i]), ++n);
         if (card.kind === 'upgrade' && card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
@@ -15791,7 +15859,10 @@ const LOAN_TOK = /^~([0-9])([0-9a-z])$/;
 // เล่นต่อเป็นผู้สืบสายเลือด (B76) = "@<ทาง A-Z><ลำดับในรายชื่อ>" · รายชื่ออ่านจากสถานะที่เล่นซ้ำมาถึงจุดเดียวกัน ลำดับจึงตรงกันทุกครั้ง
 const bloodPick = (i, k) => `@${afterPick(i)}${k.toString(36)}`;
 const BLOOD_TOK = /^@([A-Z])([0-9a-z])$/;
-const tokens = (log) => log.match(/[~@]..|[^]/g) ?? [];
+// ทบทวนเงินพร้อมระดับใช้จ่าย (B29) = "$<ลำดับระดับ><ตัวเลือก>" · ระดับลงพร้อมตัวเลือกในก้าวเดียว เล่นซ้ำจึงได้ผลเท่ากดจริง
+const spendPick = (k, i) => `$${k.toString(36)}${i.toString(36)}`;
+const SPEND_TOK = /^\$([0-9a-z])([0-9a-z])$/;
+const tokens = (log) => log.match(/[~@$]..|[^]/g) ?? [];
 let save = null;
 
 // อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
@@ -15913,6 +15984,14 @@ function step(tok) {
     const kind = LOAN_KINDS[+loan[1]];
     if (!kind) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
     choose(st, parseInt(loan[2], 36), kind);
+    return nextCard(st);
+  }
+  const spend = SPEND_TOK.exec(tok);
+  if (spend) {
+    const id = Object.keys(st.content.spending?.levels ?? {})[parseInt(spend[1], 36)];
+    if (!id) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
+    chooseSpend(st, id);
+    choose(st, parseInt(spend[2], 36));
     return nextCard(st);
   }
   if (!/^[0-9a-z]$/.test(tok)) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
