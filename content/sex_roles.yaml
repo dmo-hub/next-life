@@ -133,7 +133,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {age: [25, 45], year: [2500, 2540], sex: [หญิง], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}}
+    when: {age: [25, 45], year: [2500, 2540], sex: [หญิง], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
     title: "ซองเงินเดือนที่วางผิดโต๊ะ"
     text: "ซองเงินเดือนของเพื่อนผู้ชายที่เข้ามาพร้อมกันวางผิดโต๊ะ ตำแหน่งเดียวกัน งานเท่ากัน แต่ตัวเลขในซองมากกว่าของคุณเกือบครึ่ง หัวหน้าเคยบอกว่า 'ผู้หญิงเดี๋ยวก็แต่งงานออกไป'"
     choices:

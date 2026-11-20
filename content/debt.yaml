@@ -404,7 +404,7 @@ events:
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
-    when: {flags: {has: [home_owner], not: [own_business]}, occupation: [clerk, professional, manager, technician, officer, senior_officer]}
+    when: {flags: {has: [home_owner], not: [own_business]}, occupation: [clerk, professional, manager, technician, officer, senior_officer], ladder: [none, private, gov]}
     weight: 1
     title: "จดหมายรีไฟแนนซ์"
     text: "ผ่อนบ้านมาหลายปี ดอกลอยขึ้นทุกปีจนงวดหนักกว่าวันแรก ธนาคารอีกแห่งส่งจดหมายมาเสนอดอกต่ำกว่า แถมให้กู้เพิ่มได้อีกก้อนถ้าย้ายมาตอนนี้"

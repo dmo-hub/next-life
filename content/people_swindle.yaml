@@ -237,7 +237,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45]}
+    when: {age: [31, 45], occupation: [clerk, professional, manager, technician, officer, senior_officer], ladder: [none, private, gov], flags: {not: [own_business]}}
     title: "ของฝากบนโต๊ะทำงาน"
     text: "เพื่อนร่วมงานเอาซองอาหารเสริมมาวางให้ทีละโต๊ะ บอกว่าลองดูไม่คิดเงิน พักนี้เธอชวนกินข้าวบ่อยผิดปกติ ถามเรื่องสุขภาพคุณละเอียดกว่าหมอ และทุกครั้งที่คุณบ่นว่าปวดหลัง เธอพยักหน้าเหมือนรอฟังคำนี้มาทั้งเดือน"
     choices:
