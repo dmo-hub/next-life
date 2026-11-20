@@ -332,6 +332,10 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice:hover > kbd, .choice:focus-visible > kbd { border-color:currentColor; color:inherit; }
 .choice .fx { font-size:13px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): ปุ่มสลับ ไม่เดินเกม — ตัวที่เลือกค้างต้องเห็นต่างจากปุ่มเลือกปกติ */
+.spend { display:flex; flex-direction:column; gap:6px; }
+.spend .choice { min-height:44px; border:1px solid var(--rule2); }
+.spend .choice[aria-pressed="true"] { border-color:currentColor; background:var(--paper2); font-weight:600; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี " · " ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
 /* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป
@@ -681,8 +685,8 @@ body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-
 <!-- โครงหน้าเปิด (ui-redo 96): ขึ้นจอก่อนสคริปต์จบ และยังเห็นเมื่อปิด JavaScript · boot() ใน app.mjs ล้างทิ้งแล้ววาดจอจริง -->
 <main id="app"><article class="card a"><div class="top"><b>เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</b><small>เริ่มชีวิต</small></div><div class="body"><h3 class="lead">เกิดเป็นคนไทยทีละชีวิต เลือกทีละการ์ด</h3><noscript><p class="sub">เกมนี้ต้องเปิด JavaScript ในเบราว์เซอร์ก่อนจึงเล่นได้</p></noscript></div><div class="choices"><button type="button">เริ่มชีวิต</button></div></article></main>
 <footer class="foot">เกม ไม่ใช่คำแนะนำการลงทุน · <span class="foot-shelf"><button type="button" id="shelfLink">ชั้นสมุด</button> · </span><button type="button" id="dayLink">ชาติประจำวัน</button> · <button type="button" id="backupLink">สำรองเซฟ</button> · <a href="guide.html#core">กลไกในเกม</a> · <a href="index.html">หน้าแรก</a></footer>
-<script src="play-data.js?v=v0.6.146" defer></script>
-<script src="play.js?v=v0.6.146" defer></script>
+<script src="play-data.js?v=v0.6.147" defer></script>
+<script src="play.js?v=v0.6.147" defer></script>
 <script>if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
 </html>

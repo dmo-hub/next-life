@@ -85,7 +85,7 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
 </style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/design.html">คำตัดสินเกม</a><a href="../dev/ui.html" aria-current="page">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a></div></div></div><!--/nav-->
 <header><div class="w">
   <h1>ดีไซน์ UI</h1>
-  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น และคำตัดสิน UI · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.146</span></p>
+  <p>สี ตัวอักษร ชิ้นส่วนของหน้าเล่น และคำตัดสิน UI · โครงหน้า เนื้อครบ ยังไม่จัดสวย · เวอร์ชัน <span data-fact="version">v0.6.147</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -427,6 +427,10 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice:hover > kbd, .choice:focus-visible > kbd { border-color:currentColor; color:inherit; }
 .choice .fx { font-size:13px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): ปุ่มสลับ ไม่เดินเกม — ตัวที่เลือกค้างต้องเห็นต่างจากปุ่มเลือกปกติ */
+.spend { display:flex; flex-direction:column; gap:6px; }
+.spend .choice { min-height:44px; border:1px solid var(--rule2); }
+.spend .choice[aria-pressed=&quot;true&quot;] { border-color:currentColor; background:var(--paper2); font-weight:600; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี &quot; · &quot; ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
 /* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป
@@ -1094,6 +1098,10 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice:hover > kbd, .choice:focus-visible > kbd { border-color:currentColor; color:inherit; }
 .choice .fx { font-size:13px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): ปุ่มสลับ ไม่เดินเกม — ตัวที่เลือกค้างต้องเห็นต่างจากปุ่มเลือกปกติ */
+.spend { display:flex; flex-direction:column; gap:6px; }
+.spend .choice { min-height:44px; border:1px solid var(--rule2); }
+.spend .choice[aria-pressed=&quot;true&quot;] { border-color:currentColor; background:var(--paper2); font-weight:600; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี &quot; · &quot; ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
 /* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป
