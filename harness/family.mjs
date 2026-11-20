@@ -48,6 +48,8 @@ const WED_SPREAD = 3, WED_AGE = [24, 28], WED_MIN = 2000;
 const wedCohort = new Map();
 // ใบ 93 (B114 ข้อ 153 167): สัดส่วนคู่แรกของชีวิตที่หย่า แยกตามปีที่แต่ง · กรอบอยู่ data/divorce-rate.json
 const divBands = JSON.parse(readFileSync(new URL('../data/divorce-rate.json', import.meta.url), 'utf8')).bands.map((x) => ({ ...x, wed: 0, div: 0 }));
+// ใบ 94 (B114 ข้อ 153): ชีวิตคู่ที่มีนอกใจ (เราหรือคู่) ต่อชีวิตที่เคยแต่ง · ราวครึ่งจบหย่า · วัดเฉพาะบอทสุ่ม (สายบุญไม่เคยรับ สายบาปรับทุกใบ)
+const CHEAT = { from: 0.10, to: 0.15, divFrom: 0.30, divTo: 0.70, wed: 0, cheat: 0, div: 0, us: 0, them: 0 };
 const wedAges = [];
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
@@ -147,6 +149,16 @@ for (const [bot, pick] of Object.entries(BOTS)) {
       if (band && first) {
         band.wed++;
         if (first.status === 'divorced') band.div++;
+      }
+      if (bot === 'สุ่ม' && first) {
+        CHEAT.wed++;
+        const us = !!st.flags.we_cheated, them = !!st.flags.spouse_cheated;
+        if (us || them) {
+          CHEAT.cheat++;
+          if (us) CHEAT.us++;
+          if (them) CHEAT.them++;
+          if (first.status === 'divorced') CHEAT.div++;
+        }
       }
     }
     if (wedAge !== undefined) wedAges.push(wedAge);
@@ -283,6 +295,11 @@ check('  การ์ดรักใหม่ขึ้นได้ · แต่�
 for (const x of divBands) {
   const r = x.div / Math.max(1, x.wed);
   check(`หย่าตามยุค (ใบ 93) · แต่ง ${x.from}–${x.to} ใกล้ ${x.target} ±${x.tolerance}`, x.wed >= 300 && Math.abs(r - x.target) <= x.tolerance ? 0 : 1, ` ${x.div}/${x.wed} = ${fmt(r)}`);
+}
+{
+  const r = CHEAT.cheat / Math.max(1, CHEAT.wed), d = CHEAT.div / Math.max(1, CHEAT.cheat);
+  check(`นอกใจ (ใบ 94) · ชีวิตคู่ที่มีนอกใจ ${CHEAT.from}–${CHEAT.to} (เรา ${CHEAT.us} · คู่ ${CHEAT.them})`, CHEAT.wed >= 200 && r >= CHEAT.from && r <= CHEAT.to ? 0 : 1, ` ${CHEAT.cheat}/${CHEAT.wed} = ${fmt(r)}`);
+  check(`นอกใจ (ใบ 94) · จบหย่า ${CHEAT.divFrom}–${CHEAT.divTo}`, CHEAT.cheat >= 25 && d >= CHEAT.divFrom && d <= CHEAT.divTo ? 0 : 1, ` ${CHEAT.div}/${CHEAT.cheat} = ${fmt(d)}`);
 }
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;
