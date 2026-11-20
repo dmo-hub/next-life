@@ -55,8 +55,8 @@ const reach = new Map();
 const fireAll = new Map();
 for (const node of nodes) {
   const target = node === drop ? ['know'] : [...pathTo(node)].filter((x) => x !== node);
-  const a = measure({ node }, (bot) => ({ pick: withGate(bot), extra: { tree: node === drop ? () => {} : treeToward(node), focus: bot.focus } }), Math.max(1, Math.round(n / 3)));
-  const r = measure({}, (bot) => ({ pick: withGate(bot), extra: { focus: bot.focus } }), n, node === drop ? null : (st) => { st.tree = { done: { [node]: 18 }, yrs: {}, cards: {} }; });
+  const a = measure({ node }, (bot) => ({ pick: withGate(bot), extra: { tree: node === drop ? () => {} : treeToward(node) } }), Math.max(1, Math.round(n / 3)));
+  const r = measure({}, (bot) => ({ pick: withGate(bot), extra: {} }), n, node === drop ? null : (st) => { st.tree = { done: { [node]: 18 }, yrs: {}, cards: {} }; });
   if (!a.opened) fails.push(`บอททุ่มทางไป ${node} แล้วปลดไม่ได้เลย (${a.lives} ชีวิต)`);
   const mine = [...gated].filter(([, ids]) => ids.includes(node)).map(([k]) => k);
   const hit = mine.filter((k) => (r.picks.get(k) ?? 0) > 0);
@@ -76,7 +76,7 @@ const deadOnly = [...GATE_ONLY_CHOICES.filter((k) => !reach.get(k) && !gated.has
 if (deadOnly.length) fails.push(`รายการยกเว้นด่าน 2 ที่บอททุ่มต้นไม้แล้วยังไม่ถึง ${deadOnly.length}: ${deadOnly.join(' · ')}`);
 
 // ตัวควบคุม: ไม่ทุ่มต้นไม้ ตัวเลือกประตู (ที่ธงชวนไม่เปิด) ต้องไม่ถูกกดเลย
-const ctl = measure({}, (bot) => ({ pick: bot, extra: { focus: bot.focus } }));
+const ctl = measure({}, (bot) => ({ pick: bot, extra: {} }));
 const leaked = [...gated.keys()].filter((k) => (ctl.picks.get(k) ?? 0) > 0).map((k) => `${k} (${ctl.picks.get(k)})`);
 console.log(`ตัวควบคุมไม่ทุ่มต้นไม้: ${ctl.lives} ชีวิต · ตัวเลือกติดประตูที่ถูกกด ${leaked.length}`);
 if (leaked.length) fails.push(`ประตูรั่ว: ไม่ปลดโหนดแต่ตัวเลือกถูกกด ${leaked.join(' · ')}`);

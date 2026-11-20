@@ -4,7 +4,7 @@ import { treePace, treePaceCtl, treeInvest, treeYearEnd } from '../src/engine/in
 import { playLife, lifeFocusYear, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, setLifeFocus, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
-import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE, withSpend, SPEND_WAY } from '../harness/bots.mjs';
+import { BOTS, readFx, random, withSpend, SPEND_WAY } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
 import { cadetCard, chooseCadet } from '../src/engine/cadet.mjs';
 import { newLedger } from '../src/engine/merit.mjs';
@@ -304,7 +304,7 @@ const f2 = (v) => v.toFixed(2);
 
   // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
   const N = 1200;
-  let wrong = 0, flowLives = 0, flowGatedCards = 0, flowGateChoices = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0, polFocus = 0, polOffice = 0;
+  let wrong = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0;
   for (let i = 0; i < N; i++) {
     const seed = mixSeed(404, i);
     const bot = BOTS[Object.keys(BOTS)[i % 6]];
@@ -316,22 +316,15 @@ const f2 = (v) => v.toFixed(2);
         // ตัวเลือกครบตามเนื้อหา (ลำดับไม่เลื่อน) · ซ่อน = ล็อกด้วยเสมอ · ซ่อนตรงสถานะประตู
         const shut = ev.choices.map((x) => !!x.gate && ![x.gate].flat().some((id) => lifeGateOpen(s, id)));
         if (c.choices.length !== ev.choices.length || shut.some((h, k) => h !== !!c.hidden?.[k] || (h && !c.locked?.[k]))) wrong++;
-        if (botFlows(s)) { flowGatedCards++; flowGateChoices += ev.choices.filter((x, k) => x.gate && !c.hidden?.[k]).length; }
       }
       if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
       if (c.id === 'biz_politics_invite_01') invited = true;
     });
-    if (botFlows(st)) flowLives++;
     if (st.flags.own_business && !(st.focusYears?.politics_base)) { bizLives++; if (invited) bizInvite++; }
-    if ((st.focusYears?.politics_base ?? 0) >= base.focus.chain_years) { polFocus++; if ((st.officeTop ?? -1) >= 0) polOffice++; }
   }
   check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
   check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
-  const share = flowLives / N;
-  check('ใบ 04 บอทตามน้ำราว 1/3', Math.abs(share - FOCUS_FLOW_SHARE) < 0.05, `${(share * 100).toFixed(1)}%`);
-  check('ใบ 04 ชีวิตตามน้ำยังเจอการ์ดทั่วไปที่มีประตู แต่ไม่เห็นตัวเลือกประตู', flowGatedCards > 0 && flowGateChoices === 0, `การ์ด ${flowGatedCards} · ตัวเลือกประตูที่เห็น ${flowGateChoices}`);
   check('ใบ 04 นักธุรกิจที่ไม่โฟกัสการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
-  check('ใบ 04 บอทที่โฟกัสการเมืองครบ ได้ตำแหน่ง > 0', polOffice > 0, `${polOffice}/${polFocus}`);
 }
 
 // ใบ 05a: อาชีพต่างโลกนับปีเต็มด้วยกติกากลาง — สคริปต์บังคับโฟกัสทีละตา ไม่ใช้บอท
@@ -466,8 +459,8 @@ const f2 = (v) => v.toFixed(2);
 }
 
 // B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50% (ใบ: สืบทอดโอกาสเล็กน้อย ไม่ใช่ได้แน่) · นับเฉพาะทายาทที่พ่อแม่มีนิสัยและถึงอายุล็อก
-// ตัวควบคุม heir_nature 0 (เจ้าของเคาะ): seed เดียวกัน ชีวิตแรกเดินเหมือนกันทุกหลัก และแต้มไม่มีผลก่อนล็อก
-// ⇒ ทายาทรุ่นแรกต่างกันแค่แต้มทุ่มเทที่ได้จากพ่อแม่ — ทายาทที่ได้นิสัยเดียวกันต้องลดลง ไม่งั้นสายแต้มทายาทไม่ต่อ
+// ตัวควบคุม heir_nature 0 ถอดแล้ว (ft15 commit 3): heir_nature มีผลทางเดียวผ่าน focusBorn (ทายาทรับโฟกัสพ่อแม่) ซึ่งบอทเลิกเลือกโฟกัสแล้ว · ตัดทิ้ง treeParent ก็ไม่ขยับ (356→360/856)
+// ค้าง: หลังตัดโฟกัส ทายาทไม่มีกลไกสืบนิสัยเหลือ — เจ้าของต้องเคาะว่าสร้างทางต้นไม้ใหม่หรือไม่ (ดู build/lane-b.md)
 {
   const content = loadContent();
   const heirs = (n) => {
@@ -490,11 +483,6 @@ const f2 = (v) => v.toFixed(2);
   };
   const real = heirs(160);
   check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
-  const keep = content.nature.heir_nature;
-  content.nature.heir_nature = 0;
-  const zero = heirs(160);
-  content.nature.heir_nature = keep;
-  check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
 }
 
 // ใบ 06a: ด่านทวีปจับตัวสุ่ม/แผนที่ที่พังได้ (ตัวควบคุม) — ป้อนของพังเข้า contChecks ตรง ๆ ไม่แก้ข้อมูลจริง
