@@ -10612,6 +10612,7 @@ function eraStory(st, e) {
 
 
 
+
 const lv = (v) => (v ? Math.sign(v) * LEVELS[Math.abs(v)] / LEVELS[1] : 0);
 const tags = (c) => (c?.merit ?? []).map((t) => ({ id: meritId(t.cat), level: t.level ?? 1 }));
 const flagsOf = (c) => c?.sets_flags ?? [];
@@ -10806,7 +10807,21 @@ function lifeFacts(st) {
     wealth: worth / (nationalIncome(era, st.seed, st.birthYear + st.age) * 12),
     workYears: st.workFrom === null ? 0 : Math.max(0, Math.min(st.age, RETIRE_AGE) - st.workFrom),
     expected: expectedDeathAge(era, st.sex, st.birthYear, st.seed),
+    ...treeShape(st),
   };
+}
+
+// รูปต้นไม้ตอนตาย (ใบ ft14) — นับโหนดที่เคยปลดรวมที่ล้างแล้ว (ข้อ 56) · ความลึก = ห่วง pre ยาวสุดของโหนดที่เคยปลด · กายใจ = แขนง skill
+const depthMemo = new WeakMap();
+const nodeDepth = (defs, id) => {
+  let m = depthMemo.get(defs);
+  if (!m) depthMemo.set(defs, (m = {}));
+  return (m[id] ??= 1 + Math.max(0, ...(defs[id]?.pre ?? []).map((p) => nodeDepth(defs, p))));
+};
+function treeShape(st) {
+  const defs = st.content.tree?.nodes ?? {};
+  const ever = treeEver(st).filter((id) => defs[id]);
+  return { treeDepth: Math.max(0, ...ever.map((id) => nodeDepth(defs, id))), treeSkill: ever.filter((id) => defs[id].branch === 'skill').length };
 }
 
 const has = (f, ...k) => k.some((x) => f.flags[x]);
@@ -10842,6 +10857,9 @@ const TITLES = [
   { id: 'rags_riches', tier: 'หายาก', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
   { id: 'never_dark', tier: 'หายาก', name: 'ผู้ไม่เคยเลือกทางมืด', hint: 'ทั้งชีวิตไม่เคยเลือกทางผิดเลยสักครั้ง', test: (f) => f.age >= 60 && f.sinPicks === 0 && f.declined >= 11 },
   { id: 'peaceful', tier: 'ตำนาน', name: 'จากไปอย่างสงบ', hint: 'แก่เฒ่า ไม่มีหนี้ มีคนรักรายล้อม และมีความสุข', test: (f) => f.age >= 80 && f.debt <= 0 && f.worth >= 0 && f.st.relations >= 70 && f.st.happiness >= 70 && has(f, 'has_kids') },
+  // ฉายารูปต้นไม้ (ใบ ft14) — อ่านแค่ความลึกกับแขนงกายใจ ไม่ซ้ำแกนฉายาแบบชีวิต
+  { id: 'tree_deep', tier: 'หายาก', name: 'รากหยั่งลึก', hint: 'ปลดโหนดต้นไม้ไล่ลงไปลึกถึงสี่ชั้น', test: (f) => f.treeDepth >= 4 },
+  { id: 'tree_mind', tier: 'หายาก', name: 'ฝึกกายฝึกใจ', hint: 'ปลดโหนดสายกายใจครบสามโหนด', test: (f) => f.treeSkill >= 3 },
 ];
 
 // ฉายาตระกูล (ใบ 04) — ข้ามรุ่น · ch = ผังตระกูลรุ่นก่อน + ชีวิตนี้ · lin = รุ่นก่อนเท่านั้น
