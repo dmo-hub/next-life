@@ -200,6 +200,10 @@ function conditions(e, L) {
     out.push(`${any((k.roles ?? ['parent', 'spouse', 'child', 'grandchild']).map((r) => FAMILY_ROLE_NAMES[r] ?? r))}รู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
   }
   if (w.child_far) out.push(`มีลูก${w.child_far.far ? 'อยู่ไกล' : 'อยู่ใกล้'}${w.child_far.age ? ` อายุ ${range(w.child_far.age, ' ปี')}` : ''}${w.child_far.grandkids ? ' มีหลานแล้ว' : ''}`);
+  if (w.illness) {
+    const k = w.illness;
+    out.push(`ตัวเองรู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
+  }
   if (w.filial) {
     const n = w.filial.n ?? [1, 99];
     out.push(`เคยดูแลพ่อแม่ ${n[1] >= 99 ? `${n[0]} ครั้งขึ้นไป` : range(n, ' ครั้ง')}${w.filial.way ? ` ครั้งล่าสุดแบบ${any(w.filial.way.map((x) => FILIAL_TH[x] ?? x))}` : ''}`);
