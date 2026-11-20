@@ -1,5 +1,5 @@
 {
- "version": "v0.6.138",
+ "version": "v0.6.139",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -29,7 +29,9 @@
   "centenarian",
   "rags_riches",
   "never_dark",
-  "peaceful"
+  "peaceful",
+  "tree_deep",
+  "tree_mind"
  ],
  "family": [
   "fam_climb",
