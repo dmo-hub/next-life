@@ -205,7 +205,7 @@ check(`  เซฟฐานไม่เกิน ${SNAPS_MAX_KB} KB`, kb > SNAPS
   check(`ค″ เซฟระหว่างชาติก่อนมีวงของ ${old.version} (${old.snaps.length} เซฟ) เล่นแบบเดิมจนเกิด`, bad + (ok && old.snaps.length ? 0 : 1), rs.find((r) => r.err) ? ` · ${rs.find((r) => r.err).err}` : '');
 }
 
-// เซฟสังเคราะห์ (ft15 C′): ทุ่มประตู business ครบ chain_years แต่ไม่มี st.gates → โหลดแล้วประตูต้องยังเปิดและจดไว้ใน st.gates ไม่ปลดโหนด · ตัวควบคุม: ทุ่ม chain_years-1 ปี = ประตูไม่เปิด
+// เซฟสังเคราะห์ (ft15 C′): ทุ่มประตู business ครบ chain_years แต่ไม่มี st.gates → โหลดแล้วแปลงเป็นรหัสโหนด mo5 ใน st.gates ประตูยังเปิด ตัด focusYears ไม่ปลดโหนด · ตัวควบคุม: ทุ่ม chain_years-1 ปี = ประตูไม่เปิด
 {
   const chain = content.focus.chain_years;
   const load = (years) => {
@@ -220,8 +220,8 @@ check(`  เซฟฐานไม่เกิน ${SNAPS_MAX_KB} KB`, kb > SNAPS
     return { st: root.st, treeSame: done === JSON.stringify(root.st.tree?.done ?? {}) };
   };
   const on = load(chain), off = load(chain - 1);
-  const bad = (lifeGateOpen(on.st, 'business') && on.st.gates?.includes('business') && on.treeSame ? 0 : 1) + (lifeGateOpen(off.st, 'business') || off.st.gates?.includes('business') ? 1 : 0);
-  check(`ง. เซฟที่ focusYears.business=${chain} ไม่มี st.gates โหลดแล้วประตูยังเปิด (จด st.gates · ไม่ปลดโหนด) · ตัวควบคุม ${chain - 1} ปี = ปิด`, bad);
+  const bad = (lifeGateOpen(on.st, 'mo5') && on.st.gates?.includes('mo5') && on.st.focusYears === undefined && on.treeSame ? 0 : 1) + (lifeGateOpen(off.st, 'mo5') || off.st.gates?.includes('mo5') ? 1 : 0);
+  check(`ง. เซฟที่ focusYears.business=${chain} ไม่มี st.gates โหลดแล้วประตู mo5 ยังเปิด (จด st.gates · ตัด focusYears · ไม่ปลดโหนด) · ตัวควบคุม ${chain - 1} ปี = ปิด`, bad);
 }
 
 // ตัวควบคุม: ตัววัดต้องเห็นของพังที่ทำขึ้นเอง ไม่งั้นด่านนี้ผ่านเงียบได้

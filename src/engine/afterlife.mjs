@@ -173,13 +173,11 @@ export function thaiEarn(st) {
   const map = st.content.skillMap;
   if (!map || Object.values(map).every((m) => !Object.keys(m).length)) return [];
   const t = titlesOf(st);
-  const chain = st.content.focus?.chain_years ?? Infinity;
   const src = {
     job: st.occupation ? [st.occupation] : [],
     title: t.titles.map((x) => x.id),
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
-    focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
     lifeGoal: st.goalsDone ?? [],
   };
   const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
