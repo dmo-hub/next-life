@@ -329,6 +329,10 @@ body:has(.mnav) .choices.pin { bottom:calc(var(--nav-h) + env(safe-area-inset-bo
 .choice:hover > kbd, .choice:focus-visible > kbd { border-color:currentColor; color:inherit; }
 .choice .fx { font-size:13px; text-align:right; flex-shrink:0; max-width:50%; }
 .choice .fx span { white-space:nowrap; }
+/* แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): ปุ่มสลับ ไม่เดินเกม — ตัวที่เลือกค้างต้องเห็นต่างจากปุ่มเลือกปกติ */
+.spend { display:flex; flex-direction:column; gap:6px; }
+.spend .choice { min-height:44px; border:1px solid var(--rule2); }
+.spend .choice[aria-pressed="true"] { border-color:currentColor; background:var(--paper2); font-weight:600; }
 /* ปุ่มล็อกใช้ช่องป้ายผลวางเหตุผลเป็นประโยค — ก้อนเดียวไม่มี " · " ห้ามตัดแล้วยาวเกินครึ่งปุ่มจนล้นจอมือถือ (B174) */
 .choice:disabled .fx span { white-space:normal; }
 /* ป้ายผลไอคอน (ui-redo 54): ชิปพื้นจางสีตามทิศทั้งชิ้น · ลูกศรติดท้ายทุกชิ้น จอขาวดำ/ตาบอดสีจึงแยกขึ้นลงได้จากรูป

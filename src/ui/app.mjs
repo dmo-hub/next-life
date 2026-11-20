@@ -1,4 +1,4 @@
-import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, lifeTreeStart, lifeTreeRespec, lifeTreeRusty, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
+import { newLife, dlcOpen, DLC_KEYS, DLC_OPEN, DLC_LOCKED, setDlcDefault, nextCard, causeWords, goalNames, choose, chooseSpend, statsOf, provinceLabel, STAT_LABELS, STAT_KEYS, STAGES, isWorking, monthlyIncome, jobText, promoText, moodMul, totalDebt, startAfterlife, nextAfterCard, chooseAfter, nextLife, lineageText, titlesOf, stageSummary, TITLES, heirCandidates, FAMILY_TITLES, TIERS, horoscope, familyOf, MERIT_LEVELS, CLASSES, standingOf, classNow, ISEKAI_STAT, ISEKAI_STAGES, ISEKAI_ROLES, roleInfo, snapshot, restore, repairLife, nextGoal, schoolOf, lifeEndWord, isGone, ENTRY, ISEKAI_LORE, ISEKAI_WORLDS, isekaiWorldLore, LINEAGE_BRIEF, LOAN_KINDS, lifeQx, MAX_AGE, classOdds, regionRatio, protoYear, lifeFocusOffers, lifeFocusDefs, setLifeFocus, focusWords, FOCUS_FLOW, FOCUS_FLOW_NAME, isekaiFocusOpen, isekaiFocusList, setIsekaiFocus, useIsekaiCards, itemsOf, itemsVisible, ISEKAI_SKILLS, SKILL, skillBookAdd, bookCarryOffers, LOOP_KEYS, LOOP_LABELS, CONT_LIFE, arcSummary, focusMain, stageOf, overlapOf, overlapStageOf, lifeTreeDefs, lifeTreeStart, lifeTreeRespec, lifeTreeRusty, treeInvestNode, treeOffersNow, treeWaiting, treeReach } from '../engine/index.mjs';
 import { eraArt, eraPicArt, ERA_PICS, avatarArt, artTier, ERA_ART_W, ERA_ART_H, AVATAR_SIZE, ART_INK, sceneArt, ERA_FRAME, catArt, resultArtCat } from './art.mjs';
 import { shelfMemoArt, shelfTitleArt, shelfLineageArt } from './shelfart.mjs';
 import { BTN, STAT_HELP, HELP, HELP_NOTE, FOLLOW_ICON, SHOWN_STATS, ISEKAI_SHOWN, ISEKAI_HP, HEART_ICON, statIcon, menuIcon } from './labels.mjs';
@@ -2062,6 +2062,26 @@ const followIcon = (k) => {
   return s;
 };
 
+// แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): เลือกค้างไว้ ยังไม่เดินเกม — ลงผลตอนกดตัวเลือกเงินเก็บ · คืนตัวอ่านลำดับที่เลือก
+// เริ่มที่ระดับปัจจุบัน ผู้เล่นที่ไม่แตะจึงได้ระดับเดิมต่อ
+function spendRowEl(spend, body) {
+  let k = Math.max(0, spend.levels.findIndex((l) => l.id === spend.cur));
+  const row = el('div', 'spend');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', 'ระดับการใช้จ่ายช่วงนี้');
+  const btns = spend.levels.map((l, j) => {
+    const b = button(l.name, l.fx, () => {
+      k = j;
+      btns.forEach((x, m) => x.setAttribute('aria-pressed', String(m === k)));
+    });
+    b.setAttribute('aria-pressed', String(j === k));
+    return b;
+  });
+  row.append(...btns);
+  body.append(el('h4', null, 'ใช้จ่ายช่วงนี้'), row);
+  return () => k;
+}
+
 function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
@@ -2630,6 +2650,7 @@ function render(card) {
         body.append(ul);
       }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
+      const spendAt = card.spend ? spendRowEl(card.spend, body) : null;
       let n = 0;
       card.choices.forEach((c, i) => {
         // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
@@ -2639,7 +2660,7 @@ function render(card) {
         const fx = why ?? card.fx?.[i];
         const b = numbered(button(c, fx, () => {
           veil(card, i);
-          play(lifePick(i));
+          play(spendAt ? spendPick(spendAt(), i) : lifePick(i));
           if (card.kind === 'upgrade') upgradeFx(card, i);
         }, card.hints?.[i]), ++n);
         if (card.kind === 'upgrade' && card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
@@ -3527,7 +3548,10 @@ const LOAN_TOK = /^~([0-9])([0-9a-z])$/;
 // เล่นต่อเป็นผู้สืบสายเลือด (B76) = "@<ทาง A-Z><ลำดับในรายชื่อ>" · รายชื่ออ่านจากสถานะที่เล่นซ้ำมาถึงจุดเดียวกัน ลำดับจึงตรงกันทุกครั้ง
 const bloodPick = (i, k) => `@${afterPick(i)}${k.toString(36)}`;
 const BLOOD_TOK = /^@([A-Z])([0-9a-z])$/;
-const tokens = (log) => log.match(/[~@]..|[^]/g) ?? [];
+// ทบทวนเงินพร้อมระดับใช้จ่าย (B29) = "$<ลำดับระดับ><ตัวเลือก>" · ระดับลงพร้อมตัวเลือกในก้าวเดียว เล่นซ้ำจึงได้ผลเท่ากดจริง
+const spendPick = (k, i) => `$${k.toString(36)}${i.toString(36)}`;
+const SPEND_TOK = /^\$([0-9a-z])([0-9a-z])$/;
+const tokens = (log) => log.match(/[~@$]..|[^]/g) ?? [];
 let save = null;
 
 // อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
@@ -3649,6 +3673,14 @@ function step(tok) {
     const kind = LOAN_KINDS[+loan[1]];
     if (!kind) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
     choose(st, parseInt(loan[2], 36), kind);
+    return nextCard(st);
+  }
+  const spend = SPEND_TOK.exec(tok);
+  if (spend) {
+    const id = Object.keys(st.content.spending?.levels ?? {})[parseInt(spend[1], 36)];
+    if (!id) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
+    chooseSpend(st, id);
+    choose(st, parseInt(spend[2], 36));
     return nextCard(st);
   }
   if (!/^[0-9a-z]$/.test(tok)) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
