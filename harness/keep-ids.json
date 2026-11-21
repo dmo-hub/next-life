@@ -1,5 +1,5 @@
 {
- "version": "v0.6.152",
+ "version": "v0.6.153",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -111,6 +111,9 @@
   "after_era_work_01",
   "after_era_young_01",
   "after_fest_work_01",
+  "bel_built_hall_later",
+  "bel_built_pond_later",
+  "bel_built_tree_later",
   "bel_fortune_cards_rite",
   "bel_fortune_market_rite",
   "bel_hope_birthday",
@@ -448,6 +451,9 @@
   "bel_hope_robe",
   "bel_merit_wish_birthday",
   "bel_hope_birthday",
+  "bel_built_hall_later",
+  "bel_built_pond_later",
+  "bel_built_tree_later",
   "bel_vow_exam",
   "bel_vow_exam_due",
   "bel_vow_exam_due2",
