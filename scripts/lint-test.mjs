@@ -17,7 +17,7 @@ import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../s
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 import { checkTree } from '../src/node/lint/tree.mjs';
 import { sillyGaps } from '../src/node/lint/heavy.mjs';
-import { officeGaps } from '../src/node/lint/office.mjs';
+import { officeGaps, hasWord } from '../src/node/lint/office.mjs';
 import { checkNature } from '../src/node/lint/nature.mjs';
 
 const root = new URL('../', import.meta.url);
@@ -685,7 +685,20 @@ try {
     ['ยกเว้นพร้อมเหตุผล', { office_ok: 'ที่ประชุมหมู่บ้าน ไม่ใช่ออฟฟิศ' }, 0],
     ['ช่วงเด็กไม่นับ', { stage: 'เด็ก', years: [2500, 2650] }, 0],
     ['ไม่มีคำออฟฟิศ', { text: 'คุณเดินกลับบ้านตอนเย็น ฝนตกหนักจนรองเท้าเปียก' }, 0],
+    ['วางแผนก่อน ไม่ใช่แผนก', { text: 'คุณนั่งวางแผนก่อนลงมือทำนาปีนี้' }, 0],
+    ['ตัวควบคุม: แผนกจริงในประโยคเดียวกัน', { text: 'คุณนั่งวางแผนก่อน แล้วเดินไปบอกทั้งแผนก' }, 1],
   ];
+  // ขอบพยางค์: [ข้อความ, คำ, ต้องเจอ]
+  const words = [
+    ['หัวหน้าแผนก', 'แผนก', true],
+    ['ตัวแทนแผนกลงแข่ง', 'แผนก', true],
+    ['วางแผนก่อน', 'แผนก', false],
+    ['แผนการตลาด', 'แผนก', false],
+    ['วางแผนก่อน ทั้งแผนกรู้', 'แผนก', true],
+    ['สลิปเงินเดือนเดือนนี้', 'เงินเดือน', true],
+    ['ไปประชุมเช้า', 'ประชุม', true],
+  ];
+  for (const [s, w, want] of words) if (hasWord(s, w) !== want) fails.push(`office-word "${s}" คำ ${w}: ต้อง${want ? 'เจอ' : 'ไม่เจอ'}`);
   for (const [name, extra, want] of cases) {
     const g = officeGaps([{ file: `office-case:${name}`, doc: { events: [card(extra)] } }]);
     if (g.missing.length !== want) fails.push(`office-gaps "${name}": ต้องค้าง ${want} ใบ ได้ ${g.missing.length}`);
@@ -702,7 +715,7 @@ try {
     const ps = lintDocs([{ file: `office-filter:${name}`, doc: { events: [card(extra)] } }], ctx).filter((p) => p.rule === 'office-filter');
     if (ps.length !== want) fails.push(`office-filter "${name}": ต้องตก ${want} ได้ ${ps.length}`);
   }
-  rows.push(['คำออฟฟิศ ตัวควบคุม', `${cases.length * 2 + 6} เคส`]);
+  rows.push(['คำออฟฟิศ ตัวควบคุม', `${cases.length * 2 + words.length + 6} เคส`]);
   const og = officeGaps(dir('content/').map((f) => load('content/', f)));
   if (og.missing.length) fails.push(`office-filter: ของจริงค้าง ${og.missing.length} ใบ (${og.missing.slice(0, 5).map((m) => m.id).join(' ')})`);
   rows.push(['คำออฟฟิศ การ์ดจริง', `${og.total} ใบมีคำ · ยกเว้น ${og.exempt} · ค้าง ${og.missing.length}`]);

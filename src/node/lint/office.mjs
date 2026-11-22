@@ -13,9 +13,21 @@ const EXEMPT_MIN = 6;
 
 const subsetOf = (v, ok) => Array.isArray(v) && v.length > 0 && v.every((x) => ok.includes(x));
 
+// ไทยไม่เว้นวรรคระหว่างคำ จับแค่ substring จะนับ "วางแผนก่อน" เป็น "แผนก" · ตัดตามขอบพยางค์แทน:
+// ตัวก่อนหน้าเป็นสระหน้า (เ แ โ ใ ไ) = พยัญชนะตัวแรกเป็นของพยางค์ก่อน · ตัวถัดไปเป็นสระหลัง/บน/ล่าง วรรณยุกต์ การันต์ = พยัญชนะตัวท้ายเป็นต้นพยางค์ถัดไป
+// ไม่ใช้ Intl.Segmenter เพราะพจนานุกรม ICU ต่างกันตามรุ่น Node ผลด่านจะไม่ตรงกันทุกเครื่อง
+const LEAD_VOWEL = /[เ-ไ]/;
+const TAIL_MARK = /[ะ-ฺๅ็-๎]/;
+export function hasWord(s, w) {
+  for (let i = s.indexOf(w); i >= 0; i = s.indexOf(w, i + 1)) {
+    if (!LEAD_VOWEL.test(s[i - 1] ?? '') && !TAIL_MARK.test(s[i + w.length] ?? '')) return true;
+  }
+  return false;
+}
+
 function officeHits(e) {
   const hits = new Set();
-  for (const { s } of textsOf(e)) for (const w of OFFICE_WORDS) if (s.includes(w)) hits.add(w);
+  for (const { s } of textsOf(e)) for (const w of OFFICE_WORDS) if (hasWord(s, w)) hits.add(w);
   return [...hits];
 }
 
