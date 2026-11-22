@@ -134,6 +134,8 @@ export function addMember(st, role, extra = {}) {
   }
   // อายุของเราตอนคู่เข้าบ้าน — ให้แผงบอก "อยู่ด้วยกัน N ปี" ของคู่เก่า · เซฟก่อนมีช่องนี้ไม่มี since
   if (mate) m.since = st.age;
+  // คนจีบ (ใบ 172 ขั้น 2): เจอ → จีบ → แฟน เดินด้วยนัดล่วงหน้า (ปีที่ครบกำหนดสุ่มจาก seed+id ไม่ดึง kinRng) · extra.after = [น้อย, มาก] ปีถึงขั้นถัดไป
+  if (role === 'courter') { m.stage = 'met'; courtDue(st, m, extra.after); }
   if (role === 'child') {
     m.order = st.kin.filter((x) => x.role === 'child').length + 1;
     // พ่อ/แม่อีกคน (ใบ 91 ข้อ 149 154 166): id ของคู่ปัจจุบันตอนลูกเกิด · null = ไม่มีคู่ (พ่อ/แม่เลี้ยงเดี่ยว) · ลูกจากเซฟเก่าไม่มีช่อง by = คิดย้อนจากปีเกิด (parentSpouseOf)
@@ -217,6 +219,25 @@ export function parentSpouseOf(st, child) {
 // บทแฟน (ใบ 90 ข้อ 146 165): partner = คนมีชื่อในบ้าน ไม่ใช่สถานะของคู่ · เลิกกัน = status ex (ออกจากบ้าน · ชื่อยังอ้างได้) · แต่งกับแฟน = คนเดิมเปลี่ยนบทเป็น spouse
 export const isEx = (m) => m.role === 'partner' && m.status === 'ex';
 export const exPartnerOf = (st) => (st.kin ?? []).findLast((m) => isEx(m)) ?? null;
+const COURT_STEP_YEARS = [1, 2];
+// นัดขั้นถัดไปของคนจีบ: สุ่มจำนวนปีจาก seed+id+ปีที่นัด ไม่ใช่ kinRng/rng ชีวิต — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
+function courtDue(st, m, after = COURT_STEP_YEARS) {
+  m.due = st.age + ownRoll(st, m, kinYearOf(st), 0xc5ed).int(after[0], after[1]);
+}
+// เดินขั้นคนจีบปีละครั้ง (เรียกใน ageKin): ครบกำหนด met→courting→แฟน (becomePartner · เข้าบ้านตอนเป็นแฟนตามข้อ 305) · ขอแต่งเป็นของการ์ด/ใบ 173
+export function stepCourtship(st) {
+  for (const m of st.kin) {
+    if (m.role !== 'courter' || !m.alive || m.due === undefined || st.age < m.due) continue;
+    if (m.stage === 'met') {
+      m.stage = 'courting';
+      courtDue(st, m);
+    } else if (m.stage === 'courting') {
+      delete m.stage;
+      delete m.due;
+      becomePartner(st, m);
+    }
+  }
+}
 // รับคนที่มีอยู่แล้วนอกบ้าน (เช่น courter ของใบ 172 · peer) เป็นแฟน: id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบจากอายุตอนนี้ · ไม่ดึงเลขสุ่ม · คนในบ้านอยู่ในหมวดคู่/แฟนอยู่แล้ว = ไม่ทำอะไร
 export function becomePartner(st, m) {
   if (!m || !m.alive || m.role === 'partner' || m.role === 'spouse') return null;
@@ -484,6 +505,7 @@ export function ageKin(st, year, saving = 0) {
   filialMirror(st);
   const lost = [];
   if (!st.kin.length) return lost;
+  stepCourtship(st);
   petYear(st, saving);
   for (const m of [...st.kin]) {
     if (!m.alive) continue;
