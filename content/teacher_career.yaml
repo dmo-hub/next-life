@@ -170,7 +170,6 @@ events:
         merit: [{cat: neutral}]
 
   - id: kru_practicum_01
-    office_ok: "คำว่าแผนกมาจากแผนการสอนของครูพี่เลี้ยง ไม่ใช่แผนกในที่ทำงาน"
     type: A
     category: study
     stage: หนุ่มสาว
