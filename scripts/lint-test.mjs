@@ -274,7 +274,7 @@ rows.push(['ช่องแทนค่าแกนเติมครบ', `${Ob
     ['คนค้าขาย', { occupation: 'service', ladder: { id: 'trade' } }, 'ร้าน', 'เจ้าของร้าน'],
     ['เด็กก่อนทำงาน', { occupation: 'clerk', ladder: null, workFrom: null, age: 10 }, 'ที่ทำงาน', 'หัวหน้างาน'],
     ['เกษียณแล้ว', { occupation: 'clerk', ladder: { id: 'private' }, retiredAt: 55, age: 58 }, 'ที่ทำงาน', 'หัวหน้างาน'],
-    ['ชาวนา (ไม่มีนาย)', { occupation: 'farmer', ladder: { id: 'trade' } }, 'ไร่นา', 'ผู้ใหญ่บ้าน'],
+    ['ชาวนา (ไม่มีนาย)', { occupation: 'farmer', ladder: { id: 'trade' } }, 'ไร่นา', 'เจ้าของที่นา'],
     ['ทหาร ใช้คำสาย', { occupation: 'officer', ladder: { id: 'army' } }, 'ค่าย', 'ผู้บังคับบัญชา'],
   ];
   for (const [name, patch, wantPlace, wantBoss] of jobCases) {
