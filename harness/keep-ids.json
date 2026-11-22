@@ -1,5 +1,5 @@
 {
- "version": "v0.6.154",
+ "version": "v0.6.155",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -468,6 +468,7 @@
   "bel_teen_camp_invite",
   "bel_teen_friend_fortune",
   "bel_teen_grandma_merit",
+  "bel_borrow_name_01",
   "boxer_kid_01",
   "boxer_temple_01",
   "boxer_teen_01",
