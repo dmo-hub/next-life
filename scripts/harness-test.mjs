@@ -1,7 +1,7 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
 import { readFileSync } from "node:fs";
-import { treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf, spouseOk, KIN_CUSTODY, DIVORCE_SPLIT, BOND_FLOOR, NOT_MINE } from '../src/engine/index.mjs';
+import { pickFocus, treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf, spouseOk, KIN_CUSTODY, DIVORCE_SPLIT, BOND_FLOOR, NOT_MINE } from '../src/engine/index.mjs';
 import { playLife, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
 import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
@@ -1250,6 +1250,46 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 90 becomePartner: คนนอกบ้าน (peer) ย้ายเข้าเป็นแฟน id/ชื่อ/ปีเกิด/เพศเดิม · เริ่มนับปีคบ · แต่งต่อเป็นคู่ได้', moved === peer && peer.role === 'partner' && [peer.id, peer.name, peer.born, peer.sex].join('|') === was && peer.since === 24 && (applyFamily(h, { sets_flags: ['married'] }), h.kin.find((m) => m.id === peer.id).role === 'spouse'));
   check('ใบ 90 becomePartner: คู่/แฟนอยู่แล้ว = ไม่ทำอะไร (null)', becomePartner(h, peer) === null && becomePartner(h, null) === null);
   check('ใบ 90 ชีวิตไม่มีแฟน: แต่งตามเดิม (ธง married เพิ่มคู่ ไม่ผ่านทางแปลงบท)', g.kin.filter((m) => m.role === 'spouse').length === 1 && g.kin.some((m) => m.role === 'partner'));
+}
+
+// คนจีบ (ใบ 172 ข้อ 289 305 · K2 บทแยก · K3 สายสุ่มแยก): คนมีชื่อนอกบ้านแบบเพื่อนรุ่น · ไม่ทอยตาย ไม่นับงานศพ/คำฝาก · ไม่ขยับลำดับสุ่ม/ชื่อของญาติ
+{
+  const content = loadContent();
+  const withCourters = (n) => {
+    const st = newLife(7, content);
+    st.age = 19;
+    applyFamily(st, { family: Array.from({ length: n }, () => ({ add: 'courter' })) });
+    return st;
+  };
+  const a = withCourters(1);
+  const c = a.kin[0];
+  check('ใบ 172 คนจีบ: บทแยก courter · id นับแยก (OWN_ID_BASE+) · มีชื่อ/เพศ/ปีเกิดใกล้เรา · ไม่ตั้งธง married', c.role === 'courter' && c.id >= 10000 && !!c.name && !!c.sex && Math.abs(c.born - a.birthYear) <= 6 && !(a.flags ?? []).includes?.('married'));
+  check('ใบ 172 คนจีบ: familyOk เห็น (role courter) · แผงครอบครัวไม่นับเป็นคนในบ้าน', familyOk(a, { role: 'courter' }) && !familyOf(a).some((m) => m.role === 'courter'));
+  const old = withCourters(1);
+  for (let y = 0; y < 70; y++) ageKin(old, old.birthYear + 20 + y);
+  check('ใบ 172 คนจีบไม่ทอยตายตลอด 70 ปี · ไม่ลงบันทึกสูญเสีย · ไม่นับงานศพ/คำฝาก', old.kin[0].alive && (old.kinLoss ?? []).length === 0 && !Object.keys(funeralWho(old, 10)?.came ?? funeralWho(old, 10) ?? {}).some((k) => k === 'courter') && letterTo(old) === null);
+  // จีบพร้อมกัน 2 คน: คนละคน (id/ชื่อ) · การ์ดเรียกได้ทั้งสอง (เลือกเป้าจาก seed ไม่ใช่ kinRng) · ตัวควบคุม: เป้าสลับตามปี = เลือกจริง ไม่ติดคนเดียว
+  const two = withCourters(2);
+  check('ใบ 172 จีบ 2 คนพร้อมกัน: คนละ id คนละชื่อ · familyOk count 2', two.kin[0].id !== two.kin[1].id && two.kin[0].name !== two.kin[1].name && familyOk(two, { role: 'courter', count: [2, 2] }));
+  const picked = new Set();
+  for (let age = 19; age < 45; age++) { two.age = age; pickFocus(two); picked.add(two.kinFocus.courter); }
+  check('ใบ 172 เป้าการ์ดจีบ: เลือกได้ทั้งสองคนตามปี · ตัวควบคุม (ถ้าเลือกคนเดียวตลอดตัวนี้ต้องตก)', picked.size === 2);
+  // K3: มี/ไม่มีคนจีบ ญาติที่ตามมา (id ชื่อ เพศ ปีเกิด) + ผลตายราย 12 ปี + เลขสุ่มถัดไปของ kinRng ต้องเท่ากัน · ตัวควบคุม: เพิ่มคู่แทน (ใช้สายเดิม) ต้องต่าง
+  const track = (role, n = 1) => {
+    const st = newLife(7, content);
+    st.age = 22;
+    if (role) applyFamily(st, { family: Array.from({ length: n }, () => ({ add: role })) });
+    pickFocus(st);
+    applyFamily(st, { family: [{ add: 'child' }, { add: 'child' }] });
+    const kids = st.kin.filter((m) => m.role === 'child').map((m) => [m.id, m.name, m.sex, m.born].join('|'));
+    for (let y = 0; y < 12; y++) ageKin(st, st.birthYear + 23 + y);
+    return { kids, next: st.kinRng.next(), alive: st.kin.filter((m) => m.role === 'child').map((m) => m.alive).join() };
+  };
+  const base = track(null), one = track('courter'), twoT = track('courter', 2), spouseT = track('spouse');
+  check('ใบ 172 คนจีบไม่แตะ kinSeq/kinRng/kinCauseRng: ลูกที่ตามมา + ผลตาย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีคนจีบ (1 คน และ 2 คน)', JSON.stringify(one) === JSON.stringify(base) && JSON.stringify(twoT) === JSON.stringify(base));
+  check('ใบ 172 ตัวควบคุม: เพิ่มคู่ (สายสุ่มเดิม) แทนคนจีบ ลูก/เลขสุ่มต่าง · สคริปต์วัดจับความต่างได้', JSON.stringify(spouseT) !== JSON.stringify(base));
+  const moved = becomePartner(a, c);
+  check('ใบ 172 คนจีบ → แฟน (becomePartner): id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบ · ไม่ใช่คนจีบอีก', moved === c && c.role === 'partner' && c.id >= 10000 && c.since === a.age && !familyOk(a, { role: 'courter' }) && familyOf(a).some((m) => m.id === c.id));
 }
 
 // จดพ่อ/แม่บนตัวลูก (ใบ 91 B114 ข้อ 149 154 166): ลูกจด by = คู่ปัจจุบันตอนเกิด · พ่อ/แม่ของลูกคือคู่คนนั้นแม้หย่าไปแล้ว · เซฟเก่าไม่มี by คิดย้อนจากปีเกิด

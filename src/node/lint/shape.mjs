@@ -745,7 +745,7 @@ export const rules = [
           const p = `${path}.family[${i}]`;
           const kinds = ['add', 'leave', 'separate', 'divorce', 'reconcile', 'custody', 'paternity', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
           if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce reconcile custody paternity breakup marry far back die หรือ bond อย่างเดียว');
-          if (o.add !== undefined && !['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น partner spouse child grandchild pet herd peer');
+          if (o.add !== undefined && !['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer', 'courter'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น partner spouse child grandchild pet herd peer courter');
           // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
           const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
           if (animals && (!Object.hasOwn(animals, o.kind) || !isRange(o.life, 1, 40))) r(`${p}`, `add: ${o.add} ต้องมี kind (${Object.keys(animals).join(' ')}) และ life: [จาก, ถึง] ปี 1–40`);
