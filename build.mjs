@@ -12,7 +12,17 @@ const content = loadContent();
 // ไม่มี bundler: ตัด import/export ออกแล้วต่อโมดูลตามลำดับ dependency ให้เป็นสคริปต์เดียว
 const strip = (src) =>
   src.replace(/^import .*?;\s*$/gm, '').replace(/^export \* from .*$/gm, '').replace(/^export /gm, '');
-const files = [...['rng', 'dlc', 'era', 'birth', 'family', 'finance', 'merit', 'career', 'rank', 'pace', 'death', 'court', 'cadet', 'warn', 'focus', 'tree', 'memory', 'past', 'life', 'goal', 'belief', 'continent', 'isekai', 'afterlife', 'intro', 'titles', 'save'].map((m) => `./src/engine/${m}.mjs`), './src/ui/art.mjs', './src/ui/shelfart.mjs', './src/ui/labels.mjs', './src/ui/treeview.mjs', './src/ui/app.mjs'];
+const files = [...['rng', 'dlc', 'era', 'birth', 'family', 'finance', 'merit', 'career', 'rank', 'pace', 'death', 'court', 'cadet', 'warn', 'focus', 'tree', 'memory', 'past', 'jobwords', 'life', 'goal', 'belief', 'continent', 'isekai', 'afterlife', 'intro', 'titles', 'save'].map((m) => `./src/engine/${m}.mjs`), './src/ui/art.mjs', './src/ui/shelfart.mjs', './src/ui/labels.mjs', './src/ui/treeview.mjs', './src/ui/app.mjs'];
+// โมดูลที่ถูก import แต่ไม่อยู่ในลิสต์ = ไม่ถูกต่อเข้า play.js ⇒ ReferenceError ในเบราว์เซอร์ (node รันผ่านเพราะ import จริง) — ต้องหยุด build
+// barrel (มีแต่ export * from) ไม่มีโค้ดให้ต่อ จึงยกเว้น
+const bundled = new Set(files.map((f) => new URL(f, import.meta.url).href));
+const isBarrel = (href) => read(href).split('\n').every((l) => /^(|\/\/.*|export \* from .*)$/.test(l.trim()));
+for (const f of files) {
+  for (const [, spec] of read(f).matchAll(/^import .*? from '(\.[^']+)';/gm)) {
+    const dep = new URL(spec, new URL(f, import.meta.url)).href;
+    if (!bundled.has(dep) && !isBarrel(dep)) throw new Error(`${f} import ${spec} แต่ไม่อยู่ในลิสต์ files ของ build.mjs — play.js จะไม่มีโมดูลนี้`);
+  }
+}
 // ต่อทุกโมดูลไว้ scope เดียว: function ชื่อซ้ำไม่ error แต่ตัวหลังทับตัวแรกเงียบ ๆ — ชื่อชั้นบนสุดซ้ำข้ามไฟล์ต้องหยุด build
 // เลขเวอร์ชันจองชื่อไว้ก่อน: โมดูลไหนประกาศเลขเองอีก = มีซอร์สถือเลขสองที่ build หยุด
 const owner = new Map([['APP_VERSION', 'src/version.json'], ['APP_BUILD', 'src/version.json'], ['RELEASE_NOTES', 'docs/whatsnew.html']]);
