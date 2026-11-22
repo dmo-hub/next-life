@@ -1300,6 +1300,20 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 172 ขั้น 2: นัดครบกำหนดไม่เร็วกว่า 1 ปีต่อขั้น (ตัวควบคุมถอดนัด: เป็นแฟนทันทีปีเดียว ต้องตก)', trail.slice(0, 2).join() === 'courter/met,courter/met' || trail[1] !== 'partner/-');
   const clone = (seed) => { const x = newLife(seed, content); x.age = 19; applyFamily(x, { family: [{ add: 'courter' }] }); return x.kin[0].due; };
   check('ใบ 172 ขั้น 2: ปีนัดสุ่มจาก seed+id ซ้ำได้ (seed เดียวกันนัดเท่ากัน) ไม่ดึง kinRng', clone(7) === clone(7) && sched.kinRng.next() === (() => { const x = newLife(7, content); x.age = 19; applyFamily(x, { family: [{ add: 'courter' }] }); for (let age = 20; age <= 26; age++) { x.age = age; ageKin(x, x.birthYear + age + 1); } return x.kinRng.next(); })());
+  // ขั้น 3: เกณฑ์อายุ (แฟน ≥18 ทั้งสองฝ่าย) · จีบซ้อน ≤2 · เลือกคนเดียวเป็นแฟน อีกคนหลุด
+  const ageAtMeet = (age) => { const x = newLife(7, content); x.age = age; applyFamily(x, { family: [{ add: 'courter' }] }); return x; };
+  const youngLife = ageAtMeet(15);
+  const yc = youngLife.kin[0];
+  for (let age = 16; age <= 24; age++) { youngLife.age = age; ageKin(youngLife, youngLife.birthYear + age + 1); if (yc.role === 'partner') { check('ใบ 172 เกณฑ์: ผู้เล่นเป็นแฟนไม่ก่อน 18 และคนจีบอายุ ≥18 ตอนเป็นแฟน', age >= 18 && youngLife.birthYear + age - yc.born >= 18); break; } }
+  check('ใบ 172 เกณฑ์: ผู้เล่น 15 เจอคนจีบ ไม่เป็นแฟนก่อน 18 · ถึง 24 เป็นแฟนแล้ว', yc.role === 'partner' && yc.since >= 18);
+  const gap = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((sd) => { const x = newLife(sd, content); x.age = 18; applyFamily(x, { family: [{ add: 'courter' }] }); return x.birthYear + 18 - x.kin[0].born; });
+  check('ใบ 172 เกณฑ์: คนจีบทุก seed อายุ ≥18 ตอนเจอ (ผู้เล่น 18 · ช่วงห่าง ±5 ถูกดึงขึ้น)', gap.every((v) => v >= 18) , gap.join());
+  const three = withCourters(3);
+  check('ใบ 172 จีบซ้อน ≤2: คนที่ 3 ไม่เข้า', three.kin.length === 2);
+  const pick = withCourters(2);
+  const [p1, p2] = pick.kin;
+  becomePartner(pick, p2);
+  check('ใบ 172 เลือกคนเดียวเป็นแฟน: อีกคนหลุด (ไม่อยู่ในรายชื่อคนจีบ) · คนที่เลือกเข้าแผง', p2.role === 'partner' && p1.left === true && !familyOk(pick, { role: 'courter' }) && familyOf(pick).some((m) => m.id === p2.id) && !familyOf(pick).some((m) => m.id === p1.id));
   const moved = becomePartner(a, c);
   check('ใบ 172 คนจีบ → แฟน (becomePartner): id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบ · ไม่ใช่คนจีบอีก', moved === c && c.role === 'partner' && c.id >= 10000 && c.since === a.age && !familyOk(a, { role: 'courter' }) && familyOf(a).some((m) => m.id === c.id));
 }
