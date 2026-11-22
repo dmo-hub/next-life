@@ -18,7 +18,7 @@ events:
         text: "ซื้อใบเดียว ลุ้นเล่น ๆ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 985, text: "ประกาศผลวันที่สิบหก ไม่ใกล้เลยสักตัว ฉีกทิ้งลงถังขยะหน้า{ที่ทำงาน}", effects: {money: {unit: fixed_baht, amount: -80, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 985, text: "ประกาศผลวันที่สิบหก ไม่ใกล้เลยสักตัว ฉีกทิ้งลงถังขยะข้างโต๊ะ", effects: {money: {unit: fixed_baht, amount: -80, ref_year: 2560}}, merit: [{cat: neutral}]}
           - {weight: 13, ok: true, text: "ถูกเลขท้ายสองตัว! ได้คืนหลายสิบเท่าของค่าใบ เลี้ยงหมูกระทะเพื่อนทั้งโต๊ะจนหมดเกลี้ยง", effects: {happiness: 2, relations: 1, money: {unit: fixed_baht, amount: 2000, ref_year: 2560}}, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, text: "ตรวจซ้ำสามรอบ ทุกตัวตรงเป๊ะ ถูกรางวัลที่หนึ่ง มือสั่นจนต้องนั่งลงกับพื้น ชีวิตเปลี่ยนในบ่ายวันเดียว", effects: {happiness: 3, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, merit: [{cat: neutral}]}
       - id: buy_every_draw

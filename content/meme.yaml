@@ -313,8 +313,8 @@ events:
       - id: ancient_email
         text: "ตอบแชตงานด้วยภาษาโบราณ"
         outcomes:
-          - {weight: 2, ok: true, text: "ลูกค้าส่งต่อกันขำทั้ง{ที่ทำงาน} ยอดสั่งซื้อมาเงียบ ๆ", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ลูกค้าอีกฝั่งคิดว่าคุณไม่สบาย ถามหาคนรับผิดชอบคนใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "คนในแชตส่งต่อกันขำทั้ง{ที่ทำงาน} คุณกลายเป็นคนตลกประจำสัปดาห์", effects: {network: 2, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนติดต่องานอีกฝั่งคิดว่าคุณไม่สบาย ถามหาคนรับผิดชอบคนใหม่", effects: {relations: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: skip_trend
         text: "ไม่ตามกระแส ใส่เสื้อเชิ้ตมา"

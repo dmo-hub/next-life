@@ -90,7 +90,7 @@ events:
         text: "พาแม่มาที่ทำงาน เที่ยงค่อยไป"
         outcomes:
           - {weight: 1, ok: true, text: "แม่นั่งโต๊ะรับแขก แจกขนมทั้งชั้น ทีมตรวจงานถามว่าบ้านคุณขายขนมหรือเปล่า", effects: {relations: 1, happiness: 2, network: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "แม่นั่งรอห้าชั่วโมงแล้วบ่นยาวทั้งทางไปเขต ว่าห้องแอร์{ที่ทำงาน}หนาวกว่าหน้าหนาวที่บ้าน", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "แม่นั่งรอห้าชั่วโมงแล้วบ่นยาวทั้งทางไปเขต ว่า{ที่ทำงาน}ของคุณวุ่นกว่าตลาดที่บ้านเสียอีก", effects: {relations: -1, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: workday_sick_cert_01

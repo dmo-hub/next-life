@@ -372,21 +372,21 @@ events:
     category: work_money
     stage: กลางคน
     years: [2500, 2650]
-    title: "ห้องหัวหน้า"
-    text: "กลับมาทำงานวันแรกหลังเป็นลม หัวหน้าเรียกเข้าห้อง ปิดประตู แล้ววางแฟ้มงานที่ค้างไว้บนโต๊ะ ถามว่าจะเอายังไงกับสุขภาพตัวเอง"
+    title: "เรียกคุยเรื่องสุขภาพ"
+    text: "กลับมาทำงานวันแรกหลังเป็นลม {คนคุมงาน}เรียกไปคุยสองต่อสอง งานที่ค้างไว้ยังรออยู่ แล้วถามว่าจะเอายังไงกับสุขภาพตัวเอง"
     choices:
       - id: sick_leave
         text: "ขอลาป่วยไปรักษาให้จบ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "หัวหน้าเซ็นให้ลาสองอาทิตย์ ส่องกล้องเอานิ่วออก กลับมาทำงานตัวเบาเหมือนคนใหม่", effects: {health: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, multipliers: {stats: {relations: 1.3}}, text: "{คนคุมงาน}ให้ลาสองอาทิตย์ ส่องกล้องเอานิ่วออก กลับมาทำงานตัวเบาเหมือนคนใหม่", effects: {health: 2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ลาได้ แต่งานชิ้นใหญ่ถูกโอนให้คนอื่นถาวร", effects: {health: 1, happiness: -1, income_mult: 0.95}, merit: [{cat: neutral}]}
       - id: promise_fine
         text: "ยืนยันว่าไหว ทำต่อได้"
         effects: {health: -1, happiness: -1}
         merit: [{cat: neutral}]
       - id: hand_over
-        text: "ขอแบ่งงานให้ทีมช่วย"
+        text: "ขอแบ่งงานให้คนช่วย"
         effects: {health: 1, relations: 1, network: -1}
         merit: [{cat: neutral}]
       - id: quit_job
