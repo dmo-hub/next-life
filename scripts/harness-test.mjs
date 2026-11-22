@@ -1266,6 +1266,7 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 172 คนจีบ: บทแยก courter · id นับแยก (OWN_ID_BASE+) · มีชื่อ/เพศ/ปีเกิดใกล้เรา · ไม่ตั้งธง married', c.role === 'courter' && c.id >= 10000 && !!c.name && !!c.sex && Math.abs(c.born - a.birthYear) <= 6 && !(a.flags ?? []).includes?.('married'));
   check('ใบ 172 คนจีบ: familyOk เห็น (role courter) · แผงครอบครัวไม่นับเป็นคนในบ้าน', familyOk(a, { role: 'courter' }) && !familyOf(a).some((m) => m.role === 'courter'));
   const old = withCourters(1);
+  old.kin[0].due = 999; // คงเป็นคนจีบตลอด (ไม่ให้นัดเลื่อนเป็นแฟนกลางทาง)
   for (let y = 0; y < 70; y++) ageKin(old, old.birthYear + 20 + y);
   check('ใบ 172 คนจีบไม่ทอยตายตลอด 70 ปี · ไม่ลงบันทึกสูญเสีย · ไม่นับงานศพ/คำฝาก', old.kin[0].alive && (old.kinLoss ?? []).length === 0 && !Object.keys(funeralWho(old, 10)?.came ?? funeralWho(old, 10) ?? {}).some((k) => k === 'courter') && letterTo(old) === null);
   // จีบพร้อมกัน 2 คน: คนละคน (id/ชื่อ) · การ์ดเรียกได้ทั้งสอง (เลือกเป้าจาก seed ไม่ใช่ kinRng) · ตัวควบคุม: เป้าสลับตามปี = เลือกจริง ไม่ติดคนเดียว
@@ -1288,6 +1289,17 @@ const f2 = (v) => v.toFixed(2);
   const base = track(null), one = track('courter'), twoT = track('courter', 2), spouseT = track('spouse');
   check('ใบ 172 คนจีบไม่แตะ kinSeq/kinRng/kinCauseRng: ลูกที่ตามมา + ผลตาย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีคนจีบ (1 คน และ 2 คน)', JSON.stringify(one) === JSON.stringify(base) && JSON.stringify(twoT) === JSON.stringify(base));
   check('ใบ 172 ตัวควบคุม: เพิ่มคู่ (สายสุ่มเดิม) แทนคนจีบ ลูก/เลขสุ่มต่าง · สคริปต์วัดจับความต่างได้', JSON.stringify(spouseT) !== JSON.stringify(base));
+  // ขั้น 2: เจอ → จีบ → แฟน เดินด้วยนัดล่วงหน้า (ชีวิตบังคับ: เจอคน A อายุ 19 → ปีถัดไปจีบ → ต่อมาเป็นแฟน เข้าแผงครอบครัว)
+  const sched = newLife(7, content);
+  sched.age = 19;
+  applyFamily(sched, { family: [{ add: 'courter' }] });
+  const sc = sched.kin[0];
+  const trail = [`${sc.role}/${sc.stage}`];
+  for (let age = 20; age <= 26; age++) { sched.age = age; ageKin(sched, sched.birthYear + age + 1); trail.push(`${sc.role}/${sc.stage ?? '-'}`); }
+  check('ใบ 172 ขั้น 2: เจอ(met) → จีบ(courting) → แฟน(partner) ตามนัดภายใน 7 ปี · เข้าแผงครอบครัวเมื่อเป็นแฟน · id/ชื่อเดิม', trail[0] === 'courter/met' && trail.includes('courter/courting') && sc.role === 'partner' && sc.stage === undefined && sc.due === undefined && familyOf(sched).some((m) => m.id === sc.id) && trail.indexOf('courter/courting') < trail.indexOf('partner/-'));
+  check('ใบ 172 ขั้น 2: นัดครบกำหนดไม่เร็วกว่า 1 ปีต่อขั้น (ตัวควบคุมถอดนัด: เป็นแฟนทันทีปีเดียว ต้องตก)', trail.slice(0, 2).join() === 'courter/met,courter/met' || trail[1] !== 'partner/-');
+  const clone = (seed) => { const x = newLife(seed, content); x.age = 19; applyFamily(x, { family: [{ add: 'courter' }] }); return x.kin[0].due; };
+  check('ใบ 172 ขั้น 2: ปีนัดสุ่มจาก seed+id ซ้ำได้ (seed เดียวกันนัดเท่ากัน) ไม่ดึง kinRng', clone(7) === clone(7) && sched.kinRng.next() === (() => { const x = newLife(7, content); x.age = 19; applyFamily(x, { family: [{ add: 'courter' }] }); for (let age = 20; age <= 26; age++) { x.age = age; ageKin(x, x.birthYear + age + 1); } return x.kinRng.next(); })());
   const moved = becomePartner(a, c);
   check('ใบ 172 คนจีบ → แฟน (becomePartner): id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบ · ไม่ใช่คนจีบอีก', moved === c && c.role === 'partner' && c.id >= 10000 && c.since === a.age && !familyOk(a, { role: 'courter' }) && familyOf(a).some((m) => m.id === c.id));
 }
