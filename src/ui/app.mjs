@@ -2787,7 +2787,8 @@ const kinWord = (m) => {
   const male = m.sex === 'ชาย';
   if (m.role === 'parent') return male ? 'พ่อ' : 'แม่';
   if (m.role === 'partner') return m.left ? 'แฟนเก่า' : 'แฟน';
-  if (m.role === 'spouse') return m.left ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
+  // แยกทาง (apart) ยังเป็นคู่ตามกฎหมาย — ป้ายสามี/ภรรยาเดิม ไม่ใช่อดีตคู่
+  if (m.role === 'spouse') return m.left && m.status !== 'apart' ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
   if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
   if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';
   if (m.role === 'pet') return m.kind ?? 'สัตว์เลี้ยง';
@@ -2831,7 +2832,8 @@ function kinParts(members, animals = false) {
     return [el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(members)];
   }
   // คู่ที่จากไป/แยกทางย้ายไปหัวของมันเอง (ui-redo ใบ 30) ไม่ซ้ำในรายการหลัก · คู่ที่ยังอยู่คนเดียวไม่มีหัวนี้
-  const past = members.filter((m) => m.role === 'spouse' && (!m.alive || m.left));
+  // แยกกันอยู่ยังไม่จบความเป็นคู่ จึงอยู่คนในบ้าน · หย่า/ตาย/ออกจากบ้านแบบเซฟเก่า (ไม่มี status) = ผ่านมาแล้ว
+  const past = members.filter((m) => m.role === 'spouse' && (!m.alive || (m.left && m.status !== 'apart')));
   const home = members.filter((m) => !past.includes(m));
   const alive = home.filter((m) => m.alive).length;
   const out = home.length ? [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === home.length ? 'คน' : `จาก ${home.length} คน`}`), kinList(home)] : [];
@@ -3041,7 +3043,8 @@ function kinList(members) {
         li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}`);
         return ul.append(li);
       }
-      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `แยกทางแล้ว${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
+      const leftWord = m.status === 'apart' ? 'แยกกันอยู่' : m.status === 'divorced' ? 'หย่าแล้ว' : 'แยกทางแล้ว';
+      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `${leftWord}${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;
 }
