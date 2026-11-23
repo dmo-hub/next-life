@@ -2782,7 +2782,7 @@ function helpRow(h) {
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
 // ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
 const FAMILY_ORDER = ['parent', 'sibling', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
-// พี่/น้องอ่านจาก rank ที่แกนเทียบปีเกิดให้ — จอไม่คิดอายุเอง · ปีเกิดเท่ากัน = ฝาแฝด
+// พี่/น้องอ่านจาก rank ที่แกนเทียบปีเกิดให้ — จอไม่คิดอายุเอง · ปีเกิดเท่ากัน = พี่/น้องฝาแฝด ไม่แยกเพศ
 const SIB_WORD = { elder: ['พี่ชาย', 'พี่สาว'], younger: ['น้องชาย', 'น้องสาว'] };
 const ANIMAL_ROLES = ['pet', 'herd'];
 const kinWord = (m) => {
@@ -2792,7 +2792,7 @@ const kinWord = (m) => {
   if (m.role === 'spouse') return m.left ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
   if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
   if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';
-  if (m.role === 'sibling') return SIB_WORD[m.rank]?.[male ? 0 : 1] ?? (m.rank === 'twin' ? 'ฝาแฝด' : 'พี่น้อง');
+  if (m.role === 'sibling') return SIB_WORD[m.rank]?.[male ? 0 : 1] ?? (m.rank === 'twin' ? 'พี่/น้องฝาแฝด' : 'พี่น้อง');
   if (m.role === 'pet') return m.kind ?? 'สัตว์เลี้ยง';
   if (m.role === 'herd') return `ฝูง${m.kind ?? 'สัตว์'}`;
   return 'เพื่อนรุ่น';
