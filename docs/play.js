@@ -220,6 +220,33 @@ function pickProvince(rng, birth, regionName) {
   return list[list.length - 1].name;
 }
 
+// ศาสนาตอนเกิด (B93) ตามจังหวัดเกิด — ผู้เรียกส่ง rng แยกเสมอ · ไม่มีตารางในข้อมูล = ค่าเริ่มต้น ไม่ดึงเลขสุ่ม
+// birth.religion = { default, provinces: { <จังหวัด>: { <ศาสนา>: น้ำหนัก } } } · จังหวัดที่ไม่อยู่ในตาราง = default
+function pickReligion(rng, birth, province) {
+  const t = birth.religion;
+  if (!t) return DEFAULT_RELIGION;
+  const row = t.provinces?.[province];
+  if (!row) return t.default ?? DEFAULT_RELIGION;
+  const list = Object.entries(row);
+  let r = rng.next() * list.reduce((s, [, w]) => s + w, 0);
+  for (const [name, w] of list) {
+    r -= w;
+    if (r < 0) return name;
+  }
+  return list[list.length - 1][0];
+}
+
+const DEFAULT_RELIGION = 'พุทธ';
+
+// คำปิดหน้าจบ (B93) ศาสนาละ 1 ชุด · ไม่มีภาพ/คำตัดสินปรโลก · ศาสนานอกรายการใช้ชุด 'อื่น ๆ'
+const RELIGION_CLOSING = {
+  พุทธ: 'ชีวิตนี้จบลงแล้ว สิ่งที่ทำไว้ยังอยู่กับคนที่เหลือ',
+  อิสลาม: 'อินนาลิลลาฮิ วะอินนา อิลัยฮิ ราจิอูน — เราเป็นของพระเจ้า และสู่พระองค์เราจะกลับไป',
+  คริสต์: 'ขอให้เขาหลับในความสงบ คนที่รักเขายังจดจำ',
+  'อื่น ๆ': 'ชีวิตหนึ่งจบลง คนที่อยู่ต่อยังจดจำเขา',
+};
+const closingOf = (religion) => RELIGION_CLOSING[religion] ?? RELIGION_CLOSING['อื่น ๆ'];
+
 // ชื่อจังหวัดบนจอ: กรุงเทพฯ ไม่ใช่ "จังหวัด" จึงไม่นำหน้า จ.
 const placeName = (province) => (province === 'กรุงเทพมหานคร' ? province : `จ.${province}`);
 
@@ -4654,6 +4681,8 @@ function newLife(seed, content, heir = null) {
   if (heir) ({ birthYear, sex, region, cls } = heir);
   // จังหวัดสุ่มจาก stream แยกในภาคที่ได้ (B34) — ไม่กินเลขสุ่มของโลก · ทางเป็นลูกเกิดบ้านเดิม · เซฟเก่าไม่มีจังหวัด สุ่มซ้ำจาก seed ได้ค่าเดิม
   const province = heir?.province ?? pickProvince(makeRng(seed ^ 0xa54ff53a), era.birth, region.name);
+  // ศาสนา (B93): ทายาทถือศาสนาของบ้าน · เกิดใหม่สุ่มตามจังหวัดจาก stream แยก ไม่แตะเลขสุ่มจังหวัด/โลก · คู่ครองและลูกถือศาสนาเดียวกับตัวเอก (ไม่มีช่องศาสนาต่อญาติ)
+  const religion = heir?.religion ?? pickReligion(makeRng(seed ^ 0x3b9aca07), era.birth, province);
   // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
   const jit = makeRng(seed ^ 0x6a09e667);
   const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER + (heir?.bonus[k] ?? 0))]));
@@ -4680,6 +4709,7 @@ function newLife(seed, content, heir = null) {
     realName: pickRealName(seed, sex, birthYear, era.names),
     region: region.name,
     province,
+    religion,
     ses: region.ses,
     cls,
     // ก่อนได้งาน occupation = อาชีพของครอบครัว เป็นฐานของเงินในผลการ์ด (income_x) · ได้งานแล้วเปลี่ยนเป็นงานของตัวเอง
@@ -10533,7 +10563,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -10559,6 +10589,7 @@ function makeHeir(af, r) {
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
+    religion = st.religion;
     // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
     const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
@@ -10642,6 +10673,7 @@ function makeHeir(af, r) {
     cls,
     region,
     province,
+    religion,
     birthYear,
     parents,
     legacy,
@@ -11260,6 +11292,8 @@ function repairLife(st, card) {
   st.queue = q.filter((c) => !('ev' in c) || c.ev);
   // เซฟก่อนมีชื่อจริง (names-fun) — สุ่มจาก seed เดิม โหลดกี่ครั้งก็ได้ชื่อเดียวกัน
   st.realName ??= pickRealName(st.seed, st.sex, st.birthYear, st.content.era.names);
+  // เซฟก่อนมีศาสนา (B93) — สุ่มจาก seed+จังหวัดเดิมด้วย stream เดียวกับตอนเกิด โหลดกี่ครั้งก็ได้ค่าเดียว · ไม่มีจังหวัด/ตาราง = ค่าเริ่มต้น
+  st.religion ??= st.province ? pickReligion(makeRng(st.seed ^ 0x3b9aca07), st.content.era.birth, st.province) : DEFAULT_RELIGION;
   const occ = st.content.era.finance.occupations;
   if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
   const ladders = st.content.era.careers?.ladders;
@@ -14811,7 +14845,7 @@ const FX = {
     build: (ov, o) => {
       ov.innerHTML = `<div class="fx-veil"></div>${fxSvg(120, 120, `<path class="fx-smoke" d="M60 44c-6-8 6-14 0-22s6-14 0-20" fill="none" stroke="${FX_INK.cream}" stroke-width="1.4" stroke-linecap="round" pathLength="100" stroke-dasharray="100"/><g class="fx-flame" style="transform-origin:60px 58px"><path d="M60 34c7 9 9 15 6 20q-2 4-6 4t-6-4c-3-5-1-11 6-20z" fill="${FX_INK.gold2}"/><path d="M60 44c3 4 4 7 2 10q-1 2-2 2t-2-2c-2-3-1-6 2-10z" fill="${FX_INK.cream}"/></g><path d="M36 64h48q-4 18-24 18t-24-18z" fill="${FX_INK.bronze2}" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M58 64v-6h4v6" fill="${FX_INK.lacquer2}"/><path d="M44 90h32" stroke="${FX_INK.gold}" stroke-width="1.4"/>`, 'fx-lamp')}<div class="fx-cap"></div>`;
       const cap = ov.querySelector('.fx-cap');
-      cap.append(o.head, el('small', null, o.sub));
+      cap.append(o.head, el('small', null, o.sub), ...(o.closing ? [el('small', null, o.closing)] : []));
       return { ov, flame: ov.querySelector('.fx-flame'), smoke: ov.querySelector('.fx-smoke'), veil: ov.firstChild, cap };
     },
     frame: (p, t) => {
@@ -14931,7 +14965,7 @@ function fxCard(box, card) {
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
   const gone = isGone(st);
-  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
+  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}`, closing: closingOf(st.religion) }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
 }
 const fxGate = (e) => {
   if (!fxCur) return;
