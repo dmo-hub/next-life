@@ -135,7 +135,9 @@ export function planProblems(html) {
 }
 
 // แถวอยู่ในหน้า whatsnew เอง ⇒ ลิงก์ #id ในหน้าเดียวกัน
-export const roadmapHtml = (cats) => `<ul class="road-l">${cats.map((c) => `<li><a href="#${c.id}">${c.name}</a></li>`).join('')}</ul>`;
+// หัวเป็นเฟส "เฟส 4 · ชื่อ" แต่แถวลิงก์ห้ามมีตัวเลข (ui-redo 23) ⇒ แถวโชว์ชื่อเปล่า หัว h3 คงเลขเฟส
+const roadName = (name) => name.replace(/^เฟส\s*\d+\s*·\s*/, '');
+export const roadmapHtml = (cats) => `<ul class="road-l">${cats.map((c) => `<li><a href="#${c.id}">${roadName(c.name)}</a></li>`).join('')}</ul>`;
 
 export function injectRoadmap(html, cats, where) {
   const a = html.indexOf(ROAD_START);
