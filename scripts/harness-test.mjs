@@ -1330,6 +1330,15 @@ const f2 = (v) => v.toFixed(2);
   const [p1, p2] = pick.kin;
   becomePartner(pick, p2);
   check('ใบ 172 เลือกคนเดียวเป็นแฟน: อีกคนหลุด (ไม่อยู่ในรายชื่อคนจีบ) · คนที่เลือกเข้าแผง', p2.role === 'partner' && p1.left === true && !familyOk(pick, { role: 'courter' }) && familyOf(pick).some((m) => m.id === p2.id) && !familyOf(pick).some((m) => m.id === p1.id));
+  // การ์ดหาคู่/จีบ/เจอคนใหม่ (food_night_market_01 · love_last_train_01 · love_old_photo_date_01) ต้องปิดเมื่อมีแฟน — เปิดเมื่อไม่มีทั้งคู่และแฟน · ตัวควบคุม: การ์ดที่ไม่ใช่หาคู่ (love_bouquet_elder_01) ไม่ถูกปิดด้วยแฟน
+  const famOf = (id) => content.events.find((e) => e.id === id).when.family;
+  const famPass = (st, id) => famOf(id).every((f) => familyOk(st, f));
+  const COURT_IDS = ['food_night_market_01', 'love_last_train_01', 'love_old_photo_date_01'];
+  const sgl = newLife(7, content); sgl.age = 30;
+  const dtd = newLife(7, content); dtd.age = 30;
+  applyFamily(dtd, { family: [{ add: 'courter' }] });
+  becomePartner(dtd, dtd.kin[0]);
+  check('ใบ 172 โสดในการ์ดหาคู่: ไม่มีคู่/แฟน = ผ่าน familyOk · มีแฟน = ไม่ผ่าน (3 ใบ) · ใบที่ไม่ใช่หาคู่ผ่านแม้มีแฟน', COURT_IDS.every((id) => famPass(sgl, id) && !famPass(dtd, id)) && famPass(dtd, 'love_bouquet_elder_01'));
   // K4 (เจ้าของเคาะ 11-23): คู่ต้องอายุ ≥20 ตอนแต่ง · ปีเกิดสุ่มเดิมแล้วย้าย ไม่ดึง kinRng เพิ่ม
   const spAges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((sd) => { const x = newLife(sd, content); x.age = 22; const r0 = JSON.stringify(x.kinRng); applyFamily(x, { family: [{ add: 'spouse' }] }); const m = x.kin.find((k) => k.role === 'spouse'); return { age: x.birthYear + 22 - m.born, rngMoved: JSON.stringify(x.kinRng) !== r0 }; });
   check('ใบ 172 K4: คู่ที่เข้าบ้านตอนผู้เล่น 22 อายุ ≥20 ทุก seed · ดึง kinRng เท่าเดิม (ครั้งเดียวต่อคู่)', spAges.every((v) => v.age >= 20) && new Set(spAges.map((v) => v.rngMoved)).size === 1, spAges.map((v) => v.age).join());
