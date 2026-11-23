@@ -1435,8 +1435,13 @@ const f2 = (v) => v.toFixed(2);
   // ทายาทสายเลือดที่เป็นลูกไม่ใช่ลูกเรา: ผู้เล่นตายด้วยโรคถ่ายทอด (มะเร็ง) → ลูกปกติได้ประวัติโรค · ลูกไม่ใช่ลูกไม่ได้ (seed ที่มีลูกให้เลือกทางสายเลือด)
   const E = await import('../src/engine/index.mjs');
   const heirHeredity = (notMine) => {
-    const { state: p } = playLife(mixSeed(1, 5314), content, BOTS.สุ่ม);
-    const c = E.heirCandidates(p).find((m) => m.role === 'child');
+    // ชีวิตแรกจาก seed 5314 ขึ้นไปที่ตายแล้วมีลูกเป็นทายาท — การ์ดใหม่ขยับลำดับสุ่ม ฝัง seed เดียวแล้วไม่มีลูกได้
+    let p, c;
+    for (let k = 0; !c; k++) {
+      if (k >= 200) throw new Error('heirHeredity: 200 seed แรกจาก 5314 ไม่มีชีวิตที่ตายแล้วมีลูกเป็นทายาท — ลำดับสุ่มขยับ ดูการ์ดที่เพิ่งเพิ่ม');
+      ({ state: p } = playLife(mixSeed(1, 5314 + k), content, BOTS.สุ่ม));
+      c = E.heirCandidates(p).find((m) => m.role === 'child');
+    }
     p.cause = 'cancer';
     if (notMine) p.kin.find((m) => m.id === c.id).notMine = true;
     const af = E.startAfterlife(p);
