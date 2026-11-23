@@ -311,6 +311,9 @@ const KIN_FAR = { decay: 2 };
 const KIN_CUSTODY = { decay: 2, minorUntil: 18 };
 // หย่าแบ่งสินสมรส (ใบ 92 ข้อ 153 · AI ตัดสิน "แบ่งครึ่ง"): ส่วนสมรส = เงินที่งอกจากปีเริ่มอยู่ด้วยกัน (trail) ถึงวันหย่า · เสียสัดส่วนนี้ของส่วนนั้น
 const DIVORCE_SPLIT = 0.5;
+// ลูกไม่ใช่ลูก (ใบ 95 ข้อ 149 166): ผู้เล่นชายเท่านั้น · ลูกที่เกิดช่วงคู่นอกใจ (ปีเกิด − ปีที่จด spouse_cheated อยู่ใน [-before, after]) มีโอกาส p ที่ไม่ใช่ลูกทางสายเลือดของเรา
+// ทอยจาก seed+id ไม่ดึง kinRng · paternity: 'kept' ยังเป็นลูกเรา (ผูกพันขึ้น keepBond) · 'cut' ตัดขาด (ผูกพันตกเหลือ cutTo) · ทั้งสองทางทายาทเท่าเดิม ต่างแค่ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา
+const NOT_MINE = { p: 0.3, before: 1, after: 2, keepBond: 4, cutTo: 15 };
 // เราดูแลพ่อแม่แบบไหน (B167) — ตัวเลือกการ์ดดูแลพ่อแม่ติด filial · จดเฉพาะชีวิตนี้ ไม่ส่งต่อรุ่น
 // way = วิธีครั้งล่าสุด (การ์ดชราให้ลูกทำแบบเดียวกัน) · score = บุญดูแลพ่อแม่ − บาปทำร้ายผู้ใหญ่ ตามระดับของตัวเลือก
 // ถึงอายุ at ลูกที่ยังอยู่ได้ bond ± step × score (ไม่เกิน cap) — ลูกที่เห็นเราดูแลพ่อแม่ผูกพันกับเรามากขึ้น · kinAid ทำงานต่อเอง
@@ -411,6 +414,7 @@ function addMember(st, role, extra = {}) {
     m.order = st.kin.filter((x) => x.role === 'child').length + 1;
     // พ่อ/แม่อีกคน (ใบ 91 ข้อ 149 154 166): id ของคู่ปัจจุบันตอนลูกเกิด · null = ไม่มีคู่ (พ่อ/แม่เลี้ยงเดี่ยว) · ลูกจากเซฟเก่าไม่มีช่อง by = คิดย้อนจากปีเกิด (parentSpouseOf)
     m.by = spouseOf(st)?.id ?? null;
+    if (notMineBorn(st, m)) m.notMine = true;
   }
   if (role === 'grandchild') {
     // หลานจากเนื้อหา (รับหลานมาเลี้ยง) เป็นลูกของลูกที่ยังอยู่ ถ้ามี — ไม่มีลูกเหลือ = ไม่ระบุพ่อแม่
@@ -442,6 +446,21 @@ function spouseOk(st, w) {
   if (w.together && (m.left || m.since === undefined || !kinInRange(st.age - m.since, w.together))) return false;
   if (w.apart && (spouseStatus(m) !== 'apart' || m.leftAge === undefined || !kinInRange(st.age - m.leftAge, w.apart))) return false;
   return true;
+}
+
+// ลูกที่เกิดช่วงคู่นอกใจและทอยได้ว่าไม่ใช่ลูกเรา (ใบ 95) · เซฟก่อนมีช่องไม่มี notMine = ลูกเราทั้งหมด
+function notMineBorn(st, m) {
+  const at = st.flagAge?.spouse_cheated;
+  if (st.sex !== 'ชาย' || !st.flags.spouse_cheated || at === undefined || m.by === null) return false;
+  const d = st.age - at;
+  return d >= -NOT_MINE.before && d <= NOT_MINE.after && makeRng(mixSeed(st.seed ^ 0x95c1, m.id)).next() < NOT_MINE.p;
+}
+// when.child_not_mine = {age?: [lo, hi]} — ลูกที่ยังอยู่ ไม่ใช่ลูกเรา ยังไม่ได้ตัดสิน (ไม่มี paternity) · การ์ดเรียกลูกคนนั้น (โตสุดก่อน ไม่ดึงเลขสุ่ม)
+const childNotMineList = (st, w) => st.kin.filter((m) => m.role === 'child' && m.alive && !m.left && m.notMine && !m.paternity && kinInRange(kinYearOf(st) - m.born, w.age));
+const childNotMineOk = (st, w) => childNotMineList(st, w).length > 0;
+function focusChildNotMine(st, w) {
+  const m = childNotMineList(st, w)[0];
+  if (m) st.kinFocus.child = m.id;
 }
 
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
@@ -604,6 +623,16 @@ function applyFamily(st, c, care = 0) {
       if (c.role !== 'child' || !c.alive || memberAge(st, c) >= KIN_CUSTODY.minorUntil) continue;
       if (!isDivorced(parentSpouseOf(st, c) ?? {})) continue;
       c.custody = op.custody;
+    }
+    // ตัดสินลูกที่ไม่ใช่ลูกเรา (ใบ 95): keep = ยังเป็นลูกเรา · cut = ตัดขาด · จดครั้งเดียวต่อคน
+    if (op.paternity) {
+      const m = st.kin.find((x) => x.id === st.kinFocus?.child && x.notMine && !x.paternity && x.alive) ?? st.kin.find((x) => x.role === 'child' && x.notMine && !x.paternity && x.alive);
+      if (m) {
+        m.paternity = op.paternity === 'keep' ? 'kept' : 'cut';
+        m.paternityAge = st.age;
+        if (op.paternity === 'keep') bondAdd(st, [m], NOT_MINE.keepBond);
+        else m.bond = Math.min(m.bond ?? BOND_START.child, NOT_MINE.cutTo);
+      }
     }
     if (op.far || op.back) {
       const m = focusOf(st, op.far ?? op.back);
@@ -5863,6 +5892,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
   ev = awayCallCard(st, ev);
   pickFocus(st);
   if (ev.when?.child_far) focusChildFar(st, ev.when.child_far);
+  if (ev.when?.child_not_mine) focusChildNotMine(st, ev.when.child_not_mine);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -6545,6 +6575,7 @@ function whenOk(st, when) {
   if (when.illness && !illnessOk(st, when.illness)) return false;
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
   if (when.child_far && !childFarOk(st, when.child_far)) return false;
+  if (when.child_not_mine && !childNotMineOk(st, when.child_not_mine)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.spouse && !spouseOk(st, when.spouse)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
@@ -10389,6 +10420,8 @@ const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
+// ลูกที่ไม่ใช่ลูกทางสายเลือดของเรา (ใบ 95) ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา — สาเหตุที่ส่งต่อเป็น other (ไม่ถ่ายทอด ไม่นัดป่วย) · ปีตาย/ชื่อ/บทบาทเท่าเดิม
+const NOT_BLOOD_DEATH = { cause: 'other' };
 const deathOf = (st) => (isGone(st) ? { gone: true } : { cause: st.cause ?? 'other', ...illOf(st.cause, st.age, st.terminal?.cause === st.cause ? (st.terminal.toldAge ?? st.age - 1) : st.age) });
 const kinDeathOf = (m) => (m.cause ? { cause: m.cause, ...illOf(m.cause, m.diedAge, m.ill?.cause === m.cause ? (m.ill.toldAt ?? m.diedAge - 1) : m.diedAge) } : {});
 
@@ -10448,7 +10481,7 @@ function makeHeir(af, r) {
       // ลูกเรียกผู้เล่นตามอัตลักษณ์ (หญิงข้ามเพศ = แม่) · คู่ชายเป็นพ่อ ⇒ บ้านมีแม่และพ่อครบเหมือนชีวิตอื่น · ไม่มีอัตลักษณ์ = เพศกำเนิดเท่าเดิม
       const self = speechSex(st);
       parents = [
-        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
+        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...(me?.notMine && !isGone(st) ? NOT_BLOOD_DEATH : deathOf(st)) },
         spouse && spouse.born <= year0
           ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge, ...kinDeathOf(spouse) }), name: spouse.name }
           : { sex: otherSex(self), age: spouseAge(rng, self, kidAge), alive: true },
