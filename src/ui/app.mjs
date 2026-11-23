@@ -2795,13 +2795,13 @@ const kinWord = (m) => {
   if (m.role === 'herd') return `ฝูง${m.kind ?? 'สัตว์'}`;
   return 'เพื่อนรุ่น';
 };
-// แผงครอบครัว (ui-redo ใบ 06): คนในบ้าน · ผังตระกูล · กราฟฐานะตระกูล ย้ายจากแถบแท็บใต้หัวการ์ด · สัตว์อยู่ท้ายแผง แถวละตัว
-// วาดตอนกดเปิดเท่านั้น — กราฟฐานะตระกูลแพง การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครเปิด
+// แผงครอบครัว (ui-redo ใบ 06): คนในบ้าน · ผังตระกูล ย้ายจากแถบแท็บใต้หัวการ์ด · สัตว์อยู่ท้ายแผง แถวละตัว
+// กราฟฐานะตระกูลเจ้าของเอาออกจากแผงนี้ — เหลือที่แท็บตระกูลของการ์ดตาย/ปรโลก
 function familyPanel() {
   const all = familyOf(st);
-  // แผงอยู่นอกการ์ด สีกราฟฐานะตระกูลผูกกับชุดสีการ์ด (.a) — ไม่ใส่ กราฟเป็นก้อนดำ
+  // แผงอยู่นอกการ์ด สีผังตระกูลผูกกับชุดสีการ์ด (.a)
   const wrap = el('div', 'fam a');
-  wrap.append(...kinParts(all.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...clanParts(), ...kinParts(all.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
+  wrap.append(...kinParts(all.filter((m) => !ANIMAL_ROLES.includes(m.role))), ...clanParts(false), ...kinParts(all.filter((m) => ANIMAL_ROLES.includes(m.role)), true));
   return wrap;
 }
 // แผงปรโลก (ui-redo ใบ 15): st ยังเป็นคนที่เพิ่งตายจนกว่าจะไปเกิด — แผงจึงอ่านชีวิตที่จบแล้วจากตัวเดียวกับการ์ดตาย
@@ -2843,10 +2843,10 @@ function kinParts(members, animals = false) {
   return out;
 }
 // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
-function clanParts() {
+function clanParts(chart = true) {
   const out = [];
   if (st.lineage.length) out.push(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls, undefined, undefined, st));
-  out.push(
+  if (chart) out.push(
     el('h3', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'),
     standingChart(standingGens(st.lineage, standingNow(!!st.dead)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'),
   );
