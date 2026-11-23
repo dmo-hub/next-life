@@ -7,7 +7,7 @@ import {
 import { INCOME_MULT, MONEY_KEYS, PACT, OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
-import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS, IDENTITY, IDENTITIES } from '../../engine/family.mjs';
+import { COURT_STAGES, PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS, IDENTITY, IDENTITIES } from '../../engine/family.mjs';
 import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
 import { SIN_CATS } from '../../engine/merit.mjs';
 import { REALMS } from '../../engine/afterlife.mjs';
@@ -35,7 +35,7 @@ const KEYS = {
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
-  family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
+  family: ['role', 'sex', 'age', 'alive', 'count', 'stage', 'years', 'health', 'relations'],
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'home_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
@@ -371,6 +371,8 @@ export const rules = [
           if (f.alive !== undefined && typeof f.alive !== 'boolean') r(`${p}.alive`, 'alive ต้องเป็น true/false');
           if (f.sex !== undefined && !SEXES.includes(f.sex)) r(`${p}.sex`, `sex ต้องเป็น ${SEXES.join(' ')}`);
           if (f.count !== undefined && !isRange(f.count, 0, 20)) r(`${p}.count`, 'count ต้องเป็น [จาก, ถึง] 0–20');
+          if (f.stage !== undefined && ![].concat(f.stage).every((x) => COURT_STAGES.includes(x))) r(`${p}.stage`, `stage ต้องเป็น ${COURT_STAGES.join(' ')} (หรือรายการ)`);
+          if (f.years !== undefined && !isRange(f.years, 0, 120)) r(`${p}.years`, 'years ต้องเป็น [จาก, ถึง] 0–120 (ปีที่จีบ/คบมา)');
           for (const k of ['health', 'relations']) if (f[k] !== undefined && !bound(f[k])) r(`${p}.${k}`, 'ต้องเป็น {min, max} 0–100');
         });
       }

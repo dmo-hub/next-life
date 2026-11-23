@@ -128,7 +128,8 @@ export function addMember(st, role, extra = {}) {
   const sex = extra.sex ?? (mate ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
   const born0 = extra.born ?? (mate ? st.birthYear + (own ? makeRng(mixSeed(st.seed ^ 0x7a10, id)) : st.kinRng).int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
   // คนจีบต้องถึงเกณฑ์แฟน (≥18) เท่าผู้เล่น (ข้อ 309) · ย้ายปีเกิดหลังสุ่มแล้ว ไม่ดึงเลขเพิ่ม
-  const born = role === 'courter' ? Math.min(born0, year - COURT_MIN.partner) : born0;
+  // คู่ ≥20 ตอนแต่ง (ข้อ 309 · K4 เจ้าของเคาะ 11-23): ปีเกิดที่สุ่มได้ถูกย้ายให้ไม่น้อยกว่าเกณฑ์ ไม่ดึงเลขสุ่มเพิ่ม · ปีเกิดที่ส่งมาเอง (ทายาท) ไม่แตะ
+  const born = role === 'courter' ? Math.min(born0, year - COURT_MIN.partner) : role === 'spouse' && extra.born === undefined ? Math.min(born0, year - COURT_MIN.spouse) : born0;
   // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
   const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
   const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: extra.bond ?? BOND_START[role], ...(own && { own: true }) };
@@ -226,6 +227,7 @@ export const exPartnerOf = (st) => (st.kin ?? []).findLast((m) => isEx(m)) ?? nu
 // เกณฑ์อายุขั้นความสัมพันธ์ (ข้อ 309): แฟน ≥18 · คู่ ≥20 ทั้งผู้เล่นและอีกฝ่าย · จีบซ้อนพร้อมกัน ≤2 (ข้อ 307)
 export const COURT_MIN = { partner: 18, spouse: 20 };
 const COURT_MAX = 2;
+export const COURT_STAGES = ['met', 'courting'];
 const COURT_STEP_YEARS = [1, 2];
 // นัดขั้นถัดไปของคนจีบ: สุ่มจำนวนปีจาก seed+id+ปีที่นัด ไม่ใช่ kinRng/rng ชีวิต — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
 function courtDue(st, m, after = COURT_STEP_YEARS) {
@@ -261,6 +263,7 @@ export function becomePartner(st, m) {
   return m;
 }
 function marryPartner(st, m) {
+  m.born = Math.min(m.born, kinYearOf(st) - COURT_MIN.spouse);
   m.dated = { since: m.since, ...(m.endedBy && { endedBy: m.endedBy }) };
   m.role = 'spouse';
   m.since = st.age;
@@ -636,8 +639,9 @@ export function familyOk(st, f) {
   const year = kinYearOf(st);
   const pool = f.role === 'parent'
     ? st.parents.map((p) => ({ alive: p.alive, age: p.age, sex: p.sex }))
-    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex }));
-  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age)).length;
+    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex, stage: m.stage, years: m.since === undefined ? undefined : st.age - m.since }));
+  // stage (คนจีบ: met|courting) · years = ปีที่คบ/จีบมา (นับจาก since) — ไม่ใส่ช่อง = ไม่เช็ก · ใส่แล้วสมาชิกที่ไม่มีค่านั้นไม่ผ่าน
+  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age) && (f.stage === undefined || [].concat(f.stage).includes(m.stage)) && (f.years === undefined || (m.years !== undefined && kinInRange(m.years, f.years)))).length;
   return f.count ? kinInRange(n, f.count) : n > 0;
 }
 
