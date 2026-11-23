@@ -73,3 +73,27 @@ events:
       - {text: "ทางที่สอง", family: [{die: pet, cause: sick}], merit: [{cat: neutral}]}
       - {text: "ทางที่สาม", family: [{die: parent, cause: road}], merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  # ใบ 99 รับบุตรบุญธรรม: adopted ไม่มี age · age ไม่มี adopted · adopted ไม่ใช่ child · when.age ขอบล่างน้อยกว่าอายุเด็ก+15 · เด็กหลายคน — รับเด็กตามกฎหมายยังผ่าน
+  - id: bad_case_04
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {age: [30, 50]}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: child, adopted: true}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{add: child, age: 3}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{add: spouse, adopted: true, age: 3}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", family: [{add: child, adopted: true, age: 17}], merit: [{cat: neutral}]}
+      - {text: "ทางที่ห้า", family: [{add: child, adopted: true, age: 3, n: 2}], merit: [{cat: neutral}]}
+  - id: ok_case_04
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {age: [30, 50]}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: child, adopted: true, age: 2}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{add: child, adopted: true, age: 15}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
