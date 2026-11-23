@@ -537,7 +537,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -563,6 +563,7 @@ function makeHeir(af, r) {
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
+    religion = st.religion;
     // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
     const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
@@ -646,6 +647,7 @@ function makeHeir(af, r) {
     cls,
     region,
     province,
+    religion,
     birthYear,
     parents,
     legacy,

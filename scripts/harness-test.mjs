@@ -1666,6 +1666,48 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 97 หย่าเพราะเรานอกใจ (we_cheated): น้ำหนักการ์ดคืนดีต่ำลง', lowered);
 }
 
+// ศาสนาตอนเกิด (ใบ 26 B93): ตารางศาสนาต่อจังหวัด · ทายาท/เซฟเก่าถือศาสนาเดิม · ไม่มีตาราง = พุทธ ไม่ขยับค่าอื่น
+// ตารางในเทสเป็นของสังเคราะห์ ไม่ใช่ตัวเลขจริงของ สสช.
+{
+  const content = loadContent();
+  const withTable = (provinces, def = 'พุทธ') => ({ ...content, era: { ...content.era, birth: { ...content.era.birth, religion: { default: def, provinces } } } });
+  const base0 = newLife(31, content);
+  check('ศาสนา: ไม่มีตารางในข้อมูล = พุทธ', base0.religion === 'พุทธ', String(base0.religion));
+  const onlyMuslim = withTable({ [base0.province]: { อิสลาม: 1 } });
+  const m = newLife(31, onlyMuslim);
+  check('ศาสนา: จังหวัดที่ตารางว่าอิสลามล้วน เกิดที่นั่น = อิสลาม', m.religion === 'อิสลาม', String(m.religion));
+  const other = newLife(31, withTable({ ไม่มีจังหวัดนี้: { อิสลาม: 1 } }, 'พุทธ'));
+  check('ศาสนา: จังหวัดที่ไม่อยู่ในตาราง = ค่า default', other.religion === 'พุทธ');
+  // ตัวควบคุม: ศาสนาใช้ stream แยก — เปิดตารางแล้วชื่อ/ปีเกิด/จังหวัด/ฐานะ/เลขสุ่มโลกถัดไปต้องเท่าเดิม
+  const keep = (x) => JSON.stringify([x.name, x.birthYear, x.province, x.cls, x.sex, x.rng.next()]);
+  check('ศาสนา: เปิดตารางแล้วค่าอื่นของชีวิตไม่ขยับ (stream แยก)', keep(newLife(31, content)) === keep(newLife(31, onlyMuslim)));
+  const allProv = (w) => Object.fromEntries(content.era.birth.regions.flatMap((r) => r.provinces.map((x) => [x.name, w])));
+  // สัดส่วน: 70/30 ทุกจังหวัด ต้องใกล้ 0.7 (1500 seed)
+  const split = withTable(allProv({ อิสลาม: 7, พุทธ: 3 }));
+  let mus = 0;
+  for (let i = 0; i < 1500; i++) if (newLife(mixSeed(31, i), split).religion === 'อิสลาม') mus++;
+  check('ศาสนา: สัดส่วนที่เกิดใน harness ใกล้ตาราง (0.7 ±0.05)', Math.abs(mus / 1500 - 0.7) < 0.05, `${mus}/1500`);
+  // เซฟเก่า: ไม่มีช่อง → repairLife เติมค่าเดียวกับตอนเกิด โหลดกี่ครั้งก็เท่าเดิม
+  const old = newLife(31, onlyMuslim);
+  delete old.religion;
+  repairLife(old, null);
+  const old2 = newLife(31, onlyMuslim);
+  delete old2.religion;
+  repairLife(old2, null);
+  check('ศาสนา: เซฟเก่าไม่มีช่อง repairLife ได้ค่าเดียวกับตอนเกิดและซ้ำได้', old.religion === 'อิสลาม' && old2.religion === old.religion);
+  // ทายาท: ทางเป็นลูก/สายเลือด (จังหวัดบ้านเดิม) ถือศาสนาของบ้าน · ชีวิตถัดไปได้ค่าเดียวกัน
+  const half = withTable(allProv({ อิสลาม: 1, พุทธ: 1 }));
+  let kept = 0, child = 0;
+  for (let i = 0; i < 120; i++) {
+    const { state: parent } = playLife(mixSeed(31, i * 131), half, random);
+    const af = playAfterlife(parent, (card, r, a) => (card.kind === 'path' && !card.locked?.[0] ? 0 : random(card, r, a)));
+    if (af.path !== 'child' || !af.heir || af.heir.province !== parent.province) continue;
+    child++;
+    if (af.heir.religion === parent.religion && nextLife(af).religion === parent.religion) kept++;
+  }
+  check('ศาสนา: ทายาททางเป็นลูก/สายเลือดถือศาสนาของบ้าน', child > 0 && kept === child, `${kept}/${child}`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
