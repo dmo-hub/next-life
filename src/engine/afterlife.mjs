@@ -8,7 +8,7 @@ import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
-import { heirPets, letterTo, deadKinOf, speechSex, spouseOf, parentSpouseOf } from './family.mjs';
+import { heirPets, heirSibs, letterTo, deadKinOf, speechSex, spouseOf, parentSpouseOf } from './family.mjs';
 import { CHRONIC } from './death.mjs';
 import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeTreeMain, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
@@ -663,6 +663,7 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
+    ...(blood && heirSibs(st, blood).length && { sibs: heirSibs(st, blood) }),
     // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
     ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
     // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง

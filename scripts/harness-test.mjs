@@ -924,6 +924,67 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
 }
 
+// ใบ tld14 พี่น้องตามมาในชาติทายาท (เจ้าของเคาะ 11-23): ทายาทสายเลือด = ลูกคนอื่นที่ยังอยู่ตามมาเป็น sibling ชื่อเดิม · ไม่ดึง kinRng · ไม่เข้า KIN_HOUSEHOLD · ทางอื่นไม่มี
+{
+  const { startAfterlife, nextAfterCard, chooseAfter, heirCandidates, HEIR_AGE } = await import('../src/engine/index.mjs');
+  const { addMember, heirSibs, sibsAtBirth, kinAid, FUNERAL_WHO } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  // หน่วย: heirSibs เลือกลูกคนอื่นที่ยังอยู่ (รวมย้ายออก) · ไม่รวมคนตาย/คนที่เลือก · หลานเอาเฉพาะ of เดียวกัน
+  const u = newLife(7, content);
+  u.age = 60;
+  const yr = u.birthYear + 60;
+  const k1 = addMember(u, 'child', { born: yr - 40 }), k2 = addMember(u, 'child', { born: yr - 35 }), k3 = addMember(u, 'child', { born: yr - 30 }), k4 = addMember(u, 'child', { born: yr - 25 });
+  k3.left = true;
+  k4.alive = false;
+  const g1 = addMember(u, 'grandchild', { born: yr - 10, of: k1.id }), g2 = addMember(u, 'grandchild', { born: yr - 8, of: k1.id }), g3 = addMember(u, 'grandchild', { born: yr - 6, of: k2.id });
+  const sc = heirSibs(u, k2);
+  check('ใบ tld14 heirSibs ทายาทเป็นลูก: ลูกคนอื่นที่ยังอยู่ (รวมย้ายออก) ไม่รวมคนตาย/ตัวเอง/หลาน', sc.length === 2 && sc.map((s) => s.name).join() === [k1.name, k3.name].join() && sc.find((s) => s.name === k3.name).left === true, sc.map((s) => s.name).join());
+  const sg = heirSibs(u, g1);
+  check('ใบ tld14 heirSibs ทายาทเป็นหลาน: หลานคนอื่นที่ of เดียวกันเท่านั้น (ไม่เอาหลานสายอื่น/ลูก/ลุงป้า)', sg.length === 1 && sg[0].name === g2.name, sg.map((s) => s.name).join());
+  check('ใบ tld14 heirSibs ไม่ใช่ทางสายเลือด (blood=null) = ไม่มี', heirSibs(u, null).length === 0);
+  // เข้าบ้านทายาท: ชื่อ/เพศ/ปีเกิดเดิม · rank ตามปีเกิดเทียบทายาท · แฝด · ไม่ดึง kinRng · ไม่เข้า household
+  const mk = (sibs) => { const st = newLife(11, content); sibsAtBirth(st, sibs ? { sibs } : null); return st; };
+  const by = newLife(11, content).birthYear;
+  const withS = mk([{ sex: 'ชาย', name: 'สมชาย', born: by - 3 }, { sex: 'หญิง', name: 'สมหญิง', born: by + 2 }, { sex: 'หญิง', name: 'แฝดน้อง', born: by }, { sex: 'ชาย', name: 'ไกลบ้าน', born: by - 5, left: true }]);
+  const rk = Object.fromEntries(familyOf(withS).filter((m) => m.role === 'sibling').map((m) => [m.name, m.rank]));
+  check('ใบ tld14 พี่น้องเข้าบ้านทายาท: ชื่อเดิม · rank พี่/น้อง/แฝด · id นับแยก (SIB base) ไม่ชนคนจีบ/แฟน', rk['สมชาย'] === 'elder' && rk['สมหญิง'] === 'younger' && rk['แฝดน้อง'] === 'twin' && withS.kin.filter((m) => m.role === 'sibling').every((m) => m.id >= 20000), JSON.stringify(rk));
+  check('ใบ tld14 พี่น้องที่ย้ายออก (left) ยังอยู่ในรายการ · familyOk ไม่นับคน left', withS.kin.filter((m) => m.role === 'sibling').length === 4 && familyOk(withS, { role: 'sibling', count: [3, 3] }));
+  const base = mk(null);
+  check('ใบ tld14 ไม่ดึง kinRng/kinSeq/kinCauseRng: ลำดับสุ่มของคนในบ้านเท่าชีวิตที่ไม่มีพี่น้อง', JSON.stringify(withS.kinRng) === JSON.stringify(base.kinRng) && withS.kinSeq === base.kinSeq && JSON.stringify(withS.kinCauseRng) === JSON.stringify(base.kinCauseRng));
+  const track = (st) => { st.age = 22; applyFamily(st, { family: [{ add: 'child' }, { add: 'child' }] }); for (let y = 0; y < 12; y++) ageKin(st, st.birthYear + 23 + y); return JSON.stringify([st.kin.filter((m) => m.role === 'child').map((m) => [m.id, m.name, m.sex, m.born, m.alive]), st.kinRng.next()]); };
+  check('ใบ tld14 ลูกที่ตามมา + ผลตาย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีพี่น้อง', track(mk([{ sex: 'ชาย', name: 'สมชาย', born: by - 3 }, { sex: 'หญิง', name: 'สมหญิง', born: by + 2 }])) === track(mk(null)));
+  const bond0 = withS.kin.filter((m) => m.role === 'sibling').map((m) => m.bond);
+  for (let y = 0; y < 5; y++) ageKin(withS, withS.birthYear + 5 + y);
+  check('ใบ tld14 พี่น้องไม่เข้า household: bond ไม่ขยับรายปี · ไม่เป็นผู้ช่วย kinAid', withS.kin.filter((m) => m.role === 'sibling').every((m, i) => m.bond === bond0[i]) && kinAid(withS) === null);
+  const old = mk([{ sex: 'ชาย', name: 'พี่แก่', born: by - 2 }]);
+  for (let y = 0; y < 100; y++) ageKin(old, old.birthYear + 1 + y);
+  check('ใบ tld14 พี่น้องตายตามตารางชีพภายใน 100 ปี (ไม่อยู่ยั้งยืน) · ไม่ลงบันทึกสูญเสียในบ้าน', old.kin[0].alive === false && (old.kinLoss ?? []).every((l) => l.role !== 'sibling'));
+  check('ใบ tld14 งานศพนับพี่น้อง: FUNERAL_WHO.roles มี sibling', FUNERAL_WHO.roles.includes('sibling'));
+  // ครบทาง: ตายมีลูก 3 → เลือกคนกลาง → ทายาทมีพี่ 1 น้อง 1 (ชื่อเดิม) · ทางอื่น (เกิดใหม่) ไม่มี
+  const bot = BOTS['สายครอบครัว'];
+  const died = () => { for (let i = 0; i < 50; i++) { const { state } = playLife(mixSeed(0x14b, i), content, bot); if (state.kin && !state.tripLost) return state; } return null; };
+  const toPath = (af) => { for (let g = 0; g < 400; g++) { const card = nextAfterCard(af); if (af.pending?.path) return card; if (card.done) return null; if (card.choices?.length) chooseAfter(af, bot(card, af.botRng, af)); } return null; };
+  const st = died();
+  let e2e = { err: 'ไม่มีชีวิตที่มีครอบครัว' };
+  if (st) {
+    for (const k of st.kin.filter((m) => m.role === 'child')) { k.alive = false; k.diedAge = 30; }
+    const year = st.birthYear + st.age;
+    const kids = [0, 1, 2].map((i) => addMember(st, 'child', { born: year - HEIR_AGE[0] - 4 - i * 2 }));
+    const heirs = heirCandidates(st);
+    const af = startAfterlife(st);
+    const card = toPath(af);
+    const bi = (card?.manual ?? []).findIndex(Boolean);
+    if (bi >= 0) {
+      const mid = heirs.find((h) => h.id === kids[1].id);
+      chooseAfter(af, bi, mid.id);
+      for (let g = 0; g < 400 && !af.heir; g++) { const c = nextAfterCard(af); if (c.done) break; if (c.choices?.length) chooseAfter(af, bot(c, af.botRng, af)); }
+      if (af.heir) { const nl = nextLife(af); e2e = { names: nl.kin.filter((m) => m.role === 'sibling').map((m) => m.name), ranks: familyOf(nl).filter((m) => m.role === 'sibling').map((m) => m.rank), sibs: af.heir.sibs?.length, want: [kids[0].name, kids[2].name], name: nl.name, mid: kids[1].name }; }
+      else e2e = { err: 'ไม่ถึงการ์ดส่งต่อ' };
+    } else e2e = { err: 'ไม่มีปุ่มสายเลือด' };
+  }
+  check('ใบ tld14 ครบทาง: ตายมีลูก 3 → เลือกคนกลาง → ทายาทมีพี่ 1 น้อง 1 ชื่อเดิม', !e2e.err && e2e.name === e2e.mid && e2e.sibs === 2 && [...e2e.names].sort().join() === [...e2e.want].sort().join() && e2e.ranks.includes('elder') && e2e.ranks.includes('younger'), e2e.err ?? JSON.stringify(e2e));
+}
+
 // เฟส 3 เตรียมทหาร ช่วง 2 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ตายระหว่างฝึก = สาเหตุ training ผ่านด่านตายเดียว
 // การ์ดฉากสุดท้ายที่รอในคิวต้องเล่าก่อนงานศพ · สัญญารอดตายยังกันได้ · คำบนการ์ดตายต้องมี
 {

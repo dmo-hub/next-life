@@ -1,6 +1,6 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
-import { exPartnerOf, childFarOk, focusChildFar, childNotMineOk, focusChildNotMine, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, spouseOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
+import { sibsAtBirth, exPartnerOf, childFarOk, focusChildFar, childNotMineOk, focusChildNotMine, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, spouseOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -399,6 +399,7 @@ export function newLife(seed, content, heir = null) {
   // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
   for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
+  sibsAtBirth(st, heir);
   if (heir?.start) skipToAge(st, heir.start.age);
   // เริ่มกลางวัย = เงินของบ้านเป็นบาทของปีที่เริ่ม (yearlySaving อ่านปีจาก st.age)
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
