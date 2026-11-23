@@ -73,7 +73,7 @@ export function navBlocks(html) {
   return { css: pick(NAV_CSS_START, NAV_CSS_END), nav: pick(NAV_START, NAV_END), count: html.split(NAV_START).length - 1 };
 }
 
-// แถบห้องผู้พัฒนา = แถบเว็บ nav.top + แท็บ 7 ป้าย (ข้อ 292 293): หน้าที่ build สร้างใต้ dev/ เรียก devNavHtml · หน้าเขียนมือ (DEV_NAV_PAGES) build เขียนทับระหว่าง marker
+// แถบห้องผู้พัฒนา = แถบเว็บ nav.top + แท็บ DEV_TABS (ข้อ 292 293): หน้าที่ build สร้างใต้ dev/ เรียก devNavHtml · หน้าเขียนมือ (DEV_NAV_PAGES) build เขียนทับระหว่าง marker
 export const DEV_TABS = [
   ['dev/index.html', 'สารบัญ'],
   ['dev/spec.html', 'ภาคผนวกสเปก'],

@@ -20,7 +20,6 @@
   .st { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 6px; border: 1px solid currentColor; margin-left: 6px; white-space: nowrap; line-height: 1.5; }
   .st.done { color: var(--good); }
   .st.pick { color: var(--accent2); }
-  .st.wait { color: var(--accent2); }
   .box small { display: block; color: var(--muted); font-size: 13px; line-height: 1.5; }
   a { color: var(--accent2); }
 </style>
@@ -69,6 +68,12 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
   <p>เครื่องมือ แผนที่ และแผนงาน สำหรับคนที่ร่วมทำเกม · ผู้เล่นไม่ต้องอ่านก็เล่นได้</p>
 </div></header>
 <main><div class="w grid">
+  <section class="box"><h2>สถานะเฟส</h2><ul>
+    <li>เฟส 2 ต้นไม้โฟกัส<span class="st done">ปิดแล้ว</span></li>
+    <li>เฟส 3 หน้าจอและสมุด<span class="st pick">กำลังทำ</span><small>เดินคู่ไปกับทุกเฟส</small></li>
+    <li>เฟส 4 ตระกูล ชีวิตคู่และลูก<span class="st pick">กำลังทำ</span></li>
+    <li><a href="../whatsnew.html#plan">แผนเต็ม → แพตช์โน้ต หัว "วางแผนไว้"</a></li>
+  </ul></section>
   <section class="box"><h2>ร่วมพัฒนา</h2><ul>
     <li><a href="https://github.com/dmo-hub/next-life">repo บน GitHub</a><small>อ่าน CONTRIBUTING.md ก่อนส่งงาน · ส่งงานเป็น PR ตัวตรวจอัตโนมัติรันให้ทุกครั้ง</small></li>
     <li>ด่านก่อนส่งงาน<small><code>npm run lint:test</code> · <code>npm run harness:test</code> · <code>npm run site:check</code> · <code>npm run check:data</code> · แก้เนื้อการ์ดแล้ว <code>npm run build</code> ก่อน commit</small></li>
