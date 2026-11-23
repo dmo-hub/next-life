@@ -288,7 +288,16 @@ const f2 = (v) => v.toFixed(2);
     if (st.flags.own_business && !(st.tree?.done?.r5 !== undefined)) { bizLives++; if (invited) bizInvite++; }
   }
   check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
-  check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
+  // ชวนในชีวิตสุ่มหายาก (เลขขยับตามลำดับสุ่มเมื่อเพิ่มการ์ด) — ส่วน "ต้องมีตัวอย่าง" วัดจากชีวิตที่เปิดประตูไว้ก่อน
+  let openInvites = 0;
+  for (let i = 0; i < 60; i++) {
+    const seed = mixSeed(405, i);
+    const st = newLife(seed, base);
+    st.gates = [OFFICE_GATE];
+    playLife(seed, base, BOTS[Object.keys(BOTS)[i % 6]], (c, s) => { if (/^office_/.test(c.id ?? '') && !s.office) openInvites++; }, st);
+  }
+  check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด (ประตูปิดไม่ออก)', invitesClosed === 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
+  check('ใบ 04 ประตูการเมืองเปิดแล้ว การ์ดชวนออกได้', openInvites > 0, `${openInvites} ครั้ง/60 ชีวิต`);
   check('ใบ 04 นักธุรกิจที่ไม่โฟกัสการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
 }
 
