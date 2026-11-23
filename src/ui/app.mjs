@@ -2794,6 +2794,9 @@ const kinWord = (m) => {
   if (m.role === 'herd') return `ฝูง${m.kind ?? 'สัตว์'}`;
   return 'เพื่อนรุ่น';
 };
+// ลูกบุญธรรม (ui-redo ใบ 336 · ช่องจากใบ 99): familyOf กับรายชื่อทายาทไม่ส่งช่องนี้ — อ่านจากสมาชิกตัวจริงตาม id
+// st ยังเป็นคนที่เพิ่งตายจนกว่าจะไปเกิด แผงปรโลกกับหน้าเลือกทายาทจึงอ่านตัวเดียวกันได้ · เซฟเก่าไม่มีช่อง = ไม่ใช่
+const adoptedWord = (m) => (m.role === 'child' && st.kin?.find((x) => x.id === m.id)?.adopted ? 'ลูกบุญธรรม' : null);
 // แผงครอบครัว (ui-redo ใบ 06): คนในบ้าน · ผังตระกูล · กราฟฐานะตระกูล ย้ายจากแถบแท็บใต้หัวการ์ด · สัตว์อยู่ท้ายแผง แถวละตัว
 // วาดตอนกดเปิดเท่านั้น — กราฟฐานะตระกูลแพง การ์ดส่วนใหญ่ผ่านไปโดยไม่มีใครเปิด
 function familyPanel() {
@@ -3036,12 +3039,13 @@ function kinList(members) {
       // ยกให้คนอื่น/หายไป ≠ ตาย — จางไม่ขีด (ตัวที่ยกให้แล้วตายภายหลังก็ยังเป็นตัวที่ยกให้)
       if (m.role === 'pet' && m.left) return row(`${who} · ไม่ได้อยู่กับเราแล้ว`, true);
       // ตาย (ui-redo ใบ 28): ขีดเฉพาะชื่อ แถวไม่จาง อายุที่จากไปอ่านง่าย
+      const adopted = adoptedWord(m);
       if (!m.alive) {
         const li = el('li', 'dead');
-        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}`);
+        li.append(el('s', null, who), ` · ${adopted ? `${adopted} · ` : ''}${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}`);
         return ul.append(li);
       }
-      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `แยกทางแล้ว${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
+      row([who, m.age != null && `อายุ ${m.age}`, adopted, m.left ? `แยกทางแล้ว${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;
 }
@@ -3219,7 +3223,7 @@ function heirPick(card, i, choices, back) {
   again.dataset.prev = '';
   choices.replaceChildren(
     el('p', 'ix-ask', 'เลือกคนที่จะเล่นต่อ — เริ่มที่อายุจริงของเขาวันนี้ ไม่ย้อนไปวัยเด็ก'),
-    ...card.heirs.map((h, k) => numbered(button(h.name, null, () => play(bloodPick(i, k)), `${kinWord(h)} · อายุ ${h.age} ปี`), k + 1)),
+    ...card.heirs.map((h, k) => numbered(button(h.name, null, () => play(bloodPick(i, k)), [kinWord(h), `อายุ ${h.age} ปี`, adoptedWord(h)].filter(Boolean).join(' · ')), k + 1)),
     again,
   );
   choices.querySelector('button').focus();
