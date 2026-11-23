@@ -1432,10 +1432,12 @@ const f2 = (v) => v.toFixed(2);
   kid2.bond = 90;
   applyFamily(st2, { family: [{ paternity: 'cut' }] });
   check('ใบ 95 cut: จด cut · ผูกพันตกเหลือไม่เกิน NOT_MINE.cutTo · ตัดซ้ำไม่ขยับ', kid2.paternity === 'cut' && kid2.bond <= NOT_MINE.cutTo && (applyFamily(st2, { family: [{ paternity: 'keep' }] }), kid2.paternity === 'cut'));
-  // ทายาทสายเลือดที่เป็นลูกไม่ใช่ลูกเรา: ผู้เล่นตายด้วยโรคถ่ายทอด (มะเร็ง) → ลูกปกติได้ประวัติโรค · ลูกไม่ใช่ลูกไม่ได้ (seed ที่มีลูกให้เลือกทางสายเลือด)
+  // ทายาทสายเลือดที่เป็นลูกไม่ใช่ลูกเรา: ผู้เล่นตายด้วยโรคถ่ายทอด (มะเร็ง) → ลูกปกติได้ประวัติโรค · ลูกไม่ใช่ลูกไม่ได้ · ชีวิตไม่มีลูกในช่วง HEIR_AGE (ทายาทจากลูกหายาก ~0–3% ของชีวิตบอท · seed ตายตัวพังเมื่อเนื้อหาเปลี่ยน) = ใส่ลูกเอง ไม่ขึ้นกับ RNG
   const E = await import('../src/engine/index.mjs');
+  const { addMember: addKin } = await import('../src/engine/family.mjs');
   const heirHeredity = (notMine) => {
     const { state: p } = playLife(mixSeed(1, 5314), content, BOTS.สุ่ม);
+    if (!E.heirCandidates(p).some((m) => m.role === 'child')) addKin(p, 'child', { born: p.birthYear + p.age - E.HEIR_AGE[0] });
     const c = E.heirCandidates(p).find((m) => m.role === 'child');
     p.cause = 'cancer';
     if (notMine) p.kin.find((m) => m.id === c.id).notMine = true;
