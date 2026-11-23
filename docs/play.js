@@ -282,7 +282,7 @@ const pickRealName = (seed, sex, birthYear, names) => makeRng(seed ^ 0x2c4e1a77)
 
 
 const KIN_ROLES = ['partner', 'spouse', 'child', 'grandchild'];
-const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', partner: 'แฟน', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น', courter: 'คนจีบ' };
+const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', partner: 'แฟน', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', sibling: 'พี่น้อง', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น', courter: 'คนจีบ' };
 // ธงเดิมที่เนื้อหาอ่านอยู่ ↔ บทบาทที่ธงนั้นหมายถึง · ตั้งธงจากตัวเลือก = มีสมาชิกคนนั้นเพิ่มขึ้นจริง
 const KIN_FLAG_ROLE = { married: 'spouse', has_kids: 'child', raised_grandkids: 'grandchild' };
 // ลูกที่โตแล้วมีหลานให้เองปีละโอกาสนี้ ช่วงอายุนี้ ไม่เกินจำนวนนี้ต่อคน — ค่าตั้งของเกม (ไม่มีข้อมูลเจริญพันธุ์รายยุคในชุดข้อมูล)
@@ -290,12 +290,12 @@ const GRANDKID = { from: 22, to: 40, chance: 0.08, max: 3 };
 // คู่ครองอายุห่างจากเราได้เท่านี้ (ปีเกิด) · ค่าตั้งของเกม
 const KIN_SPOUSE_GAP = [-5, 5];
 // pet · herd (B44) · peer (B43) เป็นสมาชิกได้ แต่ไม่ใช่ทายาท ไม่ตั้งธง ไม่มีหลาน — สัตว์ตายตามอายุขัยของชนิด เพื่อนรุ่นตายตามตารางชีพแบบคน
-const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer', 'courter'];
+const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer', 'courter', 'sibling'];
 // คนในบ้าน = คนที่การ์ดครอบครัวดูแลถึง และคนที่นับว่า "ยังมีใคร" ตอนแก่ · เพื่อนรุ่นไม่นับ
 const KIN_HOUSEHOLD = ['partner', 'spouse', 'child', 'grandchild', 'pet'];
 
 // ความผูกพันรายคน 0–100 (B36a2): ปีที่ไม่ได้ดูแลลดเอง 1 แต่การลดเองไม่พาต่ำกว่า floor — ผลร้ายจากเนื้อหาพาต่ำกว่าได้
-const BOND_START = { parent: 70, partner: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50, courter: 50 };
+const BOND_START = { parent: 70, partner: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50, courter: 50, sibling: 60 };
 const BOND_FLOOR = 38;
 const BOND_LEVELS = [[80, 'ผูกพัน'], [60, 'สนิท'], [40, 'คุ้นเคย'], [20, 'เฉย ๆ'], [0, 'ห่างเหิน']];
 // การ์ดหมวด family ที่ตัวเลือกให้ความสัมพันธ์บวก = ดูแลคนในบ้านปีนั้น · bond ขึ้นเท่านี้ต่อระดับความสัมพันธ์ (1–3)
@@ -392,13 +392,15 @@ function nameParents(st) {
 // extra: of (หลาน = id ลูกที่เป็นพ่อแม่) · สัตว์เลี้ยง kind (ชนิด) + life [จาก, ถึง] (อายุขัยของชนิด) + name? (เนื้อหาตั้งให้ · ไม่ตั้ง = เรียกตามชนิด)
 // แฟน (ใบ 90) เข้ามากลางชีวิตได้โดยไม่ขยับลำดับสุ่ม/ชื่อของคนที่มาทีหลัง: id นับแยก (OWN_ID_BASE+) · ปีเกิด/ทอยตายใช้สุ่มจาก seed+id+ปี ไม่ใช่ kinRng/kinCauseRng · own = ติดตัวไปตลอดแม้แต่งแล้วเปลี่ยนบทเป็นคู่
 const OWN_ID_BASE = 10000;
+// พี่น้องของทายาท (ใบ tld14): id นับแยกอีกชุด + ผลสุ่มตายจาก seed+id ไม่ใช่ kinRng/kinCauseRng — เลขสุ่มของคนในบ้านจึงเท่ากับชีวิตที่ไม่มีพี่น้อง
+const SIB_ID_BASE = 20000;
 const ownRoll = (st, m, year, salt) => makeRng(mixSeed(st.seed ^ salt, m.id * 1000 + (year % 1000)));
 function addMember(st, role, extra = {}) {
   const year = kinYearOf(st);
   // จีบซ้อนได้ไม่เกิน COURT_MAX คน (ใบ 172 ข้อ 307) · คนที่ 3 ไม่เข้า
   if (role === 'courter' && livingOf(st, 'courter').length >= COURT_MAX) return null;
-  const own = role === 'partner' || role === 'courter';
-  const id = own ? OWN_ID_BASE + (st.ownSeq = (st.ownSeq ?? 0) + 1) : ++st.kinSeq;
+  const own = role === 'partner' || role === 'courter' || role === 'sibling';
+  const id = role === 'sibling' ? SIB_ID_BASE + (st.sibSeq = (st.sibSeq ?? 0) + 1) : own ? OWN_ID_BASE + (st.ownSeq = (st.ownSeq ?? 0) + 1) : ++st.kinSeq;
   // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
   const mate = role === 'spouse' || role === 'partner' || role === 'courter';
   const sex = extra.sex ?? (mate ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
@@ -407,7 +409,7 @@ function addMember(st, role, extra = {}) {
   // คู่ ≥20 ตอนแต่ง (ข้อ 309 · K4 เจ้าของเคาะ 11-23): ปีเกิดที่สุ่มได้ถูกย้ายให้ไม่น้อยกว่าเกณฑ์ ไม่ดึงเลขสุ่มเพิ่ม · ปีเกิดที่ส่งมาเอง (ทายาท) ไม่แตะ
   const born = role === 'courter' ? Math.min(born0, year - COURT_MIN.partner) : role === 'spouse' && extra.born === undefined ? Math.min(born0, year - COURT_MIN.spouse) : born0;
   // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
-  const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
+  const name = role === 'herd' ? null : role === 'sibling' && extra.name ? extra.name : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
   const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: extra.bond ?? BOND_START[role], ...(own && { own: true }) };
   if (ANIMAL.includes(role)) {
     m.kind = extra.kind;
@@ -747,7 +749,8 @@ function kinSyncFlags(st) {
 function kinYearlyBond(st) {
   if (!st.kinCared) {
     for (const m of [...st.parents, ...st.kin]) {
-      if (!m.alive || m.left) continue;
+      // พี่น้องของทายาท (tld14 ข้อ 3) ไม่ถือ bond: ไม่ลดรายปี เหมือนไม่เข้าความผูกพันของบ้าน
+      if (!m.alive || m.left || m.role === 'sibling') continue;
       const b = m.bond ?? BOND_START[m.role ?? 'parent'];
       m.bond = b > BOND_FLOOR ? Math.max(BOND_FLOOR, b - 1) : b;
     }
@@ -969,6 +972,21 @@ function kinAid(st) {
   return st.kinRng.next() < (h.bond - KIN_AID.base) / KIN_AID.span ? h : null;
 }
 
+// พี่น้องตามมาในชาติทายาท (ใบ tld14 · เจ้าของเคาะ 11-23): ทางสายเลือดเท่านั้น · ทายาทเป็นลูก = ลูกคนอื่นของผู้ตายที่ยังมีชีวิต (รวมที่ย้ายออก ทุกอายุ) · ทายาทเป็นหลาน = หลานคนอื่นที่ of เดียวกัน
+// ลุง/ป้า · คู่ของลูกคนอื่น · หลานของพี่น้อง ไม่ตามมา · เก็บเฉพาะ เพศ/ชื่อ/ปีเกิด/ย้ายออก (ความผูกพันเริ่มใหม่จากมุมทายาท)
+function heirSibs(st, blood) {
+  if (!blood || !st.kin) return [];
+  const same = (m) => m.id !== blood.id && m.alive && (blood.role === 'child' ? m.role === 'child' : m.role === 'grandchild' && m.of === blood.of);
+  return st.kin.filter(same).map((m) => ({ sex: m.sex, name: m.name, born: m.born, ...(m.left && { left: true }) }));
+}
+// เข้าบ้านทายาทตอนเกิด (ก่อน skipToAge) · ปีเกิดเท่าทายาท = แฝด · ไม่ดึง kinRng (id/ตายแยกสาย)
+function sibsAtBirth(st, heir) {
+  for (const s of heir?.sibs ?? []) {
+    const m = addMember(st, 'sibling', { sex: s.sex, name: s.name, born: s.born });
+    if (s.left) { m.left = true; m.leftAge = Math.max(0, st.age); }
+  }
+}
+
 // สัตว์ติดบ้านตอนเกิด (B44): ทางในตระกูลได้ตัวที่บ้านเดิมยังเลี้ยงอยู่ (heir.pets) · ที่เหลือสุ่มตามบ้านจาก stream แยก
 // ไม่ดึง rng ของโลก/kinRng — ชีวิตที่ไม่ได้สัตว์ไม่มีอะไรเปลี่ยนจากส่วนนี้
 function petsAtBirth(st, heir, clsIndex) {
@@ -1059,8 +1077,8 @@ function petsAfter(st) {
 // มรณบัตร: ใครมาส่ง (B164) — ผลย้อนของความสัมพันธ์ทั้งชีวิต เล่าเป็นคำ ไม่โชว์ค่าและไม่มีชื่อใคร (คนที่จากไปห้ามถูกเรียก)
 // คนที่ยังอยู่มาจากที่ไกลได้ (นับคนที่ย้ายออกด้วย) · bond ถึงเกณฑ์ = อยู่ช่วยงาน ต่ำกว่า = แวะมาครู่เดียว (พื้น bond แค่ "เฉย ๆ" ไม่ถึงขั้นไม่มา) · แขกที่เหลือแบ่งตามน้ำหนักเดียวกับสูตรแขก
 // ใช้ค่าเฉลี่ยวัยทำงาน ไม่ใช่ค่าตอนตาย — ค่าตกตามวัยชรา แต่คนที่เคยรู้จักกันยังมา · อ่าน state ล้วน ไม่ดึงเลขสุ่ม
-const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer'] };
-const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน' };
+const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer', 'sibling'] };
+const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน', sibling: 'พี่น้อง' };
 const whoList = (by) => {
   const parts = FUNERAL_WHO.roles.filter((r) => by[r]).map((r) => (r === 'spouse' ? WHO_WORD[r] : `${WHO_WORD[r]} ${by[r]} คน`));
   return parts.length > 1 ? `${parts.slice(0, -1).join(' ')} และ${parts.at(-1)}` : parts[0];
@@ -1119,7 +1137,7 @@ function familyOf(st) {
   const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
   const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
   // คนจีบที่ยังอยู่ (ไม่หลุด) ส่งพร้อม stage ให้จอวาดหัวแยก "กำลังจีบ" นอกคนในบ้าน · ไม่ส่ง bond · แฟนที่ยังคบส่ง together (ปีที่คบ)
-  const kin = (st.kin ?? []).filter((m) => m.role !== 'courter' || (m.alive && !m.left)).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...(m.role !== 'courter' && bondOf(m)), ...(m.role === 'courter' && { stage: m.stage }), ...(m.role === 'partner' && !m.left && spouseStatus(m) === 'together' && m.since !== undefined && { together: st.age - m.since }), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)), ...(m.role === 'child' && m.by != null && { by: m.by }) }));
+  const kin = (st.kin ?? []).filter((m) => m.role !== 'courter' || (m.alive && !m.left)).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...(m.role !== 'courter' && bondOf(m)), ...(m.role === 'courter' && { stage: m.stage }), ...(m.role === 'partner' && !m.left && spouseStatus(m) === 'together' && m.since !== undefined && { together: st.age - m.since }), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.role === 'sibling' && { rank: m.born < st.birthYear ? 'elder' : m.born > st.birthYear ? 'younger' : 'twin' }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)), ...(m.role === 'child' && m.by != null && { by: m.by }) }));
   return [...parents, ...kin];
 }
 
@@ -4783,6 +4801,7 @@ function newLife(seed, content, heir = null) {
   // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
   for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
+  sibsAtBirth(st, heir);
   if (heir?.start) skipToAge(st, heir.start.age);
   // เริ่มกลางวัย = เงินของบ้านเป็นบาทของปีที่เริ่ม (yearlySaving อ่านปีจาก st.age)
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
@@ -10640,6 +10659,7 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
+    ...(blood && heirSibs(st, blood).length && { sibs: heirSibs(st, blood) }),
     // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
     ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
     // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
