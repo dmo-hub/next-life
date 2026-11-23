@@ -15285,12 +15285,13 @@ function helpRow(h) {
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
 // ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
-const FAMILY_ORDER = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
+const FAMILY_ORDER = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer', 'courter'];
 const ANIMAL_ROLES = ['pet', 'herd'];
 const kinWord = (m) => {
   const male = m.sex === 'ชาย';
   if (m.role === 'parent') return male ? 'พ่อ' : 'แม่';
-  if (m.role === 'partner') return m.left ? 'แฟนเก่า' : 'แฟน';
+  // แยกทางชั่วคราว (apart) ยังเป็นแฟน คืนดีได้ — แฟนเก่าเฉพาะที่เลิกกันแล้ว (ex)
+  if (m.role === 'partner') return m.status === 'ex' ? 'แฟนเก่า' : 'แฟน';
   if (m.role === 'spouse') return m.left ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
   if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
   if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';
@@ -15334,11 +15335,14 @@ function kinParts(members, animals = false) {
     const here = members.filter((m) => m.alive && !m.left).length;
     return [el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(members)];
   }
-  // คู่ที่จากไป/แยกทางย้ายไปหัวของมันเอง (ui-redo ใบ 30) ไม่ซ้ำในรายการหลัก · คู่ที่ยังอยู่คนเดียวไม่มีหัวนี้
-  const past = members.filter((m) => m.role === 'spouse' && (!m.alive || m.left));
-  const home = members.filter((m) => !past.includes(m));
+  // คู่ที่จากไป/แยกทาง + แฟนที่เลิกกันแล้วย้ายไปหัวของมันเอง (ui-redo ใบ 30 · 335) ไม่ซ้ำในรายการหลัก · คู่ที่ยังอยู่คนเดียวไม่มีหัวนี้
+  // คนจีบอยู่นอกบ้าน (ใบ 334) หัวแยกใต้คนในบ้าน ไม่นับในหัว "ยังอยู่"
+  const past = members.filter((m) => (m.role === 'spouse' && (!m.alive || m.left)) || (m.role === 'partner' && m.status === 'ex'));
+  const courting = members.filter((m) => m.role === 'courter');
+  const home = members.filter((m) => !past.includes(m) && !courting.includes(m));
   const alive = home.filter((m) => m.alive).length;
   const out = home.length ? [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === home.length ? 'คน' : `จาก ${home.length} คน`}`), kinList(home)] : [];
+  if (courting.length) out.push(el('h3', null, 'กำลังจีบ'), kinList(courting));
   if (past.length) out.push(el('h3', null, 'คู่ชีวิตที่ผ่านมา'), kinList(past));
   return out;
 }
@@ -15525,6 +15529,7 @@ function notesBoot() {
   };
 }
 // เซฟเก่าไม่มี since → engine ไม่ส่ง together · ไม่โชว์ 0 ปี
+const COURT_STAGE_WORD = { met: 'เพิ่งรู้จัก', courting: 'กำลังจีบ' };
 const togetherText = (m) => (m.together ? ` · อยู่ด้วยกัน ${m.together} ปี` : '');
 function kinList(members) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
@@ -15545,7 +15550,11 @@ function kinList(members) {
         li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}`);
         return ul.append(li);
       }
-      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `แยกทางแล้ว${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
+      // คนจีบ: ชื่อนำแถว (ไม่มีคำเรียกนำ — หัวบอกแล้ว) · ไม่มีความผูกพัน ขั้นแทน
+      if (m.role === 'courter') return row([m.name ?? 'คนจีบ', m.age != null && `อายุ ${m.age}`, COURT_STAGE_WORD[m.stage]].filter(Boolean).join(' · '), false);
+      // แฟนเก่าไม่มีจำนวนปี (เจ้าของเคาะ 335) · แฟนที่ยังคบบอกปีที่คบ (เซฟเก่าไม่มี since = ไม่ส่ง ไม่โชว์ 0 ปี)
+      if (m.role === 'partner' && m.status === 'ex') return row([who, m.age != null && `อายุ ${m.age}`, 'เลิกกันแล้ว'].filter(Boolean).join(' · '), false);
+      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `แยกทางแล้ว${togetherText(m)}` : m.bondLevel, m.role === 'partner' && m.together && `คบกัน ${m.together} ปี`].filter(Boolean).join(' · '), false);
     });
   return ul;
 }
