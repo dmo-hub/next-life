@@ -1076,7 +1076,7 @@ function familyOf(st) {
   // สาเหตุตาย (B110) ให้ผังตระกูลแสดง — มีเฉพาะคนที่จากไปแล้ว · เซฟก่อนมีสาเหตุไม่มีช่องนี้
   const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
   const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
-  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)) }));
+  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)), ...(m.role === 'child' && m.by != null && { by: m.by }) }));
   return [...parents, ...kin];
 }
 
@@ -15308,8 +15308,11 @@ function kinParts(members, animals = false) {
   const past = members.filter((m) => m.role === 'spouse' && (!m.alive || (m.left && m.status !== 'apart')));
   const home = members.filter((m) => !past.includes(m));
   const alive = home.filter((m) => m.alive).length;
-  const out = home.length ? [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === home.length ? 'คน' : `จาก ${home.length} คน`}`), kinList(home)] : [];
-  if (past.length) out.push(el('h3', null, 'คู่ชีวิตที่ผ่านมา'), kinList(past));
+  // คู่คนเดียว = ลูกทุกคนเป็นของคู่นั้นอยู่แล้ว บอกซ้ำทุกแถวแค่รก (ui-redo ใบ 331)
+  const mates = members.filter((m) => m.role === 'spouse');
+  const mateName = mates.length >= 2 ? new Map(mates.map((m) => [m.id, m.name])) : null;
+  const out = home.length ? [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === home.length ? 'คน' : `จาก ${home.length} คน`}`), kinList(home, mateName)] : [];
+  if (past.length) out.push(el('h3', null, 'คู่ชีวิตที่ผ่านมา'), kinList(past, mateName));
   return out;
 }
 // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
@@ -15496,8 +15499,9 @@ function notesBoot() {
 }
 // เซฟเก่าไม่มี since → engine ไม่ส่ง together · ไม่โชว์ 0 ปี
 const togetherText = (m) => (m.together ? ` · อยู่ด้วยกัน ${m.together} ปี` : '');
-function kinList(members) {
+function kinList(members, mateName = null) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
+  const withMate = (m) => (m.role === 'child' && mateName?.get(m.by) ? `ลูกกับ${mateName.get(m.by)}` : null);
   const ul = el('ul', 'picks');
   members
     .map((m, i) => ({ m, i }))
@@ -15512,11 +15516,11 @@ function kinList(members) {
       // ตาย (ui-redo ใบ 28): ขีดเฉพาะชื่อ แถวไม่จาง อายุที่จากไปอ่านง่าย
       if (!m.alive) {
         const li = el('li', 'dead');
-        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}`);
+        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}${withMate(m) ? ` · ${withMate(m)}` : ''}`);
         return ul.append(li);
       }
       const leftWord = m.status === 'apart' ? 'แยกกันอยู่' : m.status === 'divorced' ? 'หย่าแล้ว' : 'แยกทางแล้ว';
-      row([who, m.age != null && `อายุ ${m.age}`, m.left ? `${leftWord}${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
+      row([who, m.age != null && `อายุ ${m.age}`, withMate(m), m.left ? `${leftWord}${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;
 }
