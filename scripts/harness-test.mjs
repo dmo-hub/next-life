@@ -1314,6 +1314,25 @@ const f2 = (v) => v.toFixed(2);
   const [p1, p2] = pick.kin;
   becomePartner(pick, p2);
   check('ใบ 172 เลือกคนเดียวเป็นแฟน: อีกคนหลุด (ไม่อยู่ในรายชื่อคนจีบ) · คนที่เลือกเข้าแผง', p2.role === 'partner' && p1.left === true && !familyOk(pick, { role: 'courter' }) && familyOf(pick).some((m) => m.id === p2.id) && !familyOf(pick).some((m) => m.id === p1.id));
+  // K4 (เจ้าของเคาะ 11-23): คู่ต้องอายุ ≥20 ตอนแต่ง · ปีเกิดสุ่มเดิมแล้วย้าย ไม่ดึง kinRng เพิ่ม
+  const spAges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((sd) => { const x = newLife(sd, content); x.age = 22; const r0 = JSON.stringify(x.kinRng); applyFamily(x, { family: [{ add: 'spouse' }] }); const m = x.kin.find((k) => k.role === 'spouse'); return { age: x.birthYear + 22 - m.born, rngMoved: JSON.stringify(x.kinRng) !== r0 }; });
+  check('ใบ 172 K4: คู่ที่เข้าบ้านตอนผู้เล่น 22 อายุ ≥20 ทุก seed · ดึง kinRng เท่าเดิม (ครั้งเดียวต่อคู่)', spAges.every((v) => v.age >= 20) && new Set(spAges.map((v) => v.rngMoved)).size === 1, spAges.map((v) => v.age).join());
+  const yp = newLife(7, content); yp.age = 19;
+  applyFamily(yp, { family: [{ add: 'courter' }] });
+  yp.kin[0].born = yp.birthYear + yp.age - 18; // 18 ปี
+  becomePartner(yp, yp.kin[0]);
+  yp.age = 21;
+  applyFamily(yp, { family: [{ marry: 'partner' }] });
+  const pm = yp.kin.find((k) => k.role === 'spouse' || k.role === 'partner');
+  check('ใบ 172 K4: แฟนอายุ 18 ตอนแต่งผู้เล่น 21 ปีเกิดถูกย้ายให้ ≥20', pm.role === 'spouse' && yp.birthYear + 21 - pm.born >= 20);
+  // familyOk stage/years
+  const fk = newLife(7, content); fk.age = 19;
+  applyFamily(fk, { family: [{ add: 'courter' }] });
+  const fkOk = (f) => familyOk(fk, { role: 'courter', ...f });
+  const stageNow = fk.kin[0].stage;
+  check('ใบ 172 familyOk: stage met ผ่าน · courting ตก · รายการผ่าน · years [0,0] ผ่าน [1,5] ตก', stageNow === 'met' && fkOk({ stage: 'met' }) && !fkOk({ stage: 'courting' }) && fkOk({ stage: ['met', 'courting'] }) && fkOk({ years: [0, 0] }) && !fkOk({ years: [1, 5] }));
+  fk.age = 23; fk.kin[0].stage = undefined; becomePartner(fk, fk.kin[0]); fk.age = 27;
+  check('ใบ 172 familyOk: แฟนคบมา 4 ปี years [3,5] ผ่าน [5,9] ตก · แฟนไม่มี stage ตกเมื่อใส่ stage', familyOk(fk, { role: 'partner', years: [3, 5] }) && !familyOk(fk, { role: 'partner', years: [5, 9] }) && !familyOk(fk, { role: 'partner', stage: 'met' }));
   const moved = becomePartner(a, c);
   check('ใบ 172 คนจีบ → แฟน (becomePartner): id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบ · ไม่ใช่คนจีบอีก', moved === c && c.role === 'partner' && c.id >= 10000 && c.since === a.age && !familyOk(a, { role: 'courter' }) && familyOf(a).some((m) => m.id === c.id));
 }
