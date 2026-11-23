@@ -1459,6 +1459,50 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 95 ปีตรวจพ่อ 2 ช่วง: การ์ดฐาน years[0] = pt.common · สำเนาหายาก years[0] = pt.from จบก่อน common และจำกัด กทม.', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => ev95(id).years[0] === pt.common) && ['fam_not_mine_mid_rare_01', 'fam_not_mine_old_rare_01'].every((id) => ev95(id).years[0] === pt.from && ev95(id).years[1] === pt.common - 1 && ev95(id).when.province?.join() === 'กรุงเทพมหานคร') && pt.from < pt.common);
 }
 
+// รับบุตรบุญธรรม (ใบ 99 B114 ข้อ 147 160): op add child + adopted + age · เด็กเข้าบ้านเป็น child ทายาทเหมือนลูกทั่วไป · การ์ดขึ้นเฉพาะ ≥30 ไม่มีลูก เงินไม่ตึง
+{
+  const content = loadContent();
+  const E = await import('../src/engine/index.mjs');
+  const adopt = (seed, age, { married = false, sex = 'ชาย' } = {}) => {
+    const st = newLife(seed, content);
+    st.sex = sex;
+    st.age = 25;
+    if (married) applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    // ธงคู่นอกใจเปิดไว้ — ลูกที่เกิดช่วงนี้ถูกทอยว่าไม่ใช่ลูกเรา · ลูกบุญธรรมต้องไม่ถูกทอย
+    st.flags.spouse_cheated = true;
+    st.flagAge.spouse_cheated = 34;
+    st.age = 35;
+    applyFamily(st, { sets_flags: ['has_kids'], family: [{ add: 'child', adopted: true, age }] });
+    return st;
+  };
+  const stA = adopt(9100, 9, { married: true });
+  const kidA = stA.kin.find((m) => m.role === 'child');
+  check('ใบ 99 รับเด็กโต: เข้าบ้านเป็น child อายุตามที่เลือก · จด adopted/adoptAge · by = คู่ตอนรับ', !!kidA && kidA.adopted === true && kidA.adoptAge === 9 && E.memberAge(stA, kidA) === 9 && kidA.by === E.spouseOf(stA).id);
+  check('ใบ 99 ลูกบุญธรรมไม่ผ่านการทอยลูกคนอื่น (ธงคู่นอกใจเปิด) · ธง has_kids ติด · นับเป็นลูกที่ยังอยู่ 1', kidA.notMine === undefined && stA.flags.has_kids === true && E.livingChildren(stA) === 1);
+  const stB = adopt(9101, 2);
+  const kidB = stB.kin.find((m) => m.role === 'child');
+  check('ใบ 99 รับเด็กเล็กตอนโสด: อายุ 2 · by = null (ไม่มีคู่) · ไม่มีคู่ในบ้าน', E.memberAge(stB, kidB) === 2 && kidB.by === null && !stB.kin.some((m) => m.role === 'spouse'));
+  // ทายาท: เด็กโตรับตอน 35 อายุ 9 → ตอนเรา 44 เด็กอายุ 18 อยู่ในช่วง HEIR_AGE ให้เลือกเล่นต่อสายเลือดได้
+  stA.age = 44;
+  const heirs = E.heirCandidates(stA);
+  check('ใบ 99 ลูกบุญธรรมเป็นทายาท: เด็กอายุ 18 อยู่ในรายชื่อทายาทสายเลือด', heirs.length === 1 && heirs[0].id === kidA.id && heirs[0].age === 18);
+  const single = content.events.find((e) => e.id === 'fam_adopt_single_01');
+  const couple = content.events.find((e) => e.id === 'fam_adopt_couple_01');
+  const base = (over = {}, married = false) => {
+    const st = newLife(9102, content);
+    st.age = 35;
+    st.money = 1e8;
+    if (married) applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return Object.assign(st, over);
+  };
+  const gate = (e, st) => whenOk(st, e.when);
+  check('ใบ 99 การ์ดโสด: ออกที่ 35 ไม่มีลูก เงินพอ · ไม่ออกเมื่ออายุ 29 · มีลูกแล้ว · ติดหนี้ · เงินตึง · มีคู่',
+    gate(single, base()) === true && gate(single, base({ age: 29 })) === false && gate(single, (() => { const s = base(); s.flags.has_kids = true; return s; })()) === false
+      && gate(single, (() => { const s = base(); s.flags.in_debt = true; return s; })()) === false && gate(single, base({ money: 0 })) === false && gate(single, base({}, true)) === false);
+  check('ใบ 99 การ์ดมีคู่: ออกเมื่อคู่อยู่ด้วยกัน · ไม่ออกเมื่อไม่มีคู่ · แยกทาง',
+    gate(couple, base({}, true)) === true && gate(couple, base()) === false && gate(couple, (() => { const s = base({}, true); s.kin.find((m) => m.role === 'spouse').status = 'apart'; return s; })()) === false);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
