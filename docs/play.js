@@ -463,6 +463,20 @@ function focusChildNotMine(st, w) {
   if (m) st.kinFocus.child = m.id;
 }
 
+// when.ex_spouse = {within: [lo, hi]} — คู่เก่าที่หย่าแล้วและยังอยู่ · หย่ามาแล้ว lo–hi ปี · เรายังโสด (ไม่มีคู่/แฟนอยู่ในบ้าน) · คืนดีได้ครั้งเดียวต่อชีวิต m.reunited (ใบ 97)
+// spouseOk ตัดคู่ที่หย่าทิ้ง จึงมีฟังก์ชันของตัวเอง · การ์ดเรียกคู่เก่าล่าสุด ไม่ดึงเลขสุ่ม
+const exSpouseOf = (st, w) => {
+  if (st.kin.some((m) => m.reunited !== undefined)) return null;
+  if (st.kin.some((m) => (m.role === 'spouse' && m.alive && !isDivorced(m)) || (m.role === 'partner' && m.alive && !m.left))) return null;
+  const m = st.kin.findLast((x) => x.role === 'spouse' && x.alive && isDivorced(x));
+  return m && m.divorcedAge !== undefined && kinInRange(st.age - m.divorcedAge, w.within) ? m : null;
+};
+const exSpouseOk = (st, w) => exSpouseOf(st, w) !== null;
+function focusExSpouse(st, w) {
+  const m = exSpouseOf(st, w);
+  if (m) st.kinFocus.spouse = m.id;
+}
+
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
 // สถานะคู่ (ใบ 89 B114 ข้อ 145 164): together อยู่ด้วยกัน · apart แยกทาง (ยังมีคู่ตามกฎหมาย แต่งใหม่ไม่ได้) · divorced หย่า · ม่าย = ตายแล้วและไม่ได้หย่า (derived)
 // ไม่มีช่อง = together (เซฟเก่า) · หย่าแล้วไม่นับเป็นคู่ในงานศพ/จดหมาย/ผู้ถูกหยิบเป็นพ่อแม่ทายาท และคู่ที่หย่าแล้วตายไม่ลงบันทึกสูญเสีย
@@ -617,6 +631,21 @@ function applyFamily(st, c, care = 0) {
       m.left = false;
       delete m.leftAge;
       m.reconciledAge = st.age;
+    }
+    // คืนดีหลังหย่า (ใบ 97): คู่เก่าคนเดิม (id/ชื่อ/ผูกพันที่ค้างไว้) กลับเป็นคู่ · อายุแต่งนับรอบใหม่ · m.reunited กันซ้ำ · ex_bitter ของคู่คนนี้จบลง ไม่งั้นการ์ดแฟนเก่ากลับมา (B166) อ่านเป็นคนอื่น
+    if (op.remarry) {
+      const m = st.kin.find((x) => x.id === st.kinFocus?.spouse && isDivorced(x) && x.alive) ?? st.kin.findLast((x) => isDivorced(x) && x.alive);
+      if (m && !st.kin.some((x) => x.reunited !== undefined || (x.role === 'spouse' && x.alive && !isDivorced(x)))) {
+        m.status = 'together';
+        m.left = false;
+        delete m.leftAge;
+        m.since = st.age;
+        m.reunited = st.age;
+        m.reunitedGap = st.age - (m.divorcedAge ?? st.age);
+        delete m.divorcedAge;
+        for (const c of st.kin) if (c.role === 'child' && c.by === m.id) delete c.custody;
+        delete st.flags.ex_bitter;
+      }
     }
     // ลูกเล็กของคู่ที่หย่า: self = เราเลี้ยง · other = อยู่กับอีกฝ่าย (ผูกพันจางเร็วกว่า) · ทั้งสองทางยังเป็นทายาท
     if (op.custody) for (const c of st.kin) {
@@ -5893,6 +5922,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
   pickFocus(st);
   if (ev.when?.child_far) focusChildFar(st, ev.when.child_far);
   if (ev.when?.child_not_mine) focusChildNotMine(st, ev.when.child_not_mine);
+  if (ev.when?.ex_spouse) focusExSpouse(st, ev.when.ex_spouse);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -6576,6 +6606,7 @@ function whenOk(st, when) {
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
   if (when.child_far && !childFarOk(st, when.child_far)) return false;
   if (when.child_not_mine && !childNotMineOk(st, when.child_not_mine)) return false;
+  if (when.ex_spouse && !exSpouseOk(st, when.ex_spouse)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.spouse && !spouseOk(st, when.spouse)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
