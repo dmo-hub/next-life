@@ -1,0 +1,135 @@
+// ภาพการ์ดหมวด show_* (มหรสพ/ดนตรีตามยุค เด็ก → ชรา) — ใบ 210 ขั้น ② · ผืน 200×125 พื้น y=108 · บทบาทชิ้นดู parts.mjs
+// จุดเด่นแดงหนึ่งจุดต่อภาพ = ของที่การ์ดถามถึง (เครื่องเสียง · ของขาย · ที่นั่ง)
+import { gl, s, a, al, k, l, f, n, circ, rect, GROUND } from './parts.mjs';
+
+const torso = (x, top, foot, w) => `M${x - w} ${foot}V${top + w}q0-${w} ${w}-${w}t${w} ${w}V${foot}z`;
+const person = (x, top = 66, foot = 108, w = 12, dark = false) => [(dark ? n : s)(circ(x, top - 9, 8) + torso(x, top, foot, w))];
+const screen = (x, w) => [s(rect(x, 18, w, 50)), k(rect(x + 4, 22, w - 8, 42)), f(`M${x + 6} 68v40M${x + w - 6} 68v40`, 2)];
+const radio = (x, y, role) => [role(rect(x, y, 40, 26)), k(circ(x + 12, y + 13, 7)), l(`M${x + 24} ${y + 8}h10M${x + 24} ${y + 14}h10M${x + 24} ${y + 20}h10`, 1), f(`M${x + 30} ${y}l8-14`, 1.4)];
+
+export default {
+  show_tonic_01: [
+    GROUND, ...screen(30, 90),
+    gl('M50 40l12 8l-12 8zM70 34h30', 1),
+    a('M140 56h14v8l4 6v38h-22V70l4-6z'),
+    k(rect(140, 80, 14, 12)),
+    ...person(176, 80, 108, 8),
+  ],
+  show_mat_01: [
+    GROUND, ...screen(100, 84),
+    a('M30 94h50v14H30z'),
+    al('M30 100h50', 1),
+    a('M88 94q0-8 8-8t8 8v14h-16z'),
+    gl('M40 30q4-4 8 0M58 24q4-4 8 0', 1),
+  ],
+  show_crystal_01: [
+    GROUND, s(rect(30, 76, 140, 6)), f('M36 82v26M164 82v26', 2),
+    a('M80 60h40v16H80z'),
+    k(circ(92, 68, 4)),
+    f('M112 60v-30M100 30h24', 1.4),
+    l('M120 66q10-4 14 6', 1),
+    ...person(152, 54, 76, 10),
+    s('M60 66q0-10 10-10t10 10v10H60z'),
+  ],
+  show_cloth_01: [
+    GROUND,
+    a('M20 108V40h100v68'),
+    al('M40 40v68M60 40v68M80 40v68M100 40v68', 1),
+    s(rect(44, 20, 52, 20)),
+    gl('M150 20h36v40h-36zM158 60v48M178 60v48', 1),
+    ...person(136, 72, 108, 9),
+  ],
+  show_combo_01: [
+    GROUND,
+    ...person(50, 60), ...person(150, 60, 108, 12, true),
+    f('M100 72V30M94 30h12', 2.4),
+    a('M100 72q-12 0-12 10q0 6 4 8q-6 4-6 10q0 10 14 10t14-10q0-6-6-10q4-2 4-8q0-10-12-10z'),
+    k(circ(100, 90, 3.4)),
+    l('M94 100h12', 1.4),
+  ],
+  show_school_tv_01: [
+    GROUND,
+    a('M126 46h30v20h-30zM156 52l14-6v20l-14-6z'),
+    k(circ(141, 56, 5)),
+    f('M140 66l-10 42M142 66v42M144 66l10 42', 1.6),
+    ...person(40, 66, 108, 10), ...person(70, 62, 108, 10), ...person(100, 66, 108, 10, true),
+  ],
+  show_ramwong_01: [
+    GROUND,
+    s(circ(100, 70, 10)),
+    k(circ(100, 70, 5)),
+    f('M100 80v20', 2),
+    ...person(60, 60, 108, 10), ...person(140, 60, 108, 10, true),
+    a('M166 84h20v6h-20zM168 90v18M184 90v18M168 84V66'),
+    al('M168 66v18', 2),
+  ],
+  show_molam_night_01: [
+    GROUND,
+    a('M20 108V60h100v48'),
+    s('M14 60h112l-8-16H22z'),
+    k(rect(30, 70, 80, 30)),
+    ...person(70, 82, 100, 8, true),
+    s(rect(140, 30, 30, 50)),
+    k(circ(155, 46, 8) + circ(155, 68, 6)),
+    gl('M160 16q6-6 12 0', 1),
+  ],
+  show_karaoke_01: [
+    GROUND,
+    s(rect(20, 24, 70, 44)),
+    k(rect(24, 28, 62, 30)),
+    l('M30 50h50', 2),
+    ...person(130, 64),
+    a('M142 64l14-12l6 6l-14 12z'),
+    k(circ(158, 54, 2.4)),
+    ...person(176, 72, 108, 8, true),
+  ],
+  show_satire_01: [
+    GROUND, s(rect(20, 70, 160, 6)), f('M26 76v32M174 76v32', 2),
+    ...radio(80, 44, a),
+    s('M40 58h16v12H40z'),
+    f('M56 62q6 0 4 6', 1.2),
+    gl('M126 40q6 4 0 10M132 36q10 8 0 18', 1),
+  ],
+  show_molam_live_01: [
+    GROUND,
+    s(rect(30, 30, 140, 78)),
+    k(rect(40, 40, 30, 24)),
+    a('M90 70h46v30H90z'),
+    k(rect(94, 74, 38, 20)),
+    l('M84 100h58', 2),
+    gl('M150 56q6 4 0 10M156 52q10 8 0 18', 1),
+  ],
+  show_tape_box_01: [
+    GROUND,
+    s(rect(40, 70, 100, 38)),
+    l('M40 78h100', 1),
+    s('M54 64h20v14H54zM78 60h20v18H78z'),
+    a('M104 56h28v18h-28z'),
+    k(circ(112, 65, 3) + circ(124, 65, 3)),
+    al('M132 70q20 10 30 0q10-10 20 0', 1.2),
+  ],
+  show_two_radios_01: [
+    GROUND,
+    gl('M100 20v88', 1.2),
+    ...radio(30, 60, s),
+    ...radio(130, 60, a),
+    gl('M76 56q6 4 0 10M180 56q6 4 0 10', 1),
+  ],
+  show_quiz_01: [
+    GROUND,
+    a(rect(24, 30, 74, 54)),
+    k(rect(30, 36, 62, 42)),
+    l('M40 48h42M40 58h30M40 68h36', 1),
+    s(rect(50, 84, 22, 6)),
+    ...person(140, 66, 108, 12),
+    ...person(172, 80, 108, 8, true),
+  ],
+  show_forest_lige_01: [
+    GROUND,
+    a(rect(30, 46, 30, 62)),
+    k(circ(45, 64, 9) + circ(45, 92, 6)),
+    s('M80 40h90v8H80z'),
+    gl('M84 48v60M166 48v60M80 40l45-20l45 20', 1),
+    ...person(110, 80, 108, 9), ...person(140, 84, 108, 7), ...person(160, 84, 108, 7, true),
+  ],
+};
