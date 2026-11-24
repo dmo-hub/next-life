@@ -134,4 +134,4 @@ export const FLAG_RE = /^[a-z][a-z0-9_]*(:[a-z0-9_]+)?$/;
 export const ID_RE = /^[a-z][a-z0-9_]*$/;
 export const YEAR_MIN = 2400;
 export const YEAR_MAX = 2700;
-export const FAMILY_ROLES = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
+export const FAMILY_ROLES = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer', 'courter', 'sibling'];

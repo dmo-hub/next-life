@@ -29,6 +29,33 @@ export function pickProvince(rng, birth, regionName) {
   return list[list.length - 1].name;
 }
 
+// ศาสนาตอนเกิด (B93) ตามจังหวัดเกิด — ผู้เรียกส่ง rng แยกเสมอ · ไม่มีตารางในข้อมูล = ค่าเริ่มต้น ไม่ดึงเลขสุ่ม
+// birth.religion = { default, provinces: { <จังหวัด>: { <ศาสนา>: น้ำหนัก } } } · จังหวัดที่ไม่อยู่ในตาราง = default
+export function pickReligion(rng, birth, province) {
+  const t = birth.religion;
+  if (!t) return DEFAULT_RELIGION;
+  const row = t.provinces?.[province];
+  if (!row) return t.default ?? DEFAULT_RELIGION;
+  const list = Object.entries(row);
+  let r = rng.next() * list.reduce((s, [, w]) => s + w, 0);
+  for (const [name, w] of list) {
+    r -= w;
+    if (r < 0) return name;
+  }
+  return list[list.length - 1][0];
+}
+
+export const DEFAULT_RELIGION = 'พุทธ';
+
+// คำปิดหน้าจบ (B93) ศาสนาละ 1 ชุด · ไม่มีภาพ/คำตัดสินปรโลก · ศาสนานอกรายการใช้ชุด 'อื่น ๆ'
+export const RELIGION_CLOSING = {
+  พุทธ: 'ชีวิตนี้จบลงแล้ว สิ่งที่ทำไว้ยังอยู่กับคนที่เหลือ',
+  อิสลาม: 'อินนาลิลลาฮิ วะอินนา อิลัยฮิ ราจิอูน — เราเป็นของพระเจ้า และสู่พระองค์เราจะกลับไป',
+  คริสต์: 'ขอให้เขาหลับในความสงบ คนที่รักเขายังจดจำ',
+  'อื่น ๆ': 'ชีวิตหนึ่งจบลง คนที่อยู่ต่อยังจดจำเขา',
+};
+export const closingOf = (religion) => RELIGION_CLOSING[religion] ?? RELIGION_CLOSING['อื่น ๆ'];
+
 // ชื่อจังหวัดบนจอ: กรุงเทพฯ ไม่ใช่ "จังหวัด" จึงไม่นำหน้า จ.
 export const placeName = (province) => (province === 'กรุงเทพมหานคร' ? province : `จ.${province}`);
 
