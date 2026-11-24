@@ -2101,6 +2101,65 @@ function artSvg(cls, w, h, parts) {
   for (const p of parts) svg.append(svgEl('path', { d: p.d, fill: p.fill ?? 'none', ...(p.stroke && { stroke: p.stroke, 'stroke-width': p.w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }) }));
   return svg;
 }
+// ภาพประจำการ์ด (ใบ 210 · ข้อ 410 492): ข้อมูลอยู่ไฟล์แยกที่ขอหลังการ์ดแรก — ยังไม่มา/โหลดไม่ได้ = การ์ดไม่มีภาพ ไม่รอ
+// ไม่วาดใบที่กำลังเปิดซ้ำเมื่อภาพมาถึง: ภาพโผล่กลางการอ่านดันข้อความกับปุ่มกระโดด · สีของแต่ละบทบาทอยู่ CSS (.cp .r-*)
+let cardArt = null;
+let artAsked = false;
+function askArt() {
+  if (artAsked) return;
+  artAsked = true;
+  const sc = document.createElement('script');
+  sc.src = ART_SRC;
+  sc.async = true;
+  sc.onload = () => (cardArt = self.NL_CARD_ART ?? null);
+  document.head.append(sc);
+}
+function cardPic(id) {
+  const parts = cardArt?.pics?.[id];
+  if (!parts) return null;
+  const svg = svgEl('svg', { class: 'cp', viewBox: `0 0 ${cardArt.w} ${cardArt.h}`, 'aria-hidden': 'true' });
+  for (const [r, d, w] of parts) svg.append(svgEl('path', { class: `r-${r}`, d, ...(w !== undefined && { 'stroke-width': w }) }));
+  const box = el('div', 'cpic');
+  box.dataset.pic = id;
+  box.append(svg);
+  return box;
+}
+// ข้อ 429: ปุ่มล่างสุดต้องอยู่ในจอแรกก่อนภาพ (แนว B131) — ภาพดันปุ่มพ้นจอ = หดภาพพอให้ปุ่มขึ้น · หดถึงขั้นต่ำแล้วยังพ้น = ถอดภาพ
+// เฉพาะเมื่อภาพเป็นต้นเหตุ (ข้อ 493):ถอดภาพแล้วปุ่มก็ยังพ้นจอ (หัวเว็บ + แถบสถานะ + เรื่องยาวกินจอเอง) = คงภาพเต็มขนาด
+// ขอบล่างของจอแรก = ขอบบนเมนูล่าง (ลอยทับเนื้อการ์ด) · วัดเป็นพิกัดหน้า ไม่ขึ้นกับระยะเลื่อนตอนวาด
+// data-fit บอกผลให้ตัววัดนับได้: full · long (ปุ่มพ้นจอเพราะเรื่องยาว คงภาพ) · shrunk · hid
+const PIC_MIN_H = 48;
+function fitPic(box) {
+  const pic = box.querySelector('.cpic');
+  if (!pic) return;
+  box.dataset.pic = pic.dataset.pic;
+  const over = () => {
+    const last = [...box.querySelectorAll('.choices button')].filter((b) => b.offsetParent).pop();
+    if (!last) return 0;
+    const nav = document.querySelector('.mnav');
+    return last.getBoundingClientRect().bottom + scrollY - (nav ? nav.getBoundingClientRect().top : innerHeight);
+  };
+  const cut = over();
+  box.dataset.fit = 'full';
+  box.dataset.cut = Math.round(cut);
+  if (cut <= 0) return;
+  pic.hidden = true;
+  const bare = over();
+  pic.hidden = false;
+  if (bare > 0) {
+    box.dataset.fit = 'long';
+    return;
+  }
+  const { width, height } = pic.getBoundingClientRect();
+  const keep = height - cut - 1;
+  if (keep >= PIC_MIN_H) {
+    pic.style.width = `${Math.floor((width * keep) / height)}px`;
+    box.dataset.fit = 'shrunk';
+    if (over() <= 0) return;
+  }
+  pic.remove();
+  box.dataset.fit = 'hid';
+}
 function artDraw(ctx, parts, x, y, size) {
   ctx.save();
   ctx.translate(x, y);
@@ -2518,7 +2577,10 @@ function render(card) {
       if (bg) body.classList.add('has-bg'), body.append(bg);
     } else {
       const scene = SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
+      // ภาพประจำการ์ด (ใบ 210): ภาพยุค/ฉากมาก่อน · การ์ดผลยังใช้ภาพหมวด (ข้อ 492)
+      const pic = !scene && card.kind === 'event' && cardPic(card.id);
       if (scene) body.append(scene);
+      else if (pic) body.append(pic);
       else if (card.kind === 'result' && !card.isekai && !hasScene(prevBase) && !digestRest(card).length) body.append(catSvg(resultArtCat(card)));
     }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
@@ -2611,8 +2673,10 @@ function render(card) {
   }
   box.append(body, choices, ...after);
   root.append(panels(box, false), lifeMenu(card, box));
+  fitPic(box);
   shelfDot();
   fxCard(box, card);
+  askArt();
 }
 
 // กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)

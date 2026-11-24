@@ -18,4 +18,5 @@ docs/focus.html    merge=build
 docs/play-data.js  merge=build
 docs/play.js       merge=build
 docs/sw.js         merge=build
+docs/play-art.js   merge=build
 docs/fonts/fonts.css merge=build

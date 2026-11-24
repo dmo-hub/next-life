@@ -32,7 +32,8 @@ import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { docsScope, injectDocsLayout, pageKind, DOCS_LAYOUT_START, DOCS_LAYOUT_END } from '../src/site/docs-layout.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
-import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
+import { PLAY_FILES, playAssets, playScripts, swJs, artSrc } from '../src/site/play-files.mjs';
+import { loadCardPics, cardPicText, cardPicHash, cardPicGaps, cardPicFiles } from '../src/site/card-art.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -656,6 +657,7 @@ check('ภาพหมวดการ์ดผลครบ 10 หมวด · �
 // ตัวควบคุม: หน้าแบบเดิม (ฝังสคริปต์) เกินเพดาน · สลับลำดับสคริปต์ · เลขรุ่นอื่น · ตัดโครงหน้าเปิด ⇒ ต้องถูกจับทุกแบบ
 {
   const PLAY_MAX = 100 * 1024;
+  const artHash = cardPicHash(cardPicText(await loadCardPics()));
   const html = read('play.html');
   const bytes = (s) => Buffer.byteLength(s, 'utf8');
   const fontFiles = playFonts().map(([, , f]) => `${FONT_DIR}${f}.woff2`);
@@ -664,7 +666,7 @@ check('ภาพหมวดการ์ดผลครบ 10 หมวด · �
     ...(bytes(h) > PLAY_MAX ? [`play.html ${bytes(h).toLocaleString('en-US')} B เกิน`] : []),
     ...(!h.includes(playScripts(v)) ? ['สคริปต์ไม่ตรงชุด (ลำดับ/ ?v= / defer)'] : []),
     ...(h.indexOf(playAssets(v)[0]) > h.indexOf(playAssets(v)[1]) ? ['ข้อมูลมาหลังโค้ด'] : []),
-    ...(toLf(sw) !== swJs(v, fontFiles) ? ['sw.js ไม่ตรงรุ่น/ชุดไฟล์'] : []),
+    ...(toLf(sw) !== swJs(v, fontFiles, artHash) ?['sw.js ไม่ตรงรุ่น/ชุดไฟล์'] : []),
     ...(!/<header class="logo">/.test(h.slice(0, h.indexOf('<script'))) || !/<button[^>]*>[^<]+<\/button>/.test(shellOf(h)) ? ['ไม่มีหัว/ปุ่มเริ่มก่อนสคริปต์'] : []),
   ];
   const bootClears = /function boot\(\) \{\s*(?:\/\/[^\n]*\n\s*)*root\.replaceChildren\(\);/.test(appSrc);
@@ -672,11 +674,50 @@ check('ภาพหมวดการ์ดผลครบ 10 หมวด · �
   const ctl = {
     'หน้าแบบฝังสคริปต์': splitGap(`${html}<script>${read(PLAY_FILES.data)}${read(PLAY_FILES.app)}</script>`).length > 0,
     'สลับลำดับ': splitGap(html.replace(playScripts(ver.version), playScripts(ver.version).split('\n').slice(0, 2).reverse().join('\n') + '\n' + playScripts(ver.version).split('\n')[2])).length > 0,
-    'เลขรุ่นอื่น': splitGap(html, 'v0.0.00').length > 0 && splitGap(html, ver.version, swJs('v0.0.00', fontFiles)).length > 0,
+    'เลขรุ่นอื่น': splitGap(html, 'v0.0.00').length > 0 && splitGap(html, ver.version, swJs('v0.0.00', fontFiles, artHash)).length > 0,
     'ตัดโครงหน้าเปิด': splitGap(html.replace(/(<main id="app">)[\s\S]*?(<\/main>)/, '$1$2')).length > 0,
   };
   const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
   check('หน้าเล่นแยกไฟล์: HTML ≤ 100 KB · สคริปต์ ?v=เลขรุ่น ข้อมูลก่อนโค้ด · service worker ชุดเดียวกัน · หัว + ปุ่มเริ่มขึ้นก่อนสคริปต์', miss.length || ctlBad.length, ` play.html ${bytes(html).toLocaleString('en-US')} B · ${PLAY_FILES.data} ${bytes(read(PLAY_FILES.data)).toLocaleString('en-US')} B · ${PLAY_FILES.app} ${bytes(read(PLAY_FILES.app)).toLocaleString('en-US')} B${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
+}
+
+// 9b3) ภาพประจำการ์ด (ใบ 210 · ข้อ 492): play-art.js ตรงภาพใน src/ui/cardpics · play.js ขอไฟล์ตาม hash เนื้อภาพ · ภาพไม่อยู่ CORE ของ service worker · sw แคชภาพแยกตาม hash
+// · ทุก id ภาพมีการ์ดจริง · ชิ้นวาดได้ · แฟ้มที่ชื่อตรงหมวด id (kid.mjs = kid_*) ต้องครบทุกใบในหมวด · หน้าเล่นวาดภาพจริง เรียกกฎ 429 และขอไฟล์ภาพ
+// การ์ดที่ยังไม่มีภาพรายงานเป็นตัวเลข ไม่ตก — วาดทีละหมวด (ข้อ 492 ④)
+// ตัวควบคุม: id ภาพปลอม · ชิ้นบทบาทผิด · ถอดภาพ 1 ใบจากหมวดที่มีแฟ้ม · ภาพเข้า CORE · hash เก่า · ถอดการวาดจาก app.mjs ⇒ ต้องถูกจับ
+{
+  const pics = await loadCardPics();
+  const text = cardPicText(pics);
+  const hash = cardPicHash(text);
+  const ids = [...content.events, ...content.isekai].map((e) => e.id);
+  const cats = new Set(ids.map((id) => id.split('_')[0]));
+  const fileCats = cardPicFiles().map((f) => f.replace(/\.mjs$/, '')).filter((c) => cats.has(c));
+  const catHoles = (p) => fileCats.flatMap((c) => ids.filter((id) => id.startsWith(`${c}_`) && !(id in p)));
+  const core = (sw) => JSON.parse(sw.match(/^const CORE = (.*);$/m)?.[1] ?? '[]');
+  const artGap = (file, app, sw) => [
+    ...(file !== text ? [`${PLAY_FILES.art} ไม่ตรงภาพใน src/ui/cardpics (ยังไม่ build)`] : []),
+    ...(!app.includes(`const ART_SRC = ${JSON.stringify(artSrc(hash))};`) ? ['play.js ไม่ได้ขอไฟล์ภาพตาม hash ปัจจุบัน'] : []),
+    ...(core(sw).some((f) => f.startsWith(PLAY_FILES.art)) ? ['ภาพอยู่ใน CORE ของ service worker'] : []),
+    ...(!sw.includes(`const ART = "nl-art-${hash}";`) ? ['sw.js ไม่มีแคชภาพตาม hash'] : []),
+  ];
+  const drawn = (src) => /const pic = !scene && card\.kind === 'event' && cardPic\(card\.id\);/.test(src) && /else if \(pic\) body\.append\(pic\);/.test(src) && /\n  fitPic\(box\);/.test(src) && /\n  askArt\(\);/.test(src);
+  const gaps = cardPicGaps(pics, ids);
+  const appNow = read(PLAY_FILES.app), swNow = read(PLAY_FILES.sw);
+  const holes = catHoles(pics);
+  const miss = [...gaps.orphan.map((id) => `ภาพไม่มีการ์ด ${id}`), ...gaps.broken.map((id) => `ชิ้นพัง ${id}`), ...holes.map((id) => `หมวดมีแฟ้มแต่ไม่มีภาพ ${id}`), ...artGap(read(PLAY_FILES.art), appNow, swNow), ...(drawn(appSrc) ? [] : ['app.mjs ไม่วาดภาพการ์ด/ไม่เรียก fitPic/askArt'])];
+  const one = Object.keys(pics)[0];
+  const ctl = {
+    'id ภาพปลอม': cardPicGaps({ ...pics, no_such_card: [['s', 'M0 0h1']] }, ids).orphan.includes('no_such_card'),
+    'ชิ้นบทบาทผิด': cardPicGaps({ x: [['zz', 'M0 0']] }, ['x']).broken.length === 1 && cardPicGaps({ x: [[['s', 'M0 0']]] }, ['x']).broken.length === 1,
+    'ถอดภาพในหมวด': !one || catHoles(Object.fromEntries(Object.entries(pics).filter(([id]) => id !== one))).includes(one),
+    'ภาพเข้า CORE': artGap(text, appNow, swNow.replace(/^const CORE = \[/m, `const CORE = ["${artSrc(hash)}",`)).length > 0,
+    'hash เก่า': artGap(text, appNow.replace(artSrc(hash), artSrc('0000000000')), swNow).length > 0,
+    'ถอดการวาด': !drawn(appSrc.replace('else if (pic) body.append(pic);', '')),
+  };
+  const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
+  const size = Buffer.byteLength(text, 'utf8');
+  check('ภาพประจำการ์ด: ทุกภาพมีการ์ด วาดได้ · หมวดที่มีแฟ้มครบ · ไฟล์แยกตาม hash ไม่อยู่ CORE · หน้าเล่นวาด+กฎ 429', miss.length || ctlBad.length,
+    ` ภาพ ${Object.keys(pics).length}/${ids.length} ใบ (ยังไม่มี ${gaps.missing.length}) · แฟ้ม ${cardPicFiles().join(',') || '-'} · ${PLAY_FILES.art} ${size.toLocaleString('en-US')} B${miss.length ? ` · ${miss.slice(0, 5).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
 }
 
 // 10) เดโมการ์ดบนหน้ารวมการ์ด (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
