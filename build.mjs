@@ -1,10 +1,10 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
 import { loadContent } from './src/node/load.mjs';
 import { buildSite, toLf } from './src/site/build.mjs';
 import { readVersion, versionLines, releaseLog, notesLines } from './src/site/facts.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, fontsCss, playFonts } from './src/site/fonts.mjs';
-import { PLAY_FILES, playScripts, swJs, artSrc } from './src/site/play-files.mjs';
-import { loadCardPics, cardPicText, cardPicHash } from './src/site/card-art.mjs';
+import { PLAY_FILES, ART_FILES, artFile, playScripts, swJs } from './src/site/play-files.mjs';
+import { loadCardPics, cardArtBuild } from './src/site/card-art.mjs';
 
 const read = (p) => readFileSync(new URL(p, import.meta.url), 'utf8');
 
@@ -46,11 +46,12 @@ const out = (rel, text) => {
   if (!existsSync(url) || readFileSync(url, 'utf8') !== next) writeFileSync(url, next);
 };
 out(PLAY_FILES.data, `self.NL_CONTENT = ${JSON.stringify(content).replace(/</g, '\\u003c')};\n`);
-// ภาพการ์ด (ใบ 210): ไฟล์แยก · play.js รู้แค่ชื่อไฟล์ + hash
-const artText = cardPicText(await loadCardPics());
-const artHash = cardPicHash(artText);
-out(PLAY_FILES.art, artText);
-out(PLAY_FILES.app, `(() => {\n${versionLines(ver)}${notesLines(notes)}const ART_SRC = ${JSON.stringify(artSrc(artHash))};\nconst CONTENT = self.NL_CONTENT;\n${code}\n})();\n`);
+// ภาพการ์ด (ใบ 210 · ข้อ 494): ไฟล์แยกตามวัย · play.js รู้แค่วัย → ชื่อไฟล์ + hash · ไฟล์ภาพชื่ออื่นที่ค้างใน docs/ (play-art.js ก่อนแบ่ง) ลบทิ้ง
+const art = cardArtBuild(await loadCardPics(), [...content.events, ...content.isekai]);
+for (const g of art.groups) out(artFile(g.id), g.text);
+for (const f of readdirSync(new URL('./docs/', import.meta.url))) if (/^play-art.*\.js$/.test(f) && !ART_FILES.includes(f)) rmSync(new URL(`./docs/${f}`, import.meta.url));
+const artHash = art.hash;
+out(PLAY_FILES.app, `(() => {\n${versionLines(ver)}${notesLines(notes)}const ART_SRC = ${JSON.stringify(art.srcByStage)};\nconst CONTENT = self.NL_CONTENT;\n${code}\n})();\n`);
 
 // ฟอนต์ไฟล์ในเว็บชุดเดียวทุกหน้า (ข้อ 205) · ต้นฉบับ src/ui/fonts ตัดเหลือไทยทั้งบล็อก + ASCII + เครื่องหมายที่เกมใช้ (src/ui/fonts/README.md)
 // ภาพแชร์ (canvas) รอ document.fonts.load ก่อนวาด ⇒ ได้ Srisakdi จริงแม้ฟอนต์ไม่ได้ฝังในหน้าแล้ว
@@ -64,6 +65,6 @@ out(FONT_CSS, fontsCss(FONTS, ''));
 const playFaces = fontsCss(playFonts(), FONT_DIR).trimEnd();
 out(PLAY_FILES.sw, swJs(ver.version, playFonts().map(([, , f]) => `${FONT_DIR}${f}.woff2`), artHash));
 writeFileSync(new URL('./docs/play.html', import.meta.url), toLf(read('./src/ui/template.html').replace('/*__FONTS__*/', () => playFaces).replace('<!--__SCRIPTS__-->', () => playScripts(ver.version))));
-console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร · ${PLAY_FILES.art} ${Buffer.byteLength(artText).toLocaleString('en-US')} B`);
+console.log(`docs/play.html: ${content.events.length} เหตุการณ์ · ข้อมูลยุค ${JSON.stringify(content.era).length.toLocaleString('en-US')} ตัวอักษร · ภาพการ์ด ${art.groups.map((g) => `${artFile(g.id)} ${g.count} ภาพ ${Buffer.byteLength(g.text).toLocaleString('en-US')} B`).join(' · ')}`);
 const site = buildSite(content);
 console.log(`docs/ หน้าเว็บ: ${site.pages.join(' · ')} · ${site.facts.version}`);

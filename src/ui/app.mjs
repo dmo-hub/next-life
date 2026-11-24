@@ -2101,18 +2101,22 @@ function artSvg(cls, w, h, parts) {
   for (const p of parts) svg.append(svgEl('path', { d: p.d, fill: p.fill ?? 'none', ...(p.stroke && { stroke: p.stroke, 'stroke-width': p.w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }) }));
   return svg;
 }
-// ภาพประจำการ์ด (ใบ 210 · ข้อ 410 492): ข้อมูลอยู่ไฟล์แยกที่ขอหลังการ์ดแรก — ยังไม่มา/โหลดไม่ได้ = การ์ดไม่มีภาพ ไม่รอ
+// ภาพประจำการ์ด (ใบ 210 · ข้อ 410 492 494): ข้อมูลอยู่ไฟล์แยกตามวัย ขอหลังการ์ดแรก — ยังไม่มา/โหลดไม่ได้ = การ์ดไม่มีภาพ ไม่รอ
+// ขอไฟล์ของวัยตอนนี้ + วัยของอีก ART_AHEAD ปี ⇒ ไฟล์วัยถัดไปมาถึงก่อนข้ามวัย · ไฟล์ที่ได้แล้วเก็บไว้ (การ์ดนัดย้อนของวัยก่อนยังมีภาพ)
 // ไม่วาดใบที่กำลังเปิดซ้ำเมื่อภาพมาถึง: ภาพโผล่กลางการอ่านดันข้อความกับปุ่มกระโดด · สีของแต่ละบทบาทอยู่ CSS (.cp .r-*)
+const ART_AHEAD = 3;
 let cardArt = null;
-let artAsked = false;
-function askArt() {
-  if (artAsked) return;
-  artAsked = true;
-  const sc = document.createElement('script');
-  sc.src = ART_SRC;
-  sc.async = true;
-  sc.onload = () => (cardArt = self.NL_CARD_ART ?? null);
-  document.head.append(sc);
+const artAsked = new Set();
+function askArt(age) {
+  for (const src of [ART_SRC[stageOf(age)], ART_SRC[stageOf(age + ART_AHEAD)]]) {
+    if (!src || artAsked.has(src)) continue;
+    artAsked.add(src);
+    const sc = document.createElement('script');
+    sc.src = src;
+    sc.async = true;
+    sc.onload = () => (cardArt = self.NL_CARD_ART ?? null);
+    document.head.append(sc);
+  }
 }
 function cardPic(id) {
   const parts = cardArt?.pics?.[id];
@@ -2676,7 +2680,7 @@ function render(card) {
   fitPic(box);
   shelfDot();
   fxCard(box, card);
-  askArt();
+  askArt(st.age);
 }
 
 // กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)

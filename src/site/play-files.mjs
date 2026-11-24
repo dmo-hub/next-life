@@ -1,11 +1,20 @@
 // ไฟล์ของหน้าเล่นที่ build เขียน (ui-redo 96 · ข้อ 203 204): ชื่อคงที่ เปลี่ยนรุ่นแค่ ?v= — docs/ ไม่มีไฟล์ชื่อ hash ค้าง และสอง branch merge แล้วได้ชื่อเดียวกัน
 // ทุกไฟล์ในนี้ใส่ .gitattributes merge=build (site-check ตรวจ)
-export const PLAY_FILES = { data: 'play-data.js', app: 'play.js', sw: 'sw.js', art: 'play-art.js' };
+export const PLAY_FILES = { data: 'play-data.js', app: 'play.js', sw: 'sw.js' };
 
 const q = (version) => `?v=${encodeURIComponent(version)}`;
 export const playAssets = (version) => [`${PLAY_FILES.data}${q(version)}`, `${PLAY_FILES.app}${q(version)}`];
-// ภาพการ์ด (ใบ 210 · ข้อ 492) ต่อ ?h=hash เนื้อภาพแทนเลขรุ่น · เกมขอไฟล์นี้เองหลังการ์ดแรก ไม่อยู่ในสคริปต์ของหน้า
-export const artSrc = (hash) => `${PLAY_FILES.art}?h=${hash}`;
+// ภาพการ์ด (ใบ 210 · ข้อ 492 494) แบ่งไฟล์ตามวัยของการ์ด (stage) — ผู้เล่นโหลดเฉพาะวัยที่ถึง + วัยถัดไปก่อนข้ามวัยไม่กี่ปี ไม่จ่ายภาพทั้งชีวิตตั้งแต่การ์ดแรก
+// การ์ดที่ไม่มีวัยหรือวัยไม่อยู่ในรายการ (ต่างโลก) ตกกลุ่มท้าย · ต่อ ?h=hash เนื้อภาพของไฟล์นั้นแทนเลขรุ่น · เกมขอเอง ไม่อยู่ในสคริปต์ของหน้า
+export const ART_GROUPS = [
+  { id: 'young', stages: ['เด็ก', 'วัยรุ่น'] },
+  { id: 'adult', stages: ['หนุ่มสาว', 'ทำงาน'] },
+  { id: 'late', stages: ['กลางคน', 'ชรา', 'ระหว่างชาติ'] },
+];
+export const artGroupOf = (stage) => (ART_GROUPS.find((g) => g.stages.includes(stage)) ?? ART_GROUPS.at(-1)).id;
+export const artFile = (group) => `play-art-${group}.js`;
+export const ART_FILES = ART_GROUPS.map((g) => artFile(g.id));
+export const artSrc = (group, hash) => `${artFile(group)}?h=${hash}`;
 const artCache = (hash) => `nl-art-${hash}`;
 
 // defer: สคริปต์รันตามลำดับหลังอ่าน HTML จบ ⇒ หัว + โครงหน้าเปิดขึ้นจอก่อน · ข้อมูลต้องมาก่อนโค้ด
@@ -47,7 +56,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   // ภาพการ์ด: ชื่อไฟล์มี hash แล้ว เจอในแคชภาพ = ของถูกรุ่น ไม่ต้องขอซ้ำ
-  if (new URL(req.url).pathname.endsWith('/${PLAY_FILES.art}')) {
+  if (/\\/play-art-[a-z]+\\.js$/.test(new URL(req.url).pathname)) {
     e.respondWith(caches.open(ART).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
       if (res.ok && res.type === 'basic') c.put(req, res.clone());
       return res;

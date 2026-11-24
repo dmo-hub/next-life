@@ -32,8 +32,8 @@ import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { docsScope, injectDocsLayout, pageKind, DOCS_LAYOUT_START, DOCS_LAYOUT_END } from '../src/site/docs-layout.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
-import { PLAY_FILES, playAssets, playScripts, swJs, artSrc } from '../src/site/play-files.mjs';
-import { loadCardPics, cardPicText, cardPicHash, cardPicGaps, cardPicFiles } from '../src/site/card-art.mjs';
+import { PLAY_FILES, ART_FILES, ART_GROUPS, artFile, artGroupOf, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
+import { loadCardPics, cardArtBuild, cardStages, cardPicGaps, cardPicFiles } from '../src/site/card-art.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -657,7 +657,7 @@ check('ภาพหมวดการ์ดผลครบ 10 หมวด · �
 // ตัวควบคุม: หน้าแบบเดิม (ฝังสคริปต์) เกินเพดาน · สลับลำดับสคริปต์ · เลขรุ่นอื่น · ตัดโครงหน้าเปิด ⇒ ต้องถูกจับทุกแบบ
 {
   const PLAY_MAX = 100 * 1024;
-  const artHash = cardPicHash(cardPicText(await loadCardPics()));
+  const artHash = cardArtBuild(await loadCardPics(), [...content.events, ...content.isekai]).hash;
   const html = read('play.html');
   const bytes = (s) => Buffer.byteLength(s, 'utf8');
   const fontFiles = playFonts().map(([, , f]) => `${FONT_DIR}${f}.woff2`);
@@ -681,43 +681,64 @@ check('ภาพหมวดการ์ดผลครบ 10 หมวด · �
   check('หน้าเล่นแยกไฟล์: HTML ≤ 100 KB · สคริปต์ ?v=เลขรุ่น ข้อมูลก่อนโค้ด · service worker ชุดเดียวกัน · หัว + ปุ่มเริ่มขึ้นก่อนสคริปต์', miss.length || ctlBad.length, ` play.html ${bytes(html).toLocaleString('en-US')} B · ${PLAY_FILES.data} ${bytes(read(PLAY_FILES.data)).toLocaleString('en-US')} B · ${PLAY_FILES.app} ${bytes(read(PLAY_FILES.app)).toLocaleString('en-US')} B${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
 }
 
-// 9b3) ภาพประจำการ์ด (ใบ 210 · ข้อ 492): play-art.js ตรงภาพใน src/ui/cardpics · play.js ขอไฟล์ตาม hash เนื้อภาพ · ภาพไม่อยู่ CORE ของ service worker · sw แคชภาพแยกตาม hash
-// · ทุก id ภาพมีการ์ดจริง · ชิ้นวาดได้ · แฟ้มที่ชื่อตรงหมวด id (kid.mjs = kid_*) ต้องครบทุกใบในหมวด · หน้าเล่นวาดภาพจริง เรียกกฎ 429 และขอไฟล์ภาพ
+// 9b3) ภาพประจำการ์ด (ใบ 210 · ข้อ 492 494): ไฟล์ภาพแยกตามวัย play-art-<วัย>.js ตรงภาพใน src/ui/cardpics · ภาพอยู่ไฟล์ตรงวัยของการ์ด (stage)
+// · play.js รู้วัย → ไฟล์ตาม hash เนื้อภาพ · ภาพไม่อยู่ CORE ของ service worker · sw แคชภาพแยกตาม hash รวม · ไม่มีไฟล์ภาพชื่ออื่นค้างใน docs/
+// · ทุก id ภาพมีการ์ดจริง · ชิ้นวาดได้ · แฟ้มที่ชื่อตรงหมวด id (kid.mjs = kid_*) ต้องครบทุกใบในหมวด · หน้าเล่นวาดภาพจริง เรียกกฎ 429 และขอไฟล์ตามอายุ
 // การ์ดที่ยังไม่มีภาพรายงานเป็นตัวเลข ไม่ตก — วาดทีละหมวด (ข้อ 492 ④)
-// ตัวควบคุม: id ภาพปลอม · ชิ้นบทบาทผิด · ถอดภาพ 1 ใบจากหมวดที่มีแฟ้ม · ภาพเข้า CORE · hash เก่า · ถอดการวาดจาก app.mjs ⇒ ต้องถูกจับ
+// ตัวควบคุม: id ภาพปลอม · ชิ้นบทบาทผิด · ถอดภาพ 1 ใบจากหมวดที่มีแฟ้ม · ภาพเข้า CORE · hash เก่า · ภาพผิดไฟล์วัย · ไฟล์ภาพเก่าค้าง · ถอดการวาด ⇒ ต้องถูกจับ
 {
   const pics = await loadCardPics();
-  const text = cardPicText(pics);
-  const hash = cardPicHash(text);
-  const ids = [...content.events, ...content.isekai].map((e) => e.id);
+  const cards = [...content.events, ...content.isekai];
+  const art = cardArtBuild(pics, cards);
+  const stage = cardStages(cards);
+  const ids = cards.map((e) => e.id);
   const cats = new Set(ids.map((id) => id.split('_')[0]));
   const fileCats = cardPicFiles().map((f) => f.replace(/\.mjs$/, '')).filter((c) => cats.has(c));
   const catHoles = (p) => fileCats.flatMap((c) => ids.filter((id) => id.startsWith(`${c}_`) && !(id in p)));
   const core = (sw) => JSON.parse(sw.match(/^const CORE = (.*);$/m)?.[1] ?? '[]');
-  const artGap = (file, app, sw) => [
-    ...(file !== text ? [`${PLAY_FILES.art} ไม่ตรงภาพใน src/ui/cardpics (ยังไม่ build)`] : []),
-    ...(!app.includes(`const ART_SRC = ${JSON.stringify(artSrc(hash))};`) ? ['play.js ไม่ได้ขอไฟล์ภาพตาม hash ปัจจุบัน'] : []),
-    ...(core(sw).some((f) => f.startsWith(PLAY_FILES.art)) ? ['ภาพอยู่ใน CORE ของ service worker'] : []),
-    ...(!sw.includes(`const ART = "nl-art-${hash}";`) ? ['sw.js ไม่มีแคชภาพตาม hash'] : []),
+  const docsArt = () => readdirSync(docs).filter((f) => /^play-art.*\.js$/.test(f)).sort();
+  // ภาพในไฟล์วัย g ที่การ์ดของมันไม่ได้อยู่วัย g — อ่านจากข้อความไฟล์จริงแบบที่หน้าเล่นอ่าน
+  const misplaced = (files) => Object.entries(files).flatMap(([g, text]) => {
+    const self = {};
+    new Function('self', text)(self);
+    return Object.keys(self.NL_CARD_ART?.pics ?? {}).filter((id) => artGroupOf(stage.get(id)) !== g).map((id) => `${id} อยู่ ${artFile(g)}`);
+  });
+  const fileNow = Object.fromEntries(ART_GROUPS.map((g) => [g.id, existsSync(new URL(artFile(g.id), docs)) ? read(artFile(g.id)) : '']));
+  const artGap = (files, app, sw, list) => [
+    ...art.groups.filter((g) => files[g.id] !== g.text).map((g) => `${artFile(g.id)} ไม่ตรงภาพใน src/ui/cardpics (ยังไม่ build)`),
+    ...misplaced(files),
+    ...(!app.includes(`const ART_SRC = ${JSON.stringify(art.srcByStage)};`) ? ['play.js ไม่ได้ขอไฟล์ภาพตามวัย/hash ปัจจุบัน'] : []),
+    ...(core(sw).some((f) => f.startsWith('play-art')) ? ['ภาพอยู่ใน CORE ของ service worker'] : []),
+    ...(!sw.includes(`const ART = "nl-art-${art.hash}";`) ? ['sw.js ไม่มีแคชภาพตาม hash'] : []),
+    ...list.filter((f) => !ART_FILES.includes(f)).map((f) => `ไฟล์ภาพค้าง ${f}`),
   ];
-  const drawn = (src) => /const pic = !scene && card\.kind === 'event' && cardPic\(card\.id\);/.test(src) && /else if \(pic\) body\.append\(pic\);/.test(src) && /\n  fitPic\(box\);/.test(src) && /\n  askArt\(\);/.test(src);
+  const drawn = (src) => /const pic = !scene && card\.kind === 'event' && cardPic\(card\.id\);/.test(src) && /else if \(pic\) body\.append\(pic\);/.test(src) && /\n  fitPic\(box\);/.test(src) && /\n  askArt\(st\.age\);/.test(src) && /ART_SRC\[stageOf\(age\)\], ART_SRC\[stageOf\(age \+ ART_AHEAD\)\]/.test(src);
   const gaps = cardPicGaps(pics, ids);
   const appNow = read(PLAY_FILES.app), swNow = read(PLAY_FILES.sw);
   const holes = catHoles(pics);
-  const miss = [...gaps.orphan.map((id) => `ภาพไม่มีการ์ด ${id}`), ...gaps.broken.map((id) => `ชิ้นพัง ${id}`), ...holes.map((id) => `หมวดมีแฟ้มแต่ไม่มีภาพ ${id}`), ...artGap(read(PLAY_FILES.art), appNow, swNow), ...(drawn(appSrc) ? [] : ['app.mjs ไม่วาดภาพการ์ด/ไม่เรียก fitPic/askArt'])];
+  const miss = [...gaps.orphan.map((id) => `ภาพไม่มีการ์ด ${id}`), ...gaps.broken.map((id) => `ชิ้นพัง ${id}`), ...holes.map((id) => `หมวดมีแฟ้มแต่ไม่มีภาพ ${id}`), ...artGap(fileNow, appNow, swNow, docsArt()), ...(drawn(appSrc) ? [] : ['app.mjs ไม่วาดภาพการ์ด/ไม่เรียก fitPic/askArt ตามอายุ'])];
   const one = Object.keys(pics)[0];
+  const [g0, g1] = art.groups;
+  const moved = one && (() => {
+    const from = art.groups.find((g) => fileNow[g.id].includes(`"${one}":`));
+    const to = art.groups.find((g) => g !== from);
+    const piece = `"${one}":${JSON.stringify(pics[one])}`;
+    const cut = (t) => (t.includes(`${piece},`) ? t.replace(`${piece},`, '') : t.replace(`,${piece}`, '').replace(piece, ''));
+    return { ...fileNow, [from.id]: cut(fileNow[from.id]), [to.id]: fileNow[to.id].replace('pics, {', `pics, {${piece},`).replace(',})', '})') };
+  })();
   const ctl = {
     'id ภาพปลอม': cardPicGaps({ ...pics, no_such_card: [['s', 'M0 0h1']] }, ids).orphan.includes('no_such_card'),
     'ชิ้นบทบาทผิด': cardPicGaps({ x: [['zz', 'M0 0']] }, ['x']).broken.length === 1 && cardPicGaps({ x: [[['s', 'M0 0']]] }, ['x']).broken.length === 1,
     'ถอดภาพในหมวด': !one || catHoles(Object.fromEntries(Object.entries(pics).filter(([id]) => id !== one))).includes(one),
-    'ภาพเข้า CORE': artGap(text, appNow, swNow.replace(/^const CORE = \[/m, `const CORE = ["${artSrc(hash)}",`)).length > 0,
-    'hash เก่า': artGap(text, appNow.replace(artSrc(hash), artSrc('0000000000')), swNow).length > 0,
-    'ถอดการวาด': !drawn(appSrc.replace('else if (pic) body.append(pic);', '')),
+    'ภาพเข้า CORE': artGap(fileNow, appNow, swNow.replace(/^const CORE = \[/m, `const CORE = ["${g0.src}",`), ART_FILES).length > 0,
+    'hash เก่า': artGap(fileNow, appNow.replace(g1.src, artFile(g1.id) + '?h=0000000000'), swNow, ART_FILES).length > 0,
+    'ภาพผิดไฟล์วัย': !one || misplaced(moved).some((x) => x.startsWith(`${one} `)),
+    'ไฟล์ภาพเก่าค้าง': artGap(fileNow, appNow, swNow, [...ART_FILES, 'play-art.js']).length > 0,
+    'ถอดการวาด': !drawn(appSrc.replace('else if (pic) body.append(pic);', '')) && !drawn(appSrc.replace('askArt(st.age);', 'askArt();')),
   };
   const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
-  const size = Buffer.byteLength(text, 'utf8');
-  check('ภาพประจำการ์ด: ทุกภาพมีการ์ด วาดได้ · หมวดที่มีแฟ้มครบ · ไฟล์แยกตาม hash ไม่อยู่ CORE · หน้าเล่นวาด+กฎ 429', miss.length || ctlBad.length,
-    ` ภาพ ${Object.keys(pics).length}/${ids.length} ใบ (ยังไม่มี ${gaps.missing.length}) · แฟ้ม ${cardPicFiles().join(',') || '-'} · ${PLAY_FILES.art} ${size.toLocaleString('en-US')} B${miss.length ? ` · ${miss.slice(0, 5).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
+  check('ภาพประจำการ์ด: ทุกภาพมีการ์ด วาดได้ · หมวดที่มีแฟ้มครบ · ไฟล์แยกตามวัย ภาพตรงวัย · hash ไม่อยู่ CORE · หน้าเล่นวาด+กฎ 429 ขอไฟล์ตามอายุ', miss.length || ctlBad.length,
+    ` ภาพ ${Object.keys(pics).length}/${ids.length} ใบ (ยังไม่มี ${gaps.missing.length}) · แฟ้ม ${cardPicFiles().join(',') || '-'} · ${art.groups.map((g) => `${artFile(g.id)} ${g.count} ภาพ ${Buffer.byteLength(g.text, 'utf8').toLocaleString('en-US')} B`).join(' · ')}${miss.length ? ` · ${miss.slice(0, 5).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
 }
 
 // 10) เดโมการ์ดบนหน้ารวมการ์ด (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
@@ -807,7 +828,7 @@ check('หน้าเฉลยวาดทุกเงื่อนไขแล�
 // merge=build เก็บไฟล์ฝั่งตัวเองตอน merge — ใส่กับหน้าเขียนมือ = เนื้อที่อีก branch เขียนหายเงียบ · หน้าสร้างใหม่ที่ไม่ได้ใส่ = ชนทุก merge
 const attrs = readFileSync(new URL('../.gitattributes', import.meta.url), 'utf8').split(/\r?\n/).map((l) => l.trim().split(/\s+/));
 const mergeBuild = (lines) => new Set(lines.filter(([p, ...w]) => !p.startsWith('#') && w.includes('merge=build')).map(([p]) => p));
-const wantBuild = [...['play', ...GEN_PAGES.map(([name]) => name)].map((n) => `docs/${n}.html`), ...[...Object.values(PLAY_FILES), FONT_CSS].map((f) => `docs/${f}`)];
+const wantBuild = [...['play', ...GEN_PAGES.map(([name]) => name)].map((n) => `docs/${n}.html`), ...[...Object.values(PLAY_FILES), ...ART_FILES, FONT_CSS].map((f) => `docs/${f}`)];
 const sameSet = (got) => got.size === wantBuild.length && wantBuild.every((p) => got.has(p));
 const gotBuild = mergeBuild(attrs);
 const handBuild = FACT_PAGES.filter((n) => gotBuild.has(`docs/${n}.html`));
@@ -819,7 +840,7 @@ const lfOf = (lines) => lines.some(([p, ...w]) => p === 'docs/**/*.html' && w.in
 const lfAttr = lfOf(attrs);
 const lfCtl = !lfOf(attrs.filter(([, ...w]) => !w.includes('eol=lf')));
 const allHtml = (dir) => readdirSync(new URL(dir, docs), { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? allHtml(`${dir}${d.name}/`) : d.name.endsWith('.html') ? [`${dir}${d.name}`] : []));
-const htmlAll = [...allHtml(''), ...Object.values(PLAY_FILES), FONT_CSS];
+const htmlAll = [...allHtml(''), ...Object.values(PLAY_FILES), ...ART_FILES, FONT_CSS];
 const crPages = htmlAll.filter((f) => read(f).includes('\r'));
 check('.gitattributes merge=build ครบหน้าที่ build สร้าง ไม่มีหน้าเขียนมือ · docs/** eol=lf · html ทุกโฟลเดอร์ไม่มี CR', !sameSet(gotBuild) || handBuild.length || !ctlCaught || !lfAttr || !lfCtl || crPages.length,
   ` merge=build ${gotBuild.size}/${wantBuild.length}${handBuild.length ? ` หน้ามือ ${handBuild.join(',')}` : ''} · eol=lf ${lfAttr ? 'มี' : 'ไม่มี'} · มี CR ${crPages.length}/${htmlAll.length} หน้า${crPages.length ? ` (${crPages.slice(0, 5).join(',')})` : ''} · ตัวควบคุม merge=build ${ctlCaught ? 'จับได้' : 'จับไม่ได้'} · ถอด eol ${lfCtl ? 'จับได้' : 'จับไม่ได้'}`);
