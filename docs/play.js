@@ -431,7 +431,7 @@ function addMember(st, role, extra = {}) {
   // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
   const mate = role === 'spouse' || role === 'partner' || role === 'courter';
   const sex = extra.sex ?? (mate ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
-  const born0 = extra.born ?? (mate ? st.birthYear + (own ? makeRng(mixSeed(st.seed ^ 0x7a10, id)) : st.kinRng).int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
+  const born0 = extra.born ?? (extra.adopted ? year - extra.age : mate ? st.birthYear + (own ? makeRng(mixSeed(st.seed ^ 0x7a10, id)) : st.kinRng).int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
   // คนจีบต้องถึงเกณฑ์แฟน (≥18) เท่าผู้เล่น (ข้อ 309) · ย้ายปีเกิดหลังสุ่มแล้ว ไม่ดึงเลขเพิ่ม
   // คู่ ≥20 ตอนแต่ง (ข้อ 309 · K4 เจ้าของเคาะ 11-23): ปีเกิดที่สุ่มได้ถูกย้ายให้ไม่น้อยกว่าเกณฑ์ ไม่ดึงเลขสุ่มเพิ่ม · ปีเกิดที่ส่งมาเอง (ทายาท) ไม่แตะ
   const born = role === 'courter' ? Math.min(born0, year - COURT_MIN.partner) : role === 'spouse' && extra.born === undefined ? Math.min(born0, year - COURT_MIN.spouse) : born0;
@@ -450,7 +450,11 @@ function addMember(st, role, extra = {}) {
     m.order = st.kin.filter((x) => x.role === 'child').length + 1;
     // พ่อ/แม่อีกคน (ใบ 91 ข้อ 149 154 166): id ของคู่ปัจจุบันตอนลูกเกิด · null = ไม่มีคู่ (พ่อ/แม่เลี้ยงเดี่ยว) · ลูกจากเซฟเก่าไม่มีช่อง by = คิดย้อนจากปีเกิด (parentSpouseOf)
     m.by = spouseOf(st)?.id ?? null;
-    if (notMineBorn(st, m)) m.notMine = true;
+    // ลูกบุญธรรม (ใบ 99): รับมาเลี้ยงตอนอายุเด็ก adoptAge · เป็นลูกในบ้านและทายาทเหมือนลูกทั่วไป · ไม่ผ่านการทอยลูกคนอื่น (ไม่ได้เกิดช่วงคู่นอกใจ)
+    if (extra.adopted) {
+      m.adopted = true;
+      m.adoptAge = extra.age;
+    } else if (notMineBorn(st, m)) m.notMine = true;
   }
   if (role === 'grandchild') {
     // หลานจากเนื้อหา (รับหลานมาเลี้ยง) เป็นลูกของลูกที่ยังอยู่ ถ้ามี — ไม่มีลูกเหลือ = ไม่ระบุพ่อแม่
@@ -657,7 +661,7 @@ function applyFamily(st, c, care = 0) {
   for (const op of ops) {
     // คู่ใจทีละ 1 ตัว — เนื้อหากั้นด้วย when อยู่แล้ว ตรงนี้กันเผื่อหลุด (ไม่เพิ่มตัวที่สอง)
     if (op.add === 'pet' && livingOf(st, 'pet').length) continue;
-    if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : {});
+    if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : op.adopted ? { adopted: true, age: op.age } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
     if (op.leave) for (const m of livingOf(st, op.leave)) {
       m.left = true;
