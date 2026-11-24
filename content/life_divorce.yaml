@@ -67,7 +67,8 @@ events:
         effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
         merit: [{cat: neutral}]
 
-  # ← ผูกพันกับคู่ต่ำนาน
+  # ← ผูกพันกับคู่ต่ำนาน · แยกใบตามรุ่นที่แต่ง (ใบ 93 แก้ต่อ · เจ้าของเคาะทาง ข): คู่แต่งก่อน 2540 หย่าเกินกรอบ ~1/10 (ข้อ 488)
+  #   ใบ _old_01 ของรุ่นนั้นจึงมี weight ครึ่งหนึ่ง · engine ไม่มีตัวคูณน้ำหนักตามปีแต่ง ⇒ ใช้ใบคู่ข้อความเดียวกันแทน
   - id: fam_separate_work_01
     away_block: [abroad, monk]
     type: A
@@ -75,7 +76,40 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 4
-    when: {spouse: {status: together, bond: [38, 48], together: [3, 99]}}
+    when: {spouse: {status: together, bond: [38, 48], together: [3, 99], wed: [2540, 2650]}}
+    title: "กระเป๋าใบเดียวที่หน้าประตู"
+    text: "คุณสองคนอยู่ใต้หลังคาเดียวกันมาหลายปีโดยแทบไม่ได้คุยกัน วันนี้“{ชื่อคู่}”ยืนอยู่หน้าประตูพร้อมกระเป๋าใบเดียว บอกว่าขอไปอยู่ที่อื่นสักพักเพื่อคิดให้ออก"
+    choices:
+      - id: let_go
+        text: "ให้เขาไป ไม่รั้ง"
+        family: [{separate: spouse}]
+        effects: {happiness: -2, relations: -1}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: pack_myself
+        text: "บอกว่าคุณเป็นฝ่ายออกเอง"
+        family: [{separate: spouse}]
+        effects: {happiness: -2, money: {unit: income_x, amount: -0.3}}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: counselling
+        text: "ขอผู้ใหญ่ที่เคารพมาช่วยคุย"
+        family: [{bond: spouse, d: 10}]
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: ask_wait
+        text: "ขอให้เขารอ คุยกันอีกรอบ"
+        family: [{bond: spouse, d: 4}]
+        merit: [{cat: neutral}]
+
+  - id: fam_separate_work_old_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {spouse: {status: together, bond: [38, 48], together: [3, 99], wed: [2500, 2539]}}
     title: "กระเป๋าใบเดียวที่หน้าประตู"
     text: "คุณสองคนอยู่ใต้หลังคาเดียวกันมาหลายปีโดยแทบไม่ได้คุยกัน วันนี้“{ชื่อคู่}”ยืนอยู่หน้าประตูพร้อมกระเป๋าใบเดียว บอกว่าขอไปอยู่ที่อื่นสักพักเพื่อคิดให้ออก"
     choices:
@@ -108,7 +142,40 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 4
-    when: {spouse: {status: together, bond: [38, 48], together: [3, 99]}}
+    when: {spouse: {status: together, bond: [38, 48], together: [3, 99], wed: [2540, 2650]}}
+    title: "ห้องที่ไม่มีใครนอน"
+    text: "ห้องนอนใหญ่กลายเป็นห้องของคนคนเดียวมาปีกว่าแล้ว เช้านี้“{ชื่อคู่}”วางกุญแจบ้านไว้บนโต๊ะ บอกว่าเช่าห้องใกล้ที่ทำงานไว้แล้ว"
+    choices:
+      - id: let_go
+        text: "ไม่ห้าม บอกให้เขาดูแลตัวเอง"
+        family: [{separate: spouse}]
+        effects: {happiness: -2, relations: -1}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: shut_him_out
+        text: "ล็อกประตูตามหลังเขาเอง"
+        family: [{separate: spouse}]
+        effects: {happiness: -3, relations: -2}
+        schedules: [{event: fam_reconcile_01, after_years: [1, 3]}]
+        merit: [{cat: neutral}]
+      - id: counselling
+        text: "ขออีกหนึ่งปี ไปคุยกับผู้ใหญ่"
+        family: [{bond: spouse, d: 10}]
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: one_month
+        text: "ขอให้เขาอยู่ต่ออีกเดือน"
+        family: [{bond: spouse, d: 4}]
+        merit: [{cat: neutral}]
+
+  - id: fam_separate_mid_old_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {spouse: {status: together, bond: [38, 48], together: [3, 99], wed: [2500, 2539]}}
     title: "ห้องที่ไม่มีใครนอน"
     text: "ห้องนอนใหญ่กลายเป็นห้องของคนคนเดียวมาปีกว่าแล้ว เช้านี้“{ชื่อคู่}”วางกุญแจบ้านไว้บนโต๊ะ บอกว่าเช่าห้องใกล้ที่ทำงานไว้แล้ว"
     choices:
@@ -135,13 +202,13 @@ events:
         merit: [{cat: neutral}]
 
   # ← ห่างกันเอง/ทำงานไกลกัน (ใบ 93 · ข้อ 167) · สี่ใบเรื่องเดียวกันตามรุ่นที่แต่ง (when.spouse.wed) น้ำหนักตามอัตราหย่า (data/divorce-rate.json) · ไม่ดูค่าผูกพัน
+  # ใบรุ่นแต่งก่อน 2540 ไม่มี weight = ไม่เข้ากองสุ่ม (เจ้าของเคาะทาง ข): ใบนี้ถือหย่าของรุ่นนั้นราว 2 ใน 3 จนอัตรารวมเกินกรอบ ~1/10 · loader ไม่รับ weight 0
   - id: fam_separate_far_old_01
     away_block: [abroad, monk]
     type: A
     category: family
     stage: ทำงาน
     years: [2500, 2569]
-    weight: 3
     when: {spouse: {status: together, together: [3, 20], wed: [2500, 2539]}}
     title: "จดหมายที่ตอบห่างลงทุกฉบับ"
     text: "งานของ“{ชื่อคู่}”พาไปอยู่ต่างจังหวัดเป็นปี ๆ จดหมายที่เคยยาวสามหน้าเหลือไม่กี่บรรทัด คราวนี้เขาเขียนมาว่าที่นั่นมีที่ให้อยู่ถาวรแล้ว และอยากให้คุณตัดสินใจว่าจะเอายังไงกับเรา"
