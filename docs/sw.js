@@ -1,11 +1,12 @@
 // build สร้าง (src/site/play-files.mjs) — ห้ามแก้มือ
 const CACHE = "nl-v0.6.163";
+const ART = "nl-art-bd0e9aa866";
 const CORE = ["play.html","play-data.js?v=v0.6.163","play.js?v=v0.6.163","favicon.svg","fonts/Sarabun-Regular.woff2","fonts/Sarabun-SemiBold.woff2","fonts/Srisakdi-Bold.woff2","fonts/Maitree-SemiBold.woff2"];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', (e) => {
-  e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith('nl-') && k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k.startsWith('nl-') && k !== CACHE && k !== ART).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 const keep = (req, res) => {
   if (res.ok && res.type === 'basic') {
@@ -20,6 +21,14 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate') {
     // หน้าเล่นมี ?seed= ของลิงก์เพื่อน — เก็บและหาโดยไม่สนพารามิเตอร์ แคชจึงไม่งอกตาม seed
     e.respondWith(fetch(req).then((res) => keep(req.url.split('?')[0], res)).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || Response.error())));
+    return;
+  }
+  // ภาพการ์ด: ชื่อไฟล์มี hash แล้ว เจอในแคชภาพ = ของถูกรุ่น ไม่ต้องขอซ้ำ
+  if (new URL(req.url).pathname.endsWith('/play-art.js')) {
+    e.respondWith(caches.open(ART).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
+      if (res.ok && res.type === 'basic') c.put(req, res.clone());
+      return res;
+    }))));
     return;
   }
   e.respondWith(caches.match(req).then((hit) => {

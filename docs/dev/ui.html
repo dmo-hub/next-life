@@ -182,6 +182,18 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .era-art { display:block; width:100%; height:auto; aspect-ratio:5 / 2; }
 /* ภาพฉากบนการ์ดแรกเกิด/การ์ดตาย: เล็กพอให้ปุ่มไปต่ออยู่จอแรก */
 .era-art.scene-sm { width:min(100%, 150px); margin:0 auto 6px; }
+/* ภาพประจำการ์ด (ใบ 210 · ข้อ 410): แบนเนอร์เหนือป้ายหัวเรื่อง 42% ของเนื้อการ์ด (จอ ≥1024 = 36%) · ระบายสี เส้นหมึก จุดเด่นแดง
+   สีตามบทบาทชิ้น ใช้ตัวแปรธีมของการ์ด · stroke-width ตั้งที่ svg ให้ชิ้นที่ระบุความหนาเอง (attribute) ทับได้ */
+.cpic { width:42%; margin:0 auto 8px; }
+.cp { display:block; width:100%; height:auto; aspect-ratio:200 / 125; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.cp .r-g { fill:color-mix(in srgb, var(--red) 12%, transparent); stroke:none; }
+.cp .r-gl { fill:none; stroke:color-mix(in srgb, var(--ink) 38%, transparent); }
+.cp .r-s { fill:color-mix(in srgb, var(--ink) 16%, var(--paper)); stroke:var(--ink); }
+.cp .r-a { fill:var(--red); stroke:var(--ink); }
+.cp .r-al { fill:none; stroke:var(--red); }
+.cp .r-k { fill:var(--paper); stroke:var(--ink); }
+.cp .r-l, .cp .r-f { fill:none; stroke:var(--ink); }
+.cp .r-n { fill:var(--ink); stroke:var(--ink); }
 .same { margin-left:8px; padding:1px 6px; border:1px solid currentColor; border-radius:var(--rc); font:400 12px/1.4 var(--ft); white-space:nowrap; opacity:0.85; vertical-align:2px; }
 .bar { position:relative; height:6px; }
 .bar i { position:absolute; left:0; top:0; display:block; height:6px; }
@@ -761,6 +773,7 @@ body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-
 /* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
    · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
 @media (min-width: 1024px) {
+  .cpic { width:36%; }
   body:has(.mnav) .logo { margin-left:calc(-1 * var(--rail-w)); }
   .mnav, .sheet { top:var(--hd, 0px); }
   /* แผงค้าง (เกณฑ์ความกว้างอยู่ที่ PIN_MQ ใน app.mjs): การ์ดเลื่อนไปช่องกลางระหว่างราวกับแผง ไม่ถูกบัง · ไม่มีเงาลิ้นชัก ไม่เลื่อนเข้า */
@@ -853,6 +866,18 @@ body { margin:0; background:var(--page); color:var(--ink); font:16px/1.6 var(--f
 .era-art { display:block; width:100%; height:auto; aspect-ratio:5 / 2; }
 /* ภาพฉากบนการ์ดแรกเกิด/การ์ดตาย: เล็กพอให้ปุ่มไปต่ออยู่จอแรก */
 .era-art.scene-sm { width:min(100%, 150px); margin:0 auto 6px; }
+/* ภาพประจำการ์ด (ใบ 210 · ข้อ 410): แบนเนอร์เหนือป้ายหัวเรื่อง 42% ของเนื้อการ์ด (จอ ≥1024 = 36%) · ระบายสี เส้นหมึก จุดเด่นแดง
+   สีตามบทบาทชิ้น ใช้ตัวแปรธีมของการ์ด · stroke-width ตั้งที่ svg ให้ชิ้นที่ระบุความหนาเอง (attribute) ทับได้ */
+.cpic { width:42%; margin:0 auto 8px; }
+.cp { display:block; width:100%; height:auto; aspect-ratio:200 / 125; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.cp .r-g { fill:color-mix(in srgb, var(--red) 12%, transparent); stroke:none; }
+.cp .r-gl { fill:none; stroke:color-mix(in srgb, var(--ink) 38%, transparent); }
+.cp .r-s { fill:color-mix(in srgb, var(--ink) 16%, var(--paper)); stroke:var(--ink); }
+.cp .r-a { fill:var(--red); stroke:var(--ink); }
+.cp .r-al { fill:none; stroke:var(--red); }
+.cp .r-k { fill:var(--paper); stroke:var(--ink); }
+.cp .r-l, .cp .r-f { fill:none; stroke:var(--ink); }
+.cp .r-n { fill:var(--ink); stroke:var(--ink); }
 .same { margin-left:8px; padding:1px 6px; border:1px solid currentColor; border-radius:var(--rc); font:400 12px/1.4 var(--ft); white-space:nowrap; opacity:0.85; vertical-align:2px; }
 .bar { position:relative; height:6px; }
 .bar i { position:absolute; left:0; top:0; display:block; height:6px; }
@@ -1432,6 +1457,7 @@ body:has(#app > .card.i) .logo b { font-family:var(--ft); font-weight:600; font-
 /* ราว/แผงเริ่มใต้หัวเว็บ (ui-redo ใบ 67 · เจ้าของเลือกจากภาพ): หัวเว็บกว้างเต็มจอทับช่องราว · --hd = ขอบล่างหัวที่วัดขณะเลื่อน เลื่อนพ้นแล้วชิดบน
    · มือถือแนวนอนเตี้ยคงราวเต็มสูงแบบเดิม (หัวบางอยู่แล้ว) */
 @media (min-width: 1024px) {
+  .cpic { width:36%; }
   body:has(.mnav) .logo { margin-left:calc(-1 * var(--rail-w)); }
   .mnav, .sheet { top:var(--hd, 0px); }
   /* แผงค้าง (เกณฑ์ความกว้างอยู่ที่ PIN_MQ ใน app.mjs): การ์ดเลื่อนไปช่องกลางระหว่างราวกับแผง ไม่ถูกบัง · ไม่มีเงาลิ้นชัก ไม่เลื่อนเข้า */
