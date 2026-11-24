@@ -1,6 +1,6 @@
 // build สร้าง (src/site/play-files.mjs) — ห้ามแก้มือ
 const CACHE = "nl-v0.6.166";
-const ART = "nl-art-58cefc957c";
+const ART = "nl-art-8164b4cdbf";
 const CORE = ["play.html","play-data.js?v=v0.6.166","play.js?v=v0.6.166","favicon.svg","fonts/Sarabun-Regular.woff2","fonts/Sarabun-SemiBold.woff2","fonts/Srisakdi-Bold.woff2","fonts/Maitree-SemiBold.woff2"];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -24,7 +24,7 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   // ภาพการ์ด: ชื่อไฟล์มี hash แล้ว เจอในแคชภาพ = ของถูกรุ่น ไม่ต้องขอซ้ำ
-  if (new URL(req.url).pathname.endsWith('/play-art.js')) {
+  if (/\/play-art-[a-z]+\.js$/.test(new URL(req.url).pathname)) {
     e.respondWith(caches.open(ART).then((c) => c.match(req).then((hit) => hit || fetch(req).then((res) => {
       if (res.ok && res.type === 'basic') c.put(req, res.clone());
       return res;
