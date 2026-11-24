@@ -269,12 +269,12 @@ const f2 = (v) => v.toFixed(2);
 
   // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
   const N = 1200;
-  let wrong = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0;
+  let wrong = 0, invites = 0, invitesClosed = 0;
   for (let i = 0; i < N; i++) {
     const seed = mixSeed(404, i);
     const bot = BOTS[Object.keys(BOTS)[i % 6]];
-    let st0 = null, invited = false;
-    const { state: st } = playLife(seed, base, bot, (c, s) => {
+    let st0 = null;
+    playLife(seed, base, bot, (c, s) => {
       st0 = s;
       const ev = c.kind === 'event' && byId.get(c.id);
       if (ev && ev.choices.some((x) => x.gate)) {
@@ -283,9 +283,7 @@ const f2 = (v) => v.toFixed(2);
         if (c.choices.length !== ev.choices.length || shut.some((h, k) => h !== !!c.hidden?.[k] || (h && !c.locked?.[k]))) wrong++;
       }
       if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
-      if (c.id === 'biz_politics_invite_01') invited = true;
     });
-    if (st.flags.own_business && !(st.tree?.done?.r5 !== undefined)) { bizLives++; if (invited) bizInvite++; }
   }
   check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
   // ชวนในชีวิตสุ่มหายาก (เลขขยับตามลำดับสุ่มเมื่อเพิ่มการ์ด) — ส่วน "ต้องมีตัวอย่าง" วัดจากชีวิตที่เปิดประตูไว้ก่อน
@@ -296,9 +294,19 @@ const f2 = (v) => v.toFixed(2);
     st.gates = [OFFICE_GATE];
     playLife(seed, base, BOTS[Object.keys(BOTS)[i % 6]], (c, s) => { if (/^office_/.test(c.id ?? '') && !s.office) openInvites++; }, st);
   }
+  // การ์ดชวนนักธุรกิจออกตามธง own_business + อายุ 46–59 · ตั้งธงตั้งแต่เกิดแทนรอสุ่มเจอ
+  let bizLives = 0, bizInvite = 0;
+  for (let i = 0; i < 60; i++) {
+    const seed = mixSeed(406, i);
+    const st = newLife(seed, base);
+    st.flags.own_business = true;
+    let invited = false;
+    playLife(seed, base, BOTS[Object.keys(BOTS)[i % 6]], (c) => { if (c.id === 'biz_politics_invite_01') invited = true; }, st);
+    bizLives++; if (invited) bizInvite++;
+  }
   check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด (ประตูปิดไม่ออก)', invitesClosed === 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
   check('ใบ 04 ประตูการเมืองเปิดแล้ว การ์ดชวนออกได้', openInvites > 0, `${openInvites} ครั้ง/60 ชีวิต`);
-  check('ใบ 04 นักธุรกิจที่ไม่โฟกัสการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
+  check('ใบ 04 นักธุรกิจที่ยังไม่เปิดประตูการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
 }
 
 // ใบ 05a: อาชีพต่างโลกนับปีเต็มด้วยกติกากลาง — สคริปต์บังคับโฟกัสทีละตา ไม่ใช้บอท
