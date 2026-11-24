@@ -220,6 +220,33 @@ function pickProvince(rng, birth, regionName) {
   return list[list.length - 1].name;
 }
 
+// ศาสนาตอนเกิด (B93) ตามจังหวัดเกิด — ผู้เรียกส่ง rng แยกเสมอ · ไม่มีตารางในข้อมูล = ค่าเริ่มต้น ไม่ดึงเลขสุ่ม
+// birth.religion = { default, provinces: { <จังหวัด>: { <ศาสนา>: น้ำหนัก } } } · จังหวัดที่ไม่อยู่ในตาราง = default
+function pickReligion(rng, birth, province) {
+  const t = birth.religion;
+  if (!t) return DEFAULT_RELIGION;
+  const row = t.provinces?.[province];
+  if (!row) return t.default ?? DEFAULT_RELIGION;
+  const list = Object.entries(row);
+  let r = rng.next() * list.reduce((s, [, w]) => s + w, 0);
+  for (const [name, w] of list) {
+    r -= w;
+    if (r < 0) return name;
+  }
+  return list[list.length - 1][0];
+}
+
+const DEFAULT_RELIGION = 'พุทธ';
+
+// คำปิดหน้าจบ (B93) ศาสนาละ 1 ชุด · ไม่มีภาพ/คำตัดสินปรโลก · ศาสนานอกรายการใช้ชุด 'อื่น ๆ'
+const RELIGION_CLOSING = {
+  พุทธ: 'ชีวิตนี้จบลงแล้ว สิ่งที่ทำไว้ยังอยู่กับคนที่เหลือ',
+  อิสลาม: 'อินนาลิลลาฮิ วะอินนา อิลัยฮิ ราจิอูน — เราเป็นของพระเจ้า และสู่พระองค์เราจะกลับไป',
+  คริสต์: 'ขอให้เขาหลับในความสงบ คนที่รักเขายังจดจำ',
+  'อื่น ๆ': 'ชีวิตหนึ่งจบลง คนที่อยู่ต่อยังจดจำเขา',
+};
+const closingOf = (religion) => RELIGION_CLOSING[religion] ?? RELIGION_CLOSING['อื่น ๆ'];
+
 // ชื่อจังหวัดบนจอ: กรุงเทพฯ ไม่ใช่ "จังหวัด" จึงไม่นำหน้า จ.
 const placeName = (province) => (province === 'กรุงเทพมหานคร' ? province : `จ.${province}`);
 
@@ -282,7 +309,7 @@ const pickRealName = (seed, sex, birthYear, names) => makeRng(seed ^ 0x2c4e1a77)
 
 
 const KIN_ROLES = ['partner', 'spouse', 'child', 'grandchild'];
-const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', partner: 'แฟน', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น' };
+const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', partner: 'แฟน', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', sibling: 'พี่น้อง', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น', courter: 'คนจีบ' };
 // ธงเดิมที่เนื้อหาอ่านอยู่ ↔ บทบาทที่ธงนั้นหมายถึง · ตั้งธงจากตัวเลือก = มีสมาชิกคนนั้นเพิ่มขึ้นจริง
 const KIN_FLAG_ROLE = { married: 'spouse', has_kids: 'child', raised_grandkids: 'grandchild' };
 // ลูกที่โตแล้วมีหลานให้เองปีละโอกาสนี้ ช่วงอายุนี้ ไม่เกินจำนวนนี้ต่อคน — ค่าตั้งของเกม (ไม่มีข้อมูลเจริญพันธุ์รายยุคในชุดข้อมูล)
@@ -290,12 +317,12 @@ const GRANDKID = { from: 22, to: 40, chance: 0.08, max: 3 };
 // คู่ครองอายุห่างจากเราได้เท่านี้ (ปีเกิด) · ค่าตั้งของเกม
 const KIN_SPOUSE_GAP = [-5, 5];
 // pet · herd (B44) · peer (B43) เป็นสมาชิกได้ แต่ไม่ใช่ทายาท ไม่ตั้งธง ไม่มีหลาน — สัตว์ตายตามอายุขัยของชนิด เพื่อนรุ่นตายตามตารางชีพแบบคน
-const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer'];
+const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer', 'courter', 'sibling'];
 // คนในบ้าน = คนที่การ์ดครอบครัวดูแลถึง และคนที่นับว่า "ยังมีใคร" ตอนแก่ · เพื่อนรุ่นไม่นับ
 const KIN_HOUSEHOLD = ['partner', 'spouse', 'child', 'grandchild', 'pet'];
 
 // ความผูกพันรายคน 0–100 (B36a2): ปีที่ไม่ได้ดูแลลดเอง 1 แต่การลดเองไม่พาต่ำกว่า floor — ผลร้ายจากเนื้อหาพาต่ำกว่าได้
-const BOND_START = { parent: 70, partner: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50 };
+const BOND_START = { parent: 70, partner: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50, courter: 50, sibling: 60 };
 const BOND_FLOOR = 38;
 const BOND_LEVELS = [[80, 'ผูกพัน'], [60, 'สนิท'], [40, 'คุ้นเคย'], [20, 'เฉย ๆ'], [0, 'ห่างเหิน']];
 // การ์ดหมวด family ที่ตัวเลือกให้ความสัมพันธ์บวก = ดูแลคนในบ้านปีนั้น · bond ขึ้นเท่านี้ต่อระดับความสัมพันธ์ (1–3)
@@ -392,17 +419,24 @@ function nameParents(st) {
 // extra: of (หลาน = id ลูกที่เป็นพ่อแม่) · สัตว์เลี้ยง kind (ชนิด) + life [จาก, ถึง] (อายุขัยของชนิด) + name? (เนื้อหาตั้งให้ · ไม่ตั้ง = เรียกตามชนิด)
 // แฟน (ใบ 90) เข้ามากลางชีวิตได้โดยไม่ขยับลำดับสุ่ม/ชื่อของคนที่มาทีหลัง: id นับแยก (OWN_ID_BASE+) · ปีเกิด/ทอยตายใช้สุ่มจาก seed+id+ปี ไม่ใช่ kinRng/kinCauseRng · own = ติดตัวไปตลอดแม้แต่งแล้วเปลี่ยนบทเป็นคู่
 const OWN_ID_BASE = 10000;
+// พี่น้องของทายาท (ใบ tld14): id นับแยกอีกชุด + ผลสุ่มตายจาก seed+id ไม่ใช่ kinRng/kinCauseRng — เลขสุ่มของคนในบ้านจึงเท่ากับชีวิตที่ไม่มีพี่น้อง
+const SIB_ID_BASE = 20000;
 const ownRoll = (st, m, year, salt) => makeRng(mixSeed(st.seed ^ salt, m.id * 1000 + (year % 1000)));
 function addMember(st, role, extra = {}) {
   const year = kinYearOf(st);
-  const own = role === 'partner';
-  const id = own ? OWN_ID_BASE + (st.ownSeq = (st.ownSeq ?? 0) + 1) : ++st.kinSeq;
+  // จีบซ้อนได้ไม่เกิน COURT_MAX คน (ใบ 172 ข้อ 307) · คนที่ 3 ไม่เข้า
+  if (role === 'courter' && livingOf(st, 'courter').length >= COURT_MAX) return null;
+  const own = role === 'partner' || role === 'courter' || role === 'sibling';
+  const id = role === 'sibling' ? SIB_ID_BASE + (st.sibSeq = (st.sibSeq ?? 0) + 1) : own ? OWN_ID_BASE + (st.ownSeq = (st.ownSeq ?? 0) + 1) : ++st.kinSeq;
   // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
-  const mate = role === 'spouse' || role === 'partner';
+  const mate = role === 'spouse' || role === 'partner' || role === 'courter';
   const sex = extra.sex ?? (mate ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
-  const born = extra.born ?? (mate ? st.birthYear + (own ? makeRng(mixSeed(st.seed ^ 0x7a10, id)) : st.kinRng).int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
+  const born0 = extra.born ?? (mate ? st.birthYear + (own ? makeRng(mixSeed(st.seed ^ 0x7a10, id)) : st.kinRng).int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
+  // คนจีบต้องถึงเกณฑ์แฟน (≥18) เท่าผู้เล่น (ข้อ 309) · ย้ายปีเกิดหลังสุ่มแล้ว ไม่ดึงเลขเพิ่ม
+  // คู่ ≥20 ตอนแต่ง (ข้อ 309 · K4 เจ้าของเคาะ 11-23): ปีเกิดที่สุ่มได้ถูกย้ายให้ไม่น้อยกว่าเกณฑ์ ไม่ดึงเลขสุ่มเพิ่ม · ปีเกิดที่ส่งมาเอง (ทายาท) ไม่แตะ
+  const born = role === 'courter' ? Math.min(born0, year - COURT_MIN.partner) : role === 'spouse' && extra.born === undefined ? Math.min(born0, year - COURT_MIN.spouse) : born0;
   // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
-  const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
+  const name = role === 'herd' ? null : role === 'sibling' && extra.name ? extra.name : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
   const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: extra.bond ?? BOND_START[role], ...(own && { own: true }) };
   if (ANIMAL.includes(role)) {
     m.kind = extra.kind;
@@ -410,6 +444,8 @@ function addMember(st, role, extra = {}) {
   }
   // อายุของเราตอนคู่เข้าบ้าน — ให้แผงบอก "อยู่ด้วยกัน N ปี" ของคู่เก่า · เซฟก่อนมีช่องนี้ไม่มี since
   if (mate) m.since = st.age;
+  // คนจีบ (ใบ 172 ขั้น 2): เจอ → จีบ → แฟน เดินด้วยนัดล่วงหน้า (ปีที่ครบกำหนดสุ่มจาก seed+id ไม่ดึง kinRng) · extra.after = [น้อย, มาก] ปีถึงขั้นถัดไป
+  if (role === 'courter') { m.stage = 'met'; courtDue(st, m, extra.after); }
   if (role === 'child') {
     m.order = st.kin.filter((x) => x.role === 'child').length + 1;
     // พ่อ/แม่อีกคน (ใบ 91 ข้อ 149 154 166): id ของคู่ปัจจุบันตอนลูกเกิด · null = ไม่มีคู่ (พ่อ/แม่เลี้ยงเดี่ยว) · ลูกจากเซฟเก่าไม่มีช่อง by = คิดย้อนจากปีเกิด (parentSpouseOf)
@@ -493,9 +529,36 @@ function parentSpouseOf(st, child) {
 // บทแฟน (ใบ 90 ข้อ 146 165): partner = คนมีชื่อในบ้าน ไม่ใช่สถานะของคู่ · เลิกกัน = status ex (ออกจากบ้าน · ชื่อยังอ้างได้) · แต่งกับแฟน = คนเดิมเปลี่ยนบทเป็น spouse
 const isEx = (m) => m.role === 'partner' && m.status === 'ex';
 const exPartnerOf = (st) => (st.kin ?? []).findLast((m) => isEx(m)) ?? null;
+// เกณฑ์อายุขั้นความสัมพันธ์ (ข้อ 309): แฟน ≥18 · คู่ ≥20 ทั้งผู้เล่นและอีกฝ่าย · จีบซ้อนพร้อมกัน ≤2 (ข้อ 307)
+const COURT_MIN = { partner: 18, spouse: 20 };
+const COURT_MAX = 2;
+const COURT_STAGES = ['met', 'courting'];
+const COURT_STEP_YEARS = [1, 2];
+// นัดขั้นถัดไปของคนจีบ: สุ่มจำนวนปีจาก seed+id+ปีที่นัด ไม่ใช่ kinRng/rng ชีวิต — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
+function courtDue(st, m, after = COURT_STEP_YEARS) {
+  m.due = st.age + ownRoll(st, m, kinYearOf(st), 0xc5ed).int(after[0], after[1]);
+}
+// เดินขั้นคนจีบปีละครั้ง (เรียกใน ageKin): ครบกำหนด met→courting→แฟน (becomePartner · เข้าบ้านตอนเป็นแฟนตามข้อ 305) · ขอแต่งเป็นของการ์ด/ใบ 173
+function stepCourtship(st) {
+  for (const m of st.kin) {
+    if (m.role !== 'courter' || !m.alive || m.left || m.due === undefined || st.age < m.due) continue;
+    if (m.stage === 'met') {
+      m.stage = 'courting';
+      courtDue(st, m);
+    } else if (m.stage === 'courting') {
+      // ยังไม่ถึงเกณฑ์แฟนทั้งสองฝ่าย = รอปีหน้า
+      if (st.age < COURT_MIN.partner || kinYearOf(st) - m.born < COURT_MIN.partner) { m.due = st.age + 1; continue; }
+      delete m.stage;
+      delete m.due;
+      becomePartner(st, m);
+    }
+  }
+}
 // รับคนที่มีอยู่แล้วนอกบ้าน (เช่น courter ของใบ 172 · peer) เป็นแฟน: id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบจากอายุตอนนี้ · ไม่ดึงเลขสุ่ม · คนในบ้านอยู่ในหมวดคู่/แฟนอยู่แล้ว = ไม่ทำอะไร
 function becomePartner(st, m) {
   if (!m || !m.alive || m.role === 'partner' || m.role === 'spouse') return null;
+  // เลือกคนเดียวเป็นแฟน คนจีบที่เหลือหลุด (ข้อ 307) · ออกจากรายชื่อคนจีบแต่ชื่อยังอยู่ในบันทึก
+  for (const o of st.kin) if (o !== m && o.role === 'courter' && o.alive && !o.left) { o.left = true; o.leftAge = st.age; o.status = 'dropped'; }
   m.role = 'partner';
   m.since = st.age;
   m.bond = m.bond ?? BOND_START.partner;
@@ -505,6 +568,7 @@ function becomePartner(st, m) {
   return m;
 }
 function marryPartner(st, m) {
+  m.born = Math.min(m.born, kinYearOf(st) - COURT_MIN.spouse);
   m.dated = { since: m.since, ...(m.endedBy && { endedBy: m.endedBy }) };
   m.role = 'spouse';
   m.since = st.age;
@@ -529,6 +593,9 @@ function pickFocus(st) {
     const live = livingOf(st, role);
     if (live.length) st.kinFocus[role] = (live.length > 1 ? live[st.kinRng.int(0, live.length - 1)] : live[0]).id;
   }
+  // คนจีบ (ใบ 172): จีบพร้อมกัน ≥2 คน เลือกคนเป้าจาก seed+ปีของเรา ไม่ดึง kinRng — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
+  const courting = livingOf(st, 'courter');
+  if (courting.length) st.kinFocus.courter = (courting.length > 1 ? courting[makeRng(mixSeed(st.seed ^ 0xc0e7, st.age)).int(0, courting.length - 1)] : courting[0]).id;
 }
 // คนเป้าของการ์ดใบปัจจุบัน (ยังคืนคนเดิมแม้ผลการ์ดใบนี้ทำให้เขาจากไป — การ์ดผลจะได้เรียกชื่อถูกคน) · นอกการ์ด = คนล่าสุดที่ยังอยู่
 function focusOf(st, role) {
@@ -709,7 +776,8 @@ function kinSyncFlags(st) {
 function kinYearlyBond(st) {
   if (!st.kinCared) {
     for (const m of [...st.parents, ...st.kin]) {
-      if (!m.alive || m.left) continue;
+      // พี่น้องของทายาท (tld14 ข้อ 3) ไม่ถือ bond: ไม่ลดรายปี เหมือนไม่เข้าความผูกพันของบ้าน
+      if (!m.alive || m.left || m.role === 'sibling') continue;
       const b = m.bond ?? BOND_START[m.role ?? 'parent'];
       m.bond = b > BOND_FLOOR ? Math.max(BOND_FLOOR, b - 1) : b;
     }
@@ -757,10 +825,13 @@ function ageKin(st, year, saving = 0) {
   filialMirror(st);
   const lost = [];
   if (!st.kin.length) return lost;
+  stepCourtship(st);
   petYear(st, saving);
   for (const m of [...st.kin]) {
     if (!m.alive) continue;
     const a = year - m.born - 1;
+    // คนจีบ (ใบ 172 ข้อ 305) อยู่นอกบ้านแบบเพื่อนรุ่น: ไม่ทอยตาย ไม่ดึง kinRng/kinCauseRng — ชีวิตที่มีคนจีบกับไม่มีจึงได้ญาติ/ผลตายชุดเดียวกัน
+    if (m.role === 'courter') continue;
     if (ANIMAL.includes(m.role)) {
       if (a + 1 >= m.maxAge) {
         if (m.role === 'pet') m.cause = petCause(st, m);
@@ -874,8 +945,9 @@ function familyOk(st, f) {
   const year = kinYearOf(st);
   const pool = f.role === 'parent'
     ? st.parents.map((p) => ({ alive: p.alive, age: p.age, sex: p.sex }))
-    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex }));
-  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age)).length;
+    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex, stage: m.stage, years: m.since === undefined ? undefined : st.age - m.since }));
+  // stage (คนจีบ: met|courting) · years = ปีที่คบ/จีบมา (นับจาก since) — ไม่ใส่ช่อง = ไม่เช็ก · ใส่แล้วสมาชิกที่ไม่มีค่านั้นไม่ผ่าน
+  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age) && (f.stage === undefined || [].concat(f.stage).includes(m.stage)) && (f.years === undefined || (m.years !== undefined && kinInRange(m.years, f.years)))).length;
   return f.count ? kinInRange(n, f.count) : n > 0;
 }
 
@@ -925,6 +997,21 @@ function kinAid(st) {
   if (!able.length) return null;
   const h = able.reduce((a, b) => (b.bond > a.bond ? b : a));
   return st.kinRng.next() < (h.bond - KIN_AID.base) / KIN_AID.span ? h : null;
+}
+
+// พี่น้องตามมาในชาติทายาท (ใบ tld14 · เจ้าของเคาะ 11-23): ทางสายเลือดเท่านั้น · ทายาทเป็นลูก = ลูกคนอื่นของผู้ตายที่ยังมีชีวิต (รวมที่ย้ายออก ทุกอายุ) · ทายาทเป็นหลาน = หลานคนอื่นที่ of เดียวกัน
+// ลุง/ป้า · คู่ของลูกคนอื่น · หลานของพี่น้อง ไม่ตามมา · เก็บเฉพาะ เพศ/ชื่อ/ปีเกิด/ย้ายออก (ความผูกพันเริ่มใหม่จากมุมทายาท)
+function heirSibs(st, blood) {
+  if (!blood || !st.kin) return [];
+  const same = (m) => m.id !== blood.id && m.alive && (blood.role === 'child' ? m.role === 'child' : m.role === 'grandchild' && m.of === blood.of);
+  return st.kin.filter(same).map((m) => ({ sex: m.sex, name: m.name, born: m.born, ...(m.left && { left: true }) }));
+}
+// เข้าบ้านทายาทตอนเกิด (ก่อน skipToAge) · ปีเกิดเท่าทายาท = แฝด · ไม่ดึง kinRng (id/ตายแยกสาย)
+function sibsAtBirth(st, heir) {
+  for (const s of heir?.sibs ?? []) {
+    const m = addMember(st, 'sibling', { sex: s.sex, name: s.name, born: s.born });
+    if (s.left) { m.left = true; m.leftAge = Math.max(0, st.age); }
+  }
 }
 
 // สัตว์ติดบ้านตอนเกิด (B44): ทางในตระกูลได้ตัวที่บ้านเดิมยังเลี้ยงอยู่ (heir.pets) · ที่เหลือสุ่มตามบ้านจาก stream แยก
@@ -1017,8 +1104,8 @@ function petsAfter(st) {
 // มรณบัตร: ใครมาส่ง (B164) — ผลย้อนของความสัมพันธ์ทั้งชีวิต เล่าเป็นคำ ไม่โชว์ค่าและไม่มีชื่อใคร (คนที่จากไปห้ามถูกเรียก)
 // คนที่ยังอยู่มาจากที่ไกลได้ (นับคนที่ย้ายออกด้วย) · bond ถึงเกณฑ์ = อยู่ช่วยงาน ต่ำกว่า = แวะมาครู่เดียว (พื้น bond แค่ "เฉย ๆ" ไม่ถึงขั้นไม่มา) · แขกที่เหลือแบ่งตามน้ำหนักเดียวกับสูตรแขก
 // ใช้ค่าเฉลี่ยวัยทำงาน ไม่ใช่ค่าตอนตาย — ค่าตกตามวัยชรา แต่คนที่เคยรู้จักกันยังมา · อ่าน state ล้วน ไม่ดึงเลขสุ่ม
-const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer'] };
-const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน' };
+const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer', 'sibling'] };
+const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน', sibling: 'พี่น้อง' };
 const whoList = (by) => {
   const parts = FUNERAL_WHO.roles.filter((r) => by[r]).map((r) => (r === 'spouse' ? WHO_WORD[r] : `${WHO_WORD[r]} ${by[r]} คน`));
   return parts.length > 1 ? `${parts.slice(0, -1).join(' ')} และ${parts.at(-1)}` : parts[0];
@@ -1076,7 +1163,8 @@ function familyOf(st) {
   // สาเหตุตาย (B110) ให้ผังตระกูลแสดง — มีเฉพาะคนที่จากไปแล้ว · เซฟก่อนมีสาเหตุไม่มีช่องนี้
   const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
   const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
-  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)), ...(m.role === 'child' && m.by != null && { by: m.by }) }));
+  // คนจีบที่ยังอยู่ (ไม่หลุด) ส่งพร้อม stage ให้จอวาดหัวแยก "กำลังจีบ" นอกคนในบ้าน · ไม่ส่ง bond · แฟนที่ยังคบส่ง together (ปีที่คบ)
+  const kin = (st.kin ?? []).filter((m) => m.role !== 'courter' || (m.alive && !m.left)).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...(m.role !== 'courter' && bondOf(m)), ...(m.role === 'courter' && { stage: m.stage }), ...(m.role === 'partner' && !m.left && spouseStatus(m) === 'together' && m.since !== undefined && { together: st.age - m.since }), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.role === 'sibling' && { rank: m.born < st.birthYear ? 'elder' : m.born > st.birthYear ? 'younger' : 'twin' }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)), ...(m.role === 'child' && m.by != null && { by: m.by }) }));
   return [...parents, ...kin];
 }
 
@@ -4593,6 +4681,8 @@ function newLife(seed, content, heir = null) {
   if (heir) ({ birthYear, sex, region, cls } = heir);
   // จังหวัดสุ่มจาก stream แยกในภาคที่ได้ (B34) — ไม่กินเลขสุ่มของโลก · ทางเป็นลูกเกิดบ้านเดิม · เซฟเก่าไม่มีจังหวัด สุ่มซ้ำจาก seed ได้ค่าเดิม
   const province = heir?.province ?? pickProvince(makeRng(seed ^ 0xa54ff53a), era.birth, region.name);
+  // ศาสนา (B93): ทายาทถือศาสนาของบ้าน · เกิดใหม่สุ่มตามจังหวัดจาก stream แยก ไม่แตะเลขสุ่มจังหวัด/โลก · คู่ครองและลูกถือศาสนาเดียวกับตัวเอก (ไม่มีช่องศาสนาต่อญาติ)
+  const religion = heir?.religion ?? pickReligion(makeRng(seed ^ 0x3b9aca07), era.birth, province);
   // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
   const jit = makeRng(seed ^ 0x6a09e667);
   const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER + (heir?.bonus[k] ?? 0))]));
@@ -4619,6 +4709,7 @@ function newLife(seed, content, heir = null) {
     realName: pickRealName(seed, sex, birthYear, era.names),
     region: region.name,
     province,
+    religion,
     ses: region.ses,
     cls,
     // ก่อนได้งาน occupation = อาชีพของครอบครัว เป็นฐานของเงินในผลการ์ด (income_x) · ได้งานแล้วเปลี่ยนเป็นงานของตัวเอง
@@ -4740,6 +4831,7 @@ function newLife(seed, content, heir = null) {
   // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
   for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
+  sibsAtBirth(st, heir);
   if (heir?.start) skipToAge(st, heir.start.age);
   // เริ่มกลางวัย = เงินของบ้านเป็นบาทของปีที่เริ่ม (yearlySaving อ่านปีจาก st.age)
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
@@ -10471,7 +10563,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -10497,6 +10589,7 @@ function makeHeir(af, r) {
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
+    religion = st.religion;
     // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
     const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
@@ -10580,6 +10673,7 @@ function makeHeir(af, r) {
     cls,
     region,
     province,
+    religion,
     birthYear,
     parents,
     legacy,
@@ -10597,6 +10691,7 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
+    ...(blood && heirSibs(st, blood).length && { sibs: heirSibs(st, blood) }),
     // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
     ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
     // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
@@ -11197,6 +11292,8 @@ function repairLife(st, card) {
   st.queue = q.filter((c) => !('ev' in c) || c.ev);
   // เซฟก่อนมีชื่อจริง (names-fun) — สุ่มจาก seed เดิม โหลดกี่ครั้งก็ได้ชื่อเดียวกัน
   st.realName ??= pickRealName(st.seed, st.sex, st.birthYear, st.content.era.names);
+  // เซฟก่อนมีศาสนา (B93) — สุ่มจาก seed+จังหวัดเดิมด้วย stream เดียวกับตอนเกิด โหลดกี่ครั้งก็ได้ค่าเดียว · ไม่มีจังหวัด/ตาราง = ค่าเริ่มต้น
+  st.religion ??= st.province ? pickReligion(makeRng(st.seed ^ 0x3b9aca07), st.content.era.birth, st.province) : DEFAULT_RELIGION;
   const occ = st.content.era.finance.occupations;
   if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
   const ladders = st.content.era.careers?.ladders;
@@ -14748,7 +14845,7 @@ const FX = {
     build: (ov, o) => {
       ov.innerHTML = `<div class="fx-veil"></div>${fxSvg(120, 120, `<path class="fx-smoke" d="M60 44c-6-8 6-14 0-22s6-14 0-20" fill="none" stroke="${FX_INK.cream}" stroke-width="1.4" stroke-linecap="round" pathLength="100" stroke-dasharray="100"/><g class="fx-flame" style="transform-origin:60px 58px"><path d="M60 34c7 9 9 15 6 20q-2 4-6 4t-6-4c-3-5-1-11 6-20z" fill="${FX_INK.gold2}"/><path d="M60 44c3 4 4 7 2 10q-1 2-2 2t-2-2c-2-3-1-6 2-10z" fill="${FX_INK.cream}"/></g><path d="M36 64h48q-4 18-24 18t-24-18z" fill="${FX_INK.bronze2}" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M58 64v-6h4v6" fill="${FX_INK.lacquer2}"/><path d="M44 90h32" stroke="${FX_INK.gold}" stroke-width="1.4"/>`, 'fx-lamp')}<div class="fx-cap"></div>`;
       const cap = ov.querySelector('.fx-cap');
-      cap.append(o.head, el('small', null, o.sub));
+      cap.append(o.head, el('small', null, o.sub), ...(o.closing ? [el('small', null, o.closing)] : []));
       return { ov, flame: ov.querySelector('.fx-flame'), smoke: ov.querySelector('.fx-smoke'), veil: ov.firstChild, cap };
     },
     frame: (p, t) => {
@@ -14868,7 +14965,7 @@ function fxCard(box, card) {
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
   const gone = isGone(st);
-  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
+  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}`, closing: closingOf(st.religion) }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
 }
 const fxGate = (e) => {
   if (!fxCur) return;
