@@ -22,7 +22,7 @@ const KEYS = {
   event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'run', 'arc', 'heavy', 'office_ok'],
   choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
-  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
+  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name', 'adopted', 'age'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
@@ -753,6 +753,12 @@ export const rules = [
           if (animals && (!Object.hasOwn(animals, o.kind) || !isRange(o.life, 1, 40))) r(`${p}`, `add: ${o.add} ต้องมี kind (${Object.keys(animals).join(' ')}) และ life: [จาก, ถึง] ปี 1–40`);
           if (!animals && (o.kind !== undefined || o.life !== undefined || o.name !== undefined)) r(`${p}`, 'kind life name ใช้กับ add: pet/herd เท่านั้น');
           if (o.add === 'herd' && o.name !== undefined) r(`${p}.name`, 'ฝูงไม่มีชื่อรายตัว');
+          // รับบุตรบุญธรรม (ใบ 99): adopted + age ไปด้วยกัน · กฎหมายผู้รับแก่กว่าเด็ก ≥15 ปี ⇒ ขอบล่างอายุของการ์ดต้อง ≥ อายุเด็ก+15
+          if ((o.adopted !== undefined) !== (o.age !== undefined)) r(p, 'adopted กับ age ต้องมาคู่กัน');
+          else if (o.adopted !== undefined) {
+            if (o.add !== 'child' || o.adopted !== true || !isInt(o.age) || o.age < 0 || o.age > 17 || (o.n ?? 1) !== 1) r(p, 'adopted: true + age ใช้กับ add: child ทีละคน อายุเด็ก 0–17');
+            else if (!isRange(e.when?.age, 0, 120) || e.when.age[0] < o.age + 15) r(p, `รับเด็กอายุ ${o.age} ต้องมี when.age ขอบล่าง ≥ ${o.age + 15} (ผู้รับต้องแก่กว่าเด็ก ≥15 ปี)`);
+          }
           if (o.name !== undefined && (typeof o.name !== 'string' || !o.name)) r(`${p}.name`, 'name ต้องเป็นข้อความ');
           if (o.bond !== undefined && ![...FAMILY_ROLES, 'all'].includes(o.bond)) r(`${p}.bond`, `bond ต้องเป็น ${FAMILY_ROLES.join(' ')} all`);
           if (o.bond !== undefined && (!isInt(o.d) || !o.d || Math.abs(o.d) > 30)) r(`${p}.d`, 'd ใช้กับ bond เป็นจำนวนเต็ม ±1–30');

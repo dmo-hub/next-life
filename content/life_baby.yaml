@@ -1,0 +1,115 @@
+# ลองมีลูก + มีบุตรยาก (ใบ 98 · 1ii-4 ข้อ 147 168): คู่ที่ยังไม่มีลูกลองมีลูกหลังอายุ 30 · ทอยติด/ไม่ติด โอกาสลดตามช่วงอายุ
+# โอกาสติดต่อรอบ (ผู้เล่นอายุ → ติด:ไม่ติด) · ค่าตั้งของเกม ประมาณการจากภาพรวมการตั้งครรภ์ตามอายุ ยังไม่ได้ตรวจกับแหล่งปฐมภูมิ (ผู้รวมงานตรวจ/เจ้าของเคาะ)
+#   30–34 → 3:1 (0.75) · 35–39 → 11:9 (0.55) · 40–45 → 1:3 (0.25) · ตัวคูณสุขภาพของเราเอียงทางติด (แกนเกมไม่มีสุขภาพคู่ — ใช้ของเราตัวเดียว)
+# ผลติด = ตั้ง has_kids (แกนครอบครัวเพิ่มลูกเอง) · ไม่ติด = ไม่มีธง ใบเดิมซ้ำได้ตาม repeat · อายุเพดาน 45 เพราะคู่อายุห่างได้ ±5 (family.mjs KIN_SPOUSE_GAP) ⇒ คู่ไม่เกิน 50
+events:
+  - id: fam_try_baby_30_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    repeat: {gap: 3, max: 2}
+    when: {age: [30, 34], spouse: {status: together}, flags: {has: [married], not: [has_kids]}}
+    title: "ลองมีลูกสักคน"
+    text: "คุณกับคู่ชีวิตนั่งคุยกันตอนดึก งานเริ่มนิ่ง บ้านเริ่มเข้าที่ ห้องว่างในบ้านยังไม่มีใครใช้ ทั้งคู่เริ่มพูดเรื่องมีลูกกันจริงจังสักที"
+    choices:
+      - id: try_now
+        text: "ลองดูสักปี"
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "ปลายปีผลตรวจครรภ์ขึ้นสองขีดชัดเจน", effects: {happiness: 3}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ผ่านไปปีหนึ่งยังเงียบ ทั้งคู่บอกกันว่าไม่เป็นไร ยังมีเวลา", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: check_up
+        text: "ตรวจร่างกายทั้งคู่ก่อนลอง"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินเก็บยังไม่พอค่าตรวจ"}
+        outcomes:
+          - {weight: 4, ok: true, multipliers: {stats: {health: 1.3}}, text: "หมอตรวจแล้วบอกว่าทั้งคู่แข็งแรงดี ปีนั้นเองก็ได้ข่าวดี", effects: {happiness: 3, money: {unit: income_x, amount: -0.5}}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตรวจแล้วทุกอย่างปกติ แต่ปีนั้นยังไม่มีข่าวดี หมอบอกให้ใจเย็น ๆ", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ทำบุญขอพรก่อนลอง"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        outcomes:
+          - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "กลับจากวัดได้ไม่กี่เดือนก็ได้ข่าวดี", effects: {happiness: 3}, sets_flags: [has_kids], merit: [{cat: dana, level: 1}]}
+          - {weight: 1, text: "ไหว้ขอพรแล้ว ปีนั้นก็ยังเงียบ ทั้งคู่หัวเราะแล้วบอกกันว่าไว้ลองใหม่", effects: {happiness: -1}, merit: [{cat: dana, level: 1}]}
+        merit: [{cat: dana, level: 1}]
+      - id: not_yet
+        text: "ขอทำงานอีกสักพัก"
+        effects: {money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+
+  - id: fam_try_baby_35_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    repeat: {gap: 3, max: 2}
+    when: {age: [35, 39], spouse: {status: together}, flags: {has: [married], not: [has_kids]}}
+    title: "ยังไม่สายใช่ไหม"
+    text: "เพื่อนรุ่นเดียวกันพาเด็ก ๆ ไปส่งโรงเรียนกันหมดแล้ว คืนนั้นคู่ชีวิตเอ่ยขึ้นมาเบา ๆ ว่ายังอยากลองมีลูกสักคน ถ้าไม่ลองตอนนี้คงไม่มีโอกาสอีก"
+    choices:
+      - id: try_now
+        text: "ลองดู ไม่ว่าผลเป็นอย่างไร"
+        outcomes:
+          - {weight: 11, ok: true, multipliers: {stats: {health: 1.3}}, text: "หมอยิ้มแล้วบอกว่าตั้งครรภ์ ต้องพักผ่อนและมาตรวจถี่หน่อย แต่ทุกอย่างปกติดี", effects: {happiness: 3}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 9, text: "รอบแล้วรอบเล่าผลก็ยังเหมือนเดิม หมอบอกว่าอายุมีผล ทั้งคู่ใจหายแต่ไม่ได้ทะเลาะกัน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: check_up
+        text: "ตรวจร่างกายทั้งคู่ก่อนลอง"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินเก็บยังไม่พอค่าตรวจ"}
+        outcomes:
+          - {weight: 13, ok: true, multipliers: {stats: {health: 1.3}}, text: "ตรวจละเอียดแล้วหมอแนะนำช่วงเวลาที่เหมาะ ไม่นานก็ได้ข่าวดี", effects: {happiness: 3, money: {unit: income_x, amount: -0.5}}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 7, text: "ตรวจครบแล้วหมอบอกว่าเป็นเรื่องของอายุ ยังไม่มีข่าวดีปีนี้", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ทำบุญขอพรก่อนลอง"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        outcomes:
+          - {weight: 11, ok: true, multipliers: {stats: {health: 1.3}}, text: "ทำบุญกลับมาได้ไม่กี่เดือน ก็ได้ข่าวดี", effects: {happiness: 3}, sets_flags: [has_kids], merit: [{cat: dana, level: 1}]}
+          - {weight: 9, text: "ทำบุญแล้วรอแล้วก็ยังไม่มี คนในบ้านปลอบกันว่าสิ่งที่ทำก็ไม่เสียเปล่า", effects: {happiness: -1}, merit: [{cat: dana, level: 1}]}
+        merit: [{cat: dana, level: 1}]
+      - id: not_yet
+        text: "บอกคู่ว่าอยู่กันสองคนก็ดีแล้ว"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: fam_try_baby_40_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 3, max: 2}
+    when: {age: [40, 45], spouse: {status: together}, flags: {has: [married], not: [has_kids]}}
+    title: "โอกาสท้าย ๆ"
+    text: "หมอพูดตรง ๆ ว่าถ้าอยากมีลูก ช่วงนี้โอกาสน้อยลงมากแล้ว คู่ชีวิตนิ่งไปนาน ก่อนบอกว่าถ้าไม่ลองคงเสียใจทีหลัง"
+    choices:
+      - id: try_now
+        text: "ลองอีกครั้ง"
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "เกินคาด ผลตรวจขึ้นสองขีด หมอบอกต้องดูแลใกล้ชิด ทั้งบ้านใจจดใจจ่อไปทั้งเดือน", effects: {happiness: 3}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ผลออกมาไม่ติดอีกครั้ง ทั้งคู่นั่งเงียบกันนาน แล้วตกลงกันว่าจะดูแลกันและกันให้ดีที่สุดแทน", effects: {happiness: -2, relations: 1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: check_up
+        text: "ตรวจร่างกายทั้งคู่ก่อนลอง"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินเก็บยังไม่พอค่าตรวจ"}
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {health: 1.3}}, text: "หมอปรับแผนให้ทั้งคู่อย่างละเอียด แล้วไม่กี่เดือนก็มีข่าวดีที่ไม่มีใครกล้าหวัง", effects: {happiness: 3, money: {unit: income_x, amount: -0.5}}, sets_flags: [has_kids], merit: [{cat: neutral}]}
+          - {weight: 3, text: "ตรวจทุกอย่างแล้วหมอบอกตรง ๆ ว่าโอกาสน้อยมาก ทั้งคู่ขอบคุณแล้วกลับบ้าน", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ทำบุญขอพรก่อนลอง"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2566}
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {health: 1.3}}, text: "ทำบุญเสร็จวันนั้นไม่ได้คิดอะไรมาก แต่ปีนั้นก็มีข่าวดี", effects: {happiness: 3}, sets_flags: [has_kids], merit: [{cat: dana, level: 1}]}
+          - {weight: 3, text: "ทำบุญตั้งใจแล้ว ปีนั้นก็ยังไม่มี ทั้งคู่ยังยิ้มให้กันได้", effects: {happiness: -1}, merit: [{cat: dana, level: 1}]}
+        merit: [{cat: dana, level: 1}]
+      - id: let_go
+        text: "ปล่อยวาง พอแค่นี้"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]

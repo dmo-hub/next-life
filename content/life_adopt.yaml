@@ -1,0 +1,78 @@
+# รับบุตรบุญธรรม (ใบ 99 · 1ii-4 ข้อ 147 160): อายุ ≥30 ไม่มีลูก เงินไม่ตึง · โสดหรือมีคู่ก็ได้ · เด็กเล็ก (2 ขวบ) หรือเด็กโต (9 ขวบ)
+# กฎหมายผู้รับแก่กว่าเด็ก ≥15 ปี ⇒ when.age ขอบล่าง 30 ≥ 9+15 (lint family-ops ตรวจ) · เด็กเข้าบ้านเป็น child (m.adopted · m.adoptAge) นับเป็นทายาท/มรดกเหมือนลูกทั่วไป
+# เงินไม่ตึง = ไม่ติดหนี้ (ธง in_debt) และเงินสดอย่างน้อย 3 เดือนของรายได้ปี (money_x 0.25 · ตรงนิยาม TIGHT ใน belief.mjs)
+# ข้อความเลี่ยงคำว่า "ลูก" ในส่วนที่ยังไม่มีเด็ก (kin-unguarded) · ผลของการรับเป็นทางเดียว (ผ่านขั้นตอนครบแล้ว ไม่ทอย) ใช้ result
+events:
+  - id: fam_adopt_single_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 2}
+    when: {age: [30, 50], money_x: {min: 0.25}, flags: {not: [married, has_kids, in_debt]}}
+    title: "บ้านที่ยังมีห้องว่าง"
+    text: "งานนิ่ง เงินเก็บพอมีเหลือ บ้านก็เงียบเกินไปหน่อยตอนค่ำ เพื่อนคนหนึ่งเล่าว่าไปรับเด็กจากมูลนิธิมาเลี้ยงเป็นบุตรบุญธรรม ทุกวันนี้ครอบครัวเขาคึกคักกว่าเดิมมาก คุณนั่งนึกอยู่นานว่าตัวเองจะไหวไหม"
+    choices:
+      - id: adopt_small
+        text: "รับเด็กเล็กมาเลี้ยง"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บยังไม่พอค่าดำเนินการ"}
+        result: "ขั้นตอนใช้เวลาหลายเดือน สัมภาษณ์ ตรวจบ้าน เซ็นเอกสารกองโต วันที่ได้อุ้มเด็กสองขวบกลับบ้านคุณยืนยิ้มแหย ๆ อยู่หน้าประตูอยู่นาน บ้านหลังนี้ไม่เงียบอีกแล้ว"
+        effects: {happiness: 3, money: {unit: income_x, amount: -1}}
+        sets_flags: [has_kids]
+        family: [{add: child, adopted: true, age: 2}]
+        merit: [{cat: neutral}]
+      - id: adopt_older
+        text: "รับเด็กโตที่ไม่มีใครรับ"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บยังไม่พอค่าดำเนินการ"}
+        result: "เจ้าหน้าที่บอกตรง ๆ ว่าเด็กโตหาบ้านยาก เด็กเก้าขวบเงียบ ๆ ถือกระเป๋าใบเล็กมาที่บ้านคุณ สามวันแรกไม่พูดอะไรเลย วันที่สี่ถามว่าพรุ่งนี้ต้องย้ายไปที่อื่นอีกไหม"
+        effects: {happiness: 3, money: {unit: income_x, amount: -1}}
+        sets_flags: [has_kids]
+        family: [{add: child, adopted: true, age: 9}]
+        merit: [{cat: neutral}]
+      - id: visit_first
+        text: "ไปเยี่ยมบ้านเด็กก่อนตัดสินใจ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: not_now
+        text: "ขอทำให้ตัวเองมั่นคงก่อน"
+        effects: {money: {unit: income_x, amount: 0.5}}
+        merit: [{cat: neutral}]
+
+  - id: fam_adopt_couple_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 2}
+    when: {age: [30, 50], money_x: {min: 0.25}, spouse: {status: together}, flags: {has: [married], not: [has_kids, in_debt]}}
+    title: "เรื่องที่คุยกันมาหลายปี"
+    text: "คุณกับคู่ชีวิตคุยเรื่องมีเด็กมานานแล้ว บางปีก็ลอง บางปีก็เลิกพูด คืนนี้คู่ชีวิตวางโบรชัวร์ของมูลนิธิลงบนโต๊ะ แล้วบอกว่าถ้าเราทั้งคู่เห็นตรงกัน ก็ยินยอมรับเด็กมาเลี้ยงเป็นบุตรบุญธรรมได้"
+    choices:
+      - id: adopt_small
+        text: "ตกลงรับเด็กเล็กมาเลี้ยง"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บยังไม่พอค่าดำเนินการ"}
+        result: "ทั้งคู่เซ็นเอกสารยินยอมพร้อมกันต่อหน้าเจ้าหน้าที่ มือสั่นกันทั้งสองคน วันรับตัวเด็กสองขวบกลับบ้าน คู่ชีวิตอุ้มไม่ยอมปล่อยตลอดทางกลับ"
+        effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -1}}
+        sets_flags: [has_kids]
+        family: [{add: child, adopted: true, age: 2}]
+        merit: [{cat: neutral}]
+      - id: adopt_older
+        text: "ตกลงรับเด็กโตที่รอบ้านอยู่"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บยังไม่พอค่าดำเนินการ"}
+        result: "เด็กเก้าขวบที่เจ้าหน้าที่แนะนำมองทั้งคู่สลับกันไปมา ก่อนถามเสียงเบาว่าต้องเรียกว่าอะไรดี คู่ชีวิตตอบว่าเรียกแบบที่เธอสบายใจ คืนแรกเด็กนอนหลับทั้งที่ไฟห้องยังเปิดอยู่"
+        effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -1}}
+        sets_flags: [has_kids]
+        family: [{add: child, adopted: true, age: 9}]
+        merit: [{cat: neutral}]
+      - id: visit_first
+        text: "พากันไปเยี่ยมบ้านเด็กก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: keep_two
+        text: "บอกคู่ว่าอยู่กันสองคนก็พอแล้ว"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]

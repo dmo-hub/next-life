@@ -269,12 +269,12 @@ const f2 = (v) => v.toFixed(2);
 
   // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
   const N = 1200;
-  let wrong = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0;
+  let wrong = 0, invites = 0, invitesClosed = 0;
   for (let i = 0; i < N; i++) {
     const seed = mixSeed(404, i);
     const bot = BOTS[Object.keys(BOTS)[i % 6]];
-    let st0 = null, invited = false;
-    const { state: st } = playLife(seed, base, bot, (c, s) => {
+    let st0 = null;
+    playLife(seed, base, bot, (c, s) => {
       st0 = s;
       const ev = c.kind === 'event' && byId.get(c.id);
       if (ev && ev.choices.some((x) => x.gate)) {
@@ -283,13 +283,30 @@ const f2 = (v) => v.toFixed(2);
         if (c.choices.length !== ev.choices.length || shut.some((h, k) => h !== !!c.hidden?.[k] || (h && !c.locked?.[k]))) wrong++;
       }
       if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
-      if (c.id === 'biz_politics_invite_01') invited = true;
     });
-    if (st.flags.own_business && !(st.tree?.done?.r5 !== undefined)) { bizLives++; if (invited) bizInvite++; }
   }
   check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
-  check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
-  check('ใบ 04 นักธุรกิจที่ไม่โฟกัสการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
+  // ชวนในชีวิตสุ่มหายาก (เลขขยับตามลำดับสุ่มเมื่อเพิ่มการ์ด) — ส่วน "ต้องมีตัวอย่าง" วัดจากชีวิตที่เปิดประตูไว้ก่อน
+  let openInvites = 0;
+  for (let i = 0; i < 60; i++) {
+    const seed = mixSeed(405, i);
+    const st = newLife(seed, base);
+    st.gates = [OFFICE_GATE];
+    playLife(seed, base, BOTS[Object.keys(BOTS)[i % 6]], (c, s) => { if (/^office_/.test(c.id ?? '') && !s.office) openInvites++; }, st);
+  }
+  // การ์ดชวนนักธุรกิจออกตามธง own_business + อายุ 46–59 · ตั้งธงตั้งแต่เกิดแทนรอสุ่มเจอ
+  let bizLives = 0, bizInvite = 0;
+  for (let i = 0; i < 60; i++) {
+    const seed = mixSeed(406, i);
+    const st = newLife(seed, base);
+    st.flags.own_business = true;
+    let invited = false;
+    playLife(seed, base, BOTS[Object.keys(BOTS)[i % 6]], (c) => { if (c.id === 'biz_politics_invite_01') invited = true; }, st);
+    bizLives++; if (invited) bizInvite++;
+  }
+  check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด (ประตูปิดไม่ออก)', invitesClosed === 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
+  check('ใบ 04 ประตูการเมืองเปิดแล้ว การ์ดชวนออกได้', openInvites > 0, `${openInvites} ครั้ง/60 ชีวิต`);
+  check('ใบ 04 นักธุรกิจที่ยังไม่เปิดประตูการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
 }
 
 // ใบ 05a: อาชีพต่างโลกนับปีเต็มด้วยกติกากลาง — สคริปต์บังคับโฟกัสทีละตา ไม่ใช้บอท
@@ -1706,6 +1723,50 @@ const f2 = (v) => v.toFixed(2);
     if (af.heir.religion === parent.religion && nextLife(af).religion === parent.religion) kept++;
   }
   check('ศาสนา: ทายาททางเป็นลูก/สายเลือดถือศาสนาของบ้าน', child > 0 && kept === child, `${kept}/${child}`);
+}
+
+// รับบุตรบุญธรรม (ใบ 99 B114 ข้อ 147 160): op add child + adopted + age · เด็กเข้าบ้านเป็น child ทายาทเหมือนลูกทั่วไป · การ์ดขึ้นเฉพาะ ≥30 ไม่มีลูก เงินไม่ตึง
+{
+  const content = loadContent();
+  const E = await import('../src/engine/index.mjs');
+  const adopt = (seed, age, { married = false, sex = 'ชาย' } = {}) => {
+    const st = newLife(seed, content);
+    st.sex = sex;
+    st.age = 25;
+    if (married) applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    // ธงคู่นอกใจเปิดไว้ — ลูกที่เกิดช่วงนี้ถูกทอยว่าไม่ใช่ลูกเรา · ลูกบุญธรรมต้องไม่ถูกทอย
+    st.flags.spouse_cheated = true;
+    st.flagAge.spouse_cheated = 34;
+    st.age = 35;
+    applyFamily(st, { sets_flags: ['has_kids'], family: [{ add: 'child', adopted: true, age }] });
+    return st;
+  };
+  const stA = adopt(9100, 9, { married: true });
+  const kidA = stA.kin.find((m) => m.role === 'child');
+  check('ใบ 99 รับเด็กโต: เข้าบ้านเป็น child อายุตามที่เลือก · จด adopted/adoptAge · by = คู่ตอนรับ', !!kidA && kidA.adopted === true && kidA.adoptAge === 9 && E.memberAge(stA, kidA) === 9 && kidA.by === E.spouseOf(stA).id);
+  check('ใบ 99 ลูกบุญธรรมไม่ผ่านการทอยลูกคนอื่น (ธงคู่นอกใจเปิด) · ธง has_kids ติด · นับเป็นลูกที่ยังอยู่ 1', kidA.notMine === undefined && stA.flags.has_kids === true && E.livingChildren(stA) === 1);
+  const stB = adopt(9101, 2);
+  const kidB = stB.kin.find((m) => m.role === 'child');
+  check('ใบ 99 รับเด็กเล็กตอนโสด: อายุ 2 · by = null (ไม่มีคู่) · ไม่มีคู่ในบ้าน', E.memberAge(stB, kidB) === 2 && kidB.by === null && !stB.kin.some((m) => m.role === 'spouse'));
+  // ทายาท: เด็กโตรับตอน 35 อายุ 9 → ตอนเรา 44 เด็กอายุ 18 อยู่ในช่วง HEIR_AGE ให้เลือกเล่นต่อสายเลือดได้
+  stA.age = 44;
+  const heirs = E.heirCandidates(stA);
+  check('ใบ 99 ลูกบุญธรรมเป็นทายาท: เด็กอายุ 18 อยู่ในรายชื่อทายาทสายเลือด', heirs.length === 1 && heirs[0].id === kidA.id && heirs[0].age === 18);
+  const single = content.events.find((e) => e.id === 'fam_adopt_single_01');
+  const couple = content.events.find((e) => e.id === 'fam_adopt_couple_01');
+  const base = (over = {}, married = false) => {
+    const st = newLife(9102, content);
+    st.age = 35;
+    st.money = 1e8;
+    if (married) applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return Object.assign(st, over);
+  };
+  const gate = (e, st) => whenOk(st, e.when);
+  check('ใบ 99 การ์ดโสด: ออกที่ 35 ไม่มีลูก เงินพอ · ไม่ออกเมื่ออายุ 29 · มีลูกแล้ว · ติดหนี้ · เงินตึง · มีคู่',
+    gate(single, base()) === true && gate(single, base({ age: 29 })) === false && gate(single, (() => { const s = base(); s.flags.has_kids = true; return s; })()) === false
+      && gate(single, (() => { const s = base(); s.flags.in_debt = true; return s; })()) === false && gate(single, base({ money: 0 })) === false && gate(single, base({}, true)) === false);
+  check('ใบ 99 การ์ดมีคู่: ออกเมื่อคู่อยู่ด้วยกัน · ไม่ออกเมื่อไม่มีคู่ · แยกทาง',
+    gate(couple, base({}, true)) === true && gate(couple, base()) === false && gate(couple, (() => { const s = base({}, true); s.kin.find((m) => m.role === 'spouse').status = 'apart'; return s; })()) === false);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
