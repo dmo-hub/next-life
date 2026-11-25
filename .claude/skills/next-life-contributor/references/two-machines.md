@@ -38,9 +38,17 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
      ```json
      {
        "model": "<ชื่อโมเดลจาก gateway>",
+       "disableClaudeAiConnectors": true,
+       "autoCompactWindow": 60000,
+       "effortLevel": "medium",
        "env": {
          "ANTHROPIC_BASE_URL": "https://gateway.9arm.co",
-         "ANTHROPIC_AUTH_TOKEN": "<token>"
+         "ANTHROPIC_AUTH_TOKEN": "<token>",
+         "ANTHROPIC_DEFAULT_SONNET_MODEL": "<ชื่อโมเดลเดียวกับ model>",
+         "ANTHROPIC_DEFAULT_OPUS_MODEL": "<ชื่อโมเดลเดียวกับ model>",
+         "ANTHROPIC_DEFAULT_HAIKU_MODEL": "<ชื่อโมเดลเดียวกับ model>",
+         "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "128000",
+         "CLAUDE_CODE_DISABLE_ADVISOR_TOOL": "1"
        }
      }
      ```
@@ -52,6 +60,9 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
      function claude-9arm { claude --settings "$HOME\.claude-9arm.json" @args }
      ```
 
+   - `ANTHROPIC_DEFAULT_SONNET_MODEL` ต้องมี เพราะ skill `next-life-contributor` ตั้ง `model: sonnet` ไม่ตั้ง = gateway ตอบ `400`/`404` เรื่อง model · OPUS/HAIKU ตั้งชื่อเดียวกันกันงานย่อยที่ขอโมเดลอื่นพัง
+   - `effortLevel` ต้องมี ไม่ตั้ง = Claude Code ส่ง reasoning ระดับ xhigh แล้ว gateway ตอบ `400`
+   - `autoCompactWindow 60000` กันคำขอบวมจนชน TPM ของ key (ดู `api-errors.md` หัว "กัน 429 / 5xx")
    - ชื่อโมเดลในคลิปกับใน skill `qwen-agent` ไม่ตรงกัน ให้เช็กกับรายชื่อของ gateway แล้วลอง `claude-9arm -p "ตอบคำว่า ok"` ต้องได้ ok
 4. `~/.claude` เริ่มจากโล่ง
    - CLAUDE.md global สั้นที่สุด (ภาษาที่ตอบ + "ทำตาม CONTRIBUTING.md") เพราะทุกบรรทัดกิน 128k
@@ -120,11 +131,11 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
 
 - rebase บน `origin/main` ล่าสุด → `node build.mjs` → ด่าน → `git push -u origin lane-home/<ชื่อใบ>` → เปิด PR (ปิด issue ด้วย `Closes #<เลข>`)
 - เปิด PR ทีละใบเมื่อเสร็จ ไม่รอรวมชุด
-- ผู้รวมงานตีกลับใน PR = เปิด session ใหม่ที่ worktree เดิม อ่าน comment ใน PR ก่อนแก้
+- ผู้รวมงานตีกลับใน PR = เปิด session ใหม่ที่ worktree เดิม อ่าน comment ทั้งใน PR และใน issue ของใบก่อนแก้ (คำสั่งแก้มักอยู่ใน issue)
 
 ### เก็บกวาดหลัง merge
 
-- PR merge แล้ว: เช็ก `git -C <wt> status --short` ว่างก่อน แล้ว `git -C next-life worktree remove ../nl-home-<ชื่อใบ>` · ไม่ต้องลบ branch
+- PR ปิดแล้ว (`MERGED` หรือ `CLOSED` เพราะลงด้วย cherry-pick) เช็กว่าลงครบตามหัว "หลัง PR ปิด" ใน `SKILL.md` · `git -C <wt> status --short` ต้องว่าง แล้ว `git -C next-life worktree remove ../nl-home-<ชื่อใบ>` · ไม่ต้องลบ branch
 - `git -C next-life pull --ff-only` ให้ clone หลักตาม main
 
 ## sync ไฟล์งานของเจ้าของ (repo ไฟล์งาน next-life)
@@ -147,129 +158,7 @@ push แล้วขึ้น rejected (non-fast-forward) = อีกเคร�
 
 ## เซสชันเจอ API Error
 
-### แยกก่อนว่า error มาจากไหน
-
-| เซสชันเปิดด้วย | error มาจาก | ทำอะไรได้ |
-|---|---|---|
-| `claude` | Anthropic API | รอ · ดู status.claude.com · แก้ฝั่งเราไม่ได้ |
-| `claude-9arm` | gateway 9arm (LiteLLM) | เช็คด้วย `claude-9arm-check` แล้วแก้ตามตารางล่าง |
-
-### `claude-9arm-check` (ยิง gateway ตรง ไม่ผ่าน Claude Code · ไม่พิมพ์ token)
-
-วางที่ `~/.local/bin/claude-9arm-check` (ต้องอยู่ใน PATH) · อ่านค่าจาก `~/.claude-9arm/settings.json` · ถ้าเครื่องเก็บ config ไว้ที่อื่น แก้บรรทัด `CFG`
-
-```bash
-#!/usr/bin/env bash
-set -u
-CFG="$HOME/.claude-9arm/settings.json"
-field() { python -I -c "import json,sys;s=json.load(open(sys.argv[1],encoding='utf-8'));e=s['env'];v={'base':e['ANTHROPIC_BASE_URL'].rstrip('/'),'token':e['ANTHROPIC_AUTH_TOKEN'],'model':s['model']}[sys.argv[2]];sys.stdout.write(v)" "$CFG" "$1"; }
-BASE=$(field base); TOKEN=$(field token); MODEL=$(field model)
-OUT=$(mktemp); HDR=$(mktemp)
-CODE=$(curl -s -o "$OUT" -D "$HDR" -w '%{http_code} %{time_total}s' --max-time 120 \
-  -H "Authorization: Bearer $TOKEN" -H "content-type: application/json" -H "anthropic-version: 2023-06-01" \
-  -d "{\"model\":\"$MODEL\",\"max_tokens\":8,\"messages\":[{\"role\":\"user\",\"content\":\"reply ok\"}]}" \
-  "$BASE/v1/messages")
-echo "model=$MODEL status=$CODE"
-tr -d '\r' < "$HDR" | awk -F': ' 'tolower($1)=="x-litellm-key-spend"{s=$2} tolower($1)=="x-litellm-key-max-budget"{b=$2} tolower($1)=="x-litellm-key-tpm-limit"{t=$2} END{if(b!="") printf "budget: spent $%.2f of $%s (%.0f%%) · tpm-limit=%s\n", s, b, 100*s/b, t}'
-head -c 300 "$OUT"; echo
-rm -f "$OUT" "$HDR"
-```
-
-บรรทัด `budget:` อ่านจาก header ของ gateway (`x-litellm-key-*`) · งบหมด = ทุก session ที่ใช้ key นี้พังพร้อมกัน
-
-- ใช้ `sys.stdout.write` ไม่ใช่ `print` เพราะ python บน Windows ต่อท้ายด้วย `\r` แล้ว gateway ตอบ `400 Invalid JSON payload: unexpected control character`
-- ตั้งเสร็จลองครั้งแรกต้องได้ `200` · ลองเปลี่ยน token เป็นค่ามั่วชั่วคราวต้องได้ `401` (ไม่ได้ = ตัวเช็คใช้ไม่ได้) แล้วคืนค่าจริง
-
-### อ่านผล
-
-| ผล | สาเหตุ | แก้ |
-|---|---|---|
-| `401 token_not_found` | token ผิด · หมดอายุ · ถูก revoke | ขอ token ใหม่จาก 9arm ใส่ใน settings |
-| `400` เรื่อง effort / reasoning | ไม่ได้ตั้ง `effortLevel` → ใช้ xhigh แล้วโดนปฏิเสธ | ตั้ง `"effortLevel": "medium"` · เช็คว่าเซสชันไม่ได้สั่ง `/effort` ทับ |
-| `400` / `404` เรื่อง model | gateway เปลี่ยนชื่อโมเดล | ถาม 9arm ชื่อใหม่ แก้ทุกจุดใน settings (`model` + `ANTHROPIC_DEFAULT_*_MODEL`) |
-| `429` | ยิงเกินโควตาหรือถี่เกิน | รอ · ลดจำนวน session qwen ที่รันพร้อมกัน |
-| `5xx` · `524` · timeout | gateway ล่มหรือคิวยาว (`524` = คำขอเกิน 100 วิ) | รอ 5–10 นาทีแล้วเช็คใหม่ · ห้าม retry รัว |
-| `200` แต่เซสชันยังพัง | gateway ปกติ ปัญหาอยู่ที่เซสชัน | มักเป็น context เต็มหรือคำขอยาว → ซอยใบให้เล็กลง |
-
-`200` ที่ใช้เวลาหลายสิบวินาทีสำหรับคำตอบ 8 token = คิว gateway ยาว · งานยาวเสี่ยง `524` ช่วงนั้น
-
-### กัน 429 / 5xx
-
-เพดานของ key อ่านจาก header: **TPM 1,000,000 token/นาที** (ไม่มี rpm limit) + **งบรวม** (`x-litellm-key-max-budget`) · ทุก session ที่ใช้ token เดียวกันแบ่งโควตาเดียว
-
-ทำไม 429 เกิด: แต่ละคำขอส่ง context ทั้งก้อน (system prompt + CLAUDE.md + ประวัติแชต) · session ละ ~60k × หลายคำขอ/นาที × หลาย session = ชน 1M ง่าย · session ที่โหลด `~/.claude/CLAUDE.md` ของเครื่องเจ้าของ (หลายร้อย KB) ชนเร็วกว่ามาก
-
-| เรื่อง | กติกา |
-|---|---|
-| จำนวน session | qwen พร้อมกัน **ไม่เกิน 2** · ด่านหนักยังทีละ 1 ตามหัว "ด่านกับ CPU/RAM" |
-| config | qwen ใช้ config dir แยก (`CLAUDE_CONFIG_DIR=~/.claude-9arm`) เท่านั้น · ห้ามใส่ env ของ gateway ใน `~/.claude/settings.json` — ทุก session ใน `~/.claude` จะกลายเป็น qwen ที่โหลด CLAUDE.md ตัวใหญ่ |
-| ขนาด context | `autoCompactWindow 60000` · session ที่บวม (log หลาย MB) ห้ามใช้ต่อ เปิดใหม่ด้วย handoff |
-| ปลุก session | ห้าม SendMessage หาหลาย session พร้อมกัน — ทุกตัวยิง gateway ทันที |
-| ก่อนเปิด session ใหม่ | `claude-9arm-check` · ตอบช้าเกิน 20 วิ = คิวยาว รอ |
-| retry | `"CLAUDE_CODE_MAX_RETRIES": "15"` ใน `env` · ช่วยผ่าน 503/429 ช่วงสั้น ไม่ช่วยตอนล่มนาน |
-| 5xx | ฝั่งเราแก้ไม่ได้ · ล่มนาน = รอ หรือให้เครื่องเจ้าของทำแทน |
-
-**hook เตือนตอนเปิด session ที่ 3** — วาง `~/.claude-9arm/hooks/concurrency.py` แล้วผูกใน `~/.claude-9arm/settings.json` · นับ transcript ใน `~/.claude-9arm/projects` ที่เขียนภายใน 5 นาที (ไม่นับตัวเอง) · เตือนอย่างเดียว ไม่บล็อก
-
-```python
-import glob, json, os, sys, time
-
-ACTIVE_WINDOW_SEC = 300
-MAX_OTHERS = 1
-
-try:
-    sid = json.load(sys.stdin).get("session_id", "")
-except Exception:
-    sid = ""
-
-root = os.path.join(os.path.expanduser("~"), ".claude-9arm", "projects")
-now = time.time()
-others = [
-    f for f in glob.glob(os.path.join(root, "*", "*.jsonl"))
-    if now - os.path.getmtime(f) < ACTIVE_WINDOW_SEC and sid not in os.path.basename(f)
-]
-
-if len(others) > MAX_OTHERS:
-    msg = (f"qwen: {len(others)} other sessions active on the same 9arm key (TPM 1M/min). "
-           f"Running more than {MAX_OTHERS + 1} at once risks 429 - close idle ones first.")
-    print(json.dumps({"systemMessage": msg}))
-```
-
-```json
-"hooks": {
-  "SessionStart": [
-    { "hooks": [ { "type": "command", "command": "python -I <HOME>/.claude-9arm/hooks/concurrency.py" } ] }
-  ]
-}
-```
-
-- ข้อความเป็น ASCII เพราะ stdout ของ python บน Windows เป็น cp1252 · ข้อความไทยทำ hook ล้ม
-- ตั้งเสร็จทดสอบ: ป้อน `{"session_id":"zzz"}` ตอนมี session อื่นรัน ≥2 ต้องได้ `systemMessage` · แก้ `ACTIVE_WINDOW_SEC` เป็น 1 ต้องเงียบ
-
-**ใช้ qwen ในแผง Claude ของ VS Code** — `claudeCode.environmentVariables` เป็น scope `machine` ตั้งรายโฟลเดอร์ไม่ได้ (ตั้งใน VS Code หลัก = ทุกแผงเป็น qwen) · เปิด VS Code อีกอินสแตนซ์ที่ user settings แยก:
-
-- `code --user-data-dir "<HOME>/.vscode-qwen" <repo>` (extension ใช้ชุดเดิม)
-- `<HOME>/.vscode-qwen/User/settings.json`: `"claudeCode.environmentVariables": [{ "name": "CLAUDE_CONFIG_DIR", "value": "<HOME>/.claude-9arm" }]` + สี title bar ต่างจากหน้าต่างหลัก กันสับสน
-- ยืนยันว่าเป็น qwen จริง: transcript ต้องไปขึ้น `~/.claude-9arm/projects` และ `message.model` ของคำตอบเป็นโมเดล qwen ไม่ใช่ `claude-*`
-
-### กู้งาน
-
-**Claude ส่งงานย่อยผ่าน `claude-9arm -p` แล้วพัง**
-
-1. `claude-9arm-check`
-2. ได้ `200` → retry ได้ 1 ครั้งด้วย prompt ที่เล็กลง (ทีละไฟล์)
-3. พังซ้ำหรือได้ `5xx` → Claude ทำงานนั้นเอง ห้าม retry ครั้งที่ 3
-4. ดู `git diff` ก่อนทำต่อเสมอ qwen อาจแก้ไฟล์ไปครึ่งทาง
-
-**session qwen ที่ทำทั้งใบพัง**
-
-1. ดู state จาก git ตามหัว "เซสชัน AI พังกลางใบงาน" ใน `SKILL.md`
-2. `claude-9arm-check` · ไม่ได้ `200` = รอ อย่าเปิด session ใหม่ซ้ำ (เจอ error เดิม)
-3. ได้ `200` → เปิด `claude-9arm` ใหม่ใน worktree เดิม ส่ง handoff ตามแม่แบบใน `SKILL.md`
-4. ด่านที่ session เก่าบอกว่าผ่าน ต้องรันใหม่ทั้งหมด
-5. เลิกทำใบนั้น → comment ปลดการจองใน issue ทันที (`ปลดจอง · <เหตุผล>`) ไม่งั้นไม่มี session ไหนหยิบต่อได้
-
-**gateway ล่มนาน** qwen กู้เองไม่ได้ · ใบด่วนให้เครื่องเจ้าของทำแทน · ใบไม่ด่วนปลดจองแล้วรอ
+อยู่ที่ `api-errors.md` อ่านเมื่อเจอ error เท่านั้น
 
 ## qwen เริ่มหลุด
 

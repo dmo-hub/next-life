@@ -1,5 +1,6 @@
 ---
 name: next-life-contributor
+model: sonnet
 description: ขั้นตอนส่งงานเข้า next-life สำหรับผู้ร่วมทำ ตั้งแต่รับใบงาน ทำ branch รันด่าน จนเปิด PR ที่ผ่านการตรวจ ใช้เมื่อจะเริ่มใบงาน เพิ่มเนื้อหา/ระบบ แก้ engine content หรือหน้าเว็บ commit push เปิดหรือแก้ PR แก้ conflict กับ main PR ถูกตีกลับ หรือเซสชัน AI พังกลางใบงาน (API error · context เต็ม) แล้วต้องกู้งานต่อ
 ---
 
@@ -10,9 +11,9 @@ description: ขั้นตอนส่งงานเข้า next-life ส�
 
 ## ก่อนลงมือ
 
-อ่าน `references/process.md` ก่อนทุกใบ ไฟล์นั้นบอกลำดับงาน กฎหน้า tweak และด่านตามชนิดงาน
+ไฟล์นี้พอสำหรับใบทั่วไป อ่าน `references/process.md` เฉพาะใบปรับหน้าจอ (หน้า tweak) ใบที่แตะ `src/engine` หรือ `content` (ด่านเพิ่ม) และใบย้ายโค้ดที่ต้องพิสูจน์ด้วย lifehash
 
-เครื่องที่ใช้ Claude Code ต่อ gateway 9arm (Qwen) อ่าน `references/two-machines.md` ด้วย ไฟล์นั้นบอกการเตรียมเครื่องและขนาดใบงานที่ใส่ context 128k ได้
+เครื่อง qwen (gateway 9arm) อ่าน `references/two-machines.md` ตามหัวที่ต้องใช้ ไม่อ่านทั้งไฟล์: "เตรียมเครื่อง qwen" ครั้งแรกครั้งเดียว · "ทำหลายใบขนาน" เมื่อเปิดมากกว่า 1 session · เจอ API error อ่าน `references/api-errors.md`
 
 
 1. ต้องมี issue ที่ assign ให้ (1 issue = 1 ใบ = 1 PR) ไอเดียใหม่ที่ไม่มีใบ เปิด issue ด้วยฟอร์ม "เสนอสายหรือระบบใหม่" ก่อน รอเจ้าของเคาะ แล้วค่อยเขียน ระบบใหม่ทั้งสายไม่เริ่มจาก PR
@@ -83,6 +84,22 @@ PR ควรเล็กพอให้อ่านจบ ระบบใหญ�
 
 ## PR ถูกตีกลับหรือปนของนอกใบ
 
+เช็กผลตรวจ = ดูทั้ง `gh pr view <pr> --comments` **และ** `gh issue view <issue> --comments` · คำสั่งแก้ของเจ้าของหรือผู้รวมงาน (ขึ้นต้น `# เจ้าของ`) มักอยู่ใน issue ของใบ ไม่ใช่ใน PR · PR ที่ `reviews: []` ไม่ได้แปลว่ายังไม่มีคนตรวจ
+
+ผู้รวมงานสั่งย้ายฐาน (ทิ้ง commit build แล้ว build ใหม่เป็น commit ท้าย) ไม่ต้อง `reset --hard` หรือ `rebase -i`:
+
+```bash
+git fetch origin
+git rebase --onto <sha main ที่ผู้รวมงานสั่ง> <sha ฐานเดิม>
+# commit source ย้ายผ่าน · ชนที่ commit build (docs/*) → ทิ้ง commit นั้น
+git rebase --skip
+node build.mjs
+git add -- docs/<ไฟล์ที่ build เปลี่ยน>
+git commit -m "build(docs): rebuild หลังย้ายฐาน"
+```
+
+ถ้า commit source ชนจริง rebase หยุดให้เห็นตรงนั้น แก้ชนแล้ว `git rebase --continue` · ห้าม `--skip` commit source
+
 อย่าแก้ทับบน branch เก่าที่ห่าง main มาก ให้ยกเฉพาะไฟล์งานขึ้น branch ใหม่
 
 ```bash
@@ -92,6 +109,21 @@ git checkout <branch เก่า> -- <ไฟล์งานที่เพิ�
 ```
 
 ไฟล์เดิมที่ทั้งสองฝั่งแก้ (`build.mjs` `src/engine/life.mjs` `src/node/load.mjs`) ห้าม checkout ทับ เพราะจะลบงานใน main ทิ้ง ให้เติมบรรทัดของงานเองทีละจุด แล้ว build และรันด่านใหม่ทั้งชุด ปิด PR เก่าแล้วเปิดใหม่ หรือ force push branch ของตัวเอง
+
+## หลัง PR ปิด
+
+ผู้รวมงานเอางานลง main ได้ทั้ง merge และ cherry-pick · ลงด้วย cherry-pick แล้วปิด PR สถานะจะเป็น `CLOSED` ไม่ใช่ `MERGED` · ห้ามดูแค่ `state` แล้วสรุปว่างานไม่ลง (เปิด PR ซ้ำ) หรือลงแล้ว (ลบ branch)
+
+1. อ่านคอมเมนต์ปิดใน PR และ issue ของใบ
+2. เช็กว่าลงครบ:
+
+   ```bash
+   git fetch origin
+   git cherry origin/main <head PR> <ฐาน PR>
+   ```
+
+   ทุก commit source ต้องขึ้น `-` (patch เดียวกับบน main) · commit build ขึ้น `+` ได้ เพราะ main build ใหม่เอง
+3. ลงด้วย cherry-pick แล้ว `git branch -d` ไม่ผ่าน (commit ไม่ใช่ ancestor ของ main) · ห้ามใช้ `-D` เอง รอผู้รวมงานสั่งลบ
 
 ## เซสชัน AI พังกลางใบงาน (API error · context เต็ม · เครื่องดับ)
 
