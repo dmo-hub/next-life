@@ -44,7 +44,6 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
        "env": {
          "ANTHROPIC_BASE_URL": "https://gateway.9arm.co",
          "ANTHROPIC_AUTH_TOKEN": "<token>",
-         "ANTHROPIC_DEFAULT_SONNET_MODEL": "<ชื่อโมเดลเดียวกับ model>",
          "ANTHROPIC_DEFAULT_OPUS_MODEL": "<ชื่อโมเดลเดียวกับ model>",
          "ANTHROPIC_DEFAULT_HAIKU_MODEL": "<ชื่อโมเดลเดียวกับ model>",
          "CLAUDE_CODE_MAX_CONTEXT_TOKENS": "128000",
@@ -60,7 +59,7 @@ qwen ไม่รู้อะไรจากแชตของเจ้าขอ
      function claude-9arm { claude --settings "$HOME\.claude-9arm.json" @args }
      ```
 
-   - `ANTHROPIC_DEFAULT_SONNET_MODEL` ต้องมี เพราะ skill `next-life-contributor` ตั้ง `model: sonnet` ไม่ตั้ง = gateway ตอบ `400`/`404` เรื่อง model · OPUS/HAIKU ตั้งชื่อเดียวกันกันงานย่อยที่ขอโมเดลอื่นพัง
+   - OPUS/HAIKU ตั้งชื่อเดียวกับ `model` กันงานย่อยที่ขอโมเดลอื่นพัง
    - `effortLevel` ต้องมี ไม่ตั้ง = Claude Code ส่ง reasoning ระดับ xhigh แล้ว gateway ตอบ `400`
    - `autoCompactWindow 60000` กันคำขอบวมจนชน TPM ของ key (ดู `api-errors.md` หัว "กัน 429 / 5xx")
    - ชื่อโมเดลในคลิปกับใน skill `qwen-agent` ไม่ตรงกัน ให้เช็กกับรายชื่อของ gateway แล้วลอง `claude-9arm -p "ตอบคำว่า ok"` ต้องได้ ok

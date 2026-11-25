@@ -1,6 +1,5 @@
 ---
 name: next-life-contributor
-model: sonnet
 description: ขั้นตอนส่งงานเข้า next-life สำหรับผู้ร่วมทำ ตั้งแต่รับใบงาน ทำ branch รันด่าน จนเปิด PR ที่ผ่านการตรวจ ใช้เมื่อจะเริ่มใบงาน เพิ่มเนื้อหา/ระบบ แก้ engine content หรือหน้าเว็บ commit push เปิดหรือแก้ PR แก้ conflict กับ main PR ถูกตีกลับ หรือเซสชัน AI พังกลางใบงาน (API error · context เต็ม) แล้วต้องกู้งานต่อ
 ---
 
