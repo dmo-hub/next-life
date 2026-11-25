@@ -1100,7 +1100,8 @@ const f2 = (v) => v.toFixed(2);
       if (mode === 'quit' && quit >= 0 && !out) { k = quit; out = true; }
       else if (mode === 'med' && rush >= 0) { k = rush; out = true; }
       else if (out && work >= 0 && open.includes(work)) k = work;
-      else { open = open.filter((x) => x !== quit); k = open[R.int(0, open.length - 1)]; }
+      // ทางบวชเรียน (pali · มาจาก main) พาไปอีกเส้นที่ไม่มีการ์ดหางานในช่วงที่ดู · เลี่ยงไว้ ถ้าเหลือแต่ทางบวชค่อยเลือก
+      else { open = open.filter((x) => x !== quit); const lay = open.filter((x) => !/บวช/.test(c.choices[x])); if (lay.length) open = lay; k = open[R.int(0, open.length - 1)]; }
       choose(st, k);
     }
     return { out, job, skip: st.dead || !!st.trip || !!st.court || !out };
