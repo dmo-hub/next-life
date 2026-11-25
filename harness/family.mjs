@@ -44,7 +44,9 @@ let loveCards = 0, loveEarly = 0, rewed = 0, rewedBad = 0;
 // · อายุแต่งครั้งแรกเฉลี่ยอยู่ใน WED_AGE · "เคยแต่ง" = flagAge.married (จดครั้งแรก ไม่ลบตอนคู่จากไป)
 // เทียบกันเองในเกม ไม่ใช่เทียบโลกจริง
 // ช่วงเล็กสุดต่ำกว่า WED_MIN คน (อยู่ถึง 45) = ข้ามข้อส่วนต่าง: noise ของตัวอย่างเล็กเกิน 3 pp เอง (--n 1000 ช่วงเล็กสุด ~350–500 คน ตก 2 ใน 3 seed)
-const WED_SPREAD = 3, WED_AGE = [24, 28], WED_MIN = 2000;
+// ใบ 100: กรอบอายุแต่งแรกเฉลี่ยอ่านจาก data/first-marriage-age.json (ค่าเท่ากรอบเดิม · เจ้าของให้คงไว้)
+const wedData = JSON.parse(readFileSync(new URL('../data/first-marriage-age.json', import.meta.url), 'utf8'));
+const WED_SPREAD = 3, WED_AGE = [wedData.harness_mean_age.from, wedData.harness_mean_age.to], WED_MIN = 2000;
 const wedCohort = new Map();
 // ใบ 93 (B114 ข้อ 153 167): สัดส่วนคู่แรกของชีวิตที่หย่า แยกตามปีที่แต่ง · กรอบอยู่ data/divorce-rate.json
 const divBands = JSON.parse(readFileSync(new URL('../data/divorce-rate.json', import.meta.url), 'utf8')).bands.map((x) => ({ ...x, wed: 0, div: 0 }));

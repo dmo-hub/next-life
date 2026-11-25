@@ -1,0 +1,120 @@
+# แต่งครั้งแรกหลัง 30 (ใบ 100 · B114 ข้อ 159 169): คนโสด 31–50 ยังมีคนคบหา/ชวนแต่ง · โอกาสลดตามอายุ (น้ำหนัก 3 → 2 → 1 ต่อช่วงวัย)
+# ใบละช่วงวัยเพราะกองสุ่มแยกตาม stage (ทำงาน ถึง 45 · กลางคน 46+) · ช่วงอายุแต่งแรกตามยุคอยู่ data/first-marriage-age.json (TEMP รอใบ research)
+# when ไม่มีเงื่อนไข "ไม่เคยแต่ง" (ไม่มีกลไกอ่านประวัติคู่ในเงื่อนไข) ⇒ ข้อความเลี่ยงคำว่าครั้งแรก/ลูก · คนม่ายที่เคยมีคู่อาจเจอได้ ไม่ผิดเนื้อเรื่อง
+# ธง married แกนเพิ่มคู่ให้เอง (ไม่ใช้ family: add) · ตัวเลือกปฏิเสธ/รอ ไม่ตั้งธง ⇒ การ์ดกลับมาได้ตาม repeat
+events:
+  - id: late_wed_work_35_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    repeat: {gap: 3, max: 2}
+    when: {age: [31, 35], flags: {not: [married]}}
+    title: "คนที่ชวนไปกินข้าวบ่อยขึ้น"
+    text: "คนที่คุยกันมาเป็นปีเริ่มพูดถึงอนาคตแบบมีคุณอยู่ในประโยค ญาติถามทุกงานบุญว่าเมื่อไหร่จะเลี้ยงข้าวสักที คืนนี้เขาถามตรง ๆ ว่าอยากไปต่อด้วยกันไหม"
+    choices:
+      - id: marry_now
+        text: "ตกลง จดทะเบียนกันเลย"
+        result: "ทั้งคู่ไปสำนักงานเขตตั้งแต่เช้า พยานเป็นเพื่อนสนิทสองคน ถ่ายรูปหน้าอำเภอแล้วแยกย้ายไปทำงานต่อ ค่ำนั้นกินข้าวต้มด้วยกันเงียบ ๆ"
+        effects: {happiness: 2, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: wedding_feast
+        text: "ตกลง แล้วจัดโต๊ะจีนให้ญาติ"
+        requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บยังไม่พอจัดโต๊ะ"}
+        result: "ญาติสองฝ่ายนั่งเต็มร้าน เจ้าสาวกับเจ้าบ่าวผมขาวแซมกันทั้งคู่ ป้าข้างบ้านร้องไห้ก่อนใคร ซองมาเกือบครบค่าอาหาร"
+        effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1.5}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: date_more
+        text: "ขอคบดูใจกันไปก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: single_fine
+        text: "ปฏิเสธ อยู่คนเดียวสบายกว่า"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.3}}
+        merit: [{cat: neutral}]
+      - id: pray_sign
+        text: "ไปไหว้ขอให้ใจนิ่งก่อนตอบ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: dana, level: 1}]
+
+  - id: late_wed_work_45_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    repeat: {gap: 4, max: 2}
+    when: {age: [36, 45], flags: {not: [married]}}
+    title: "งานเลี้ยงรุ่นที่นั่งข้างกัน"
+    text: "งานเลี้ยงรุ่นปีนี้โต๊ะส่วนใหญ่พูดเรื่องค่าเทอมและงานบ้าน คุณนั่งข้างเพื่อนเก่าที่ยังโสดเหมือนกัน คุยกันถึงตีหนึ่ง ก่อนแยกกันเขาถามว่าจะลองคบกันจริงจังดูไหม"
+    choices:
+      - id: marry_soon
+        text: "ตกลง แล้วจดทะเบียนปีนี้"
+        result: "ทั้งคู่ไม่รอฤกษ์ใหญ่ ไปจดทะเบียนวันธรรมดาแล้วเลี้ยงเพื่อนสนิทที่ร้านส้มตำ เพื่อนรุ่นโพสต์รูปแซวกันสามวันไม่เลิก"
+        effects: {happiness: 2, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: simple_feast
+        text: "ตกลง จัดเลี้ยงเล็ก ๆ ที่บ้าน"
+        requires: {money: {unit: income_x, amount: 1}, reason: "เงินเก็บยังไม่พอจัดเลี้ยง"}
+        result: "ปูเสื่อกลางลานหน้าบ้าน ญาติหิ้วกับข้าวมาคนละอย่าง ผู้ใหญ่ผูกข้อมือให้ทั้งคู่ เพื่อนบ้านบอกว่ารอวันนี้มานานจนเลิกรอไปแล้ว"
+        effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: slow_down
+        text: "ขอคบกันไปก่อน ไม่รีบ"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: stay_friends
+        text: "เป็นเพื่อนกันดีแล้ว"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: work_first
+        text: "ปฏิเสธ ขอเอางานก่อน"
+        effects: {money: {unit: income_x, amount: 0.4}, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: late_wed_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 1
+    repeat: {gap: 3, max: 2}
+    when: {age: [46, 50], flags: {not: [married]}}
+    title: "ข้างบ้านที่ฝากกับข้าวมาให้"
+    text: "คนข้างบ้านที่ทักกันมาหลายปีฝากกับข้าวมาให้บ่อยขึ้น วันนี้เขาเอ่ยเสียงเบาว่าอยู่คนเดียวกันทั้งคู่ ถ้าไม่ว่าอะไรก็อยากมาอยู่เป็นเพื่อนกันตลอดไป"
+    choices:
+      - id: accept_register
+        text: "ตกลง จดทะเบียนเงียบ ๆ"
+        result: "ไม่มีงานใหญ่ ไม่มีซอง แค่ไปสำนักงานเขตด้วยกันแล้วแวะซื้อกับข้าวกลับบ้านสองถุง คืนนั้นบ้านที่เงียบมานานมีเสียงทีวีสองคนดู"
+        effects: {happiness: 2, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: accept_monks
+        text: "ตกลง นิมนต์พระมารับพร"
+        requires: {money: {unit: income_x, amount: 0.5}, reason: "เงินเก็บยังไม่พอทำบุญ"}
+        result: "พระสามรูปสวดให้ที่หน้าบ้าน เพื่อนบ้านทั้งซอยมาร่วมกินข้าวถวายเพล ทั้งคู่ยกมือไหว้ไม่พร้อมกันจนทุกคนหัวเราะ"
+        effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -0.5}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: keep_neighbors
+        text: "ขอเป็นเพื่อนบ้านกันต่อไป"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: decline_kindly
+        text: "ปฏิเสธอย่างสุภาพ"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: ask_relatives
+        text: "ขอถามญาติก่อนตัดสินใจ"
+        outcomes:
+          - {weight: 2, ok: true, text: "ญาติทั้งบ้านเชียร์ บอกว่าอยู่คนเดียวมานานพอแล้ว", effects: {happiness: 2, relations: 1}}
+          - {weight: 1, text: "ญาติกังวลเรื่องมรดกก่อนเรื่องความรู้สึก ทะเลาะกันครึ่งวัน", effects: {happiness: -1, relations: -1}}
+        merit: [{cat: neutral}]

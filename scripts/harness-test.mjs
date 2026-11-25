@@ -1769,6 +1769,33 @@ const f2 = (v) => v.toFixed(2);
     gate(couple, base({}, true)) === true && gate(couple, base()) === false && gate(couple, (() => { const s = base({}, true); s.kin.find((m) => m.role === 'spouse').status = 'apart'; return s; })()) === false);
 }
 
+// แต่งครั้งแรกหลัง 30 (ใบ 100 B114 ข้อ 159 169): การ์ดคนโสด 31–50 · น้ำหนักลดตามอายุ · ตอบรับ = ธง married + คู่เข้าบ้าน + จดอายุตอนแต่ง · ไม่ออกเมื่อมีคู่แล้ว
+{
+  const content = loadContent();
+  const ids = ['late_wed_work_35_01', 'late_wed_work_45_01', 'late_wed_mid_01'];
+  const evs = ids.map((id) => content.events.find((e) => e.id === id));
+  const at = (age, over = {}) => {
+    const st = newLife(9200, content);
+    st.age = age;
+    return Object.assign(st, over);
+  };
+  const open = (age, over) => evs.map((e) => whenOk(at(age, over), e.when));
+  const pick = (a) => JSON.stringify(open(a));
+  check('ใบ 100 การ์ดแต่งหลัง 30 ครบ 3 ใบ', evs.every(Boolean));
+  check('ใบ 100 ออกเฉพาะช่วงวัยของใบ: 35 → ใบแรก · 36 และ 45 → ใบสอง · 46 และ 50 → ใบสาม · 30 และ 51 ไม่ออกเลย',
+    pick(35) === '[true,false,false]' && pick(36) === '[false,true,false]' && pick(45) === '[false,true,false]' && pick(46) === '[false,false,true]' && pick(50) === '[false,false,true]' && pick(30) === '[false,false,false]' && pick(51) === '[false,false,false]');
+  check('ใบ 100 น้ำหนักลดตามอายุ: 3 → 2 → 1', evs[0].weight > evs[1].weight && evs[1].weight > evs[2].weight);
+  const wedSt = at(35);
+  const yes = evs[0].choices.find((c) => c.id === 'marry_now');
+  applyFamily(wedSt, { sets_flags: yes.sets_flags, family: yes.family });
+  check('ใบ 100 ตอบรับตอนโสดอายุ 35: ธง married ติด · คู่เข้าบ้าน · จดอายุแต่ง 35 · ไม่มีการ์ดชุดนี้ซ้ำหลังแต่ง',
+    wedSt.flags.married === true && wedSt.flagAge.married === 35 && wedSt.kin.some((m) => m.role === 'spouse' && m.alive) && evs.every((e) => !whenOk(wedSt, e.when)));
+  const decline = evs[0].choices.filter((c) => !c.sets_flags?.includes('married'));
+  check('ใบ 100 ตัวเลือกที่ไม่ตอบรับไม่ตั้งธง married (ต้องเหลือ ≥3 ทาง ให้ผู้เล่นไม่แต่งได้)', decline.length >= 3);
+  const wd = JSON.parse(readFileSync(new URL('../data/first-marriage-age.json', import.meta.url), 'utf8'));
+  check('ใบ 100 data/first-marriage-age.json: 4 ช่วงยุคต่อกันไม่ทับ ครอบ 2500–2650 · ชายแต่งช้ากว่าหญิงทุกช่วง · 2560+ ยืมค่า 2550–59 (carry)', wd.bands.length === 4 && wd.bands[0].from === 2500 && wd.bands.at(-1).to === 2650 && wd.bands.every((b, i, a) => b.male > b.female && (i === 0 || b.from === a[i - 1].to + 1)) && wd.bands[3].carry === true && wd.bands[3].male === wd.bands[2].male && wd.bands[3].female === wd.bands[2].female);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {

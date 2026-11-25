@@ -1,0 +1,30 @@
+{
+  "_comment": "อายุแต่งครั้งแรกตามยุค (ใบ 100 · B114 ข้อ 159 169) · SMAM = อายุแต่งแรกเฉลี่ยจากสำมะโน/สำรวจ (UN WMD 2019 · ไฟล์ owner home/handoff/research-first-marriage-wip/first-marriage-age.csv) · ยุค 2560+ ไม่มีข้อมูล: เจ้าของเคาะ 11-24 ให้ยืมค่า 2550–59 (carry) ไม่ใช่ค่าสถิติ 2560+ · harness_mean_age ยังเป็นกรอบเดิมของ harness",
+  "harness_mean_age": {
+    "from": 24,
+    "to": 28,
+    "assumption": true,
+    "note": "กรอบเดิมของ harness/family.mjs (WED_AGE) ย้ายมาไว้ที่นี่ ค่าเท่าเดิมทุกตัว ไม่เปลี่ยนผลวัด · ยังไม่ได้เทียบกับ SMAM ข้างล่างว่ากรอบนี้ควรขยับไหม (เจ้าของเคาะ 2026-11-24 ให้คงไว้ · ค่าจริงชาย 28.5 เกินขอบบน 28 · ใบ 100 ไม่แตะ)"
+  },
+  "bands": [
+    { "from": 2500, "to": 2539, "male": 25.2, "female": 22.8, "source": "https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2019_wmd_marital_status.xlsx", "note": "เฉลี่ยจุด SMAM ปี 2513 (24.7/22.0) 2523 (24.9/22.8) 2533 (26.0/23.5) หารเอง" },
+    { "from": 2540, "to": 2549, "male": 27.4, "female": 24.1, "source": "https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2019_wmd_marital_status.xlsx", "note": "SMAM ปี 2543 จุดเดียว (สสช. 27.2/24.0 ใกล้เคียง)" },
+    { "from": 2550, "to": 2559, "male": 28.5, "female": 24.9, "source": "https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2019_wmd_marital_status.xlsx", "note": "SMAM ปี 2553 จุดเดียว (สสช. 28.3/23.7 ใกล้เคียง)" },
+    { "from": 2560, "to": 2650, "male": 28.5, "female": 24.9, "carry": true, "source": "carry 2550-59 · ไม่มีข้อมูล 2560+", "assumption": true, "note": "ยืมค่าช่วง 2550–59 ตามที่เจ้าของเคาะ 2026-11-24 (ผ่านผู้รวมงาน) · ไม่ใช่ค่าสำรวจ 2560+ · เปลี่ยนเป็นค่าจริงเมื่อมีแหล่ง" }
+  ],
+  "single_share": {
+    "year_be": 2553,
+    "male_30_34": 36.48,
+    "female_30_34": 23.45,
+    "male_45_49": 11.23,
+    "female_45_49": 9.48,
+    "source": "https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2019_wmd_marital_status.xlsx",
+    "note": "สัดส่วนที่ยังโสด % ของกลุ่มอายุ (สำมะโน 2553) · ชายโสดอายุ 30–34 ยังเกือบ 4 ใน 10 และเหลือ ~1 ใน 9 ที่ 45–49 ⇒ แต่งแรกหลัง 30 เป็นเรื่องปกติและลดลงตามอายุ ตรงกับน้ำหนักการ์ด 3/2/1"
+  },
+  "late_first_marriage": {
+    "age_from": 31,
+    "age_to": 50,
+    "assumption": true,
+    "note": "ช่วงอายุที่การ์ดใบ 100 ขึ้น (content/life_late_wed.yaml) · น้ำหนัก 3/2/1 เป็นการออกแบบ ไม่ใช่ค่าจากสถิติ"
+  }
+}
