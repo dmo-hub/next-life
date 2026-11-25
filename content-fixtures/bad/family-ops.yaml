@@ -24,6 +24,7 @@ events:
   - id: ok_case_partner
     type: A
     stage: ทำงาน
+    when: {love_free: true}
     years: [2500, 2650]
     text: "ข้อความการ์ด"
     choices:

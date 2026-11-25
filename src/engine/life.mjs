@@ -1,6 +1,6 @@
 import { makeRng, mixSeed } from './rng.mjs';
 import { dlcOpen, dlcStamp, getDlcDefault } from './dlc.mjs';
-import { sibsAtBirth, exPartnerOf, childFarOk, focusChildFar, childNotMineOk, focusChildNotMine, exSpouseOk, focusExSpouse, childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, spouseOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
+import { sibsAtBirth, exPartnerOf, childFarOk, focusChildFar, childNotMineOk, focusChildNotMine, exSpouseOk, focusExSpouse, loveFreeOk, divorcedOk,childMate, childMateWord, BIRTH_IDENTITY, identityOf, speechSex, newKin, nameParents, applyFamily, ageKin, familyOk, focusOf, livingChildren, kinAid, KIN_AID, pickFocus, lossText, lossOk, lastLoss, petsAtBirth, petsAfter, funeralWho, pickKinGhost, petCall, lossCall, petArrivals, petArriveText, parentDied, kinIllNews, kinIllOk, spouseOk, lastSpouseLoss, spouseYears, filialNote, filialOk, filialMirrorText, illParentWord, letterTo, letterToText } from './family.mjs';
 import { pickBirthYear, lifeQx, priceRatio, inflationRate, infantMortality, eraEventsAt, protoYear, qx, MAX_AGE } from './era.mjs';
 import { CHRONIC, ILL_YEARS, causeHazards, causeShares, pickCause, kinDeathRoll, inherit, careHelp, HIT, HIT_KILL, isAcute, frailOf } from './death.mjs';
 import { pickRegion, pickProvince, pickReligion, placeName, regionRatio, classOdds, nationalIncome, pickName, pickRealName } from './birth.mjs';
@@ -2270,6 +2270,8 @@ export function whenOk(st, when) {
   if (when.child_far && !childFarOk(st, when.child_far)) return false;
   if (when.child_not_mine && !childNotMineOk(st, when.child_not_mine)) return false;
   if (when.ex_spouse && !exSpouseOk(st, when.ex_spouse)) return false;
+  if (when.love_free && !loveFreeOk(st)) return false;
+  if (when.divorced && !divorcedOk(st, when.divorced)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.spouse && !spouseOk(st, when.spouse)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;

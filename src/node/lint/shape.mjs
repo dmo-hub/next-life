@@ -30,7 +30,7 @@ const KEYS = {
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'child_not_mine', 'ex_spouse', 'heredity', 'filial', 'spouse', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'child_not_mine', 'ex_spouse', 'divorced', 'love_free', 'heredity', 'filial', 'spouse', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
@@ -840,6 +840,31 @@ export const rules = [
       if (w === undefined) return;
       if (!isObj(w) || Object.keys(w).some((k) => k !== 'within')) return r('.when.ex_spouse', 'ex_spouse ต้องเป็น {within: [lo, hi]}');
       if (!isRange(w.within, 0, 60)) r('.when.ex_spouse.within', 'within ต้องเป็น [lo, hi] ปีหลังหย่า');
+    },
+  },
+  {
+    id: 'divorced',
+    desc: 'when.divorced = {after, within} — คนหย่าที่ยังโสด (ชีวิตคู่ล่าสุดจบด้วยการหย่า ไม่มีแฟน) หย่ามาแล้ว after–within ปี (ใบ 96) · คนม่ายใช้ when.loss',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.divorced : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => !['after', 'within'].includes(k))) return r('.when.divorced', 'divorced ต้องเป็น {after, within}');
+      if (!isRange([w.after, w.within], 0, 60)) r('.when.divorced', 'after และ within ต้องเป็นจำนวนปี 0–60 และ after ≤ within');
+    },
+  },
+  {
+    id: 'love-free',
+    desc: 'การ์ดที่ทำให้มีคนจีบ/แฟน/คู่ ต้องพ้นช่วงพักใจหลังหย่า: when.love_free: true หรือเงื่อนไขที่รับประกันว่าผ่านมาแล้ว ≥ 1 ปี (divorced.after · ex_spouse.within · loss คู่ตาย after) (ใบ 96)',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when : {};
+      if (w.love_free !== undefined && w.love_free !== true) return r('.when.love_free', 'love_free ใส่ได้แค่ true');
+      const mates = ['courter', 'partner', 'spouse'];
+      const parts = (Array.isArray(e.choices) ? e.choices : []).flatMap((c) => (isObj(c) ? [c, ...(Array.isArray(c.outcomes) ? c.outcomes.filter(isObj) : [])] : []));
+      const makes = parts.some((p) => (Array.isArray(p.sets_flags) && p.sets_flags.includes('married'))
+        || (Array.isArray(p.family) ? p.family : []).some((o) => isObj(o) && (mates.includes(o.add) || o.marry !== undefined || o.remarry !== undefined)));
+      if (!makes) return;
+      const waited = w.love_free === true || w.divorced?.after >= 1 || w.ex_spouse?.within?.[0] >= 1 || (w.loss?.after >= 1 && w.loss.roles?.includes('spouse'));
+      if (!waited) r('.when', 'การ์ดที่ทำให้มีคู่ต้องใส่ when.love_free: true');
     },
   },
   {

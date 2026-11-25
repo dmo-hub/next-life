@@ -206,6 +206,8 @@ function conditions(e, L) {
   }
   if (w.child_not_mine) out.push(`มีลูกที่ไม่ใช่ลูกทางสายเลือดของเรา${w.child_not_mine.age ? ` อายุ ${range(w.child_not_mine.age, ' ปี')}` : ''}`);
   if (w.ex_spouse) out.push(`ยังโสดหลังหย่า มีคู่เก่าที่ยังอยู่ หย่ามาแล้ว ${range(w.ex_spouse.within, ' ปี')} (คืนดีได้ครั้งเดียว)`);
+  if (w.divorced) out.push(`ยังโสดหลังหย่า หย่ามาแล้ว ${range([w.divorced.after, w.divorced.within], ' ปี')}`);
+  if (w.love_free) out.push('ไม่ใช่ปีที่เพิ่งหย่า');
   if (w.spouse) {
     const s = w.spouse;
     out.push(`มีคู่${s.status === 'apart' ? 'ที่แยกทางกันอยู่' : s.status === 'together' ? 'ที่อยู่ด้วยกัน' : ''}${s.bond ? ` ผูกพัน ${range(s.bond, '')}` : ''}${s.together ? ` อยู่ด้วยกัน ${range(s.together, ' ปี')}` : ''}${s.apart ? ` แยกทางมา ${range(s.apart, ' ปี')}` : ''}${s.wed ? ` แต่งปี ${range(s.wed, '')}` : ''}`);

@@ -1,0 +1,208 @@
+# รักครั้งใหม่ของคนหย่า (ใบ 96): พ้นปีที่หย่าถึงขึ้น (when.divorced after) ภายใน 10 ปี · ไม่มีคู่หรือแฟนอยู่ · คนม่ายใช้ชุด remarry.yaml
+# ใบละช่วงวัยเพราะกองสุ่มแยกตาม stage · ตอบรับแล้วต่อการ์ดแต่งใหม่ของวัยเดียวกัน
+# แต่งใหม่ใช้ธง married อย่างเดียว = แกนเพิ่มคู่คนใหม่ให้ คู่เก่ายังสถานะหย่า
+events:
+  - id: divlove_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 2
+    when: {divorced: {after: 1, within: 10}, flags: {not: [married]}}
+    title: "ข้าวกล่องสองกล่อง"
+    text: "ตั้งแต่หย่า คุณกินข้าวกลางวันคนเดียวมาตลอด ช่วงหลังคนรู้จักที่{ที่ทำงาน}ซื้อข้าวกล่องมาเผื่อทุกวันพุธ เย็นนี้เขาถามตรง ๆ ว่าพร้อมจะลองคบกันหรือยัง เขารู้ว่าคุณเคยผ่านอะไรมา"
+    choices:
+      - id: ready
+        text: "ตอบว่าลองดูกันจริงจัง"
+        outcomes:
+          - {weight: 3, ok: true, text: "คบกันได้ไม่นาน ทั้งสองคนก็เริ่มคุยกันเรื่องจดทะเบียน", effects: {happiness: 2, relations: 1}, next: divlove_wedding_work_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คนรอบตัวเอาเรื่องเก่าของคุณไปคุยกันสนุกปาก สองคนเลยคบกันเงียบ ๆ ไม่แต่ง", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "ขอเป็นคนกินข้าวด้วยกันไปก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: alone
+        text: "บอกว่าอยู่คนเดียวสบายใจกว่า"
+        effects: {happiness: 1, relations: -1}
+        merit: [{cat: neutral}]
+      - id: tell_all
+        text: "เล่าให้ฟังก่อนว่าหย่าเพราะอะไร"
+        outcomes:
+          - {weight: 1, ok: true, text: "เขาฟังจนจบแล้วเล่าเรื่องของตัวเองบ้าง คืนนั้นตกลงกันว่าจะไม่ปิดกันอีก", effects: {happiness: 2, relations: 1}, next: divlove_wedding_work_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ฟังจบเขาเงียบไปนาน วันพุธถัดมาไม่มีข้าวกล่องมาเผื่ออีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: ask_kids
+        text: "ถามลูกก่อนว่าคิดยังไง"
+        requires: {family: [{role: child, alive: true}], reason: "ไม่มีลูกให้ถาม"}
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกบอกว่าขอเจอตัวก่อน กินข้าวด้วยกันมื้อเดียวก็ยอมเปิดใจ", effects: {happiness: 1, relations: 2}, next: divlove_wedding_work_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกยังหวังให้บ้านกลับมาเหมือนเดิม ปิดประตูห้องไม่ยอมคุยต่อ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: divlove_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 2
+    when: {divorced: {after: 1, within: 10}, flags: {not: [married]}}
+    title: "คนที่รอรับใบเดียวกัน"
+    text: "เช้านี้ที่ว่าการอำเภอ คนนั่งข้างคุณบนม้านั่งคือเพื่อนเก่าที่มาคัดสำเนาใบหย่าเหมือนกัน คุยกันจนเลยคิว จากนั้นก็นัดกินข้าวต่อกันมาหลายเดือน วันนี้อีกฝ่ายถามว่าจะเริ่มใหม่ด้วยกันไหม"
+    choices:
+      - id: ready
+        text: "ตอบตกลง ขอเริ่มใหม่อีกรอบ"
+        outcomes:
+          - {weight: 3, ok: true, text: "อีกฝ่ายบอกว่ารอบนี้จะคุยเรื่องเงินกันให้ชัดตั้งแต่วันแรก", effects: {happiness: 2, relations: 1}, next: divlove_wedding_mid_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "พอพูดเรื่องบ้านกับสมบัติ ต่างคนต่างระแวง เลยคบกันต่อโดยไม่จดทะเบียน", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "ขอเป็นเพื่อนคุยกันไปก่อน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: alone
+        text: "บอกว่าเข็ดกับการจดทะเบียนแล้ว"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: temple_first
+        text: "ชวนกันไปทำบุญก่อนค่อยคิดต่อ"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_kids
+        text: "กลับไปถามลูกก่อน"
+        requires: {family: [{role: child, alive: true}], reason: "ไม่มีลูกให้ถาม"}
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกโตพอจะเข้าใจ บอกว่าอยากให้มีคนอยู่เป็นเพื่อน", effects: {happiness: 1, relations: 2}, next: divlove_wedding_mid_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกถามว่าบทเรียนรอบก่อนยังไม่พออีกหรือ คุยกันไม่จบ", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  - id: divlove_old_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 2
+    when: {age: [60, 85], divorced: {after: 1, within: 10}, flags: {not: [married]}}
+    title: "แปลงผักข้างรั้ว"
+    text: "หย่ากันตอนอายุปูนนี้ คนทั้งซอยยังพูดไม่เลิก มีแต่เพื่อนบ้านข้างรั้วที่ยื่นต้นกล้าพริกข้ามมาให้โดยไม่ถามอะไร ปลูกด้วยกันมาหลายฤดู เย็นนี้เขาถามว่าจะรื้อรั้วออกเลยดีไหม"
+    choices:
+      - id: ready
+        text: "ตอบว่ารื้อได้เลย"
+        outcomes:
+          - {weight: 3, ok: true, text: "หลานสองบ้านช่วยกันถอนเสารั้ว เจ้าอาวาสรับจะดูฤกษ์ให้", effects: {happiness: 2, relations: 1}, next: divlove_wedding_old_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ญาติฝั่งเขาห่วงเรื่องที่ดิน รั้วจึงหายไปแต่ทะเบียนไม่ได้จด", effects: {happiness: 1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: slow
+        text: "เปิดแค่ประตูเล็กไว้เดินหากัน"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+      - id: alone
+        text: "ขอให้รั้วอยู่ตรงเดิม"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: share_crop
+        text: "ชวนกันเก็บผักไปถวายวัด"
+        effects: {happiness: 1, relations: 1, money: {unit: income_x, amount: -0.1}}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_kids
+        text: "ปรึกษาลูกก่อน"
+        requires: {family: [{role: child, alive: true}], reason: "ไม่มีลูกให้ถาม"}
+        outcomes:
+          - {weight: 1, ok: true, text: "ลูกบอกว่าอยู่คนเดียวมานานพอแล้ว มีคนดูกันก็เบาใจ", effects: {happiness: 1, relations: 2}, next: divlove_wedding_old_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ลูกกลัวคนอื่นพูดว่าบ้านนี้มีเรื่องไม่จบ ขอให้คิดใหม่", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+
+  # ← เรื่องต่อของการ์ดรักใหม่ วัยละใบ (เรื่องต่อต้องอยู่ช่วงเดียวกับแม่ · ไม่มี weight · ออกทาง next เท่านั้น)
+  - id: divlove_wedding_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {divorced: {after: 1, within: 10}, flags: {not: [married]}}
+    title: "จดทะเบียนอีกครั้ง"
+    text: "เจ้าหน้าที่อำเภอขอดูใบหย่าฉบับเดิมก่อนเปิดสมุดทะเบียน คนใหม่ยืนรออยู่ข้าง ๆ แล้วถามว่ารอบนี้อยากจัดงานแบบไหน"
+    choices:
+      - id: quiet
+        text: "จดเสร็จแล้วกินข้าวกันสองคน"
+        effects: {happiness: 2}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: small_party
+        text: "เลี้ยงโต๊ะจีนเฉพาะคนสนิท"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.4}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: monks
+        text: "นิมนต์พระมาทำบุญบ้านใหม่"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.3}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: agree_money
+        text: "ตกลงเรื่องเงินกันก่อนเซ็น"
+        effects: {knowledge: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+
+  - id: divlove_wedding_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    when: {divorced: {after: 1, within: 10}, flags: {not: [married]}}
+    title: "จดทะเบียนอีกครั้ง"
+    text: "กลับมาที่ว่าการอำเภอม้านั่งตัวเดิม คราวนี้มาด้วยกันและถือบัตรคิวใบเดียว อีกฝ่ายถามว่าเสร็จแล้วจะบอกญาติยังไง"
+    choices:
+      - id: quiet
+        text: "ไม่ต้องบอกใคร รู้กันสองคน"
+        effects: {happiness: 2, relations: -1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: family_meal
+        text: "ชวนลูกหลานสองบ้านมากินข้าว"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: monks
+        text: "ถวายสังฆทานเอาฤกษ์"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: agree_money
+        text: "แบ่งบัญชีกันให้ชัดก่อนเซ็น"
+        effects: {knowledge: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+
+  - id: divlove_wedding_old_01
+    type: A
+    category: family
+    stage: ชรา
+    years: [2500, 2650]
+    when: {divorced: {after: 1, within: 10}, flags: {not: [married]}}
+    title: "จดทะเบียนตอนผมขาว"
+    text: "ลูกจ้างอำเภอรุ่นหลานอ่านวันเกิดของทั้งคู่ซ้ำสองรอบแล้วยิ้ม คนข้างตัวกระซิบว่าเซ็นเสร็จจะกลับไปรดผักต่อหรือจะฉลองกันก่อน"
+    choices:
+      - id: water
+        text: "กลับไปรดผักด้วยกัน"
+        effects: {happiness: 2, health: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: noodle
+        text: "เลี้ยงก๋วยเตี๋ยวคนทั้งซอย"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
+      - id: monks
+        text: "ชวนกันไปถวายเพล"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        sets_flags: [married]
+        merit: [{cat: dana, level: 1}]
+      - id: write_will
+        text: "เขียนพินัยกรรมให้เรียบร้อยก่อน"
+        effects: {knowledge: 1, relations: 1}
+        sets_flags: [married]
+        merit: [{cat: neutral}]
