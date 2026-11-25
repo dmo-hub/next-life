@@ -1,5 +1,5 @@
 {
- "version": "v0.6.164",
+ "version": "v0.6.165",
  "snapV": 1,
  "titles": [
   "hard_worker",
@@ -1128,6 +1128,11 @@
   "abroad_return_01",
   "abroad_left_behind_01",
   "abroad_late_01",
+  "fam_adopt_single_01",
+  "fam_adopt_couple_01",
+  "fam_try_baby_30_01",
+  "fam_try_baby_35_01",
+  "fam_try_baby_40_01",
   "fam_quarrel_work_01",
   "fam_quarrel_mid_01",
   "fam_separate_work_01",
