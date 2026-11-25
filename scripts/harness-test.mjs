@@ -1784,7 +1784,7 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 100 การ์ดแต่งหลัง 30 ครบ 3 ใบ', evs.every(Boolean));
   check('ใบ 100 ออกเฉพาะช่วงวัยของใบ: 35 → ใบแรก · 36 และ 45 → ใบสอง · 46 และ 50 → ใบสาม · 30 และ 51 ไม่ออกเลย',
     pick(35) === '[true,false,false]' && pick(36) === '[false,true,false]' && pick(45) === '[false,true,false]' && pick(46) === '[false,false,true]' && pick(50) === '[false,false,true]' && pick(30) === '[false,false,false]' && pick(51) === '[false,false,false]');
-  check('ใบ 100 น้ำหนักลดตามอายุ: 3 → 2 → 1', evs[0].weight > evs[1].weight && evs[1].weight > evs[2].weight);
+  check('ใบ 100 น้ำหนักลดตามอายุ: 35 > 45 > กลางคน', evs[0].weight > evs[1].weight && evs[1].weight > evs[2].weight);
   const wedSt = at(35);
   const yes = evs[0].choices.find((c) => c.id === 'marry_now');
   applyFamily(wedSt, { sets_flags: yes.sets_flags, family: yes.family });
