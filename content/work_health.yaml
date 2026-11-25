@@ -1,11 +1,12 @@
 events:
   - id: workh_office_syndrome_01
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
     years: [2500, 2650]
     weight: 3
-    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer]}
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {flags: {sporty: 0.5}, occupation: {clerk: 1.5, professional: 1.2, officer: 1.2, senior_officer: 1.2}}
     title: "คอแข็งเป็นหิน"
     text: "อายุ {อายุ} นั่งหน้าจอวันละสิบสองชั่วโมง เช้านี้หันคอไปทางซ้ายไม่ได้ นิ้วชาไปถึงข้อศอก เพื่อนโต๊ะข้าง ๆ บอกว่าเป็นกันทั้งออฟฟิศ"
@@ -73,13 +74,14 @@ events:
         merit: [{cat: help_others, level: 2}]
 
   - id: workh_burnout_01
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
     repeat: {gap: 6, max: 3}
-    when: {occupation: [clerk, professional, manager, technician, service], ladder: [none, private, trade]}
+    when: {occupation: [clerk, professional, manager, technician], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {occupation: {manager: 1.5, professional: 1.3}}
     title: "ไฟมอดกลางประชุม"
     text: "กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว นอนไม่หลับมาสามเดือน เห็นชื่อหัวหน้าเด้งในแชตแล้วใจสั่น"
@@ -111,6 +113,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_drunk_drive_01
+    away_block: [monk]
     type: A
     category: health
     stage: ทำงาน
@@ -149,6 +152,7 @@ events:
         merit: [{cat: sila, level: 2}]
 
   - id: workh_fatty_liver_01
+    office_ok: "บริษัทในผลคือบริษัทประกัน ไม่ใช่ที่ทำงาน"
     type: A
     category: health
     stage: ทำงาน
@@ -231,6 +235,8 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_viral_offer_01
+    office_ok: "ต่อเนื่องจากใบไฟมอดกลางประชุมที่กรองอาชีพออฟฟิศแล้ว"
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน
@@ -262,6 +268,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: workh_bone_healer_call_01
+    away_block: [abroad, monk]
     type: A
     category: health
     stage: ทำงาน

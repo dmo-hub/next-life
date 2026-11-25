@@ -3,6 +3,7 @@
 # ผลย้อนกับใบแก้ตัวกั้น ladder ⇒ ออกจากสายแล้วเรื่องเงียบไป
 events:
   - id: first_police_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -41,6 +42,7 @@ events:
 
   # ← first_police_01 "รับไว้ตามธรรมเนียม"
   - id: echo_police_ledger_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -78,6 +80,7 @@ events:
 
   # ← first_police_01 "คืนซองต่อหน้าทุกคน"
   - id: echo_police_clean_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -114,6 +117,7 @@ events:
 
   # ใบแก้ตัวของคนรับซองแรก — ล้าง badge_bent ได้ (took_bribe คงเป็นประวัติ)
   - id: police_bent_turn_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -146,12 +150,14 @@ events:
 
   # ใบยั่วของคนคืนซองแรก — รับแล้วชื่อสะอาดหาย
   - id: police_clean_tempt_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     weight: 8
     when: {ladder: [police], flags: {has: [badge_clean]}}
+    office_ok: "สายตำรวจ ที่ประชุมของผู้กำกับเป็นเรื่องจริง"
     title: "ข้อเสนอจากเจ้าของบ่อน"
     text: "เจ้าของบ่อนในเขตนัดเจอที่ร้านกาแฟ บอกว่ารู้ว่าคุณไม่รับซอง เลยไม่ให้ซอง แต่จะโอนค่าเทอมเรียนต่อปริญญาโทให้ แค่ตอนตรวจให้โทรบอกก่อนครึ่งชั่วโมง"
     choices:
@@ -179,6 +185,8 @@ events:
 
   # ราชการ — ใบเบิกล่วงเวลาที่ไม่ได้ทำ
   - id: first_gov_01
+    office_ok: "เงินเดือนข้าราชการ ใบเปิดทางสายราชการ"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -216,6 +224,7 @@ events:
 
   # ← first_gov_01 "เซ็นตามทุกคน"
   - id: echo_gov_audit_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -253,6 +262,7 @@ events:
 
   # ← first_gov_01 "ขีดชื่อตัวเองออก"
   - id: echo_gov_trusted_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -286,6 +296,7 @@ events:
           - {weight: 1, text: "ผู้อำนวยการเห็นราคากลางที่ขยับ เรียกคืนงานแล้วไม่พูดกับคุณอีก", effects: {network: -2, happiness: -2}, merit: [{cat: neutral}]}
 
   - id: gov_bent_turn_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -317,6 +328,7 @@ events:
         effects: {relations: 1, happiness: 1}
 
   - id: gov_clean_tempt_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -324,7 +336,7 @@ events:
     weight: 8
     when: {ladder: [gov], flags: {has: [desk_clean]}}
     title: "ทุนดูงานต่างประเทศ"
-    text: "หัวหน้ากองเสนอชื่อคุณไปดูงานต่างประเทศสองสัปดาห์ งบมาจากบริษัทที่กำลังยื่นประมูล รายการดูงานมีแต่ห้างกับทะเล"
+    text: "หัวหน้ากองเสนอชื่อคุณไปดูงานต่างประเทศสองสัปดาห์ งบมาจากเอกชนที่กำลังยื่นประมูล รายการดูงานมีแต่ห้างกับทะเล"
     choices:
       - id: go
         text: "ไปดูงาน"
@@ -349,6 +361,8 @@ events:
 
   # ทหาร — พลทหารรับใช้
   - id: first_army_01
+    office_ok: "ที่ประชุมกองพัน ใบเปิดทางสายทหาร"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -386,6 +400,7 @@ events:
 
   # ← first_army_01 "ใช้งานตามธรรมเนียม"
   - id: echo_army_complaint_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -421,6 +436,7 @@ events:
 
   # ← first_army_01 "ส่งกลับไปฝึกตามหน้าที่"
   - id: echo_army_visit_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -449,6 +465,7 @@ events:
         effects: {happiness: -1}
 
   - id: army_bent_turn_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -480,6 +497,7 @@ events:
         effects: {relations: 1, happiness: 1}
 
   - id: army_clean_tempt_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -510,6 +528,7 @@ events:
 
   # ทางแรกของนักล่า: ภารกิจแรกในเกต ไม่มีผลย้อนตามมา (ดันเจียนเป็นของใบถัดไป)
   - id: first_hunter_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

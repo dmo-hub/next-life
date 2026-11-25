@@ -14,20 +14,26 @@ import { specFiles, specHtmlFiles, bareUrls, docId, SPEC_DIR, SPEC_START, SPEC_E
 import { BTN } from '../src/ui/labels.mjs';
 import { BTN_HELP } from '../src/site/guide.mjs';
 import { demoHtml, DEMO_START, DEMO_END } from '../src/site/demo.mjs';
-import { NEED_TEXT } from '../src/site/focus.mjs';
-import { focusWords, STAT_LABELS, FOCUS_NEEDS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
+import { treeViewLayout, treeViewNeed, treeViewNeedText } from '../src/ui/treeview.mjs';
+import { focusWords, STAT_LABELS, ISEKAI_FOCUS, ISEKAI_KNOW } from '../src/engine/index.mjs';
 import { catalogHtml, spoilerBacks, flagNames, systemNames } from '../src/site/spoilers.mjs';
+import { cadetHtml, readCadet, schoolYears } from '../src/site/cadet-cards.mjs';
+import { matchItem, recentVersions } from '../src/site/catalog-filter.mjs';
+import { FILTER_CATS } from '../src/site/catalog-ui.mjs';
 import { simDrift, careerSim, SIM_FILE } from '../src/site/career.mjs';
+import { cardGroupCounts, cardGroupRows } from '../src/site/catalog.mjs';
 import { designFiles, designPage, designPages, designHtml, DESIGN_AT } from '../src/site/design.mjs';
 import { navHtml, navBlocks, NAV_CSS, devNavHtml, injectDevNav, DEV_TABS, MOVED_MARK, movedHtml, DEV_MAPS, DEV_MAPS_PAGE, mapsMoved } from '../src/site/nav.mjs';
 import { uiPage, designMoved, cssVars, UI_PAGE, UI_MOVED_FROM } from '../src/site/ui.mjs';
-import { soonCats, roadmapHtml, ROAD_START, ROAD_END } from '../src/site/roadmap.mjs';
-import { sceneArt, ART_SCENE_IDS } from '../src/ui/art.mjs';
+import { soonCats, soonId, soonItems, roadmapHtml, dropDone, soonTicketProblems, DONE_FILE, TICKET_ID, ROAD_START, ROAD_END, PLAN_ID, PLAN_FROM, planPart, planProblems } from '../src/site/roadmap.mjs';
+import { sceneArt, ART_SCENE_IDS, catArt, CAT_IDS, resultArtCat } from '../src/ui/art.mjs';
+import { RESULT_TAGS } from '../src/engine/life.mjs';
 import { gatedFiles, gateBlock, gateBlockOf, injectGate, readGateHash, GATE_OPEN, GATE_OFF, PUBLIC_HIDE } from '../src/site/gate.mjs';
 import { SITE, SEO_START, SEO_END, OG_IMAGE, OG_W, OG_H, FAVICON_SVG, FAVICON_PNG, TOUCH_ICON, SITEMAP, seoBlock, pageMeta, sitemapXml } from '../src/site/seo.mjs';
 import { docsScope, injectDocsLayout, pageKind, DOCS_LAYOUT_START, DOCS_LAYOUT_END } from '../src/site/docs-layout.mjs';
 import { FONTS, FONT_DIR, FONT_CSS, PLAY_FACES, fontsCss, playFonts } from '../src/site/fonts.mjs';
-import { PLAY_FILES, playAssets, playScripts, swJs } from '../src/site/play-files.mjs';
+import { PLAY_FILES, playAssets, playScripts, swJs, artSrc } from '../src/site/play-files.mjs';
+import { loadCardPics, cardPicText, cardPicHash, cardPicGaps, cardPicFiles } from '../src/site/card-art.mjs';
 
 const docs = new URL('../docs/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, docs), 'utf8');
@@ -56,7 +62,7 @@ check('ตัวเลขบนหน้าเท่าค่าจริง', w
 const less = { ...content, events: content.events.slice(1) };
 const f2 = { ...siteFacts(less), titles: String(Number(facts.titles) - 1) };
 // ฉายาย้ายจากหน้าแรกไปกลไกในเกม (ui-redo 69) · เลขการ์ดเหลือแค่หน้ารวมการ์ดหลังหน้าแรกเหลือแค่หัว (ui-redo 105) ⇒ ตรวจหลายหน้ารวมกัน
-const probe = ['index.html', 'about.html', 'catalog.html'].map((p) => injectFacts(read(p), f2)).join('');
+const probe = ['index.html', 'guide.html', 'catalog.html'].map((p) => injectFacts(read(p), f2)).join('');
 const moved = ['cards', 'titles'].every((k) => probe.includes(`data-fact="${k}">${f2[k]}<`) && f2[k] !== facts[k]);
 check('ตัวควบคุม: ข้อมูลเปลี่ยนแล้วเลขบนหน้าเปลี่ยนตาม', !moved, ` (การ์ด ${facts.cards} → ${f2.cards} · ฉายา ${facts.titles} → ${f2.titles})`);
 
@@ -85,9 +91,13 @@ const escHtml = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>
 const page = read('catalog.html');
 const cards = visible(page);
 const MORE = '<section class="more"';
-const moreAt = page.indexOf(MORE);
-const [pageTh, pageIsk] = cut(page.slice(0, moreAt));
-const [moreJobs, moreIsk] = page.slice(moreAt).split('<h2 id="isk-more">');
+// หมวดสายเตรียมทหาร (ใบ 136) เป็นของมันเอง — ตัดออกก่อนแบ่งส่วนไทย/ต่างโลกที่ด่านเดิมนับด้วย content.events กับ ISEKAI_EVENTS
+const CADET_RE = /<!--cadet:start-->[\s\S]*<!--cadet:end-->/;
+const cadetBlock = page.match(CADET_RE)?.[0] ?? '';
+const pageBase = page.replace(CADET_RE, '');
+const moreAt = pageBase.indexOf(MORE);
+const [pageTh, pageIsk] = cut(pageBase.slice(0, moreAt));
+const [moreJobs, moreIsk] = pageBase.slice(moreAt).split('<h2 id="isk-more">');
 const cardsTh = visible(pageTh);
 const cardsIsk = visible(pageIsk);
 const shown = (cardsTh.match(/<article class="c /g) ?? []).length;
@@ -99,6 +109,54 @@ const leaks = leak.filter((re) => re.test(visible(catalogHtml(content)))).map(St
 // ชื่อหมวดบุญบาปภาษาไทยอาจเป็นคำธรรมดาในข้อความการ์ด — นับเฉพาะ id อังกฤษของหมวด
 const ids = cats.filter((s) => /^[a-z_]+$/.test(s) && new RegExp(`\\b${s}\\b`).test(cards));
 check('หน้ารวมการ์ดไม่มีผล/น้ำหนัก/ป้ายบุญบาป', leaks.length || ids.length, leaks.length || ids.length ? ` · เจอ ${[...leaks, ...ids].join(' ')}` : '');
+
+// 4b) หมวดสายเตรียมทหาร (ใบ 136): จำนวนใบบนหน้า = จำนวนในไฟล์ (นับจากคีย์ในไฟล์ตรง ๆ ไม่ผ่านตัวสร้าง) · ฉากโรงเรียนอยู่ปีเดียว · ด้านหน้าไม่มีผล
+const cadetDoc = readCadet();
+const cadetWant = ['apply', 'interludes', 'passed', 'failed', 'interviewQs', 'interviewFunny'].reduce((s, k) => s + cadetDoc[k].length, 0) + Object.keys(cadetDoc.school.scenes).length;
+const cadetGot = (cadetBlock.match(/<article class="k c" id="/g) ?? []).length;
+const cadetIdsMissing = [...cadetDoc.apply, ...cadetDoc.interludes, ...cadetDoc.passed, ...cadetDoc.failed].map((e) => e.id).concat(Object.keys(cadetDoc.school.scenes)).filter((id) => !cadetBlock.includes(`<article class="k c" id="${escHtml(id)}">`));
+// ตัวควบคุม: ถอดฉากออกจากไฟล์ 1 ใบ แล้วตัวสร้างต้องให้จำนวนต่างจากเดิม
+const cadetLess = { ...cadetDoc, school: { ...cadetDoc.school, scenes: Object.fromEntries(Object.entries(cadetDoc.school.scenes).slice(1)) } };
+const cadetCtl = (cadetHtml(cadetLess).match(/<article class="k c" id="/g) ?? []).length === cadetWant - 1;
+const yrs = schoolYears(cadetDoc.school);
+const yrBoth = yrs.y1.filter((id) => yrs.y2.includes(id));
+const cadetLeak = [/<b class="pct">|<p class="fx">|<span class="m /].filter((re) => re.test(visible(cadetBlock))).map(String);
+check('หมวดสายเตรียมทหารครบทุกใบในไฟล์ ฉากโรงเรียนแยกปี 1/2 ครบ ไม่เผยผลก่อนกด', cadetGot !== cadetWant || cadetIdsMissing.length || !cadetCtl || yrs.y1.length + yrs.y2.length !== Object.keys(cadetDoc.school.scenes).length || yrBoth.length || cadetLeak.length, ` ใบ ${cadetGot}/${cadetWant} · ปี 1 ${yrs.y1.length} · ปี 2 ${yrs.y2.length} · ขาด ${cadetIdsMissing.slice(0, 3).join(' ')} · ตัวควบคุมจับได้ ${cadetCtl}${cadetLeak.length ? ` · เจอ ${cadetLeak.join(' ')}` : ''}`);
+
+// 4c) ตัวกรองการ์ด: รันตัวกรองตัวเดียวกับที่ฝังในหน้า กับการ์ดบนหน้าจริง · กรองหมวด X แล้วเหลือแต่การ์ดที่มีป้าย X · ตัวควบคุม = ตัวกรองที่ไม่กรองต้องตก
+const secs = [...page.matchAll(/<details id="[^"]*" data-st="([^"]*)"/g)];
+const stageItems = secs.flatMap((m, i) => {
+  const end = i + 1 < secs.length ? secs[i + 1].index : page.indexOf(MORE);
+  return [...page.slice(m.index, end).matchAll(/<article class="[^"]*c[^"]*"[^>]*>([\s\S]*?)<\/article>/g)].map((a) => ({
+    cats: [...(a[1].match(/<p class="tags">([\s\S]*?)<\/p>/)?.[1] ?? '').matchAll(/<span>([^<]*)<\/span>/g)].map((s) => s[1]),
+    st: m[1],
+    v: a[1].match(/เพิ่มใน (v[\d.]+)/)?.[1] ?? '',
+  }));
+});
+const none = { cat: [], st: [], since: 'all', vers: [] };
+const bad = [];
+const noFilter = () => true;
+for (const c of FILTER_CATS) {
+  const hit = stageItems.filter((it) => matchItem(it, { ...none, cat: [c] }));
+  if (!hit.length || hit.length === stageItems.length || hit.some((it) => !it.cats.includes(c)) || !stageItems.filter((it) => noFilter(it, { ...none, cat: [c] })).some((it) => !it.cats.includes(c))) bad.push(`หมวด ${c} ${hit.length}`);
+}
+for (const s of ['สายเตรียมทหาร', 'ต่างโลก', 'ปรโลก', 'เด็ก']) {
+  const hit = stageItems.filter((it) => matchItem(it, { ...none, st: [s] }));
+  if (!hit.length || hit.some((it) => it.st !== s)) bad.push(`ช่วง ${s} ${hit.length}`);
+}
+const vAll = stageItems.map((it) => it.v);
+const [vNew] = recentVersions(vAll, 1);
+const vHit = stageItems.filter((it) => matchItem(it, { ...none, since: 'latest', vers: [vNew] }));
+if (!vHit.length || vHit.some((it) => it.v !== vNew) || recentVersions(['v0.6.13', 'v0.6.104', 'v0.6.9'], 2).join() !== 'v0.6.104,v0.6.13') bad.push(`รุ่น ${vNew} ${vHit.length}`);
+const both = stageItems.filter((it) => matchItem(it, { ...none, cat: ['การเรียน'], st: ['วัยรุ่น'] }));
+if (both.some((it) => !it.cats.includes('การเรียน') || it.st !== 'วัยรุ่น')) bad.push('ข้ามกลุ่ม = และ');
+// หน้าฝังซอร์สตัวกรองชุดเดียวกับที่ด่านเรียก · ไม่มี JS = การ์ดไม่ถูกซ่อน
+// เทียบหลัง normalize ปลายบรรทัด: core.autocrlf=true ทำซอร์สที่ checkout เป็น CRLF ส่วนหน้าเป็น LF
+const eolLf = (s) => s.replace(/\r\n/g, '\n');
+const pageLf = eolLf(page);
+const shipped = pageLf.includes(eolLf(matchItem.toString())) && pageLf.includes(eolLf(recentVersions.toString()));
+const hiddenCard = /<article[^>]*\shidden/.test(page);
+check('ตัวกรองการ์ด: กรองแล้วเหลือแต่ใบที่ตรง · หน้าฝังตัวกรองชุดเดียวกับที่ตรวจ · ไม่มี JS เห็นครบ', bad.length || !shipped || hiddenCard || stageItems.length < content.events.length, ` ใบ ${stageItems.length} · ${bad.join(' · ')}${shipped ? '' : ' · ซอร์สตัวกรองไม่ตรง'}${hiddenCard ? ' · มีการ์ดซ่อนมาตั้งแต่ต้น' : ''}`);
 
 // 5) หน้าเฉลย: นับชิ้นบนหน้าเทียบ content ตรง ๆ — ตัวสร้างทำตกหล่นสักทาง (ตัวเลือกซ่อน · ผลสุ่ม · ป้ายบุญบาป) เลขจะไม่เท่า
 const spoilTh = spoilOnly(pageTh);
@@ -179,6 +237,49 @@ const iskLeak = hidden.filter((t) => cards.includes(escHtml(t)));
 if (/ความยาก|class="rk"/.test(cardsIsk)) iskLeak.push('ความยาก/ผล');
 check('หน้ารวมการ์ดส่วนต่างโลกไม่เฉลยผลหรือตอนจบ', iskLeak.length || !cardsIsk, iskLeak.length ? ` · เจอ ${iskLeak.slice(0, 3).join(' | ')}` : ` (ตรวจ ${hidden.length} ข้อความ)`);
 check('spoilers.html เป็นหน้าส่งต่อไปหน้าการ์ด และหน้าการ์ดไม่ลิงก์กลับ', !read('spoilers.html').includes(`${MOVED_MARK} content="catalog.html"`) || cards.includes('href="spoilers.html"'));
+// กลไกในเกมรวมเข้าวิธีเล่น (ui-redo 98 · ข้อ 190 191): about.html เป็นหน้าส่งต่อที่พก # · id หัวเดิมทุกตัว + ตัวเลขจาก data ทุกคีย์ของ about เดิมอยู่ใน guide · ลิงก์ในหน้า/เกมไม่ชี้ about
+const ABOUT_IDS = ['core', 'rules', 'life', 'choice', 'career', 'family', 'money', 'death', 'merit', 'belief', 'titles'];
+const ABOUT_FACTS = ['build', 'carryMax', 'carryMin', 'classes', 'disputePct', 'eraEvents', 'fameLevels', 'fameNames', 'familyTitles', 'futureFrom', 'kinNames', 'lotteryCap', 'lotteryMult', 'meritMin', 'provinces', 'realmNames', 'realms', 'regions', 'sinAll', 'sinCanon', 'sinMax', 'standMix', 'taxFrom', 'taxPct', 'taxYear', 'titles', 'tracks', 'version', 'yearFrom', 'yearTo'];
+const aboutGap = (movedPage, guide, srcs) => [
+  !movedPage.includes(`${MOVED_MARK} content="guide.html"`) && 'about.html ไม่ใช่หน้าส่งต่อไป guide',
+  /location\.replace\([^)]*\+ location\.hash/.test(movedPage) || 'หน้าส่งต่อไม่พก #',
+  ...ABOUT_IDS.filter((id) => !guide.includes(`id="${id}"`)).map((id) => `guide ขาด id="${id}"`),
+  ...ABOUT_FACTS.filter((k) => !guide.includes(`data-fact="${k}"`)).map((k) => `guide ขาด data-fact "${k}"`),
+  ...srcs.filter(([, s]) => /about\.html/.test(s)).map(([n]) => `${n} ยังลิงก์ about.html`),
+].filter((x) => x && x !== true);
+const aboutSrcs = [['src/ui/app.mjs', readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8')], ['src/ui/template.html', readFileSync(new URL('../src/ui/template.html', import.meta.url), 'utf8')], ['src/site/focus.html', readFileSync(new URL('../src/site/focus.html', import.meta.url), 'utf8')], ['docs/guide.html', read('guide.html')]];
+const aboutNow = aboutGap(read('about.html'), read('guide.html'), aboutSrcs);
+const aboutCtl = [
+  aboutGap(read('about.html').replace(`${MOVED_MARK} content="guide.html"`, `${MOVED_MARK} content="index.html"`), read('guide.html'), aboutSrcs),
+  aboutGap(read('about.html'), read('guide.html').replace('id="merit"', 'id="x"'), aboutSrcs),
+  aboutGap(read('about.html'), read('guide.html').replaceAll('data-fact="sinMax"', 'data-fact="x"'), aboutSrcs),
+  aboutGap(read('about.html'), read('guide.html'), [...aboutSrcs, ['ctl', '<a href="about.html">']]),
+  aboutGap(read('about.html').replace(' + location.hash', ''), read('guide.html'), aboutSrcs),
+].filter((g) => !g.length).length;
+check('about.html เป็นหน้าส่งต่อไป guide พก # · id หัว + data-fact เดิมครบใน guide · ไม่มีลิงก์ค้างไป about', aboutNow.length || aboutCtl, aboutNow.length ? ` · ${aboutNow.slice(0, 4).join(' | ')}` : ` (${ABOUT_IDS.length} id · ${ABOUT_FACTS.length} คีย์ · ตัวควบคุมจับ ${5 - aboutCtl}/5)`);
+// หน้าต่างโลกรวมเข้าหน้า "โลก" (ui-redo 42 · ข้อ 41 131 134): otherworld.html เป็นหน้าส่งต่อไปส่วนต่างโลก พก # ได้ · หัว h2 ทุกหัวของ 2 หน้าเดิมอยู่ในหน้าโลก (10 หัว) · id ลิงก์เก่าครบ · ไม่มีลิงก์ค้างไป otherworld.html
+const WORLD_H2 = ['ชาตินี้', 'ปรโลก', 'ต่างโลก', 'ปรโลกและรุ่นถัดไป', 'ไปต่างโลกได้ทางไหน', 'ชาติต่างโลก', 'ทางเข้าจากเกมหลัก', 'กติกาต่างโลกทั้งหมด', 'ต่างโลกในเกมหลัก', 'ที่มาของต่างโลก'];
+const WORLD_IDS = ['otherworld', 'entry', 'isekai', 'rules', 'afterlife'];
+const owGap = (movedPage, world, srcs) => {
+  const h2 = [...world.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)].map((m) => m[1].replace(/<span class="tag[^>]*>[^<]*<\/span>/g, '').replace(/<[^>]+>/g, '').trim());
+  return [
+    !movedPage.includes(`${MOVED_MARK} content="worlds.html#otherworld"`) && 'otherworld.html ไม่ใช่หน้าส่งต่อไป worlds#otherworld',
+    /location\.replace\([^)]*\+ \(location\.hash \|\|/.test(movedPage) || 'หน้าส่งต่อไม่พก #',
+    ...WORLD_H2.filter((t) => !h2.includes(t)).map((t) => `หน้าโลกขาดหัว "${t}"`),
+    ...WORLD_IDS.filter((id) => !world.includes(`id="${id}"`)).map((id) => `หน้าโลกขาด id="${id}"`),
+    ...srcs.filter(([, s]) => /href="(\.\.\/)*otherworld\.html/.test(s)).map(([n]) => `${n} ยังลิงก์ otherworld.html`),
+  ].filter((x) => x && x !== true);
+};
+const owSrcs = [['docs/guide.html', read('guide.html')], ['docs/worlds.html', read('worlds.html')], ['docs/index.html', read('index.html')], ['docs/whatsnew.html', read('whatsnew.html')], ['src/site/guide.html', readFileSync(new URL('../src/site/guide.html', import.meta.url), 'utf8')], ['src/ui/app.mjs', aboutSrcs[0][1]], ['src/ui/template.html', aboutSrcs[1][1]]];
+const owNow = owGap(read('otherworld.html'), read('worlds.html'), owSrcs);
+const owCtl = [
+  owGap(read('otherworld.html').replace('content="worlds.html#otherworld"', 'content="worlds.html"'), read('worlds.html'), owSrcs),
+  owGap(read('otherworld.html'), read('worlds.html').replace('>กติกาต่างโลกทั้งหมด<', '>x<'), owSrcs),
+  owGap(read('otherworld.html'), read('worlds.html').replace('id="entry"', 'id="x"'), owSrcs),
+  owGap(read('otherworld.html'), read('worlds.html'), [...owSrcs, ['ctl', '<a href="otherworld.html#entry">']]),
+  owGap(read('otherworld.html').replace(' + (location.hash ||', ' + (x ||'), read('worlds.html'), owSrcs),
+].filter((g) => !g.length).length;
+check('otherworld.html เป็นหน้าส่งต่อไปหน้าโลก พก # · หัว h2 ทั้ง 10 + id เดิมครบในหน้าโลก · ไม่มีลิงก์ค้างไป otherworld.html', owNow.length || owCtl, owNow.length ? ` · ${owNow.slice(0, 4).join(' | ')}` : ` (${WORLD_H2.length} หัว · ${WORLD_IDS.length} id · ตัวควบคุมจับ ${5 - owCtl}/5)`);
 // 5b) เส้นทางงาน (ui-redo ใบ 21): ทุกอาชีพในทุกสายของ careers.json + การเมือง มีกล่องบนหน้า
 // ผลจำลองค้าง (การ์ดเพิ่ม/ลบ/เปลี่ยน id หลังรันจำลอง) = เตือน ไม่ตก — จำลองรันสั่งแยก ไม่ผูก build
 const occsOf = (l) => (l.occs ? l.occs.length : new Set(l.steps.map((x) => x.occ)).size);
@@ -186,6 +287,13 @@ const jobWant = Object.values(content.era.careers.ladders).reduce((s, l) => s + 
 const jobGot = (moreJobs.match(/<div class="job">/g) ?? []).length;
 check('หน้าเฉลยมีเส้นทางงานครบทุกอาชีพในทุกสาย', jobGot !== jobWant || !moreJobs.includes('id="career"'), ` ${jobGot}/${jobWant}`);
 const drift = simDrift(content);
+// ตารางการ์ดแต่ละหมวด (ใบ 324): ทุกไฟล์ content อยู่ในหมวด · ผลรวมหมวด = การ์ดทั้งหมด · แถวบนหน้า build แล้วตรงที่นับตอนนี้
+const grp = cardGroupCounts();
+check('ไฟล์ content ทุกไฟล์อยู่ในหมวดบนตารางการ์ดแต่ละหมวด (CARD_GROUPS)', grp.unmapped.length > 0, grp.unmapped.length ? ` ไม่มีหมวด: ${grp.unmapped.join(', ')}` : ` (${grp.rows.length} หมวด)`);
+check('ผลรวมตารางการ์ดแต่ละหมวด = การ์ดทั้งหมด', grp.total !== content.events.length, ` ${grp.total}/${content.events.length}`);
+const catalogNow = read('catalog.html');
+check('ตารางการ์ดแต่ละหมวดบนหน้า = ที่นับจากไฟล์ตอนนี้ (ยังไม่ build ใหม่ = ตก)', !cardGroupRows().split('\n').every((r) => catalogNow.includes(r.trim())));
+check('key กล่องเส้นทางงานทุกกล่องมีในไฟล์ผลจำลอง (ladder/ขั้นเปลี่ยนแล้วต้องรัน career:sim ใหม่)', !drift.noFile && drift.staleKeys.length > 0, drift.staleKeys.length ? ` ตกรุ่น ${drift.staleKeys.length}: ${drift.staleKeys.slice(0, 5).join(', ')}` : '');
 if (drift.noFile) console.log(`⚠ เตือน: ไม่มี ${SIM_FILE} — หน้าเฉลยส่วนเส้นทางงานไม่มีเลข · รัน npm run career:sim`);
 else if (drift.missing.length || drift.gone.length)
   console.log(`⚠ เตือน: ผลจำลองเส้นทางงานค้าง — การ์ดใหม่ไม่มีผล ${drift.missing.length} (${drift.missing.slice(0, 5).join(', ')}) · การ์ดที่หายจากกอง ${drift.gone.length} (${drift.gone.slice(0, 5).join(', ')}) · รัน npm run career:sim แล้ว build`);
@@ -199,7 +307,7 @@ const contMiss = (html) => {
   return [...Object.values(CONT_REGIONS), ...Object.values(CONT_RACES), ...Object.values(ISEKAI_CAREERS)].filter((x) => !has(x.name)).map((x) => x.name);
 };
 const ROLE_TALK = /เทพธิดายื่นบทบาท|เลือกบทบาท|บทบาทตอนเกิด/;
-const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('otherworld.html'), index: read('index.html'), about: read('about.html') };
+const newPages = { 'catalog ต่างโลก': noOld(cardsIsk), 'spoilers ต่างโลก': noOld(spoilIsk), otherworld: read('worlds.html'), index: read('index.html'), 'guide (กลไกในเกม)': read('guide.html') };
 const roleLeft = Object.entries(newPages).filter(([, h]) => ROLE_TALK.test(h)).map(([p]) => p);
 // หน้าต่างโลก (กติกาต่างโลกทั้งหมด ย้ายจากหน้า GDD เดิม) เล่าตอนจบชาติทวีปด้วยเกณฑ์ชื่อเสียงจากโค้ด — ไม่งั้นเหลือแค่ระดับตอนจบของบทบาท 4 โลกเดิม
 const endTalk = (html) => html.includes('data-fact="contFame"');
@@ -276,8 +384,8 @@ const navBad = (file, raw) => {
 const navMiss = navFiles.map((f) => [f, navBad(f, read(f))]).filter(([, why]) => why).map(([f, why]) => `${f} ${why}`);
 const navCtl =
   navBad('index.html', read('index.html').replace(/<!--NAV:START-->[\s\S]*?<!--NAV:END-->/, '')) === 'ไม่มีแถบ' &&
-  navBad('worlds.html', read('about.html')) === 'แถบไม่ตรง' &&
-  navBad('about.html', read('about.html').replace('<header>', '<nav class="top"><a href="index.html">หน้าแรก</a></nav><header>')) === 'แถบซ้อน';
+  navBad('worlds.html', read('guide.html')) === 'แถบไม่ตรง' &&
+  navBad('guide.html', read('guide.html').replace('<header>', '<nav class="top"><a href="index.html">หน้าแรก</a></nav><header>')) === 'แถบซ้อน';
 const curOk = navHtml('catalog.html').includes('href="catalog.html" aria-current="page"') && !navHtml('index.html').includes('design') && navHtml('spec/lore-finance-series.html').includes('href="../play.html"');
 
 // 7c2) แถบห้องผู้พัฒนา: หน้าเขียนมือใต้ docs/dev/ ที่มีแถบแท็บ มีครบทุกแท็บใน DEV_TABS (หน้าที่ build สร้างใช้ devNavHtml) · หน้าเรื่องคำตัดสินเกมชี้แท็บนั้น
@@ -290,7 +398,7 @@ const devTabMiss = (html) => {
 };
 const devMiss = devFiles.map((f) => [f, read(f)]).filter(([, h]) => h.includes('class="nl-tabs"')).map(([f, h]) => [f, devTabMiss(h)]).filter(([, m]) => m.length).map(([f, m]) => `${f} ขาด ${m.join(' ')}`);
 const devCtl = devTabMiss(read('dev/index.html').replace(/<a href="[^"]*dev\/design\.html"[^>]*>คำตัดสินเกม<\/a>/, '')).length === 1;
-const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && devNavHtml('dev/plan.html').includes('href="../dev/index.html" aria-current="true"');
+const devCur = devNavHtml('dev/design-lore.html').includes('href="../dev/design.html" aria-current="true"') && devNavHtml('dev/design.html').includes('href="../dev/design.html" aria-current="page"') && devNavHtml(DEV_MAPS_PAGE).includes('href="../../dev/maps/continent.html" aria-current="page"') && !devNavHtml('dev/plan.html').split('class="nl-tabs"')[1].includes('aria-current');
 // 7c3) แถบเว็บแทนแถวบนห้องผู้พัฒนา (ข้อ 292 293): ทุกหน้าที่มีแถวแท็บตรงแถบที่ build เขียน และมีแถบเว็บแถบเดียว · ตัวควบคุม: คืนแถวบนเดิม ⇒ ต้องถูกจับ
 const devBarBad = (f, h) => lf(h) !== lf(injectDevNav(h, f)) || h.split('<nav class="top"').length !== 2;
 const devBarMiss = devFiles.filter((f) => read(f).includes('class="nl-tabs"') && devBarBad(f, read(f)));
@@ -347,7 +455,7 @@ check('ทุกหน้ามีแถบบนชุดเดียวแล�
 const dtScope = docsScope(docs);
 const dtFiles = dtScope.map((p) => p.f);
 const layoutBad = (p, html) => lf(html) !== lf(injectDocsLayout(html, p.k, p.f)) || !html.includes(DOCS_LAYOUT_START);
-const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE];
+const dtMust = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'catalog.html', 'spec/lore-finance-series.html', 'dev/ui.html', 'dev/design.html', 'dev/index.html', 'dev/spec.html', DEV_MAPS_PAGE];
 const dtOut = (f) => f === 'play.html' || read(f).includes(MOVED_MARK);
 const dtMiss = [
   ...dtScope.filter((p) => layoutBad(p, read(p.f))).map((p) => `เลย์เอาต์ค้าง ${p.f} (build ใหม่)`),
@@ -358,6 +466,18 @@ const dtMiss = [
 const dtCut = (h) => h.slice(0, h.indexOf(DOCS_LAYOUT_START)) + h.slice(h.indexOf(DOCS_LAYOUT_END) + DOCS_LAYOUT_END.length);
 const dtCtl = dtScope.length > 0 && layoutBad(dtScope[0], dtCut(read(dtScope[0].f)));
 check('ทุกหน้าในขอบเขตเว็บเอกสารมีเลย์เอาต์กลางชุดปัจจุบัน', dtMiss.length || !dtCtl, ` ${dtFiles.length} หน้า${dtMiss.length ? ` · ${dtMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม${dtCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7c5) header แบบเดียวทุกหน้า (ui-redo 78): ทุกหน้าในขอบเขตมี <header> เว็บ (ยกเว้นหน้าแรก = header.home · แผนที่ = แถบเลือกผังเต็มจอ) · CSS header อยู่ที่ HEAD_CSS ที่เดียว หน้าไม่ฝัง header{…} เอง (header.sb ในจอจำลองไม่นับ)
+// ตัวควบคุม: (ก) ถอด header หน้าเดียว ⇒ ตก (ข) ฝัง header{background:#2F3833} กลับหน้าเดียว ⇒ ตก
+const headFree = new Set(['index.html', DEV_MAPS_PAGE]);
+const headStyles = (html) => (dtCut(html).match(/<style[^>]*>[\s\S]*?<\/style>/g) ?? []).join('\n');
+const headOwnRule = (html) => /(^|[{};\n])\s*header(\s+[a-z0-9]+)?\s*\{/.test(headStyles(html));
+const headBad = (f, html) => [...(!headFree.has(f) && !html.includes('<header>') ? [`ไม่มี header ${f}`] : []), ...(f !== 'index.html' && headOwnRule(html) ?[`ฝัง header{} เอง ${f}`] : [])];
+const headMiss = dtFiles.flatMap((f) => headBad(f, read(f)));
+const headPick = dtFiles.find((f) => !headFree.has(f));
+const headCtlA = headBad(headPick, read(headPick).replace('<header>', '<div>')).length > 0;
+const headCtlB = headBad(headPick, read(headPick).replace('</style>', 'header{background:#2F3833}</style>')).length > 0;
+check('ทุกหน้าในขอบเขตใช้ header เว็บแบบเดียว ไม่ฝัง CSS เอง', headMiss.length || !headCtlA || !headCtlB, ` ${dtFiles.length} หน้า${headMiss.length ? ` · ${headMiss.slice(0, 4).join(' | ')}` : ''} · ตัวควบคุม ก${headCtlA ? 'จับได้' : 'จับไม่ได้'} ข${headCtlB ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) แผนงาน (ui-redo 23 · ย้ายไป whatsnew ui-redo 69): แถวหมวดใต้หัวกำลังทำ = ชื่อหมวดของหัว "กำลังทำ" ใน whatsnew ตามลำดับ ไม่มีตัวเลข · ทุกลิงก์มี id ปลายทางในหน้า whatsnew
 // · rel.mjs ยังเห็นว่าหัวกำลังทำแบ่งหมวด (หัวมี id แล้ว — guard ที่หาแค่ <h3> เปล่าจะหลุด)
@@ -370,16 +490,53 @@ const roadNow = roadIn(wn);
 const homeLeftIn = (html) => ['ROADMAP:START', 'class="road"', 'class="sys"', '>ระบบหลัก<', 'class="footnote"'].filter((s) => html.includes(s));
 const homeLeft = homeLeftIn(read('index.html'));
 const homeCtl = homeLeftIn(read('index.html').replace('</div></header>', '<details class="sys"><summary><h2>ระบบหลัก</h2></summary></details>\n</div></header>')).length === 2;
-const coreAbout = read('about.html').includes('<h2 id="core">ระบบหลัก</h2>');
+const coreAbout = read('guide.html').includes('<h2 id="core">ระบบหลัก</h2>');
 const roadNoId = (w) => soonCats(w).filter((c) => !w.includes(`id="${c.id}"`)).map((c) => c.name);
 const relSrc = readFileSync(new URL('../scripts/rel.mjs', import.meta.url), 'utf8');
 const relSees = /\/<h3\[\\s>\]\//.test(relSrc);
 // แทรกหน้า <h2> ที่ปิดหัวกำลังทำ — หัววางแผนไว้คั่นก่อนแพตช์โน้ต หมวดของมันไม่ใช่แผนงาน
-const soonEnd = wn.indexOf('<h2>', wn.indexOf('<h2>กำลังทำ</h2>') + 1);
+const soonStart = wn.indexOf('<h2>กำลังทำ</h2>');
+const soonEnd = soonStart + 1 + wn.slice(soonStart + 1).search(/<h2[\s>]/);
 const wnMore = `${wn.slice(0, soonEnd)}<h3>หมวดทดสอบ</h3>\n  <ul>\n    <li>x</li>\n  </ul>\n\n  ${wn.slice(soonEnd)}`;
 const roadCtl = roadmapHtml(soonCats(wnMore)) !== roadNow && roadNoId(wn.replace(`<h3 id="${roadCats[0]?.id}">`, '<h3>')).length === 1;
-const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'about ไม่มีหัวระบบหลัก', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
-check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · about มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
+const roadBad = [!roadCats.length && 'whatsnew ไม่มีหมวดใต้กำลังทำ', roadNow !== roadmapHtml(roadCats) && 'แถวหมวดใน whatsnew ไม่ตรงหัวกำลังทำ (build ใหม่)', homeLeft.length && `หน้าแรกยังมี ${homeLeft.join(' ')}`, !coreAbout && 'guide ไม่มีหัวระบบหลัก (กลไกในเกม)', roadNoId(wn).length && `หัวไม่มี id: ${roadNoId(wn).join(' ')}`, !relSees && 'rel.mjs guard ไม่เห็นหัวที่มี id', /\d/.test((roadNow ?? '').replace(/<[^>]+>/g, '')) && 'แถวมีตัวเลข'].filter(Boolean);
+check('แถวหมวดใต้หัวกำลังทำใน whatsnew ตรงหมวดและลิงก์ถึงหัวหมวด · หน้าแรกไม่มีแผนงาน/ระบบหลัก · guide มีระบบหลัก', roadBad.length || !roadCtl || !homeCtl, ` ${roadCats.length} หมวด${roadBad.length ? ` · ${roadBad.join(' | ')}` : ''} · ตัวควบคุม${roadCtl && homeCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7d) ข้อในกำลังทำผูกกับใบ (ui-redo 128): ทุกข้อมี data-tickets หรือ data-backlog · ไม่มีข้อที่ใบปิดแล้วยังค้าง (รายการปิดแล้วอยู่ใน repo ที่ rel.mjs เขียน)
+// · rel.mjs ถอดได้จริง: ปิดทุกใบของหมวดแรก ⇒ หมวดหายทั้งหมวดพร้อมแถวลิงก์ · เลขที่ไม่มีใครอ้าง ⇒ unknown
+// ตัวควบคุม: ข้อปลอมผูกกับใบที่ปิดแล้ว ⇒ ตก · ข้อไม่มีป้าย ⇒ ตก
+const doneIds = Object.keys(JSON.parse(readFileSync(new URL(`../${DONE_FILE}`, import.meta.url), 'utf8')));
+const soonNow = soonItems(wn);
+const tkBad = [...(!doneIds.length || doneIds.some((id) => !TICKET_ID.test(id)) ? [`${DONE_FILE} ว่าง/เลขแปลก`] : []), ...soonTicketProblems(wn, doneIds)];
+const fakeLi = (a) => wn.replace(/(<h2>กำลังทำ<\/h2>[\s\S]*?<ul>)/, `$1\n    <li${a}><span class="tag soon">กำลังทำ</span><b>ข้อทดสอบ</b></li>`);
+const firstCat = soonNow[0]?.cat;
+const firstIds = [...new Set(soonNow.filter((it) => it.cat === firstCat).flatMap((it) => it.tickets))];
+const dropCat = dropDone(wn, firstIds);
+const tkCtl = soonTicketProblems(fakeLi(` data-tickets="${doneIds[0]}"`), doneIds).length > tkBad.length
+  && soonTicketProblems(fakeLi(''), doneIds).length > tkBad.length
+  && soonItems(wn).length === soonNow.length
+  && (soonNow.some((it) => it.cat === firstCat && it.backlog) || (!soonCats(dropCat.html).some((c) => c.name === firstCat) && !roadIn(dropCat.html).includes(soonId(firstCat)) && !dropCat.unknown.length))
+  && dropDone(wn, ['zz999']).unknown[0] === 'zz999';
+check('ข้อในกำลังทำผูกกับใบ และไม่มีข้อที่ใบปิดแล้วค้าง', tkBad.length || !tkCtl, ` ${soonNow.length} ข้อ · backlog ${soonNow.filter((it) => it.backlog).length} · ปิดแล้ว ${doneIds.length} ใบ${tkBad.length ? ` · ${tkBad.slice(0, 5).join(' | ')}${tkBad.length > 5 ? ` …อีก ${tkBad.length - 5}` : ''}` : ''} · ตัวควบคุม${tkCtl ? 'จับได้' : 'จับไม่ได้'}`);
+
+// 7d) แผนข้างหน้า (ui-redo 100): หัว "วางแผนไว้" มี id · อยู่นอกหัวกำลังทำ · ไม่มีคำของห้องผู้พัฒนา/โลกที่ปิดอยู่ · หัวกำลังทำอ่านได้ครบเท่าตอนไม่มีส่วนแผน · dev/plan เป็นหน้าส่งต่อมาที่นี่ และไม่อยู่ในแถบห้องผู้พัฒนา
+// ตัวควบคุม: เติมคำ "ใบงาน" ในส่วนแผน ⇒ ตก · ย้ายส่วนแผนเข้าไปในหัวกำลังทำ ⇒ ตก
+const planAt = planPart(wn);
+const planSect = planAt ? wn.slice(...planAt) : '';
+const wnNoPlan = planAt ? wn.slice(0, planAt[0]) + wn.slice(planAt[1]) : wn;
+const soonShort = (w) => JSON.stringify(soonCats(w)) !== JSON.stringify(soonCats(wnNoPlan)) || soonItems(w).length !== soonItems(wnNoPlan).length;
+const planBadOf = (w) => [...planProblems(w), ...(soonShort(w) ? ['หัวกำลังทำอ่านได้ไม่เท่าตอนไม่มีส่วนแผน'] : [])];
+const planPage = read(PLAN_FROM);
+const planBad = [
+  ...planBadOf(wn),
+  ...(!planPage.includes(`${MOVED_MARK} content="whatsnew.html#${PLAN_ID}"`) ? [`${PLAN_FROM} ไม่ใช่หน้าส่งต่อไป whatsnew#${PLAN_ID}`] : []),
+  ...(DEV_TABS.some(([h]) => h === PLAN_FROM) ? [`แถบห้องผู้พัฒนายังมี ${PLAN_FROM}`] : []),
+];
+const midSoon = wnNoPlan.indexOf('</ul>', wnNoPlan.indexOf('<h2>กำลังทำ</h2>')) + '</ul>'.length;
+const planCtl = !!planAt
+  && planBadOf(`${wn.slice(0, planAt[1])}<ul><li>ข้อทดสอบ ใบงาน</li></ul>\n  ${wn.slice(planAt[1])}`).length > planBadOf(wn).length
+  && planBadOf(`${wnNoPlan.slice(0, midSoon)}${planSect}${wnNoPlan.slice(midSoon)}`).length > planBadOf(wn).length;
+check('แผนข้างหน้าอยู่ในแพตช์โน้ตเป็นภาษาผู้เล่น นอกหัวกำลังทำ · dev/plan ส่งต่อมาที่นี่', planBad.length || !planCtl, ` ${(planSect.match(/<li[\s>]/g) ?? []).length} ข้อ${planBad.length ? ` · ${planBad.join(' | ')}` : ''} · ตัวควบคุม${planCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 7d) หน้าโลกที่เล่นได้ (three-worlds 08): บอกแค่ทางที่ผู้เล่นเห็นบนจอเสมอ — ทางลับที่เป็นเหตุสุ่ม (ทริปศาลทั้งตัว court.mjs) ห้ามมีแม้แต่คำ
 // · ทางเกิดครบทุกทางจาก PATHS · แผนภาพ 3 กล่องไม่มีป้ายบนลูกศร (svg มีแค่ <text> ชื่อฉาก) · ลิงก์ไปหน้าต่างโลก
@@ -394,13 +551,13 @@ const worldsBad = (html) => {
   if (labels.length !== 3 || !WORLD_NAMES.every((n) => labels.includes(n))) why.push(`แผนภาพ: ${labels.join(' ') || 'ไม่มี'}`);
   const pathsMiss = Object.keys(facts).filter((k) => /^path[A-Z]/.test(k) && !html.includes(`data-fact="${k}"`));
   if (pathsMiss.length) why.push(`ทางเกิดขาด ${pathsMiss.join(' ')}`);
-  if (!html.includes('href="otherworld.html')) why.push('ไม่ลิงก์หน้าต่างโลก');
+  if (!html.includes('href="#otherworld"') || !html.includes('id="otherworld"')) why.push('ไม่ลิงก์ส่วนต่างโลก');
   return why;
 };
 const worldsHtml = read('worlds.html');
 const worldsMiss = worldsBad(worldsHtml);
 const worldsCtl = worldsBad(worldsHtml.replace('</main>', '<p>เฉียดตาย</p></main>')).length === 1 && worldsBad(worldsHtml.replace('</svg>', '<text>ตาย</text></svg>')).length === 1;
-check('หน้าโลกที่เล่นได้: ไม่มีคำทางลับ · แผนภาพ 3 กล่องไม่มีป้ายลูกศร · ทางเกิดครบ · ลิงก์ต่างโลก', worldsMiss.length || !worldsCtl, `${worldsMiss.length ? ` · ${worldsMiss.join(' | ')}` : ''} · ตัวควบคุม${worldsCtl ? 'จับได้' : 'จับไม่ได้'}`);
+check('หน้าโลกที่เล่นได้: ไม่มีคำทางลับ · แผนภาพ 3 กล่องไม่มีป้ายลูกศร · ทางเกิดครบ · ลิงก์ส่วนต่างโลก', worldsMiss.length || !worldsCtl, `${worldsMiss.length ? ` · ${worldsMiss.join(' | ')}` : ''} · ตัวควบคุม${worldsCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
 // 8) คู่มือ (B121): ป้ายปุ่มทุกตัวในค่ากลางขึ้นคู่มือพร้อมคำอธิบาย · หน้าจอเกมไม่เขียนป้ายเหล่านั้นตรงซ้ำ (ไม่งั้นแก้ค่ากลางแล้วเกมไม่ตาม)
 const guide = read('guide.html');
@@ -459,6 +616,19 @@ const sceneMiss = [...sceneBadParts([...new Set(sceneUsed)], sceneArt).map((id) 
 const sceneCtl = sceneNoCard([...sceneMap, ['no_such_card', 'death']], evIds).includes('no_such_card') && sceneBadParts(['death'], () => ({ parts: [...sceneArt('death').parts, [sceneArt('death').parts[0]]] })).length === 1;
 check('ภาพฉากสำคัญ: ทุกชิ้นวาดได้ · การ์ดที่ผูกมีจริง', sceneMiss.length || sceneMap.length < 5 || !sceneCtl, ` ${ART_SCENE_IDS.length} ภาพ · ผูก ${sceneMap.length} การ์ด + แรกเกิด + การ์ดตาย${sceneMiss.length ? ` · ${sceneMiss.join(' | ')}` : ''} · ตัวควบคุม${sceneCtl ? 'จับได้' : 'จับไม่ได้'}`);
 
+// 9a3) ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 120): ครบ 10 หมวด ทุกชิ้นเป็น path จริง · ป้ายใบ 60 ทุกค่าตกหมวดที่มีภาพ · หน้าเล่นวาดภาพหมวดจริง (ภาพหมวดหาย = การ์ดผลไม่มีภาพเงียบ ๆ)
+// ตัวควบคุม: ถอดภาพ 1 หมวด · ชิ้นภาพซ้อน array · ป้ายที่ไม่มีหมวด · ถอดการวาดออกจาก app.mjs ⇒ ต้องถูกจับ
+const CAT_WANT = ['after', 'far', 'loss', 'ill', 'pet', 'self', 'luck', 'good', 'bad', 'mid'];
+const catBad = (ids, get) => ids.filter((k) => !get(k) || get(k).parts.some((x) => !x || typeof x.d !== 'string'));
+const catTagBad = (tags, ok) => tags.filter((t) => !ok.includes(resultArtCat({ tag: t })));
+const catDrawn = (src) => /catSvg\(resultArtCat\(card\)\)/.test(src);
+const catMiss = [...catBad(CAT_WANT, catArt).map((k) => `ภาพ ${k} พัง/ไม่มี`), ...CAT_IDS.filter((k) => !CAT_WANT.includes(k)).map((k) => `หมวดเกิน ${k}`), ...catTagBad(RESULT_TAGS, CAT_IDS).map((t) => `ป้าย ${t} ไม่ตกหมวดที่มีภาพ`), ...(catDrawn(appSrc) ? [] : ['app.mjs ไม่วาดภาพหมวด'])];
+const catCtl = catBad(CAT_WANT, (k) => (k === 'loss' ? null : catArt(k))).length === 1
+  && catBad(['loss'], () => ({ parts: [...catArt('loss').parts, [catArt('loss').parts[0]]] })).length === 1
+  && catTagBad(['good'], ['mid']).length === 1;
+const catCtl2 = !catDrawn(appSrc.replace('catSvg(resultArtCat(card))', 'null'));
+check('ภาพหมวดการ์ดผลครบ 10 หมวด · ป้ายทุกค่าตกหมวดที่มีภาพ · หน้าเล่นวาดจริง', catMiss.length || !catCtl || !catCtl2, ` ${CAT_IDS.length} หมวด · ป้าย ${RESULT_TAGS.length} ค่า${catMiss.length ? ` · ${catMiss.join(' | ')}` : ''} · ตัวควบคุม${catCtl && catCtl2 ? 'จับได้' : 'จับไม่ได้'}`);
+
 // 9b) ฟอนต์ไฟล์ในเว็บชุดเดียวทุกหน้า (ui-redo 96 · ข้อ 205): หน้าเล่นมี @font-face ครบทุกแบบที่ใช้ ชี้ fonts/*.woff2 ที่มีจริงและตรงต้นฉบับ src/ui/fonts
 // · fonts.css ตรงตาราง FONTS · ทุกไฟล์ใต้ docs/ (html/js/css) ไม่ดึง Google Fonts
 // ตัวควบคุม: ถอด @font-face หนึ่งแบบ · เติม <link> Google Fonts ในหน้าเอกสาร · ลบไฟล์ฟอนต์หนึ่งไฟล์ ⇒ ต้องถูกจับทุกแบบ
@@ -487,6 +657,7 @@ check('ภาพฉากสำคัญ: ทุกชิ้นวาดได�
 // ตัวควบคุม: หน้าแบบเดิม (ฝังสคริปต์) เกินเพดาน · สลับลำดับสคริปต์ · เลขรุ่นอื่น · ตัดโครงหน้าเปิด ⇒ ต้องถูกจับทุกแบบ
 {
   const PLAY_MAX = 100 * 1024;
+  const artHash = cardPicHash(cardPicText(await loadCardPics()));
   const html = read('play.html');
   const bytes = (s) => Buffer.byteLength(s, 'utf8');
   const fontFiles = playFonts().map(([, , f]) => `${FONT_DIR}${f}.woff2`);
@@ -495,7 +666,7 @@ check('ภาพฉากสำคัญ: ทุกชิ้นวาดได�
     ...(bytes(h) > PLAY_MAX ? [`play.html ${bytes(h).toLocaleString('en-US')} B เกิน`] : []),
     ...(!h.includes(playScripts(v)) ? ['สคริปต์ไม่ตรงชุด (ลำดับ/ ?v= / defer)'] : []),
     ...(h.indexOf(playAssets(v)[0]) > h.indexOf(playAssets(v)[1]) ? ['ข้อมูลมาหลังโค้ด'] : []),
-    ...(toLf(sw) !== swJs(v, fontFiles) ? ['sw.js ไม่ตรงรุ่น/ชุดไฟล์'] : []),
+    ...(toLf(sw) !== swJs(v, fontFiles, artHash) ?['sw.js ไม่ตรงรุ่น/ชุดไฟล์'] : []),
     ...(!/<header class="logo">/.test(h.slice(0, h.indexOf('<script'))) || !/<button[^>]*>[^<]+<\/button>/.test(shellOf(h)) ? ['ไม่มีหัว/ปุ่มเริ่มก่อนสคริปต์'] : []),
   ];
   const bootClears = /function boot\(\) \{\s*(?:\/\/[^\n]*\n\s*)*root\.replaceChildren\(\);/.test(appSrc);
@@ -503,11 +674,50 @@ check('ภาพฉากสำคัญ: ทุกชิ้นวาดได�
   const ctl = {
     'หน้าแบบฝังสคริปต์': splitGap(`${html}<script>${read(PLAY_FILES.data)}${read(PLAY_FILES.app)}</script>`).length > 0,
     'สลับลำดับ': splitGap(html.replace(playScripts(ver.version), playScripts(ver.version).split('\n').slice(0, 2).reverse().join('\n') + '\n' + playScripts(ver.version).split('\n')[2])).length > 0,
-    'เลขรุ่นอื่น': splitGap(html, 'v0.0.00').length > 0 && splitGap(html, ver.version, swJs('v0.0.00', fontFiles)).length > 0,
+    'เลขรุ่นอื่น': splitGap(html, 'v0.0.00').length > 0 && splitGap(html, ver.version, swJs('v0.0.00', fontFiles, artHash)).length > 0,
     'ตัดโครงหน้าเปิด': splitGap(html.replace(/(<main id="app">)[\s\S]*?(<\/main>)/, '$1$2')).length > 0,
   };
   const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
   check('หน้าเล่นแยกไฟล์: HTML ≤ 100 KB · สคริปต์ ?v=เลขรุ่น ข้อมูลก่อนโค้ด · service worker ชุดเดียวกัน · หัว + ปุ่มเริ่มขึ้นก่อนสคริปต์', miss.length || ctlBad.length, ` play.html ${bytes(html).toLocaleString('en-US')} B · ${PLAY_FILES.data} ${bytes(read(PLAY_FILES.data)).toLocaleString('en-US')} B · ${PLAY_FILES.app} ${bytes(read(PLAY_FILES.app)).toLocaleString('en-US')} B${miss.length ? ` · ${miss.join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
+}
+
+// 9b3) ภาพประจำการ์ด (ใบ 210 · ข้อ 492): play-art.js ตรงภาพใน src/ui/cardpics · play.js ขอไฟล์ตาม hash เนื้อภาพ · ภาพไม่อยู่ CORE ของ service worker · sw แคชภาพแยกตาม hash
+// · ทุก id ภาพมีการ์ดจริง · ชิ้นวาดได้ · แฟ้มที่ชื่อตรงหมวด id (kid.mjs = kid_*) ต้องครบทุกใบในหมวด · หน้าเล่นวาดภาพจริง เรียกกฎ 429 และขอไฟล์ภาพ
+// การ์ดที่ยังไม่มีภาพรายงานเป็นตัวเลข ไม่ตก — วาดทีละหมวด (ข้อ 492 ④)
+// ตัวควบคุม: id ภาพปลอม · ชิ้นบทบาทผิด · ถอดภาพ 1 ใบจากหมวดที่มีแฟ้ม · ภาพเข้า CORE · hash เก่า · ถอดการวาดจาก app.mjs ⇒ ต้องถูกจับ
+{
+  const pics = await loadCardPics();
+  const text = cardPicText(pics);
+  const hash = cardPicHash(text);
+  const ids = [...content.events, ...content.isekai].map((e) => e.id);
+  const cats = new Set(ids.map((id) => id.split('_')[0]));
+  const fileCats = cardPicFiles().map((f) => f.replace(/\.mjs$/, '')).filter((c) => cats.has(c));
+  const catHoles = (p) => fileCats.flatMap((c) => ids.filter((id) => id.startsWith(`${c}_`) && !(id in p)));
+  const core = (sw) => JSON.parse(sw.match(/^const CORE = (.*);$/m)?.[1] ?? '[]');
+  const artGap = (file, app, sw) => [
+    ...(file !== text ? [`${PLAY_FILES.art} ไม่ตรงภาพใน src/ui/cardpics (ยังไม่ build)`] : []),
+    ...(!app.includes(`const ART_SRC = ${JSON.stringify(artSrc(hash))};`) ? ['play.js ไม่ได้ขอไฟล์ภาพตาม hash ปัจจุบัน'] : []),
+    ...(core(sw).some((f) => f.startsWith(PLAY_FILES.art)) ? ['ภาพอยู่ใน CORE ของ service worker'] : []),
+    ...(!sw.includes(`const ART = "nl-art-${hash}";`) ? ['sw.js ไม่มีแคชภาพตาม hash'] : []),
+  ];
+  const drawn = (src) => /const pic = !scene && card\.kind === 'event' && cardPic\(card\.id\);/.test(src) && /else if \(pic\) body\.append\(pic\);/.test(src) && /\n  fitPic\(box\);/.test(src) && /\n  askArt\(\);/.test(src);
+  const gaps = cardPicGaps(pics, ids);
+  const appNow = read(PLAY_FILES.app), swNow = read(PLAY_FILES.sw);
+  const holes = catHoles(pics);
+  const miss = [...gaps.orphan.map((id) => `ภาพไม่มีการ์ด ${id}`), ...gaps.broken.map((id) => `ชิ้นพัง ${id}`), ...holes.map((id) => `หมวดมีแฟ้มแต่ไม่มีภาพ ${id}`), ...artGap(read(PLAY_FILES.art), appNow, swNow), ...(drawn(appSrc) ? [] : ['app.mjs ไม่วาดภาพการ์ด/ไม่เรียก fitPic/askArt'])];
+  const one = Object.keys(pics)[0];
+  const ctl = {
+    'id ภาพปลอม': cardPicGaps({ ...pics, no_such_card: [['s', 'M0 0h1']] }, ids).orphan.includes('no_such_card'),
+    'ชิ้นบทบาทผิด': cardPicGaps({ x: [['zz', 'M0 0']] }, ['x']).broken.length === 1 && cardPicGaps({ x: [[['s', 'M0 0']]] }, ['x']).broken.length === 1,
+    'ถอดภาพในหมวด': !one || catHoles(Object.fromEntries(Object.entries(pics).filter(([id]) => id !== one))).includes(one),
+    'ภาพเข้า CORE': artGap(text, appNow, swNow.replace(/^const CORE = \[/m, `const CORE = ["${artSrc(hash)}",`)).length > 0,
+    'hash เก่า': artGap(text, appNow.replace(artSrc(hash), artSrc('0000000000')), swNow).length > 0,
+    'ถอดการวาด': !drawn(appSrc.replace('else if (pic) body.append(pic);', '')),
+  };
+  const ctlBad = Object.entries(ctl).filter(([, v]) => !v).map(([k]) => k);
+  const size = Buffer.byteLength(text, 'utf8');
+  check('ภาพประจำการ์ด: ทุกภาพมีการ์ด วาดได้ · หมวดที่มีแฟ้มครบ · ไฟล์แยกตาม hash ไม่อยู่ CORE · หน้าเล่นวาด+กฎ 429', miss.length || ctlBad.length,
+    ` ภาพ ${Object.keys(pics).length}/${ids.length} ใบ (ยังไม่มี ${gaps.missing.length}) · แฟ้ม ${cardPicFiles().join(',') || '-'} · ${PLAY_FILES.art} ${size.toLocaleString('en-US')} B${miss.length ? ` · ${miss.slice(0, 5).join(' | ')}` : ''} · ตัวควบคุม${ctlBad.length ? `จับไม่ได้: ${ctlBad.join(' ')}` : 'จับได้'}`);
 }
 
 // 10) เดโมการ์ดบนหน้ารวมการ์ด (B121): ทุกทางมีผลให้อ่าน มีข้อความผลจริงอย่างน้อยหนึ่งทาง ไม่แตะ storage/network · build ซ้ำได้หน้าเดิม
@@ -738,21 +948,44 @@ check('.gitattributes merge=build ครบหน้าที่ build สร้
 // 12) หน้าโฟกัส: ทุกโฟกัสโลกนี้ขึ้นพร้อมป้ายเดียวกับปุ่มในเกม · ทุ่มเท/ทางลัด/อาชีพต่างโลกครบ · เงื่อนไข need มีคำครบ
 // · ระดับคู่มือ: ไม่มีข้อความเสี่ยง (ผลที่เกิดจริง) หรือตัวเลขโอกาส/ตัวคูณ · หน้าที่มีเมนูลิงก์มาที่หน้านี้
 const focusPage = read('focus.html');
-const fdefs = content.focus.focuses;
 const focusGap = (html) => [
-  ...Object.entries(fdefs).filter(([id, d]) => !new RegExp(`<tr id="f-${id}"><td[^>]*><b>${escHtml(d.name)}</b>[\\s\\S]*?${escHtml(focusWords(d, STAT_LABELS))}`).test(html)).map(([, d]) => d.name),
   ...[...Object.values(ISEKAI_FOCUS), ...Object.values(ISEKAI_KNOW).map((k) => k.focus), ...Object.values(ISEKAI_CAREERS)].filter((x) => !html.includes(`<b>${escHtml(x.name)}</b>`)).map((x) => x.name),
 ];
-const riskTexts = Object.values(fdefs).flatMap((d) => (d.risk ?? []).map((r) => r.text ?? r.warn));
-const focusLeak = (html) => [...riskTexts.filter((t) => html.includes(escHtml(t))), ...(/\d\s*%|×\s*\d|\d+\.\d+/.test(html.slice(html.indexOf('<main'))) ? ['ตัวเลขโอกาส/ตัวคูณ'] : [])];
-const needOff = [...Object.keys(FOCUS_NEEDS).filter((k) => !NEED_TEXT[k]), ...Object.keys(NEED_TEXT).filter((k) => !FOCUS_NEEDS[k])];
+const focusLeak = (html) => [...(/\d\s*%|×\s*\d|\d+\.\d+/.test(html.slice(html.indexOf('<main'))) ? ['ตัวเลขโอกาส/ตัวคูณ'] : [])];
 const noLink = !read('guide.html').includes('href="focus.html"');
-// ตัวควบคุม: ตัดโฟกัสแรกออก · แปะข้อความเสี่ยงตัวแรก ⇒ ต้องถูกจับทั้งคู่
-const f0 = Object.values(fdefs)[0];
-const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')).includes(f0.name) && focusLeak(`${focusPage}<p>${escHtml(riskTexts[0])}</p>`).length > 0;
+// ตัวควบคุม: ตัดทุ่มเทต่างโลกตัวแรกออก · แปะตัวเลขโอกาส ⇒ ต้องถูกจับทั้งคู่
+const f0 = Object.values(ISEKAI_FOCUS)[0];
+const focusCtl = focusGap(focusPage.replaceAll(`<b>${escHtml(f0.name)}</b>`, '')).includes(f0.name) && focusLeak(`${focusPage}<main><p>50 %</p>`).length > 0;
 const fGap = focusGap(focusPage);
 const fLeak = focusLeak(focusPage);
-check('หน้าโฟกัสครบทุกโฟกัสพร้อมป้ายเดียวกับเกม ไม่เผยผลเสี่ยงหรือตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || needOff.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · need ${needOff.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
+check('หน้าโฟกัสครบทุ่มเทต่างโลกพร้อมป้ายเดียวกับเกม ไม่เผยตัวเลข และหน้าวิธีเล่นลิงก์ถึง', fGap.length || fLeak.length || noLink || !focusCtl, ` ขาด ${fGap.join(',')} · เผย ${fLeak.join(',')} · ลิงก์ ${noLink} · ตัวควบคุม ${focusCtl}`);
+
+// 12b) ต้นไม้โฟกัส: ป้ายชื่อโหนดไม่ถูกเส้น/โหนด/ป้ายอื่น/ป้ายแขนงทับ (ft12 เส้นทำบุญ→ถือศีลวิ่งผ่านป้าย "เข้าค่ายธรรมะ" · เส้นออกจากรากทับป้ายราก)
+// ตัวควบคุม: ต้นสามโหนดรากมีสองลูก บังคับป้ายใต้โหนดทุกตัว ⇒ ต้องจับได้ · เลือกเองแล้วต้องว่าง
+const tvDefs = content.tree?.nodes ?? {};
+const tvCtl = { a: { name: 'ราก', branch: 'occ', pre: [] }, b: { name: 'ซ้าย', branch: 'occ', pre: ['a'] }, c: { name: 'ขวา', branch: 'occ', pre: ['a'] } };
+const tvBad = treeViewLayout(tvDefs).overlaps;
+const tvCtlOk = treeViewLayout(tvCtl, { labelPos: 'below' }).overlaps.length > 0 && treeViewLayout(tvCtl).overlaps.length === 0;
+check('ต้นไม้โฟกัส ป้ายชื่อโหนดไม่ถูกเส้น/โหนด/ป้ายอื่นทับ (ตัวควบคุมจับป้ายใต้โหนดรากได้)', tvBad.length || !tvCtlOk, ` ชน ${tvBad.map((o) => `${o.id}↔${o.kind}:${o.with}`).join(' ')}${tvCtlOk ? '' : ' · ตัวควบคุมไม่ตก'}`);
+
+// 12c) แผงโหนดล็อก/ช่อง ? บอกชื่อต้นทางที่ต้องปลดก่อน (ft12b) · and = "และ" · ไม่ and = "หรือ" · ต้นทางที่ยังซ่อนอยู่ห้ามเผยชื่อ
+// ตัวควบคุม: โค้ดแอปที่ไม่ต่อสายคำกับแผง (คำเดิมล้วน) ⇒ ต้องตก
+const needDone = {};
+const needReach = (p) => needDone[p] !== undefined;
+const needDefs = { a: { name: 'ก', pre: [] }, b: { name: 'ข', pre: [] }, h: { name: 'ลับ', hidden: true, pre: ['a'] }, or: { name: 'ค', pre: ['a', 'b'] }, and: { name: 'ง', and: true, pre: ['a', 'b'] }, onHid: { name: 'จ', pre: ['h'] } };
+const needTxt = (id, tail) => { const n = treeViewNeed(needDefs, id, needDone, needReach); return n ? treeViewNeedText(n, tail) : null; };
+const needReal = Object.entries(tvDefs).filter(([id, d]) => d.hidden && (d.pre ?? []).length).map(([id]) => treeViewNeed(tvDefs, id, {}, () => false)?.names.length ?? 0);
+const needApp = readFileSync(new URL('../src/ui/app.mjs', import.meta.url), 'utf8');
+const needWired = (src) => src.includes("treeViewNeedText(need, 'ก่อน')") && src.includes("treeViewNeedText(need, 'แล้วจะเห็น')");
+const needBad = [
+  needTxt('or', 'ก่อน') !== 'ต้องปลด "ก" หรือ "ข" ก่อน' && 'หรือ',
+  needTxt('and', 'ก่อน') !== 'ต้องปลด "ก" และ "ข" ก่อน' && 'และ',
+  needTxt('h', 'แล้วจะเห็น') !== 'ปลด "ก" แล้วจะเห็น' && 'ช่อง ?',
+  needTxt('onHid', 'ก่อน') !== null && 'เผยชื่อต้นทางที่ซ่อน',
+  needReal.some((n) => !n) && 'ช่อง ? ของจริงไม่มีชื่อต้นทาง',
+  !needWired(needApp) && 'แผงไม่ต่อสายคำ',
+].filter(Boolean);
+check('แผงโหนดล็อก/ช่อง ? บอกชื่อต้นทางที่ต้องปลด · และ/หรือตรงกฎ · ไม่เผยชื่อต้นทางที่ซ่อน (ตัวควบคุมจับโค้ดคำเดิมได้)', needBad.length || needWired(needApp.replaceAll('treeViewNeedText', 'x')), ` ${needBad.join(' · ')}`);
 
 // 285) ป้ายเวอร์ชันบนหน้าการ์ด: การ์ดที่ปล่อยแล้วต้องมีเวอร์ชันในทะเบียน · เวอร์ชันนั้นต้องมีหัวใน whatsnew · หัวรุ่นทุกหัวมี id
 // การ์ดใหม่ที่ไม่อยู่ในฐาน keep = รอ rel.mjs เติมตอนปล่อย ไม่ตก · ต่างโลกไม่อยู่ในฐาน keep จึงเตือนอย่างเดียว

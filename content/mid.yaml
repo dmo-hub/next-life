@@ -1,6 +1,7 @@
 # กลางคน (46–59) · การ์ดเงิน/ครอบครัว — กองสุ่ม
 events:
   - id: mid_debt_spiral_01
+    office_ok: "เงินเดือนเป็นตัวเทียบรายได้ประจำกับดอกเบี้ย (ธง in_debt)"
     type: A
     category: work_money
     stage: กลางคน
@@ -42,6 +43,7 @@ events:
         merit: [{cat: sila, level: 1}]
 
   - id: mid_guarantor_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -80,6 +82,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_kid_uni_01
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: กลางคน
@@ -114,6 +117,8 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_parent_care_01
+    office_ok: "ประชุมญาติแบ่งเวรดูแลพ่อแม่ ไม่ใช่ประชุมที่ทำงาน"
+    away_call: {text: "ตีสองโทรศัพท์จากบ้านเกิดดังขึ้น คนที่บ้านล้มในห้องน้ำ หมอบอกว่าต่อไปต้องมีคนดูแลตลอด ญาติถามว่าคุณจะกลับไหม"}
     type: A
     category: family
     stage: กลางคน
@@ -186,7 +191,7 @@ events:
         merit: [{cat: neutral}]
       - id: quit_dream
         text: "ลาออกไปทำตามฝันที่เก็บไว้"
-        gate: business
+        gate: mo5
         effects: {happiness: 2, income_mult: 0.8, knowledge: 1}
         sets_flags: [own_business]
         merit: [{cat: neutral}]
@@ -205,6 +210,8 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_risky_bet_01
+    office_ok: "บริษัทของรุ่นน้องที่ร่วมทุน ไม่ใช่ที่ทำงานของผู้เล่น"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -216,7 +223,7 @@ events:
     choices:
       - id: all_in
         text: "ทุ่มหมดหน้าตัก"
-        gate: business
+        gate: mo5
         outcomes:
           - {weight: 1, ok: true, text: "กิจการติดตลาดภายในปีเดียว ยอดสั่งเข้าจนผลิตไม่ทัน ชีวิตเปลี่ยนทั้งบ้าน", effects: {happiness: 3, income_mult: 1.6}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 2, text: "รุ่นน้องหายไปพร้อมบัญชีบริษัท เหลือแต่ป้ายร้านกับหนี้ร่วม", effects: {happiness: -3, health: -1, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, next: mid_risky_chase_01, merit: [{cat: neutral}]}
@@ -237,12 +244,13 @@ events:
         merit: [{cat: neutral}]
       - id: own_shop
         text: "ไม่ร่วมกับใคร เปิดร้านเอง"
-        gate: business
+        gate: mo5
         effects: {income_mult: 1.15, health: -1, happiness: 1}
         sets_flags: [own_business]
         merit: [{cat: neutral}]
 
   - id: mid_online_boom_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -315,6 +323,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_insurance_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -356,6 +365,8 @@ events:
 
   # เรื่องต่อ (next) — ไม่มี weight · อายุเดียวกับการ์ดต้นทาง
   - id: mid_online_empire_01
+    office_ok: "ผู้เล่นตั้งบริษัทของตัวเอง ไม่ใช่ลูกจ้าง"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -433,7 +444,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     title: "ทนายตามเงินคืน"
-    text: "ไม่กี่วันหลังแอปหาย มีบัญชีชื่อสำนักงานกฎหมายทักมา บอกว่าตามเงินคืนได้เต็มจำนวน ขอแค่ค่าดำเนินการล่วงหน้าก้อนเล็ก ๆ"
+    text: "ไม่กี่วันหลังแอปหาย มีบัญชีที่อ้างว่าเป็นทนายทักมา บอกว่าตามเงินคืนได้เต็มจำนวน ขอแค่ค่าดำเนินการล่วงหน้าก้อนเล็ก ๆ"
     choices:
       - id: pay_fee
         text: "โอนค่าดำเนินการ ขอแค่ได้คืน"
@@ -459,6 +470,8 @@ events:
         merit: [{cat: neutral}]
 
   - id: mid_scam_victims_01
+    office_ok: "ประชุมกลุ่มผู้เสียหายจากการหลอกลวง ไม่ใช่ประชุมที่ทำงาน"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -489,6 +502,8 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ mid_parent_care_01 (ประชุมแบ่งเวรล่ม งานตกที่เราคนเดียว) — ออกทาง next เท่านั้น
   - id: mid_care_alone_01
+    office_ok: "ประชุมนัดใหม่ของญาติเรื่องดูแลพ่อแม่ มีทนายนั่งกลาง"
+    away_block: [abroad]
     type: A
     category: family
     stage: กลางคน
@@ -523,6 +538,7 @@ events:
           - {weight: 1, text: "ญาติโกรธที่ประจานกัน กลุ่มเงียบกริบ", effects: {relations: -2}, merit: [{cat: neutral}]}
   # B167: การ์ดแรกที่ใช้ระบบญาติป่วย (when.kin_illness) — ออกหลังแกนแจ้งว่าพ่อ/แม่ป่วยโรคเรื้อรัง · ตัวเลือกติด filial
   - id: mid_parent_ill_01
+    away_call: {text: "{พ่อแม่ที่ป่วย}โทรมา เล่าผลตรวจด้วยเสียงเรียบ ๆ ว่าต่อไปต้องมีคนพาไปโรงพยาบาลทุกเดือน แล้วไม่ถามว่าคุณจะกลับเมื่อไร"}
     type: A
     category: family
     stage: กลางคน

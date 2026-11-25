@@ -1,13 +1,13 @@
 // กติกาโครงข้อมูล: ฟิลด์บังคับ · ชนิด · key นอกรายการ · ระดับผล · หน่วยเงิน · ช่องแทนค่า
 import {
   STAT_KEYS, EFFECT_KEYS, CLASSES, SEXES, STAGE_AGES, STAGE_NAMES, CATEGORIES, PLACEHOLDERS,
-  ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
+  HEAVY_TAGS, ENGINE_CARD, ID_RE, YEAR_MIN, YEAR_MAX, FAMILY_ROLES, MIN_CHOICES, FLAG_RE, EDU, SCHOOL_VALUES,
   meritCat, AFTERLIFE_STAGE,
 } from './vocab.mjs';
 import { INCOME_MULT, MONEY_KEYS, PACT, OVERLAP_STAGE_MIN } from '../../engine/life.mjs';
 import { ASSETS, DEBTS } from '../../engine/finance.mjs';
 import { EXAMS, TRACKS } from '../../engine/career.mjs';
-import { PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS } from '../../engine/family.mjs';
+import { COURT_STAGES, PET_KINDS, HERD_KINDS, PET_CAUSES, FILIAL_WAYS, IDENTITY, IDENTITIES } from '../../engine/family.mjs';
 import { CHRONIC, ILL_YEARS, HEREDITARY, CARE_CAUSES } from '../../engine/death.mjs';
 import { SIN_CATS } from '../../engine/merit.mjs';
 import { REALMS } from '../../engine/afterlife.mjs';
@@ -19,27 +19,27 @@ const KIN_ILL_ROLES = ['parent', 'spouse', 'child', 'grandchild'];
 const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
-  event: ['id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'focus', 'run', 'arc'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex'],
+  event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'run', 'arc', 'heavy', 'office_ok'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
-  familyOp: ['add', 'n', 'leave', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
-  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot'],
+  familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name'],
+  effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
   chronic: STAT_KEYS,
   invest: ['asset', 'share'],
   debt: ['kind', 'amount'],
   money: ['unit', 'amount', 'ref_year', 'grey'],
   merit: ['cat', 'level'],
   schedule: ['event', 'after_years', 'chance'],
-  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'heredity', 'filial', 'parent_flags', 'home_flags', 'overlap_stage', 'dark_gate', 'past_life', ...MONEY_KEYS],
+  when: ['age', 'year', 'class', 'region', 'province', 'sex', 'identity', 'stats', 'flags', 'family', 'occupation', 'loss', 'school', 'ladder', 'illness', 'kin_illness', 'child_far', 'child_not_mine', 'ex_spouse', 'heredity', 'filial', 'spouse', 'parent_flags', 'home_flags', 'overlap_stage', 'kin_ghost', 'ancestor', 'dark_gate', 'past_life', 'tree', ...MONEY_KEYS],
   pastLife: ['any', 'province', 'job', 'cause', 'realm', 'talent'],
   bound: ['min', 'max'],
   ratioMul: ['min', 'max', 'v'],
   whenFlags: ['has', 'not'],
-  family: ['role', 'sex', 'age', 'alive', 'count', 'health', 'relations'],
+  family: ['role', 'sex', 'age', 'alive', 'count', 'stage', 'years', 'health', 'relations'],
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'home_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
-  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'reason', 'reasons'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'isekai_lineage', 'reason', 'reasons'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -348,8 +348,12 @@ export const rules = [
       if (w.region !== undefined && !nonEmptySubset(w.region, ctx.regions)) r('.when.region', `region ต้องเป็นรายการจาก ${ctx.regions.join(' · ')}`);
       if (w.province !== undefined && !nonEmptySubset(w.province, ctx.provinces)) r('.when.province', `province ต้องเป็นรายการจากจังหวัดใน data/birthplace.json`);
       if (w.sex !== undefined && !nonEmptySubset(w.sex, SEXES)) r('.when.sex', `sex ต้องเป็นรายการจาก ${SEXES.join(' ')}`);
+      if (w.identity !== undefined && !nonEmptySubset(w.identity, IDENTITIES)) r('.when.identity', `identity ต้องเป็นรายการจาก ${IDENTITIES.join(' ')}`);
+      if (w.tree !== undefined && !(Array.isArray(w.tree) && w.tree.length && w.tree.every((id) => ctx.treeIds?.includes(id)))) r('.when.tree', 'tree ต้องเป็นรายการ id โหนดต้นไม้ที่มีในทะเบียน (content/rules/tree.yaml)');
       const top = OVERLAP_STAGE_MIN.length - 1;
+      if (w.kin_ghost !== undefined && !nonEmptySubset(w.kin_ghost, ['haunt', 'warn'])) r('.when.kin_ghost', 'kin_ghost ต้องเป็นรายการจาก haunt warn (สีหน้าผีญาติ)');
       if (w.overlap_stage !== undefined && !isRange(w.overlap_stage, 0, top)) r('.when.overlap_stage', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${top} จำนวนเต็ม`);
+      if (w.ancestor !== undefined && w.ancestor !== true) r('.when.ancestor', 'ancestor ต้องเป็น true (มีแถวชาติไทยในผังตระกูล)');
       if (w.stats !== undefined) {
         if (!isObj(w.stats)) r('.when.stats', 'stats ต้องเป็น object');
         else for (const [k, b] of Object.entries(w.stats)) if (!bound(b)) r(`.when.stats.${k}`, 'ต้องเป็น {min, max} 0–100 min ≤ max');
@@ -367,6 +371,8 @@ export const rules = [
           if (f.alive !== undefined && typeof f.alive !== 'boolean') r(`${p}.alive`, 'alive ต้องเป็น true/false');
           if (f.sex !== undefined && !SEXES.includes(f.sex)) r(`${p}.sex`, `sex ต้องเป็น ${SEXES.join(' ')}`);
           if (f.count !== undefined && !isRange(f.count, 0, 20)) r(`${p}.count`, 'count ต้องเป็น [จาก, ถึง] 0–20');
+          if (f.stage !== undefined && ![].concat(f.stage).every((x) => COURT_STAGES.includes(x))) r(`${p}.stage`, `stage ต้องเป็น ${COURT_STAGES.join(' ')} (หรือรายการ)`);
+          if (f.years !== undefined && !isRange(f.years, 0, 120)) r(`${p}.years`, 'years ต้องเป็น [จาก, ถึง] 0–120 (ปีที่จีบ/คบมา)');
           for (const k of ['health', 'relations']) if (f[k] !== undefined && !bound(f[k])) r(`${p}.${k}`, 'ต้องเป็น {min, max} 0–100');
         });
       }
@@ -544,12 +550,41 @@ export const rules = [
     },
   },
   {
+    id: 'heavy-tag',
+    desc: 'heavy = รายการป้ายเรื่องหนักของการ์ด · ค่าได้แค่ turning (จุดเปลี่ยน โหมดด่วน) กับ sad (เรื่องเศร้า ยกเว้นมุก) · มีได้ทั้งคู่ ห้ามซ้ำ · ห้ามใส่บนการ์ดที่แกนสร้างเอง · silly (ตัวเลือกปั่น) = true เท่านั้น',
+    event(e, ctx, r) {
+      for (const { c, path } of choicesOf(e)) if (c.silly !== undefined && c.silly !== true) r(`${path}.silly`, `silly ต้องเป็น true (ได้ ${JSON.stringify(c.silly)}) — ไม่ใช่ตัวเลือกปั่นให้ลบช่องออก`);
+      if (e.heavy === undefined) return;
+      if (!Array.isArray(e.heavy) || !e.heavy.length) { r('.heavy', 'heavy ต้องเป็นรายการไม่ว่าง เช่น [sad]'); return; }
+      for (const v of e.heavy) if (!HEAVY_TAGS.includes(v)) r('.heavy', `ป้าย "${v}" ไม่มี — มีแค่ ${HEAVY_TAGS.join(' ')}`);
+      if (new Set(e.heavy).size !== e.heavy.length) r('.heavy', 'ป้ายซ้ำในรายการเดียวกัน');
+      if (typeof e.id === 'string' && ENGINE_CARD.test(e.id)) r('.heavy', 'การ์ดที่แกนสร้างเอง (promo_ office_ recruit_gov early_retire) ไม่ใส่ป้ายในไฟล์เนื้อหา');
+    },
+  },
+  {
     id: 'ambient-shape',
     desc: 'ambient = true เท่านั้น · การ์ดบรรยากาศที่แบบชีวิต (titles picksAfter) ไม่นับ — ต้องเป็นการ์ดกองสุ่ม (มี weight) ไม่ใช่ใบลาง',
     event(e, ctx, r) {
       if (e.ambient === undefined) return;
       if (e.ambient !== true) r('.ambient', `ambient ต้องเป็น true (ได้ ${JSON.stringify(e.ambient)}) — ไม่ใช่ ambient ให้ลบช่องออก`);
       if (e.weight === undefined || e.herald_of !== undefined) r('.ambient', 'การ์ดบรรยากาศต้องมี weight และไม่ใช่ใบลาง (herald_of ข้ามแบบชีวิตอยู่แล้ว)');
+    },
+  },
+  {
+    id: 'away-shape',
+    desc: 'สถานะนอกบ้าน: away_block = รายการชนิดจากทะเบียน content/rules/away.yaml · away_call = {text} · effects.away_enter = ชนิดจากทะเบียน · effects.away_leave = true',
+    event(e, ctx, r) {
+      if (e.away_block !== undefined && !nonEmptySubset(e.away_block, ctx.awayKinds)) r('.away_block', `ต้องเป็นรายการจาก ${ctx.awayKinds.join(' ')}`);
+      if (e.away_only !== undefined && !nonEmptySubset(e.away_only, ctx.awayKinds)) r('.away_only', `ต้องเป็นรายการจาก ${ctx.awayKinds.join(' ')}`);
+      if (e.away_call !== undefined && (!isObj(e.away_call) || typeof e.away_call.text !== 'string' || !e.away_call.text.trim() || Object.keys(e.away_call).length !== 1)) r('.away_call', 'ต้องเป็น {text: ข้อความ}');
+      for (const { c, path } of choicesOf(e)) {
+        for (const [w, p] of [[c, path], ...list(c.outcomes).map((o, i) => [o, `${path}.outcomes[${i}]`])]) {
+          const fx = w?.effects;
+          if (!isObj(fx)) continue;
+          if (fx.away_enter !== undefined && !ctx.awayKinds.includes(fx.away_enter)) r(`${p}.effects.away_enter`, `ต้องเป็นชนิด ${ctx.awayKinds.join('|')} ได้ ${JSON.stringify(fx.away_enter)}`);
+          if (fx.away_leave !== undefined && fx.away_leave !== true) r(`${p}.effects.away_leave`, 'ต้องเป็น true');
+        }
+      }
     },
   },
   {
@@ -571,26 +606,29 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), reason?} · ล็อกด้วยธงต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), isekai_lineage?: true (ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยกลับจากต่างโลก), reason?} · ล็อกด้วยธง/isekai_lineage ต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
         const q = c.requires;
         if (q === undefined) continue;
         const at = `${path}.requires`;
-        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family age หรือ nature อย่างน้อยหนึ่งอย่าง'); continue; }
+        if (!isObj(q) || !['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'isekai_lineage'].some((k) => q[k] !== undefined)) { r(at, 'requires ต้องมี money stats flags edu family age nature หรือ isekai_lineage อย่างน้อยหนึ่งอย่าง'); continue; }
         // อายุตามกฎหมาย (เช่น พินัยกรรม 15 ปีขึ้นไป) — แกนเขียนเหตุผล "อายุยังไม่ถึง N ปี" เอง
         if (q.age !== undefined && !(isObj(q.age) && (q.age.min !== undefined || q.age.max !== undefined) && [q.age.min, q.age.max].every((v) => v === undefined || (Number.isInteger(v) && v >= 0 && v <= 120)))) r(`${at}.age`, 'ต้องเป็น {min, max} จำนวนเต็ม 0–120');
         // ตัวเลือกที่พูดถึงคนในบ้านล็อกได้เมื่อไม่มีคนนั้น (เงื่อนไขชุดเดียวกับ when.family)
         if (q.family !== undefined && !(Array.isArray(q.family) && q.family.length && q.family.every((f) => isObj(f) && FAMILY_ROLES.includes(f.role) && (f.alive === undefined || typeof f.alive === 'boolean') && (f.sex === undefined || SEXES.includes(f.sex)) && (f.age === undefined || isRange(f.age, 0, 120)) && (f.count === undefined || isRange(f.count, 0, 20)) && f.health === undefined && f.relations === undefined))) r(`${at}.family`, `ต้องเป็น [{role: parent|spouse|child|grandchild, sex?: ${SEXES.join('|')}, alive?: true/false, age?: [จาก, ถึง], count?: [จาก, ถึง]}]`);
         if (q.money !== undefined && !(isMoney(q.money) && q.money.amount > 0)) r(`${at}.money`, 'ต้องเป็นเงินมีหน่วย amount > 0');
         if (q.stats !== undefined && (!isObj(q.stats) || Object.entries(q.stats).some(([k, b]) => !STAT_KEYS.includes(k) || !bound(b) || (b.min === undefined && b.max === undefined)))) r(`${at}.stats`, 'ต้องเป็น {ค่าสถานะ: {min, max}} 0–100');
+        // ล็อกตามผังตระกูลมีรุ่นต่างโลก (world-overlap 22) — เป็น true เท่านั้น · ธงเป็นภาษาโค้ดเหมือน flags ผู้เล่นต้องอ่านเหตุเป็นคำ
+        if (q.isekai_lineage !== undefined && q.isekai_lineage !== true) r(`${at}.isekai_lineage`, 'isekai_lineage ต้องเป็น true');
+        if (q.isekai_lineage === true && !(typeof q.reason === 'string' && q.reason.trim()) && !(typeof q.reasons?.isekai_lineage === 'string' && q.reasons.isekai_lineage.trim())) r(`${at}.reason`, 'ล็อกด้วย isekai_lineage ต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
         if (q.flags !== undefined && (!isObj(q.flags) || ['has', 'not'].some((k) => q.flags[k] !== undefined && !Array.isArray(q.flags[k])))) r(`${at}.flags`, 'flags ต้องเป็น {has: [...], not: [...]}');
         // ชื่อธงเป็นภาษาโค้ด ผู้เล่นอ่านไม่ออก — ต้องบอกเหตุผลเป็นคำ
         // B1: เหตุแยกข้อ reasons.flags ใช้แทน reason ได้
         if (q.flags !== undefined && !(typeof q.reason === 'string' && q.reason.trim()) && !(typeof q.reasons?.flags === 'string' && q.reasons.flags.trim())) r(`${at}.reason`, 'ล็อกด้วยธงต้องมี reason ที่ผู้เล่นอ่านเข้าใจ');
         // B1 requires.reasons = {ข้อ: เหตุ} · ข้อต้องเป็นเงื่อนไขที่มีจริงใน requires นี้ · เหตุเป็นข้อความ
-        if (q.reasons !== undefined && !(isObj(q.reasons) && Object.entries(q.reasons).every(([k, v]) => ['money', 'stats', 'flags', 'edu', 'family'].includes(k) && q[k] !== undefined && typeof v === 'string' && v.trim()))) r(`${at}.reasons`, 'reasons ต้องเป็น {money|stats|flags|edu|family: ข้อความ} ของข้อที่มีใน requires');
+        if (q.reasons !== undefined && !(isObj(q.reasons) && Object.entries(q.reasons).every(([k, v]) => ['money', 'stats', 'flags', 'edu', 'family', 'isekai_lineage'].includes(k) && q[k] !== undefined && typeof v === 'string' && v.trim()))) r(`${at}.reasons`, 'reasons ต้องเป็น {money|stats|flags|edu|family|isekai_lineage: ข้อความ} ของข้อที่มีใน requires');
         if (q.reason !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'reason ต้องเป็นข้อความ');
       }
       if (cs.length && cs.every(({ c }) => c.requires !== undefined)) r('.choices', 'ทุกตัวเลือกล็อกได้ — ต้องมีตัวเลือกที่ไม่มี requires อย่างน้อย 1 ตัว ไม่งั้นการ์ดค้าง');
@@ -614,6 +652,13 @@ export const rules = [
         const fx = isObj(node.effects) ? node.effects : {};
         if (fx.job !== undefined && !occ.includes(fx.job)) r(`${path}.effects.job`, `อาชีพ "${fx.job}" ไม่รู้จัก (${occ.join(' ')})`);
         if (fx.school !== undefined && !SCHOOL_VALUES.includes(fx.school)) r(`${path}.effects.school`, `ต้องเป็น ${SCHOOL_VALUES.join(' ')}`);
+        // ตั้งอัตลักษณ์ได้เฉพาะการ์ดที่กั้น when.sex ไว้แค่เพศกำเนิดที่ค่านั้นใช้ได้ — ไม่งั้นเพศกำเนิดหญิงได้ค่าที่ไม่มีความหมาย
+        if (fx.identity !== undefined) {
+          const birth = IDENTITY[fx.identity]?.birth;
+          const sexes = isObj(e.when) ? e.when.sex : undefined;
+          if (!IDENTITIES.includes(fx.identity)) r(`${path}.effects.identity`, `ต้องเป็น ${IDENTITIES.join(' ')}`);
+          else if (birth && !(Array.isArray(sexes) && sexes.length && sexes.every((x) => birth.includes(x)))) r(`${path}.effects.identity`, `การ์ดต้องกั้น when.sex เป็น ${birth.join(' ')}`);
+        }
       }
       for (const [m, at] of mults) {
         const o = isObj(m) ? m.occupation : undefined;
@@ -693,16 +738,16 @@ export const rules = [
   {
     // ผลครอบครัวของตัวเลือก/ผลสุ่ม (B36a · B36a2): เพิ่มสมาชิก · คู่แยกทาง · คนในบ้านจากไป · ความผูกพันขึ้นลง — op ละอย่าง
     id: 'family-ops',
-    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {die: role, cause?} | {bond: role|all, d: ±1–30}] — op ละอย่าง · cause = สาเหตุที่การ์ดเล่า (คน: กลุ่มใน data/death-causes.json ยกเว้น self_harm · pet: old|sick|accident · herd ไม่มี)',
+    desc: 'family = [{add: spouse|child|grandchild|peer, n?: 1–3} | {add: pet|herd, kind, life: [จาก, ถึง], name?} | {leave: spouse|pet|herd} | {separate: spouse} | {divorce: spouse} | {breakup: partner, by?: us|them} | {marry: partner} | {die: role, cause?} | {bond: role|all, d: ±1–30}] — op ละอย่าง · cause = สาเหตุที่การ์ดเล่า (คน: กลุ่มใน data/death-causes.json ยกเว้น self_harm · pet: old|sick|accident · herd ไม่มี)',
     event(e, ctx, r) {
       for (const { node, path } of effectSites(e)) {
         if (node.family === undefined) continue;
         if (!Array.isArray(node.family) || !node.family.length) { r(`${path}.family`, 'family ต้องเป็นรายการไม่ว่าง'); continue; }
         node.family.forEach((o, i) => {
           const p = `${path}.family[${i}]`;
-          const kinds = ['add', 'leave', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
-          if (kinds.length !== 1) return r(p, 'ต้องมี add leave die หรือ bond อย่างเดียว');
-          if (o.add !== undefined && !['spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น spouse child grandchild pet herd peer');
+          const kinds = ['add', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'marry', 'far', 'back', 'die', 'bond'].filter((k) => isObj(o) && o[k] !== undefined);
+          if (kinds.length !== 1) return r(p, 'ต้องมี add leave separate divorce reconcile remarry custody paternity breakup marry far back die หรือ bond อย่างเดียว');
+          if (o.add !== undefined && !['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer', 'courter'].includes(o.add)) r(`${p}.add`, 'add ต้องเป็น partner spouse child grandchild pet herd peer courter');
           // สัตว์ไม่มีตารางชีพในข้อมูล — อายุขัยของชนิดต้องมาจากเนื้อหา · ชนิดต้องอยู่ในตารางของแกน (ผลต่อปีอ่านจากตาราง ชนิดสะกดผิด = ไม่มีผลเงียบ)
           const animals = o.add === 'pet' ? PET_KINDS : o.add === 'herd' ? HERD_KINDS : null;
           if (animals && (!Object.hasOwn(animals, o.kind) || !isRange(o.life, 1, 40))) r(`${p}`, `add: ${o.add} ต้องมี kind (${Object.keys(animals).join(' ')}) และ life: [จาก, ถึง] ปี 1–40`);
@@ -714,6 +759,12 @@ export const rules = [
           if (o.bond === undefined && o.d !== undefined) r(`${p}.d`, 'd ใช้กับ bond เท่านั้น');
           if (o.n !== undefined && (o.add === undefined || !isInt(o.n) || o.n < 1 || o.n > 3)) r(`${p}.n`, 'n ใช้กับ add เป็น 1–3');
           if (o.leave !== undefined && !['spouse', 'pet', 'herd'].includes(o.leave)) r(`${p}.leave`, 'leave ใช้ได้กับ spouse pet herd');
+          for (const k of ['breakup', 'marry']) if (o[k] !== undefined && o[k] !== 'partner') r(`${p}.${k}`, `${k} ใช้ได้กับ partner`);
+          if (o.by !== undefined && (o.breakup === undefined || !['us', 'them'].includes(o.by))) r(`${p}.by`, 'by ใช้กับ breakup เป็น us หรือ them');
+          for (const k of ['separate', 'divorce', 'reconcile', 'remarry']) if (o[k] !== undefined && o[k] !== 'spouse') r(`${p}.${k}`, `${k} ใช้ได้กับ spouse`);
+          if (o.custody !== undefined && !['self', 'other'].includes(o.custody)) r(`${p}.custody`, 'custody ต้องเป็น self (เราเลี้ยง) หรือ other (อยู่กับอีกฝ่าย)');
+          if (o.paternity !== undefined && !['keep', 'cut'].includes(o.paternity)) r(`${p}.paternity`, 'paternity ต้องเป็น keep (ยังเป็นลูกเรา) หรือ cut (ตัดขาด)');
+          for (const k of ['far', 'back']) if (o[k] !== undefined && o[k] !== 'child') r(`${p}.${k}`, `${k} ใช้ได้กับ child`);
           if (o.die !== undefined && !FAMILY_ROLES.includes(o.die)) r(`${p}.die`, `die ต้องเป็น ${FAMILY_ROLES.join(' ')}`);
           // สาเหตุที่จอต้องพาสายด่วน (self_harm) ห้ามเนื้อหาสั่ง — เจ้าของไม่ให้มีการ์ดที่พาไปสู่การทำร้ายตัวเอง
           if (o.cause !== undefined) {
@@ -755,6 +806,37 @@ export const rules = [
     },
   },
   {
+    id: 'child-far',
+    desc: 'when.child_far = {far: true|false, age?: [lo, hi], grandkids?: true} — ลูกที่ยังอยู่และอยู่ไกล/อยู่ใกล้ตามที่ระบุ · การ์ดเรียกลูกคนนั้น',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.child_far : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => !['far', 'age', 'grandkids'].includes(k)) || typeof w.far !== 'boolean') return r('.when.child_far', 'child_far ต้องเป็น {far: true|false, age?, grandkids?}');
+      if (w.age !== undefined && !isRange(w.age, 0, 120)) r('.when.child_far.age', 'age ต้องเป็น [lo, hi]');
+      if (w.grandkids !== undefined && w.grandkids !== true) r('.when.child_far.grandkids', 'grandkids ใส่ได้แค่ true');
+    },
+  },
+  {
+    id: 'child-not-mine',
+    desc: 'when.child_not_mine = {age?: [lo, hi]} — ลูกที่ยังอยู่ ไม่ใช่ลูกทางสายเลือดของผู้เล่นชาย และยังไม่ได้ตัดสิน (ใบ 95) · การ์ดเรียกลูกคนนั้น · ตัวเลือกตัดสินด้วย family: [{paternity: keep|cut}]',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.child_not_mine : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => k !== 'age')) return r('.when.child_not_mine', 'child_not_mine ต้องเป็น {age?}');
+      if (w.age !== undefined && !isRange(w.age, 0, 120)) r('.when.child_not_mine.age', 'age ต้องเป็น [lo, hi]');
+    },
+  },
+  {
+    id: 'ex-spouse',
+    desc: 'when.ex_spouse = {within: [lo, hi]} — คู่เก่าที่หย่าแล้วและยังอยู่ หย่ามาแล้ว lo–hi ปี · เรายังโสด · ยังไม่เคยคืนดี (ใบ 97) · การ์ดเรียกคู่เก่าเป็น {ชื่อคู่} · ตัวเลือกคืนดีด้วย family: [{remarry: spouse}]',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.ex_spouse : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => k !== 'within')) return r('.when.ex_spouse', 'ex_spouse ต้องเป็น {within: [lo, hi]}');
+      if (!isRange(w.within, 0, 60)) r('.when.ex_spouse.within', 'within ต้องเป็น [lo, hi] ปีหลังหย่า');
+    },
+  },
+  {
     id: 'kin-illness',
     desc: `when.kin_illness = {roles?: [${KIN_ILL_ROLES.join('|')}], causes?: [${CHRONIC.join('|')}], left?: [lo, hi] 0–${ILL_YEARS[1] - 1}} — พ่อแม่/คนในบ้านที่รู้แล้วว่าป่วยโรคเรื้อรังที่นัดตาย`,
     event(e, ctx, r) {
@@ -780,6 +862,22 @@ export const rules = [
       if (!isObj(w) || Object.keys(w).some((k) => k !== 'way' && k !== 'n')) return r('.when.filial', 'filial ต้องเป็น {way?, n?}');
       if (w.way !== undefined && !(Array.isArray(w.way) && w.way.length && w.way.every((x) => FILIAL_WAYS.includes(x)))) r('.when.filial.way', `way ต้องเป็นรายการจาก ${FILIAL_WAYS.join(' ')}`);
       if (w.n !== undefined && !isRange(w.n, 1, 99)) r('.when.filial.n', 'n ต้องเป็น [lo, hi] ใน 1–99');
+    },
+  },
+  {
+    id: 'spouse',
+    desc: 'when.spouse = {status?: together|apart, bond?: [lo,hi] 0–100, together?: [lo,hi] ปีที่อยู่ด้วยกัน, apart?: [lo,hi] ปีที่แยกทางมาแล้ว, wed?: [lo,hi] ปี พ.ศ. ที่แต่ง} — คู่ปัจจุบันที่ยังไม่หย่า · bond ต่ำสุดในเกม = 38 (BOND_FLOOR) เกณฑ์ต่ำกว่านั้นการ์ดไม่เคยออก',
+    event(e, ctx, r) {
+      const w = isObj(e.when) ? e.when.spouse : undefined;
+      if (w === undefined) return;
+      if (!isObj(w) || Object.keys(w).some((k) => !['status', 'bond', 'together', 'apart', 'wed'].includes(k))) return r('.when.spouse', 'spouse ต้องเป็น {status?, bond?, together?, apart?, wed?}');
+      if (w.status !== undefined && !['together', 'apart'].includes(w.status)) r('.when.spouse.status', 'status ต้องเป็น together หรือ apart');
+      if (w.bond !== undefined && !isRange(w.bond, 0, 100)) r('.when.spouse.bond', 'bond ต้องเป็น [lo, hi] ใน 0–100');
+      if (w.bond !== undefined && isRange(w.bond, 0, 100) && w.bond[1] < 38) r('.when.spouse.bond', 'bond สูงสุดต่ำกว่า BOND_FLOOR 38 การ์ดไม่เคยออก');
+      for (const k of ['together', 'apart']) if (w[k] !== undefined && !isRange(w[k], 0, 99)) r(`.when.spouse.${k}`, `${k} ต้องเป็น [lo, hi] ปี 0–99`);
+      if (w.wed !== undefined && !isRange(w.wed, 2400, 2700)) r('.when.spouse.wed', 'wed ต้องเป็น [lo, hi] ปี พ.ศ. 2400–2700');
+      if (w.apart !== undefined && w.status === 'together') r('.when.spouse.apart', 'apart ใช้กับ status: apart เท่านั้น');
+      if (w.together !== undefined && w.status === 'apart') r('.when.spouse.together', 'together ใช้กับ status: together เท่านั้น');
     },
   },
   {

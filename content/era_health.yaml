@@ -1,0 +1,224 @@
+# การ์ดบ้านเมือง · สุขภาพ — เอดส์ 3 จุด (ใบละจุด · เล่าจากมุมครอบครัว/ชุมชน ไม่ตัดสิน) · ไข้หวัดนก ×3 · ฝุ่น PM2.5 ฝั่งสุขภาพ ×2
+events:
+  # ---------- เอดส์ 2527 · ข่าวแรก ----------
+  - id: era_health_aids_first_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: aids_first_case
+    when: {age: [19, 59]}
+    title: "โรคใหม่ที่ไม่มีใครรู้จัก"
+    text: "หนังสือพิมพ์ลงข่าวพบผู้ป่วยโรคเอดส์รายแรกของประเทศ ในร้านน้ำชาทุกคนมีความเห็นต่างกันไป บางคนกลัว บางคนบอกว่าเป็นเรื่องไกลตัว หมอบอกว่ายังไม่รู้อะไรมากนัก"
+    choices:
+      - id: read_facts
+        text: "อ่านข้อมูลจากแหล่งที่เชื่อถือได้"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: calm_gossip
+        text: "ห้ามปรามคนที่เล่าข่าวลือต่อ"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: talk_family
+        text: "เปิดใจคุยเรื่องนี้กับคนในบ้าน"
+        effects: {relations: 2, health: 1}
+        merit: [{cat: neutral}]
+      - id: dismiss_news
+        text: "ไม่สนใจ คิดว่าไกลตัว"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- เอดส์ 2531 · การระบาดในกลุ่มผู้ใช้ยาเสพติดแบบฉีด ----------
+  - id: era_health_aids_idu_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    era: aids_idu_wave
+    when: {age: [19, 45]}
+    title: "คนข้างบ้านที่หายไป"
+    text: "ชุมชนเริ่มมีข่าวผู้ติดเชื้อเพิ่มขึ้นอย่างรวดเร็ว ครอบครัวหนึ่งในซอยย้ายออกไปโดยไม่บอกใคร เพื่อนบ้านกระซิบกันถึงสาเหตุ ทั้งที่ไม่มีใครรู้เรื่องจริง"
+    choices:
+      - id: visit_family
+        text: "ไปเยี่ยมครอบครัวที่ย้ายออก"
+        effects: {relations: 2, happiness: 1}
+        merit: [{cat: help_others, level: 2}]
+      - id: learn_spread
+        text: "หาความรู้ว่าติดต่ออย่างไร"
+        effects: {knowledge: 2, health: 1}
+        merit: [{cat: neutral}]
+      - id: stop_gossip
+        text: "บอกเพื่อนบ้านให้เลิกซุบซิบ"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: keep_distance
+        text: "เก็บตัวอยู่บ้านตามเดิม"
+        effects: {relations: -1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- เอดส์ 2534 · รณรงค์ ----------
+  - id: era_health_aids_campaign_01
+    type: A
+    category: health
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    era: aids_condom_campaign
+    when: {age: [19, 45]}
+    title: "ป้ายรณรงค์ตามถนนใหญ่"
+    text: "ทั่วเมืองมีป้ายและโฆษณาเรื่องการป้องกันโรคเอดส์ วิทยุเปิดบทเพลงรณรงค์ทุกชั่วโมง บางคนอายที่จะพูดถึง แต่ผู้ใหญ่ที่ทำงานชุมชนบอกว่าถ้าไม่พูดกันเรื่องนี้ก็ไม่ปลอดภัย"
+    choices:
+      - id: join_talk
+        text: "ไปฟังบรรยายที่ศูนย์ชุมชน"
+        effects: {knowledge: 2, health: 1}
+        merit: [{cat: neutral}]
+      - id: share_leaflet
+        text: "แจกแผ่นพับให้คนรู้จัก"
+        effects: {relations: 1, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: talk_partner
+        text: "คุยเรื่องการป้องกันกับคนใกล้ตัว"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: feel_awkward
+        text: "อายจนเดินหนีป้ายรณรงค์"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- ไข้หวัดนก 2547 ----------
+  - id: era_health_avian_kid_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    era: avian_flu
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "ไก่ที่หน้าบ้านหายไป"
+    text: "ข่าวบอกว่าไก่ในหลายจังหวัดติดไข้หวัดนก ผู้ใหญ่ในหมู่บ้านนำไก่ไปฝังกลบ ไก่ที่เลี้ยงไว้หน้าบ้านก็ถูกเจ้าหน้าที่เอาไป คุณมองคอกว่างเปล่าแล้วรู้สึกเงียบ ๆ"
+    choices:
+      - id: ask_officer
+        text: "ถามเจ้าหน้าที่ว่าทำไมต้องเอาไป"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: wash_hands
+        text: "ล้างมือบ่อยตามที่ครูสอน"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: miss_chicken
+        text: "คิดถึงไก่ตัวโปรดจนเศร้า"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: help_neighbors
+        text: "ช่วยเพื่อนบ้านล้างคอกไก่"
+        effects: {health: -1, relations: 1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: era_health_avian_adult_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: avian_flu
+    when: {age: [19, 59]}
+    title: "ไก่ย่างหน้าปากซอยร้าง"
+    text: "ข่าวไข้หวัดนกทำให้ไม่มีใครกล้ากินไก่ ร้านข้าวมันไก่ปากซอยเงียบกริบ ฟาร์มไก่ของคนรู้จักต้องทำลายไก่ทั้งโรง เพื่อนบางคนรีบหาทางออกกัน"
+    choices:
+      - id: keep_buying
+        text: "ยังอุดหนุนร้านไก่ที่สุกดี"
+        effects: {relations: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: help_others, level: 1}]
+      - id: lend_farmer
+        text: "ให้คนรู้จักที่ทำฟาร์มยืมเงิน"
+        effects: {relations: 2, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: dana, level: 1}]
+      - id: switch_food
+        text: "เลิกกินไก่ไปก่อนจนกว่าจะสงบ"
+        effects: {happiness: -1, health: 1}
+        merit: [{cat: neutral}]
+      - id: sell_hoard
+        text: "กักตุนหมูไว้ขายราคาแพง"
+        hint: "ราคา: บาปเบา"
+        effects: {happiness: 1, relations: -2, money: {unit: income_x, amount: 0.5, grey: true}}
+        sets_flags: [dirty_money]
+        merit: [{cat: greed_harm, level: 1}]
+
+  - id: era_health_avian_old_01
+    type: A
+    category: health
+    stage: ชรา
+    years: [2500, 2650]
+    era: avian_flu
+    when: {age: [60, 110]}
+    title: "เลี้ยงไก่มาทั้งชีวิต"
+    text: "คุณเลี้ยงไก่ไว้ข้างบ้านมาทั้งชีวิต ตอนนี้ข่าวไข้หวัดนกทำให้ลูกหลานขอให้เลิก ไก่ที่คุณรักทั้งเล้าอาจต้องถูกกำจัด เจ้าหน้าที่ประกาศผ่านเสียงตามสายตั้งแต่เช้า"
+    choices:
+      - id: give_up_flock
+        text: "ยอมให้เจ้าหน้าที่นำไก่ไป"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: keep_closed
+        text: "ขังไก่ไว้ในเล้าปิดสนิท"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: teach_neighbors
+        text: "ชวนเพื่อนบ้านล้างมือหลังจับไก่"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: grandson_help
+        text: "ให้หลานช่วยหาอาชีพใหม่แทน"
+        effects: {relations: 2, income_mult: 0.95}
+        merit: [{cat: neutral}]
+
+  # ---------- ฝุ่น PM2.5 ฝั่งสุขภาพ ----------
+  - id: era_health_pm25_kid_01
+    type: A
+    category: health
+    stage: เด็ก
+    years: [2500, 2650]
+    era: pm25_haze
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "วันที่โรงเรียนปิดเพราะฝุ่น"
+    text: "ท้องฟ้าขาวขุ่นทั้งวัน ครูประกาศหยุดเรียนเพราะฝุ่นละเอียด คุณหอบเล็กน้อยตอนเช้า ผู้ใหญ่ที่บ้านพากันหาเครื่องกรองอากาศแต่ราคาไม่ถูกเลย"
+    choices:
+      - id: stay_indoor
+        text: "นั่งเล่นในห้องปิดทั้งวัน"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: mask_up
+        text: "ใส่หน้ากากไปเล่นหน้าบ้านแป๊บ"
+        effects: {health: -1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: draw_dust
+        text: "วาดรูปท้องฟ้าฝุ่นไว้ส่งครู"
+        effects: {knowledge: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: share_mask
+        text: "แบ่งหน้ากากให้เพื่อนที่ไม่มี"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+
+  - id: era_health_pm25_adult_01
+    type: A
+    category: health
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: pm25_haze
+    when: {age: [19, 59], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "ค่าฝุ่นสีแดงทั้งเมือง"
+    text: "แอปรายงานค่าฝุ่นขึ้นสีแดงทุกเช้า ที่ทำงานเริ่มอนุญาตให้ทำงานที่บ้าน ลูกหลานไอไม่หยุด หมอเตือนว่าไม่ควรออกกำลังกายกลางแจ้ง แต่ค่ากรองอากาศก็ไม่ใช่ถูก"
+    choices:
+      - id: buy_purifier
+        text: "ซื้อเครื่องฟอกอากาศไว้ที่บ้าน"
+        effects: {health: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]
+      - id: work_home
+        text: "ขอทำงานจากที่บ้านช่วงนี้"
+        effects: {health: 1, happiness: -1, income_mult: 0.97}
+        merit: [{cat: neutral}]
+      - id: leave_city
+        text: "พาครอบครัวไปพักที่ต่างจังหวัด"
+        effects: {health: 1, relations: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: carry_on
+        text: "ทนไปตามปกติ ไม่อยากเสียงาน"
+        effects: {health: -2, income_mult: 1.03}
+        merit: [{cat: neutral}]

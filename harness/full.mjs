@@ -11,7 +11,7 @@ import { parse } from 'yaml';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 import { playLife, mixSeed, COURT_SCENES } from '../src/engine/index.mjs';
-import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS, heirChain, reachChain, CHAIN_ROOTS } from './gates.mjs';
+import { gate3a, gate3b, gate4, blame, compareBaseline, gate3bTol, splitDeadChoices, MIN_EXPECTED_PICKS, heirChain, reachChain, CHAIN_ROOTS, GATE_ONLY_EVENTS, GATE_ONLY_CHOICES } from './gates.mjs';
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(`--${name}`);
@@ -122,28 +122,25 @@ const HEIR_ONLY = new Set([...HEIR_EVENTS, ...OV.events, ...DR.events]);
 const HEIR_CHOICES = new Set([...HEIR_CHOICE_SET, ...OV.choices, ...DR.choices]);
 const HEIR_FLAGS = new Set([...HEIR_FLAG_SET, ...OV.flags, ...DR.flags]);
 // ใบศาล (B153) แกนแทรกเองตอนเฉียดตาย/ถูกเรียกตัว และบอทศาลเลือกแทน — ไม่จั่วจากกองและไม่ผ่านบอทหลัก ⇒ ด่าน 2 ตัดสินไม่ได้
-// ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death ข้ามเฉพาะตอนยังไม่มีการ์ดตั้ง (near ตั้งเอง) — มีการ์ดตั้งเมื่อไรกลับมาตัดสินที่นี่
+// ด่านว่าออกครบลำดับและถูกเรียกตัวทุกชีวิตที่ถือธงอยู่ที่ npm run near · ธง cheat_death มีการ์ดตั้งแล้ว (bel_borrow_name_01#borrow_name) ตัวกรองถอดเอง ⇒ ตัวเลือกตั้งธงตัดสินที่ด่าน 2 ตามปกติ
+// ตัวกรองคงไว้: ถ้าการ์ดตั้งถูกถอดออก ธงนี้กลับมาข้ามเอง ไม่ตกปลอม "ธงไม่มีใครตั้ง"
 const COURT_ONLY = new Set(content.events.filter((e) => COURT_SCENES.includes(e.scene)).map((e) => e.id));
 const COURT_FLAGS = new Set(['cheat_death'].filter((fl) => !setters.has(fl)));
 console.log(`ข้ามที่ด่าน 2 (ตัดสินที่ npm run near): ใบศาล ${COURT_ONLY.size} ใบ · ธงที่ยังไม่มีการ์ดตั้ง ${COURT_FLAGS.size} ตัว${COURT_FLAGS.size ? ` (${[...COURT_FLAGS].join(' · ')})` : ''}`);
-// ของสายประตูที่ถึงได้เฉพาะชีวิตที่ถือโฟกัสสายนั้นครบ 3 ปี (โฟกัสใบ 04 · เจ้าของเคาะ ข) — บอทหลักถือโฟกัสธุรกิจ/มูน้อยเกินจะถึงใน full
-// พิสูจน์ว่าถึงได้จริง: biz-reach บังคับโฟกัสธุรกิจ 1,000 ชีวิต 18/18 ตัว > 0 · gate-reach บังคับโฟกัสมู 1,000 ชีวิต ตัวเลือกมูถึงได้ > 0 ทั้งชายและหญิง · ไม่โฟกัส 0 ทุกตัว
-// ตัวเลือกมูใส่เฉพาะ bel_amulet_center#rent_stall — ถอดแล้วด่าน 2 ตกที่ seed2 611300284 · อีก 3 ตัวถอดแล้วยังถึงทุก seed ที่ลอง จึงไม่ใส่ · id ที่ไม่มีในเนื้อหาแล้ว = ตก (กันรายการเน่า)
+// ของสายประตูที่ถึงได้เฉพาะชีวิตที่ปลดโหนดประตู (tree.yaml gates · ใบ 10) — บอทหลักไม่ทุ่มต้นไม้ ถึงใน full ไม่พอ
+// พิสูจน์ว่าถึงได้จริง: npm run gate-reach (บอททุ่มแขนงของโหนดประตู ไม่นับโฟกัสเดิม) ทุกตัวในรายการ > 0 · ถอดโหนดแล้วต้องตก · รายการอยู่ harness/gates.mjs
 // ร้านอาหาร/แฟรนไชส์ (open_restaurant · copy_own_brand): บอทหลักกด ~1–7 ครั้งต่อ 51,000 ชีวิต ⇒ ด่าน 2 (24,000) ตก/ผ่านตามดวง seed สุ่ม
-// gate-reach บังคับโฟกัสธุรกิจ 1,000 ชีวิต กด 48 · 34 · ไม่โฟกัส 0 · ถอดแล้วด่าน 2 ตกที่ seed2 595696240 · 611300284
 // hire_chef · open_restaurant_rite: ลางภัยยุคกินโควตากองสุ่ม การ์ดร้านขึ้นน้อยลง ~5% · 6 บอท × 4,000 × seed 1–3 (72,000 ชีวิต) กด 1 · 8 (ก่อนมีลาง 2 · 12) ⇒ ตกที่ seed2 802194961 ตามดวงเหมือน open_restaurant
-// buy_franchise (gate business): 6 บอท × 2,000 × seed 1–5 + 623506564 (72,000 ชีวิต) กด 4 · หลังมีการ์ดเทศกาลกินช่องกอง การ์ดขึ้นน้อยลง ~6% กด 1 ⇒ ตกที่ seed2 623506564 ตามดวง · gate-reach บังคับโฟกัสธุรกิจ 1,000 ชีวิต การ์ดออก 161 · กดได้ 161 · กด 44 · ไม่โฟกัส 0
-// career_poach_cornered_01#3 (ลาออกเปิดกิจการ · gate business): กด 1–3 ครั้งต่อ 51,000 ชีวิต · บังคับโฟกัสธุรกิจถึงได้ ไม่โฟกัส 0
+// buy_franchise (gate mo5): 6 บอท × 2,000 × seed 1–5 + 623506564 (72,000 ชีวิต) กด 4 · หลังมีการ์ดเทศกาลกินช่องกอง การ์ดขึ้นน้อยลง ~6% กด 1 ⇒ ตกที่ seed2 623506564 ตามดวง
+// career_poach_cornered_01#3 (ลาออกเปิดกิจการ · gate mo5): กด 1–3 ครั้งต่อ 51,000 ชีวิต
 // ด่าน 2 รวม seed 1 ตายตัวทุกรอบ ⇒ ผ่าน/ตกขึ้นกับว่าชีวิต seed 1 ชุดนั้นมีคนกดหรือไม่ ไม่ใช่ seed สุ่ม
 // FULL_FOCUS_DROP=<id> ถอดออกจากรายการชั่วคราว (ตัวควบคุม: ถอดแล้วด่าน 2 ต้องตก)
-const FOCUS_ONLY_WHY = 'ต้องโฟกัสธุรกิจ/มูครบ 3 ปี · พิสูจน์ใน biz-reach 18/18 + gate-reach มู > 0';
-const FOCUS_ONLY_EVENTS = ['biz_grocery_rival_01', 'biz_credit_book_01', 'era_econ_gfc_cafe_01', 'mid_risky_chase_01', 'career_dream_crossroad_01', 'young_shop_rush_01'];
-const FOCUS_ONLY_CHOICES = ['biz_grocery_01#open_grocery', 'biz_grocery_01#credit_book', 'debt_guarantor_ask_01#joint_shop', 'era_econ_gfc_adult_01#0', 'era_econ_oil2_farm_01#3', 'mid_crisis_01#quit_dream', 'mid_risky_bet_01#all_in', 'career_dream_01#quit_for_dream', 'young_shop_01#cafe', 'young_shop_01#chicken_rice', 'young_shop_01#partner', 'young_shop_01#chicken_rice_rite', 'bel_amulet_center#rent_stall', 'biz_restaurant_01#open_restaurant', 'biz_restaurant_01#hire_chef', 'biz_restaurant_01#open_restaurant_rite','biz_franchise_01#copy_own_brand', 'biz_franchise_01#buy_franchise', 'career_poach_cornered_01#3', 'echo_debt_old_boss_01#join_share', 'echo_debt_old_boss_01#quit_and_run'];
+const FOCUS_ONLY_WHY = 'ต้องปลดโหนดประตู · พิสูจน์ใน npm run gate-reach';
 const focusDrop = process.env.FULL_FOCUS_DROP;
-const FOCUS_ONLY = new Set([...FOCUS_ONLY_EVENTS, ...FOCUS_ONLY_CHOICES].filter((id) => id !== focusDrop));
+const FOCUS_ONLY = new Set([...GATE_ONLY_EVENTS, ...GATE_ONLY_CHOICES].filter((id) => id !== focusDrop));
 const choiceIds = new Set(content.events.flatMap((e) => (e.choices ?? []).map((c, i) => `${e.id}#${c.id ?? i}`)));
-const focusRotten = [...FOCUS_ONLY_EVENTS.filter((id) => !content.events.some((e) => e.id === id)), ...FOCUS_ONLY_CHOICES.filter((id) => !choiceIds.has(id))];
-console.log(`ข้ามที่ด่าน 2 (${FOCUS_ONLY_WHY}): เหตุการณ์ ${FOCUS_ONLY_EVENTS.length} · ตัวเลือก ${FOCUS_ONLY_CHOICES.length}${focusDrop ? ` · ตัวควบคุมถอด ${focusDrop}` : ''} — ${[...FOCUS_ONLY_EVENTS, ...FOCUS_ONLY_CHOICES].join(' · ')}`);
+const focusRotten = [...GATE_ONLY_EVENTS.filter((id) => !content.events.some((e) => e.id === id)), ...GATE_ONLY_CHOICES.filter((id) => !choiceIds.has(id))];
+console.log(`ข้ามที่ด่าน 2 (${FOCUS_ONLY_WHY}): เหตุการณ์ ${GATE_ONLY_EVENTS.length} · ตัวเลือก ${GATE_ONLY_CHOICES.length}${focusDrop ? ` · ตัวควบคุมถอด ${focusDrop}` : ''} — ${[...GATE_ONLY_EVENTS, ...GATE_ONLY_CHOICES].join(' · ')}`);
 if (focusRotten.length) {
   console.log(`  ✗ รายการยกเว้นอ้าง id ที่ไม่มีในเนื้อหาแล้ว: ${focusRotten.join(' · ')}`);
   fails.push('ด่าน 2 รายการยกเว้นโฟกัส');

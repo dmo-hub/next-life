@@ -4,16 +4,14 @@
 <!--GATE:START--><meta name="robots" content="noindex"><!--GATE:END-->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ชาตินี้ · ปรโลก · ต่างโลก · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
-<meta name="description" content="ฉากที่เล่นได้ในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด: ชาตินี้เป็นคนไทย ตายแล้วไปปรโลก เลือกทางเกิด แล้วไปเกิดต่อในโลกเดิมหรือในต่างโลก">
+<title>โลก · ชาตินี้ ปรโลก ต่างโลก · เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด</title>
+<meta name="description" content="ฉากที่เล่นได้ในเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด: ชาตินี้เป็นคนไทย ตายแล้วไปปรโลก เลือกทางเกิด แล้วไปเกิดต่อในโลกเดิมหรือในต่างโลก · ต่างโลกเข้าทางไหน เกิดเป็นอะไร ค่าสถานะ บุญบาปต่างโลก และกลับโลกเดิมได้อะไร พร้อมบอกว่าอะไรเล่นได้แล้วและอะไรกำลังทำ">
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
-  header { background: var(--lacquer); color: var(--headink); padding: 36px 16px 30px; }
   .w { max-width: 760px; margin: 0 auto; }
   h1 { font-family: Srisakdi, serif; color: var(--headink); font-size: clamp(28px, 6vw, 42px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0; color: var(--on-head); }
   main { padding: 24px 16px 64px; }
   h2 { font-family: var(--fh); font-size: 22px; margin: 30px 0 8px; }
   .lead { margin: 0 0 8px; color: var(--muted); }
@@ -27,6 +25,19 @@
   .box.dark a { color: var(--headink); }
   .box h2 { margin-top: 0; }
   .box p { margin: 0 0 8px; }
+  h3 { font-size: 17px; margin: 18px 0 4px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border: 1px solid currentColor; margin-right: 6px; white-space: nowrap; }
+  .now { color: var(--good); } .soon { color: var(--muted); } .canon { color: var(--accent2); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .two .box { margin: 0; }
+  .two b { font-family: var(--fh); }
+  figure { margin: 0 0 16px; }
+  figure img { display: block; width: 100%; max-width: 390px; height: auto; border: 1px solid var(--bronze); }
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  /* ส่วนต่างโลก (ui-redo 42): แถบหัวส่วนสีหัวเว็บ + หัวทอง ใช้ token โลกหลัก */
+  section.ow-band.dark { background: var(--head); color: var(--on-head2); border: 0; margin-top: 28px; }
+  section.ow-band h2 { color: var(--headink); margin: 0 0 6px; }
+  section.ow-band p { margin: 0; max-width: 680px; }
   a.play { display: inline-block; margin: 8px 0; padding: 10px 22px; min-height: 44px; background: var(--lacquer); color: var(--headink); font-family: var(--fh); font-size: 18px; text-decoration: none; border: 2px solid var(--bronze); }
   a.play:hover, a.play:focus-visible { border-color: var(--gold); outline: none; }
   footer { font-size: 13px; color: var(--muted); margin-top: 32px; }
@@ -66,16 +77,18 @@
   nav.top .links { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
   nav.top a.play { background: var(--gold); color: var(--head); border-radius: var(--r); line-height: 28px; padding: 0 12px; font-weight: 600; white-space: nowrap; }
   nav.top a.play:focus-visible { outline: 2px solid var(--headink); outline-offset: 2px; }
-  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
-  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
-  body > header:not(.home) p { color: var(--on-head2); }
-  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
   main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
   @media (max-width: 760px) { nav.top .links { -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); mask-image: linear-gradient(to right, black calc(100% - 28px), transparent); } }
 /*NAV-CSS:END*/
 </style>
 <!--DOCS-LAYOUT:START--><style>
 .w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:960px!important}body>main:not(:has(.w)):not(#app){max-width:960px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+body > header:not(.home){background:var(--head);color:var(--title);padding:16px 16px 18px}
+body > header:not(.home)>.w{margin-left:auto;margin-right:auto}
+body > header:not(.home) h1{font-family:var(--fh);font-weight:600;font-size:clamp(26px,5vw,36px);line-height:1.3;margin:0 0 8px;color:var(--title)}
+body > header:not(.home) p{margin:0 0 6px;max-width:680px;color:var(--on-head2)}
+body > header:not(.home) :is(p,h1):last-child{margin-bottom:0}
+body > header:not(.home) a{color:var(--headink);text-decoration:underline;text-underline-offset:3px}
 main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
 main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
 main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
@@ -85,9 +98,9 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
 </style><!--DOCS-LAYOUT:END-->
 </head>
 <body>
-<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="about.html">กลไกในเกม</a><a href="worlds.html" aria-current="page">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
+<!--NAV:START--><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="index.html">NEXT LIFE</a><div class="links"><a href="guide.html">วิธีเล่น</a><a href="whatsnew.html">แพตช์โน้ต</a><a href="worlds.html" aria-current="page">โลก</a><a href="catalog.html">การ์ดทั้งหมด</a><a href="dev/index.html">ห้องผู้พัฒนา</a></div><a class="play" href="play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><!--NAV:END-->
 <header><div class="w">
-  <h1>ชาตินี้ · ปรโลก · ต่างโลก</h1>
+  <h1>โลก</h1>
   <p>เกมนี้เล่นได้ 3 ฉาก ชีวิตคนไทยหนึ่งชาติ ปรโลกที่รอหลังตาย และต่างโลกที่เทพธิดาพาวิญญาณไปเกิด ทุกฉากใช้บัญชีบุญบาปบัญชีเดียวกัน</p>
 </div></header>
 <main><div class="w">
@@ -117,7 +130,7 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
   <section class="box">
     <h2>ชาตินี้</h2>
     <p>เกิดแบบสุ่มเป็นคนไทยหนึ่งคนใน <span data-fact="provinces">77</span> จังหวัด ฐานะ <span data-fact="classes">10</span> ระดับตามยุคจริง ใช้ชีวิตทีละการ์ด เรียน ทำงาน มีครอบครัว แล้วตายตามตารางชีพจริง</p>
-    <p>การ์ดช่วงมีชีวิต <span data-fact="lifeCards">1,213</span> ใบ</p>
+    <p>การ์ดช่วงมีชีวิต <span data-fact="lifeCards">1,315</span> ใบ</p>
   </section>
 
   <section class="box dark">
@@ -130,20 +143,20 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
       <li><span data-fact="pathIsekai">ตามเทพธิดาต่างโลกไปเกิดในโลกแฟนตาซีก่อน</span></li>
       <li><span data-fact="pathBlood">เล่นต่อเป็นผู้สืบสายเลือด</span> — ไม่ได้เกิดใหม่ เลือกลูกหรือหลานที่ยังอยู่ อายุ <span data-fact="heirAgeFrom">16</span>–<span data-fact="heirAgeTo">22</span> ปี แล้วเล่นต่อจากอายุจริงของเขา · ขึ้นเฉพาะเมื่อมีคนวัยนั้น</li>
     </ul>
-    <p>การ์ดปรโลก <span data-fact="afterCards">34</span> ใบ</p>
+    <p>การ์ดปรโลก <span data-fact="afterCards">36</span> ใบ</p>
   </section>
 
   <section class="box dark">
     <h2>ต่างโลก</h2>
     <p>โลกแฟนตาซีบนทวีปเดียว <span data-fact="contRegions">20</span> แคว้น <span data-fact="contRaces">8</span> เผ่า เลือกแฟ้มเกิดจากเทพธิดา รับสกิลโกง ใช้ชีวิตหนึ่งชาติ แล้วกลับมาให้ปรโลกเดิมตัดสิน ที่ปรโลกเลือกได้ว่าจะกลับโลกเดิมหรืออยู่ต่างโลกต่อ</p>
-    <p>การ์ดต่างโลก <span data-fact="isekaiCards">106</span> ใบ · <a href="otherworld.html">อ่านเรื่องต่างโลกต่อ</a></p>
+    <p>การ์ดต่างโลก <span data-fact="isekaiCards">110</span> ใบ · <a href="#otherworld">อ่านเรื่องต่างโลกต่อ</a></p>
   </section>
 
   <div class="rules">
   <section id="afterlife" class="dark"><h2>ปรโลกและรุ่นถัดไป</h2>
     <div class="flow"><span>ส่วนบุญ/อนุโมทนา</span><i>→</i><span>เทวทูต 5</span><i>→</i><span>เฉลยบัญชี</span><i>→</i><span>เลือกทาง</span><i>→</i><span>ฉากภูมิ หรือ ผีบรรพบุรุษ</span><i>→</i><span>ส่งต่อกรรม</span></div>
     <ul>
-      <li>ฉากปรโลก <span data-fact="afterCards">34</span> ใบ แต่ละขั้นมีอย่างน้อย 1 ฉากที่ไม่มีเงื่อนไข · ตัวเลือกในฉากเพิ่มค่าเริ่มของชาติหน้าได้ไม่เกิน ±12</li>
+      <li>ฉากปรโลก <span data-fact="afterCards">36</span> ใบ แต่ละขั้นมีอย่างน้อย 1 ฉากที่ไม่มีเงื่อนไข · ตัวเลือกในฉากเพิ่มค่าเริ่มของชาติหน้าได้ไม่เกิน ±12</li>
       <li>ภูมิ <span data-fact="realms">5</span> ภูมิ (<span data-fact="realmNames">นรก · เปรต · ดิรัจฉาน · มนุษย์ · เทวดา</span>) ตัดสินจากบุญสุทธิ ÷ 30: ≤−0.5 นรก · ≤−0.2 เปรต · &lt;0 ดิรัจฉาน · ≤2/3 มนุษย์ · สูงกว่านั้นเทวดา · ระยะเวลาโทษบอกไว้อ่านเล่น ไม่มีผลกับเกม</li>
       <li>ทาง: <b>เป็นลูกหลาน</b> (ต้องมีลูกหรือหลานที่ยังมีชีวิต) · <b>เกิดใหม่ตามกรรม</b> · <b>ไปต่างโลก</b> · <b>เล่นต่อเป็นผู้สืบสายเลือด</b> (มีลูกหรือหลานที่ยังอยู่ อายุ <span data-fact="heirAgeFrom">16</span>–<span data-fact="heirAgeTo">22</span> ปี · เลือกคนแล้วเล่นต่อจากอายุจริง ไม่เกิดใหม่ · ฐานะ มรดก และธงของรุ่นก่อนคิดแบบทางเป็นลูกหลาน)</li>
       <li>ส่งต่อกรรม: ฝั่งที่ตัดสินภูมิถูกหักไปครึ่งหนึ่งของบุญสุทธิ ที่เหลือส่งต่อ <span data-fact="carryMin">30</span>–<span data-fact="carryMax">70</span>% · <span data-fact="kinTiers">3</span> ชั้น (<span data-fact="kinNames">ลูก · หลาน · เหลน</span>) ส่งต่อ ×1 / ×0.75 / ×0.5 · บาปสัญญากับมารไม่จางตามสัดส่วนส่งต่อ ลดได้แค่ส่วนที่หักตอนตัดสินภูมิ · ผู้เล่นเห็นแค่คำว่า แทบไม่มี · น้อย · พอประมาณ · มาก</li>
@@ -158,10 +171,123 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
     <li>ที่ปรโลก ทางที่ 3 บนการ์ดทางเกิดพาไปต่างโลกได้ทุกชาติ</li>
     <li>ระหว่างชีวิตมีการ์ดชวนไปต่างโลกโผล่มา ปฏิเสธได้ทุกใบ ชีวิตก็เดินต่อตามเดิม</li>
   </ul>
-  <p class="lead">ช่วงอายุที่เจอการ์ดชวนกับเรื่องที่ชวนอยู่ในหน้า <a href="otherworld.html#entry">ต่างโลก</a></p>
+  <p class="lead">ช่วงอายุที่เจอการ์ดชวนกับเรื่องที่ชวนอยู่ในหัวข้อ <a href="#entry">ทางเข้าจากเกมหลัก</a> ด้านล่าง</p>
+
+  <section class="ow-band dark" id="otherworld">
+    <h2>ต่างโลกโดยละเอียด</h2>
+    <p>โลกที่สองของเกมเกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด เทพธิดาต่างโลกพาวิญญาณไปเกิดใหม่ในโลกแฟนตาซีที่มีเวทมนตร์และกิลด์นักผจญภัย</p>
+  </section>
+
+  <div class="box">
+    <p><span class="tag now">เล่นได้แล้ว</span>ต่างโลกอยู่ในเกมหลักแล้ว ไปได้จากปรโลกหรือการ์ดชวนระหว่างชีวิต (ดูทางเข้าด้านล่าง)</p>
+    <p><span class="tag soon">กำลังทำ</span>ระบบเต็มของต่างโลกยังทยอยเข้าเกม ลำดับและรายละเอียดอาจเปลี่ยนได้</p>
+  </div>
+
+  <h2><span class="tag now">เล่นได้แล้ว</span>ชาติต่างโลก</h2>
+  <ul>
+    <li>เริ่มจากชีวิตเดิมที่จบลง เทพธิดาต่างโลกพาไปห้องขาว แล้วยื่นแฟ้มเกิด <span data-fact="contOffers">3</span> ใบให้เลือก</li>
+    <li>แฟ้มเกิดแต่ละใบบอกเผ่ากับแคว้นที่จะไปเกิดในทวีปเอเธอร์การ์ด มี <span data-fact="contRegions">20</span> แคว้น <span data-fact="contRaces">8</span> เผ่า เช่น มนุษย์ในอาณาจักรเฮลวาร์ด เอลฟ์ในป่าเลียวเซล คนแคระในนครใต้ภูกรอมดาล · แคว้นใหญ่ได้บ่อย แคว้นห่างไกลหายาก</li>
+    <li>แต่ละเผ่าค่าเริ่มต่างกันและแก่ไม่เท่ากัน เอลฟ์กับเชื้อมังกรอายุยืนกว่ามนุษย์หลายเท่า</li>
+    <li>รับสกิลโกงจากเทพธิดาหนึ่งอย่าง เช่น ประเมินค่า กล่องมิติ ฝีมือครัวจากโลกเดิม</li>
+    <li>ทุ่มเทสายเดียวกันครบ <span data-fact="contCareerYears">3</span> ปีได้อาชีพติดตัว (มี <span data-fact="contCareers">5</span> อาชีพ เช่น นักดาบ จอมเวท พ่อค้า) · ตอนจบดูจากชื่อเสียงกับอาชีพที่ได้</li>
+    <li>ทุกชาติทวีปสุ่มขั้วอำนาจ (มหาอำนาจ แคว้นขาลง แคว้นมาแรง) ข้อพิพาทใหญ่ และดันเจียนลับไว้ · มีกองการ์ดของตัวเองแล้ว: เรื่องประจำแคว้นที่อยู่ ข้อพิพาทที่กำลังเกิด และขั้วอำนาจที่อยู่ใกล้ (ตอนนี้มีตัวอย่างชนิดละใบ) · ดันเจียนลับยังไม่มีการ์ดพาไป</li>
+    <li>ตระกูลที่ข้ามไปกลับระหว่างสองโลกหลายรุ่น โลกเริ่มซ้อนทับกัน · ในชาติไทยได้ยินข่าวลือแปลก ๆ ที่มีแต่ตัวเองได้ยิน · ในต่างโลกมีคนจำหน้าได้ว่าเหมือน "ผู้มาจากอีกฟาก"</li>
+    <li>เล่นเป็นการ์ดทีละใบ ตายแล้วกลับไปให้ปรโลกเดิมตัดสิน</li>
+    <li>เซฟที่เริ่มชาติต่างโลกก่อนมีทวีป ยังเล่นบทบาทเดิมจาก 4 โลกต่อได้จนจบชาติ</li>
+  </ul>
+  <div class="shots">
+    <figure><img src="img/otherworld-birth.webp" alt="ห้องสีขาว เทพธิดายื่นแฟ้มเกิด 3 ใบ แต่ละใบบอกเผ่ากับแคว้น" width="326" height="562" loading="lazy"><figcaption>เลือกแฟ้มเกิดในห้องสีขาว</figcaption></figure>
+    <figure><img src="img/otherworld-event.webp" alt="การ์ดเหตุการณ์ในต่างโลก" width="326" height="562" loading="lazy"><figcaption>การ์ดเหตุการณ์ในต่างโลก</figcaption></figure>
+  </div>
+
+  <h2 id="entry"><span class="tag now">เล่นได้แล้ว</span>ทางเข้าจากเกมหลัก</h2>
+  <p class="lead">ชีวิตไทยไปต่างโลกได้ 2 ทาง แล้วเล่นชาติต่างโลกต่อ</p>
+
+  <h3>ทางที่ 3 บนการ์ดทางเกิดที่ปรโลก</h3>
+  <ul>
+    <li>หลังตาย การ์ดทางเกิดที่ปรโลกมีทางที่ 3 ให้ตามเทพธิดาต่างโลกไปเกิดในโลกแฟนตาซีเสมอ</li>
+    <li>บางรอบเทพธิดามายืนรอเองข้างทาง ชาตินั้นได้แฟ้มเกิดเพิ่มอีกใบ และเธอฝากคำสัญญาไว้ 1 ข้อ (มีทั้งหมด <span data-fact="vowCount">2</span> แบบ)</li>
+    <li>ทำบุญมากเทพธิดามารอบ่อยขึ้น บาปมากมาน้อยลง แต่ยังมีโอกาสอยู่เสมอ</li>
+    <li>การ์ดจบชาติต่างโลกบอกว่ารักษาคำสัญญาได้หรือผิด ส่วนบุญบาปของคำสัญญาไปเฉลยที่ปรโลก</li>
+  </ul>
+
+  <h3>การ์ดชวนระหว่างชีวิต</h3>
+  <ul>
+    <li>ทุกชีวิตเจอการ์ดชวน 1 ใบช่วงอายุ <span data-fact="entryFirst">13–18</span> · ช่วงอายุ <span data-fact="entryLater">25–45 และ 50–75</span> มีโอกาสเจออีกช่วงละ <span data-fact="entryLaterPct">50</span>% · ชีวิตหนึ่งเจอได้ไม่เกิน <span data-fact="entryMax">3</span> ใบ</li>
+    <li>เรื่องชวนมี <span data-fact="entryKinds">7</span> แบบ เช่น วงเวทใต้เท้า ประตูในฝัน ช่วยเด็กกลางถนน และรถบรรทุกที่เล่าเป็นมุก</li>
+    <li>ปฏิเสธได้ทุกใบ ชีวิตเดินต่อตามเดิม · กดรับแล้วจอถามยืนยันอีกครั้ง เพราะย้อนกลับมาเลือกใหม่ไม่ได้ · การ์ดไม่บอกล่วงหน้าว่ารับแล้วจะเป็นอย่างไร</li>
+    <li><span data-fact="entryGone">3</span> แบบเป็นการหายตัวไปทั้งตัว ไม่ใช่ตาย บางครั้งได้กลับมาเล่นชีวิตเดิมต่อ · ไม่ได้กลับ = ป้ายท้ายชีวิตเขียนว่าหายตัวไปตอนอายุเท่าไร ไม่มีงานศพ คนที่บ้านออกตามหาแทน</li>
+    <li>ชีวิตที่รับการ์ดชวน เทพธิดามารอแน่นอน และให้โชคแถม +<span data-fact="fatedLuck">10</span> ตอนเกิดในต่างโลก</li>
+    <li>เทพธิดายื่นแฟ้มเกิดให้เลือก กรรมไม่ทำให้แฟ้มเอียง · คนที่หายตัวข้ามไปทั้งตัวไม่ได้เลือกแฟ้ม ไปโผล่เป็นมนุษย์ในแคว้นสุ่ม · แล้วเลือกสกิลโกง 1 แผ่นจากที่เทพธิดายื่น</li>
+    <li>สกิลข้ามชาติ: ตอนจบชาติต่างโลกและที่ปรโลกหลังชีวิตไทย เลือกสกิล 1 อย่างลงสมุดสกิล (มี <span data-fact="skillAll">11</span> อย่าง) · ได้ซ้ำ = ขั้นในสมุดขึ้น สูงสุดขั้น <span data-fact="skillTop">3</span> · ก่อนไปเกิดเลือกพกจากสมุดได้ <span data-fact="skillCarry">3</span> อย่าง ใช้ทั้งชีวิตไทยและชาติต่างโลกที่ตามมา · ของที่พกเริ่มขั้น 1 แล้วฝึกด้วยการ์ดฝึกสกิล ถึงขั้นในสมุดได้เร็วกว่าครั้งแรก · สกิลที่ไม่ได้พกยังอยู่ในสมุด</li>
+    <li>ค่าสถานะชุดของต่างโลก: HP · พลัง · เวท · บารมี · โชค</li>
+    <li>ค่าตั้งต้นติดมาจากชาติไทยด้วย: สุขภาพเป็นพลัง ความรู้เป็นเวท ความสัมพันธ์เป็นบารมี ความสุขเป็นโชค คอนเน็คชั่นเป็นชื่อเสียง ทรัพย์สินเป็นทอง ยิ่งอยู่โลกเดิมนานยิ่งติดตัวไปมาก เต็มที่ตอนอายุ 40 · ตายตอนสุขภาพแย่ HP เริ่มต่ำลง แต่หักไม่เกิน 30</li>
+    <li>แนวเล่นต่างจากชาติไทยชัด: ส่วนใหญ่กดผ่านทีละตาโดยไม่ต้องตัดสิน ตั้งโฟกัสได้ทุกเมื่อในแผงตัวฉัน (ทางเลือกเปลี่ยนตามช่วงวัย โฟกัสที่ไม่เหมาะกับวัยใหม่กลับเป็นตามน้ำ) แล้วมีจดหมายเหตุบันทึกเรื่องที่เกิด</li>
+    <li>ความรู้จากโลกเดิม 9 หมวด (อาหาร เกษตร แพทย์ การค้า ช่าง การพิมพ์ ทหาร การเมือง บันเทิง) เปิดทางลัดได้ ใช้แล้วล้มเหลวได้</li>
+    <li>ชื่อเสียงเป็นอีกแกนหนึ่ง โลกจำเป็นตำนาน ดังทางร้ายก็ถูกจำเป็นคนร้าย</li>
+    <li>บัญชีบุญบาปเป็นบัญชีเดียวของดวงวิญญาณ ไปต่างโลกก็พกกรรมไปด้วยแบบเดียวกับเกิดใหม่ ต่างโลกจึงไม่ใช่ทางล้างบาป · บัญชียังซ่อนและเฉลยที่ปรโลกที่เดียวเหมือนเดิม</li>
+    <li>ตายในต่างโลกแล้วกลับมาปรโลกเดิม ปรโลกตัดสินจากชาติต่างโลก แล้วการ์ดทางเกิดให้เลือกกลับโลกเดิมตามกรรม หรืออยู่ต่างโลกต่อ (อยู่ติดกันได้จำนวนชาติจำกัด)</li>
+  </ul>
+
+  <div class="rules">
+  <section id="isekai"><h2 id="rules">กติกาต่างโลกทั้งหมด</h2>
+    <ul>
+      <li>อยู่ในวงหลักของเกม ไม่ได้เป็นโหมดแยก (ต้นแบบเกมสั้น isekai.html ลบแล้ว)</li>
+      <li>ทางเข้า: (1) ทางที่ 3 บนการ์ดเลือกทางในปรโลก · (2) เทพธิดามาเอง โอกาสขึ้นกับกรรม (บุญเต็ม 40% · กลาง ๆ 20% · บาปเต็ม 5%) · (3) การ์ดชวนระหว่างมีชีวิต <span data-fact="entryKinds">7</span> แบบ ช่วงอายุ <span data-fact="entryFirst">13–18</span> แน่นอน และ <span data-fact="entryLater">25–45 และ 50–75</span> ช่วงละ <span data-fact="entryLaterPct">50</span>% ไม่เกิน <span data-fact="entryMax">3</span> ครั้ง ปฏิเสธได้ทุกครั้ง · <span data-fact="entryGone">3</span> แบบทำให้ "หายตัว" · (4) ประตูไปแล้วกลับได้ อยู่ที่นั่น 3–12 ปีแล้วกลับมาพร้อมของ</li>
+      <li>คำสัตย์ต่อเทพธิดา <span data-fact="vowCount">2</span> แบบ (ไม่ฆ่า · ช่วยคน) · รักษาได้บุญ ผิดคำติดตัวถาวร · ถูกชวนแล้วตอบรับได้โชค +<span data-fact="fatedLuck">10</span></li>
+      <li>ในต่างโลก: ห้องขาวเลือกแฟ้มเกิด 1 ใน <span data-fact="contOffers">3</span> ใบ แต่ละใบบอกเผ่ากับแคว้นที่จะไปเกิดในทวีปเอเธอร์การ์ด (<span data-fact="contRegions">20</span> แคว้น <span data-fact="contRaces">8</span> เผ่า เช่น มนุษย์ เอลฟ์ คนแคระ) → เลือกสกิลโกง 1 ใน 3 จาก 11 สกิล → เวลาเดินเองปีละ tick (แก่แล้ว 5 ปี) ผู้เล่นเลือกว่าจะทุ่มให้อะไร → การ์ดต่างโลก <span data-fact="isekaiCards">110</span> ใบ → ตอนจบ: ชาติทวีปดูจากชื่อเสียง (ถึง <span data-fact="contFame">30</span>) กับอาชีพที่ได้ (ทุ่มสายเดียวครบ <span data-fact="contCareerYears">3</span> ปี) ได้ทั้งคู่ = ดีที่สุด · อย่างใดอย่างหนึ่ง = ดี · ไม่ได้เลย = แย่ · ชาติบทบาทจาก 4 โลกเดิม (เซฟเก่า) ยังจบตามเป้าหมายและชื่อเสียงของบทบาท ดีที่สุด/ดี/แย่ · ทั้งสองแบบตายก่อนได้</li>
+      <li>ค่าสถานะ HP พลัง เวท บารมี โชค + ทอง ชื่อเสียง เกจเป้าหมาย · บนจอขึ้นแค่ ชีวิต (= HP) · พลัง · เวท · โชค และบรรทัดทอง/ชื่อเสียง · บารมีกับเกจเป้าหมายยังคิดอยู่แต่ไม่ขึ้นจอ · ค่าเริ่มเชื่อมกับค่าชีวิตไทย (สุขภาพ→พลัง · ความรู้→เวท · ความสัมพันธ์→บารมี · ความสุข→โชค · คอนเน็คชั่น→ชื่อเสียง) · เช็ก 50 + (ค่า − ความยาก) × 4 ในกรอบ 5–95 · บาปเพิ่มความยากได้ถึง 4</li>
+      <li>ย้ายแคว้น (ชาติทวีป): ตั้งโฟกัสสำรวจดินแดนครบ 2 ปีเต็มนับจากเกิดหรือย้ายครั้งก่อน ได้การ์ดทางแยก เลือกย้ายไปแคว้นที่มีถนนติดกัน (สุ่มไม่เกิน 3 แคว้น) หรืออยู่ที่เดิม · อยู่ที่เดิมตัวนับเริ่มใหม่ · ชาติบทบาทจาก 4 โลกเดิมไม่มีการ์ดนี้</li>
+      <li>สุ่มต่อชาติทวีป: มหาอำนาจ 1 · ขาลง 1–2 · มาแรง 1–2 จากแคว้นที่มีผู้ปกครอง (ไม่ซ้ำกัน) + ข้อพิพาทหลัก 1 ใน 8 · ดันเจียนลับ 3–4 จุด (ยังไม่มีการ์ดพาไป)</li>
+      <li>กองการ์ดทวีป (ชาติทวีปเท่านั้น · การ์ดหนึ่งใบอยู่กองเดียว): <b>ประจำแคว้น</b> ขึ้นเมื่ออยู่แคว้นนั้น (น้ำหนัก 2) · <b>ข้อพิพาท</b> ขึ้นเมื่อตรงข้อพิพาทของชาติ (2) · <b>ขั้วอำนาจ</b> ขึ้นเมื่ออยู่ในหรือติดแคว้นมหาอำนาจ/ขาลง/มาแรง (1) · ชื่อแคว้นและขั้วอำนาจในข้อความเปลี่ยนตามชาติที่เล่น · ต่อท้ายกองการ์ดทุกโลกเดิม · ตอนนี้มีการ์ดตัวอย่างกองละ 1 ใบ · ชาติบทบาทเดิมไม่เห็นกองนี้</li>
+      <li>ไปต่างโลกทั้งตัวพกบุญบาปไปครบไม่หัก (ประตูนับเป็นไปทั้งตัว) · การ์ดเสียงเรียกไม่บอกผลล่วงหน้า รู้จากเรื่องหลังตอบรับ</li>
+      <li>บัญชีกรรมเป็นของวิญญาณเดียวกันทั้งสองโลก · อยู่ต่างโลกติดกันได้ 4 ชาติ · กลับมาแล้วเลือกเป็นลูกหลานไม่ได้</li>
+      <li><b>ค่าซ้อนทับของตระกูล</b>: +1 ทุกครั้งที่ตระกูลกลับเข้าโลกที่เคยออกมาแล้ว (เกิดกลับไทยหลังชาติต่างโลก · ทริปที่กลับบ้านได้ · กลับเข้าต่างโลกอีกหลังเคยออก) · ทริปที่หลงไม่กลับ เกิดไทยต่อไทย และช่วงปรโลกไม่นับ · ตกทอดถึงทายาทแบบบัญชีกรรม ตระกูลใหม่เริ่ม 0 · ค่าเป็นขั้น 0–4 ตอนนี้เปิดขั้น 1 (ค่า 1) ขั้น 2–4 ยังไม่ตั้งเกณฑ์ · การ์ดขั้นซ้อนทับไม่อยู่ในกองสุ่ม เกมนัดให้ต่อชีวิตตามขั้น (1 · 1–2 · 2–4 ใบ อายุ 15–60) · ขั้น 1 ในชาติไทย = ข่าวลือที่มีแต่ตัวเราได้ยิน · ในต่างโลก = การ์ด "หน้าคุ้น" (ขั้น 1–4 อ่านค่าตอนข้าม) · ตระกูลที่ไม่เคยข้ามโลกไม่เจอการ์ดชุดนี้</li>
+      <li>ลงโค้ดแล้วแต่ยังไปไม่ถึง (รอเกณฑ์ขั้น 3): สายอาชีพนักล่า 4 ขั้น เข้าได้ทางการ์ดรับสมัครทางเดียว · ดันเจียนในไทย 4 ประตู การ์ดทางเข้า → กลางทาง (ถอยได้) → ห้องบอส นับเป็นโควตาใบเดียว คนนอกสายถูกดึงเข้าแล้วรอดเสมอ นักล่าตายในห้องบอสได้ · ของติดตัว 3 ช่อง (เครื่องราง อาวุธ ชุด) + ย่าม 3 ชิ้น ได้จากดันเจียนตามลำดับ ไม่สุ่ม เต็มแล้วขายทิ้งเอง · แผงตัวฉันโชว์ของติดตัวเมื่อถึงขั้น 3 หรือมีของ</li>
+    </ul>
+  </section>
+  </div>
+
+  <h2><span class="tag soon">กำลังทำ</span>ต่างโลกในเกมหลัก</h2>
+  <p class="lead">ระบบที่เจ้าของเกมตัดสินแล้ว แต่ยังไม่เข้าเกม</p>
+
+  <h3>เกิดในต่างโลก</h3>
+  <ul>
+    <li>ดูค่าสถานะของคนอื่นได้เมื่อมีสกิลประเมินค่า</li>
+  </ul>
+
+  <h3>ชีวิตในต่างโลก</h3>
+  <ul>
+    <li>กิลด์นักผจญภัย ไต่แรงค์จาก F ถึง S · บอร์ดเควสให้เลือก เควสบังคับตอนเมืองมีภัย และเควสที่โผล่เอง</li>
+    <li>ทุกอย่างที่ทำได้ EXP เลเวลขึ้นได้แต้มไปเรียนสกิล · สกิลมาได้จากการฝึกซ้ำ แต้มเลเวล และสกิลต้องสาปจากกรรม</li>
+    <li>ไอเทม 4 ช่อง มีของแฟนตาซีปนของคติไทย เช่น ตะกรุด พระเครื่อง มงคล ยาหม่อง</li>
+    <li>ความรู้อันตรายอย่างดินปืนเล่าเป็นผลโดยไม่มีสูตร</li>
+    <li>ชื่อเสียงเปลี่ยนราคาในร้าน</li>
+    <li>โลกผสมทุกยุค 8 ภูมิภาคขึ้นไป รวมภูมิภาคแบบอยุธยาหนึ่งแห่ง</li>
+  </ul>
+
+  <h3>บุญบาปและการกลับบ้าน</h3>
+  <div class="two">
+    <div class="box"><b>บุญต่างโลก</b><br>ช่วยผู้อ่อนแอ · ให้ทาน · รักษาสัญญา · สู้ปกป้อง</div>
+    <div class="box"><b>บาปต่างโลก</b><br>ฆ่าเกินเหตุ · เอาเปรียบด้วยสกิลโกง · ความรู้อันตราย · ทรยศ</div>
+  </div>
+  <ul>
+    <li>ฆ่ามอนสเตอร์ดูที่เจตนา ปกป้องเมืองได้บุญเล็ก ล่าเก็บแต้มหรือล่าเผ่าที่ไม่ได้ทำร้ายใครเป็นบาป</li>
+    <li>อยู่ต่อ: เลือกทายาทจาก 3 คนที่ลักษณะสุ่ม แล้วส่งไอเทมต่อได้ 1 ชิ้น · โลกจำชาติก่อนตรงตามจริง</li>
+    <li>กลับโลกเดิมได้ 4 อย่าง: กรรมกับแถวในผังตระกูล · ของที่ระลึก 1 ชิ้นเป็นของตระกูล · ทองแปลงเป็นเงินตั้งต้นส่วนเล็ก ๆ · ตำนานที่ครอบครัวเล่าต่อ</li>
+    <li>เงินต่างโลกเป็นเหรียญทองแดง เงิน ทอง เรียกชื่อแบบไทยโบราณ</li>
+  </ul>
+
+  <h2><span class="tag canon">นอกคัมภีร์</span>ที่มาของต่างโลก</h2>
+  <ul>
+    <li>ต่างโลกทั้งหมดเป็นของเกม ไม่ได้มาจากคติไทยหรือไตรภูมิ ได้แรงบันดาลใจจากแนวเรื่องเกิดใหม่ในต่างโลกของนิยายและการ์ตูนญี่ปุ่น</li>
+    <li>ไม่มีข้อมูลจริงในต่างโลก ไม่มีตารางชีพ เงินเฟ้อ หรือเหตุการณ์บ้านเมือง</li>
+    <li><span class="tag soon">กำลังทำ</span>ต่างโลกในเกมหลักจะไม่มีเรื่องทาส การใส่ร้ายทางเพศ หรือฮาเร็ม ฉากตลาดในเกมสั้นจะเปลี่ยนตอนย้ายเข้าเกมหลัก</li>
+  </ul>
+
   <a class="play" href="play.html">เล่นเกม →</a>
 
-  <footer>กรรมเป็นบัญชีเดียวของดวงวิญญาณ ไปเกิดโลกไหนก็พกไปด้วย · ปรโลกและต่างโลกเป็นฉากของเกม ไม่ใช่คำสอนทางศาสนา</footer>
+  <footer>กรรมเป็นบัญชีเดียวของดวงวิญญาณ ไปเกิดโลกไหนก็พกไปด้วย · ปรโลกและต่างโลกเป็นฉากของเกม ไม่ใช่คำสอนทางศาสนา · โปรเจกต์ส่วนตัว · แฟนตาซีในเกมไม่ได้อ้างว่าเป็นคำสอน · เวอร์ชันเกมหลัก <span data-fact="version">v0.6.164</span> (<span data-fact="build">2026-11-24</span>)</footer>
 </div></main>
 </body>
 </html>

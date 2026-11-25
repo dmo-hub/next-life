@@ -33,6 +33,75 @@
     ] },
   { "id": "covid19", "from": 2563, "to": 2564, "name": "โควิด-19", "kind": "disaster",
     "assumption": true, "note": "ปีสิ้นสุด 2564 เกมตั้งเอง ข้อมูลมีแค่ GDP ปี 2563",
-    "facts": [{ "label": "GDP 2563", "v": -6.09, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/NY.GDP.MKTP.KD.ZG?format=json" }] }
+    "facts": [{ "label": "GDP 2563", "v": -6.09, "unit": "%", "source": "https://api.worldbank.org/v2/country/THA/indicator/NY.GDP.MKTP.KD.ZG?format=json" }] },
+  { "id": "kathun_landslide", "from": 2531, "to": 2531, "name": "ดินถล่มที่บ้านกะทูน", "kind": "accident", "regions": ["ใต้"],
+    "source": "https://en.wikipedia.org/wiki/List_of_disasters_in_Thailand",
+    "facts": [
+     { "label": "ผู้เสียชีวิตหรือบาดเจ็บ", "v": 230, "unit": "ราย", "weak": true, "source": "https://en.wikipedia.org/wiki/List_of_disasters_in_Thailand" }
+    ] },
+  { "id": "toy_factory_fire", "from": 2536, "to": 2536, "name": "ไฟไหม้โรงงานของเล่นที่นครปฐม", "kind": "accident", "regions": ["กลาง"],
+    "source": "https://en.wikipedia.org/wiki/Kader_Toy_Factory_fire",
+    "facts": [
+     { "label": "เสียชีวิต", "v": 188, "unit": "ราย", "source": "https://en.wikipedia.org/wiki/Kader_Toy_Factory_fire" },
+     { "label": "บาดเจ็บ", "v": 469, "unit": "ราย", "source": "https://en.wikipedia.org/wiki/Kader_Toy_Factory_fire" }
+    ] },
+  { "id": "hotel_collapse", "from": 2536, "to": 2536, "name": "โรงแรมถล่มที่นครราชสีมา", "kind": "accident", "regions": ["ตะวันออกเฉียงเหนือ"],
+    "source": "https://en.wikipedia.org/wiki/Collapse_of_the_Royal_Plaza_Hotel",
+    "facts": [
+     { "label": "เสียชีวิต", "v": 137, "unit": "ราย", "source": "https://en.wikipedia.org/wiki/Collapse_of_the_Royal_Plaza_Hotel" },
+     { "label": "บาดเจ็บ", "v": 227, "unit": "ราย", "source": "https://en.wikipedia.org/wiki/Collapse_of_the_Royal_Plaza_Hotel" }
+    ] },
+  { "id": "avian_flu", "from": 2547, "to": 2547, "name": "ไข้หวัดนก", "kind": "health",
+    "source": "https://wwwnc.cdc.gov/eid/article/11/11/05-0608",
+    "facts": [
+     { "label": "ผู้ป่วยยืนยันในไทย", "v": 17, "unit": "ราย", "source": "https://wwwnc.cdc.gov/eid/article/11/11/05-0608" },
+     { "label": "เสียชีวิต", "v": 12, "unit": "ราย", "source": "https://wwwnc.cdc.gov/eid/article/11/11/05-0608" }
+    ] },
+  { "id": "pm25_haze", "from": 2562, "to": 2562, "name": "ฝุ่น PM2.5 ปกคลุมกรุงเทพฯ", "kind": "health", "regions": ["กรุงเทพฯ และปริมณฑล"],
+    "source": "https://www.upi.com/Top_News/World-News/2019/01/31/437-Bangkok-schools-closed-due-to-smog/8831548928892/",
+    "facts": [
+     { "label": "โรงเรียนในกรุงเทพฯ ที่ปิดชั่วคราว", "v": 437, "unit": "แห่ง", "source": "https://www.upi.com/Top_News/World-News/2019/01/31/437-Bangkok-schools-closed-due-to-smog/8831548928892/" }
+    ] },
+  { "id": "bts_opening", "from": 2542, "to": 2542, "name": "รถไฟฟ้าบีทีเอสเปิดบริการ", "kind": "city", "regions": ["กรุงเทพฯ และปริมณฑล"],
+    "source": "https://en.wikipedia.org/wiki/BTS_Skytrain",
+    "facts": [
+     { "label": "สถานีตอนเปิด", "v": 23, "unit": "สถานี", "weak": true, "source": "https://en.wikipedia.org/wiki/BTS_Skytrain" }
+    ] },
+  { "id": "suvarnabhumi_opening", "from": 2549, "to": 2549, "name": "สนามบินสุวรรณภูมิเปิดบริการ", "kind": "city", "regions": ["กรุงเทพฯ และปริมณฑล"],
+    "source": "https://en.wikipedia.org/wiki/Suvarnabhumi_Airport",
+    "facts": [
+     { "label": "ความจุที่ออกแบบระยะแรก", "v": 45, "unit": "ล้านคนต่อปี", "weak": true, "source": "https://en.wikipedia.org/wiki/Suvarnabhumi_Airport" }
+    ] },
+  { "id": "asian_games_bangkok", "from": 2541, "to": 2541, "name": "เอเชียนเกมส์ที่กรุงเทพฯ", "kind": "sport", "regions": ["กรุงเทพฯ และปริมณฑล"],
+    "source": "https://en.wikipedia.org/wiki/1998_Asian_Games",
+    "facts": [
+     { "label": "ประเทศที่เข้าร่วม", "v": 41, "unit": "ประเทศ", "source": "https://en.wikipedia.org/wiki/1998_Asian_Games" },
+     { "label": "นักกีฬา", "v": 6554, "unit": "คน", "source": "https://en.wikipedia.org/wiki/1998_Asian_Games" }
+    ] },
+  { "id": "aids_first_case", "from": 2527, "to": 2527, "name": "ผู้ป่วยเอดส์รายแรกของไทย", "kind": "health",
+    "source": "https://en.wikipedia.org/wiki/HIV/AIDS_in_Thailand", "note": "ปีมาจากแหล่งรอง (บทความทบทวนปี 2547 ระบุรายงานทางการปี 1984 ตรงกัน) ยังไม่มีเอกสารกรมควบคุมโรคยืนยัน",
+    "facts": [
+     { "label": "ผู้ป่วยเอดส์รายแรกที่รายงาน", "v": 1, "unit": "ราย", "weak": true, "source": "https://en.wikipedia.org/wiki/HIV/AIDS_in_Thailand" }
+    ] },
+  { "id": "aids_idu_wave", "from": 2531, "to": 2531, "name": "การติดเชื้อเอชไอวีระบาดในผู้ใช้ยาเสพติด", "kind": "health",
+    "source": "https://www.culturalsurvival.org/node/4209", "note": "ตัวเลขมาจากผลตรวจที่ศูนย์บำบัดยาเสพติดในกรุงเทพฯ ไม่ใช่ทั้งประเทศ (แหล่งรอง)",
+    "facts": [
+     { "label": "ผู้ตรวจที่ศูนย์บำบัดยาเสพติดกรุงเทพฯ ติดเชื้อ ปลายปี 2531", "v": 40, "unit": "%", "weak": true, "source": "https://www.culturalsurvival.org/node/4209" }
+    ] },
+  { "id": "aids_condom_campaign", "from": 2534, "to": 2534, "name": "ประกาศรณรงค์ถุงยาง 100% ทั่วประเทศ", "kind": "health",
+    "source": "https://www.cgdev.org/sites/default/files/archive/doc/millions/CGD-MillionsSaved_Case2.pdf",
+    "facts": [
+     { "label": "ผู้ติดเชื้อรายใหม่ต่อปี 2534", "v": 143000, "unit": "ราย", "source": "https://scielosp.org/pdf/bwho/2010.v88n6/404-405/en" }
+    ] },
+  { "id": "mobile_phone_boom", "from": 2533, "to": 2533, "name": "โทรศัพท์มือถือเริ่มแพร่หลาย", "kind": "city",
+    "source": "https://en.wikipedia.org/wiki/Advanced_Info_Service",
+    "facts": [
+     { "label": "อายุสัมปทานแรกเริ่มของผู้ให้บริการรายใหญ่ (ต่อมาขยายเป็น 25 ปี)", "v": 20, "unit": "ปี", "weak": true, "source": "https://en.wikipedia.org/wiki/Advanced_Info_Service" }
+    ] },
+  { "id": "internet_commercial", "from": 2538, "to": 2538, "name": "อินเทอร์เน็ตเชิงพาณิชย์เริ่มให้บริการ", "kind": "city",
+    "source": "https://nsrc.org/sites/default/files/archives/case-studies//TH-history.pdf",
+    "facts": [
+     { "label": "ผู้ให้บริการเชิงพาณิชย์รายแรกที่ได้ใบอนุญาตในปี 2538", "v": 2, "unit": "ราย", "weak": true, "source": "https://nsrc.org/sites/default/files/archives/case-studies//TH-history.pdf" }
+    ] }
  ]
 }

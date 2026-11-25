@@ -63,7 +63,7 @@ async function open(file, width, seed = 7) {
 }
 
 // ทุกหน้าเว็บ 390/1280: ล้นแนวนอน 0 · console error 0
-for (const p of ['index', 'about', 'worlds', 'otherworld', 'catalog', 'cards', 'whatsnew', 'guide']) {
+for (const p of ['index', 'worlds', 'catalog', 'cards', 'whatsnew', 'guide']) {
   for (const w of [390, 1280]) {
     const { page, errors } = await open(`${p}.html`, w);
     await page.waitForLoadState('load');
@@ -115,7 +115,9 @@ async function playLife(w, t) {
     for (const id of Object.keys(isShot)) {
       if (got[id] || !isShot[id](s)) continue;
       const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
-      got[id] = { over, png: await page.screenshot({ animations: 'disabled' }) };
+      // render_game_to_text (ui-redo 137): เรียกที่จอเดียวกับภาพ · ข้อความบนจอวัดแยกจาก innerText ของหน้า ไม่ผ่านตัว reader
+      const read = await page.evaluate(() => ({ json: window.render_game_to_text?.(), page: document.body.innerText.replace(/\s+/g, ' '), age: document.querySelector('.sb-age b')?.textContent ?? null }));
+      got[id] = { over, read, png: await page.screenshot({ animations: 'disabled' }) };
     }
     if (got.death) break;
     // การ์ดที่ปุ่มยังปิดอยู่ (รอเวลา/แอนิเมชัน) ⇒ เดินเวลาต่อแทนการกด
@@ -221,6 +223,26 @@ for (const w of Object.keys(BIRTH_VIEW).map(Number)) {
   if (bad.length) fail++;
   console.log(`play.html แรกเกิด @${w}: ภาพ ${m.scene || '-'} จาง ${m.op} · contrast ต่ำสุด ${m.cr.toFixed(2)} (${m.worst}) · ปุ่มไปต่อ ${m.btn}/${m.fold}${w === 390 ? '' : ' (ข้อมูล)'} · ตัวควบคุม เข้ม ${dark.cr.toFixed(2)} · ปุ่ม ${low.btn}/${low.fold}${bad.length ? ` → ตก: ${bad.join(' · ')}` : ''}`);
 }
+// ด่านกันเฉลยของ render_game_to_text: ชุดคำเดียวกับ site-check (หน้ารวมการ์ด) + ธงลับ/seed · ตรวจทั้งชื่อ key และค่า
+// ตัวควบคุมข้างล่างใส่ key บุญบาปชั่วคราวแล้วต้องตก — ด่านที่ผ่านทุกอย่างไม่พิสูจน์อะไร
+const LEAK = [/"weight"|multipliers|"merit"|outcomes/, /"(?:flags?|seed|sin|karma|merits?)"/i, /บัญชีบุญบาป\s*[-+]?\d/];
+const leakOf = (json) => LEAK.filter((re) => re.test(json)).map(String);
+const textGate = (id, x) => {
+  const bad = [];
+  let j;
+  try { j = JSON.parse(x.read.json); } catch { return ['JSON.parse ไม่ได้']; }
+  if (!['start', 'life', 'death'].includes(j.mode)) bad.push(`mode ${j.mode}`);
+  if (id !== 'death' && j.age !== x.read.age) bad.push(`อายุ JSON ${j.age} ≠ จอ ${x.read.age}`);
+  if (id !== 'death' && !j.choices.length) bad.push('ไม่มีตัวเลือก');
+  if (!j.text.length) bad.push('ไม่มีข้อความการ์ด');
+  for (const t of [...j.text, ...j.choices.map((c) => c.label)]) if (!x.read.page.includes(t)) bad.push(`ไม่อยู่บนจอ: ${t.slice(0, 40)}`);
+  const leaks = leakOf(x.read.json);
+  if (leaks.length) bad.push(`หลุด ${leaks.join(' ')}`);
+  return bad;
+};
+const control = leakOf(JSON.stringify({ mode: 'life', merit: { good: 3 } }));
+console.log(`render_game_to_text ตัวควบคุมกันเฉลย (ใส่ key merit): ${control.length ? 'ตก (ถูก)' : 'ผ่าน → ด่านไม่ไวพอ'}`);
+if (!control.length) fail++;
 const write = !process.argv.includes('--check');
 const shotDir = new URL(UI_SHOTS_AT, docs);
 if (write) mkdirSync(shotDir, { recursive: true });
@@ -238,6 +260,9 @@ for (const w of UI_SHOT_W) {
   for (const [id, x] of Object.entries(r.got)) {
     if (x.over > 0) fail++;
     console.log(`play.html ${id} @${w}: ล้น ${Math.max(0, x.over)}px${x.over > 0 ? ' → ตก' : ''}`);
+    const tb = textGate(id, x);
+    if (tb.length) fail++;
+    console.log(`play.html ${id} @${w}: render_game_to_text ${tb.length ? `ตก · ${tb.join(' · ')}` : 'ผ่าน'}`);
     if (write && !miss.length) writeFileSync(new URL(`${id}-${w}.png`, shotDir), x.png);
   }
   if (miss.length || r.errors.length) fail++;

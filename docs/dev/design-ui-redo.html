@@ -11,11 +11,8 @@
 <style>
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--fb); line-height: 1.7; }
-  header { background: var(--head); color: var(--title); padding: 32px 16px 28px; }
   .w { max-width: 900px; margin: 0 auto; }
   h1 { font-family: var(--fh); font-size: clamp(26px, 5vw, 36px); margin: 0 0 8px; line-height: 1.3; }
-  header p { margin: 0; color: var(--on-head); }
-  header a { color: var(--title); }
   main { padding: 24px 16px 64px; }
   h3 { font-family: var(--fh); font-size: 17px; margin: 16px 0 4px; }
   ul, ol { padding-left: 22px; margin: 0 0 8px; }
@@ -48,6 +45,12 @@
 </style>
 <!--DOCS-LAYOUT:START--><style>
 .w:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){max-width:1280px!important}body>main:not(:has(.w)):not(#app){max-width:1280px;margin-left:auto;margin-right:auto}:is(body>main,body>header,body>footer){padding-left:24px;padding-right:24px}
+body > header:not(.home){background:var(--head);color:var(--title);padding:16px 16px 18px}
+body > header:not(.home)>.w{margin-left:auto;margin-right:auto}
+body > header:not(.home) h1{font-family:var(--fh);font-weight:600;font-size:clamp(26px,5vw,36px);line-height:1.3;margin:0 0 8px;color:var(--title)}
+body > header:not(.home) p{margin:0 0 6px;max-width:680px;color:var(--on-head2)}
+body > header:not(.home) :is(p,h1):last-child{margin-bottom:0}
+body > header:not(.home) a{color:var(--headink);text-decoration:underline;text-underline-offset:3px}
 main h2:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *):not(:first-child){margin-top:28px}main :is(section,.box):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){margin-bottom:17px}
 main:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){overflow-wrap:anywhere}main .st:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){white-space:normal;max-width:100%}@media (max-width:640px){main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *){display:block;max-width:100%;overflow-x:auto}}
 main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) :is(th,td):not(:is(.dark,.dark *)){border:1px solid var(--line)}main table:not(:is(.opts, .nl-nav, nav.top, #nl-gate) *) th:not(:is(.dark,.dark *)){background:var(--bg);color:var(--ink)}
@@ -79,10 +82,10 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
 .nl-tabs a{padding:10px 10px 8px;border-bottom:3px solid transparent;white-space:nowrap}
 .nl-tabs a[aria-current]{border-bottom-color:var(--accent2);font-weight:600}
 .nl-tabs.nl-sub{background:var(--bg);font-size:14px}
-</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../about.html">กลไกในเกม</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/plan.html">สเปก/แผน</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a></div></div></div><!--/nav-->
+</style><nav class="top" aria-label="หน้าอื่น"><a class="brand" href="../index.html">NEXT LIFE</a><div class="links"><a href="../guide.html">วิธีเล่น</a><a href="../whatsnew.html">แพตช์โน้ต</a><a href="../worlds.html">โลก</a><a href="../catalog.html">การ์ดทั้งหมด</a><a href="../dev/index.html" aria-current="true">ห้องผู้พัฒนา</a></div><a class="play" href="../play.html">เล่นเกม</a></nav><script>(()=>{const l=document.querySelector('nav.top .links'),c=l&&l.querySelector('[aria-current]');if(!c)return;const f=()=>{if(l.scrollWidth>l.clientWidth)l.scrollLeft+=c.getBoundingClientRect().left-l.getBoundingClientRect().left-(l.clientWidth-c.offsetWidth)/2};f();document.fonts&&document.fonts.ready.then(f)})()</script><div class="nl-nav nl-dev"><div class="nl-tabs" role="navigation" aria-label="เอกสารผู้พัฒนา"><div class="nl-in"><a href="../dev/index.html">สารบัญ</a><a href="../dev/spec.html">ภาคผนวกสเปก</a><a href="../dev/design.html" aria-current="true">คำตัดสินเกม</a><a href="../dev/ui.html">การออกแบบ</a><a href="../dev/maps/continent.html">แผนที่</a></div></div></div><!--/nav-->
 <header><div class="w">
   <h1>หน้าจอใหม่ทั้งเกม (ui-redo)</h1>
-  <p>เรื่อง ui-redo · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.128</span></p>
+  <p>เรื่อง ui-redo · แผนที่ใบงานและคำตัดสิน · เวอร์ชัน <span data-fact="version">v0.6.164</span></p>
 </div></header>
 <main><div class="w">
 <p class="lead"><span class="tag">มีเฉลย</span><span class="tag">สำเนาอ่านอย่างเดียว</span>เอกสารชุดนี้เปิดกลไกที่ในเกมซ่อนไว้ คัดจาก design/ ของ repo แก้บนหน้านี้ไม่ได้</p>
@@ -496,6 +499,10 @@ main :is(.warn,blockquote,.callout):not(:is(.opts, .nl-nav, nav.top, #nl-gate) *
 <ul><li>ข้อ 262 สามจุดที่ session ทะเบียนตั้งเอง <strong>เจ้าของรับทั้งสาม</strong> (ลงแล้วใบ 132 v0.6.100): ปุ่มโฟกัสปรโลกตำแหน่ง 2 ตามเมนูไทย · สรุปทุ่มเทอยู่แท็บโฟกัสที่เดียว (pastPanel ไม่มีแล้ว) · หัว &quot;ชาติที่แล้วทุ่มเทมากสุด&quot; — ไม่มีงานเพิ่ม</li></ul>
 <h4 id="d-ui-redo-decisions-h90">2026-11-11 · T4 เมนูล่าง/ราวซ้าย (เจ้าของแปะ JSON จากหน้า tweak ใบ 106 + popup)</h4>
 <ol><li><strong>T4 = ชุด ข &quot;กล่องมีขอบ · ไอคอนเส้น · พื้นตัวที่เลือก&quot;</strong> — shape tile · icon line · label auto · ตัวที่เลือก fill · ไม่แก้ค่าใดจากชุด ข (edited ว่าง · note ว่าง) · JSON: <code>{&quot;page&quot;:&quot;menu-tweak&quot;,&quot;ticket&quot;:106,&quot;items&quot;:[199,201],&quot;base&quot;:&quot;ข&quot;,&quot;shape&quot;:&quot;tile&quot;,&quot;icon&quot;:&quot;line&quot;,&quot;label&quot;:&quot;auto&quot;,&quot;on&quot;:&quot;fill&quot;}</code> · ขอบปุ่มในหน้า tweak วัดได้ 1.41 (ไทย/เพิ่มเติม) · 2.22 (ต่างโลก) · 2.10 (ปรโลก) ที่ 390+1280 ต่ำกว่าเกณฑ์ 3:1 → popup <strong>&quot;เข้มขอบจนถึง 3&quot;</strong>: ใบ 107 คงทุกค่าของชุด ข แต่ไล่สีขอบปุ่มแต่ละโลกให้ถึง ≥3:1 (เข้มเท่าที่จำเป็น) · ตัวหนังสือ ≥4.5 ตามเดิม</li></ol>
+<h4 id="d-ui-redo-decisions-h91">2026-11-16 · T11 ธีมต่างโลก + ปรโลก (เจ้าของในแชตผู้รวมงาน หลังเปิดหน้า tweak ใบ 120)</h4>
+<ol><li>(ทับ 208 · 212 · 213 เรื่องสี) <strong>ธีมต่างโลกและปรโลก ใช้แบบเดียวกับโลกหลัก</strong> — เจ้าของพิมพ์ <code>ธีมต่างโลกและปรโลก ใช้แบบเดียวกับ โลกหลัก</code> · ไม่เลือก preset ในหน้า tweak T11 · ⇒ ใบ 121: token สีพื้น/การ์ด/ตัวอักษร/ขอบของต่างโลกและปรโลก = ค่าโลกไทย (T1) · ยกเลิก <code>พื้นต่างต่อโลก/ต่างความสว่าง</code> · <strong>คงตัวบอกโลกที่ไม่ใช่สี</strong> (ฟอนต์โลโก้ · ป้ายโลก · ไอคอน — ข้อ 213 ส่วนนี้ไม่ได้ถูกยกเลิก · ผู้รวมงานตีความ ถ้าเจ้าของหมายถึงรวมฟอนต์ด้วย = แก้ข้อนี้) · ปัญหา contrast ต่างโลก (ขอบช่องเลือก 2.47 · ขอบบนการ์ด 2.22) หายไปเองเมื่อใช้ค่าไทย</li><li>(ต่อ 295 · ผู้รวมงานตอบเลน C) <code>แบบเดียวกับโลกหลัก</code> รวม <strong>รูปทรง</strong> (radius · กรอบมุม) ด้วย ไม่ใช่แค่สี · ตัวบอกโลกที่คงไว้: ฟอนต์หัว/โลโก้ · ป้ายชื่อโลก · ไอคอน · ข้อความ · แตะเฉพาะ override ต่อโลก ตัวแปรกลางไม่แตะ</li></ol>
+<h4 id="d-ui-redo-decisions-h92">2026-11-21 22:4x · owner-morning-1121 ข้อ 4 5 6 8 (เจ้าของเคาะผ่านผู้รวมงาน popup)</h4>
+<ol><li>(ใบ 19) <strong>ไปต่างโลกให้เนียน = ตาม thai-life-deep 300–303</strong> — ลาง 2–3 ใบก่อนใบชวน · ใบชวนเป็นการ์ดธรรมดา (เอากรอบฟ้า/หัว &quot;เสียงเรียกจากต่างโลก&quot; ออก) · คงหน้าถามยืนยัน · <strong>ปิดใบ 19 เป็นซ้อน thai-life-deep 186–189</strong> (186 = ใบทำจริง · DLC ต่างโลก รอประตูเกมหลัก)</li><li>(ต่อ 104) <strong><code>docs/whatsnew.html</code> ไม่นับเป็นหน้าสาธารณะที่ต้องซ่อนคำ &quot;ต่างโลก&quot;</strong> — ข้อ 104 ใช้กับ index · play head/meta · หน้าส่งต่อ เท่านั้น · แถว &quot;โฟกัสปรโลกเลือกได้ในวง&quot; (134/135) เพิ่มได้ ผู้รวมงานเติมตอน rel</li><li>ลิ้นชัก <code>.sheet</code> มือถือทับการ์ดตาย (390px · มีบน main ก่อน ft15) = <strong>ปล่อยไปก่อน</strong> · ดูด้วยตาตอน owner-play เฟส 2</li><li>ป้าย &quot;ยังคิดอยู่&quot; ใน whatsnew = <strong>แยกสไตล์จาก &quot;วางแผนไว้&quot;</strong> (เดิม <code>tag plan</code> เดียวกัน) → ใบ 325 · หน้า tweak ให้เจ้าของเลือกก่อนลงจริง</li></ol>
 </details>
 <script>(() => { const open = () => { const t = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1))); const d = t && t.closest('details'); if (d && !d.open) { d.open = true; t.scrollIntoView(); } }; addEventListener('hashchange', open); open(); })();</script>
 </div></main>

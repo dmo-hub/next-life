@@ -3,13 +3,14 @@
 // ฉากเป็นเนื้อหา (stage ระหว่างชาติ + scene) ผ่านด่าน build ชุดเดียวกับการ์ดชีวิต · ปรโลก/ทางเกิด/ส่งต่อเป็นการ์ดที่แกนสร้าง
 // ใช้ stream สุ่มของตัวเอง — ระหว่างชาติไม่กินเลขสุ่มของโลกของชีวิตใด · ชีวิตที่มี heir ดึงเลขสุ่มของโลกตำแหน่งเดียวกับชีวิตแรก (harness/lineage ตรวจ)
 import { makeRng, mixSeed } from './rng.mjs';
+import { dlcOpen, dlcEarn, dlcNext } from './dlc.mjs';
 import { pickBirthYear } from './era.mjs';
 import { pickRegion, placeName, nationalIncome } from './birth.mjs';
 import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
-import { heirPets, letterTo, deadKinOf } from './family.mjs';
+import { heirPets, heirSibs, letterTo, deadKinOf, speechSex, spouseOf, parentSpouseOf } from './family.mjs';
 import { CHRONIC } from './death.mjs';
-import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeFocusKid, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf } from './life.mjs';
+import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeTreeMain, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
@@ -172,14 +173,12 @@ export function thaiEarn(st) {
   const map = st.content.skillMap;
   if (!map || Object.values(map).every((m) => !Object.keys(m).length)) return [];
   const t = titlesOf(st);
-  const chain = st.content.focus?.chain_years ?? Infinity;
   const src = {
     job: st.occupation ? [st.occupation] : [],
     title: t.titles.map((x) => x.id),
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
-    focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
-    lifeGoal: [],
+    lifeGoal: st.goalsDone ?? [],
   };
   const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
   return Object.keys(ISEKAI_SKILLS).filter((id) => got.has(id)).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: 1 }));
@@ -199,6 +198,8 @@ function verdictCard(af) {
   const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
   // ชาติต่างโลกให้สกิลบนการ์ดจบของมันแล้ว — ตอนกลับมาปรโลกจึงไม่ให้ซ้ำจากชีวิตไทยเดิม
   const earn = af.from ? [] : thaiEarn(af.st);
+  // ศาลครั้งแรก = ปรโลกปลด (มีผลชาติหน้า)
+  dlcEarn(af.st, 'afterlife');
   return emitAfter(af, {
     kind: 'verdict',
     type: 'B',
@@ -228,6 +229,7 @@ const FROM_ISEKAI_PATHS = {
 };
 const pathLocked = (af, id) => {
   if (id === 'child') return af.from ? 'ลูกหลานในโลกเดิมห่างไปหลายรุ่นแล้ว' : hasKids(af.st) ? null : 'ไม่มีลูกหลานให้กลับไปเกิด';
+  if (id === 'isekai' && !dlcOpen(af.st, 'isekai')) return 'ยังไม่ปลดภาคเสริมต่างโลก';
   if (id === 'isekai' && af.from && af.from.run >= ISEKAI.stay) return 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว';
   if (id === 'blood' && !pathHeirs(af).length) return 'ไม่มีลูกหลานวัยที่เล่นต่อได้';
   return null;
@@ -244,9 +246,11 @@ function pathCard(af) {
   return emitAfter(af, {
     kind: 'path',
     type: 'B',
-    text: af.blessed && !af.from ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
+    text: af.blessed && !af.from && dlcOpen(af.st, 'isekai') ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
     choices: paths.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
     locked: paths.map((p) => pathLocked(af, p.id)),
+    // ปุ่มที่ซ่อนตอนล็อก DLC ยังอยู่ในแถว — เลขลำดับปุ่มที่เซฟเก็บ (afterPick) ไม่เลื่อน · UI ข้ามปุ่มนี้
+    ...(!dlcOpen(af.st, 'isekai') && { hidden: paths.map((p) => p.id === 'isekai') }),
     // ปุ่มสายเลือดคนกดได้ บอทไม่กด (openChoices) · หน้าเลือกคนอ่าน heirs แล้วส่ง id กลับทาง chooseAfter
     ...(heirs.length && { manual: paths.map((p) => p.id === 'blood'), heirs }),
   });
@@ -282,6 +286,8 @@ export const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
 function closeIsekai(af) {
   const isk = af.isekai;
+  // จบชาติต่างโลก 1 ชาติ = ซ้อนทับปลด
+  dlcEarn(af.st, 'overlap');
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
@@ -369,6 +375,8 @@ function loopCard(af) {
 
 function loopEndCard(af) {
   const l = af.loop;
+  // จบวงภูมิ 1 รอบในชีวิตที่เริ่มด้วยปรโลกปลดแล้ว = ต่างโลกปลด
+  dlcEarn(af.st, 'isekai');
   l.end = l.health <= 0 ? 'spent' : 'served';
   const text = l.end === 'spent'
     ? `ชีวิตทิพย์หมดลงในปีที่ ${l.year} ก่อนครบกำหนด ${l.years} ปี ดวงวิญญาณจึงถูกพาไปรอเกิดเร็วกว่าที่ชี้ไว้`
@@ -509,6 +517,8 @@ const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
+// ลูกที่ไม่ใช่ลูกทางสายเลือดของเรา (ใบ 95) ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา — สาเหตุที่ส่งต่อเป็น other (ไม่ถ่ายทอด ไม่นัดป่วย) · ปีตาย/ชื่อ/บทบาทเท่าเดิม
+const NOT_BLOOD_DEATH = { cause: 'other' };
 const deathOf = (st) => (isGone(st) ? { gone: true } : { cause: st.cause ?? 'other', ...illOf(st.cause, st.age, st.terminal?.cause === st.cause ? (st.terminal.toldAge ?? st.age - 1) : st.age) });
 const kinDeathOf = (m) => (m.cause ? { cause: m.cause, ...illOf(m.cause, m.diedAge, m.ill?.cause === m.cause ? (m.ill.toldAt ?? m.diedAge - 1) : m.diedAge) } : {});
 
@@ -527,7 +537,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -546,13 +556,14 @@ function makeHeir(af, r) {
     const pickOne = (list) => (list.length ? list[st.kinRng.int(0, list.length - 1)] : null);
     const me = blood ?? (st.kin ? (tier.tier === 1 ? pickOne(kids) : tier.tier === 2 ? pickOne(grand) : null) : null);
     const link = me?.role === 'grandchild' ? st.kin.find((m) => m.id === me.of) ?? null : tier.tier > 1 ? pickOne(kids) : null;
-    const spouse = (st.kin ?? []).filter((m) => m.role === 'spouse').at(-1) ?? null;
+    const spouse = me?.role === 'child' ? parentSpouseOf(st, me) : spouseOf(st);
     if (me) ({ sex, name } = me);
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
+    religion = st.religion;
     // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
     const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
@@ -565,13 +576,15 @@ function makeHeir(af, r) {
       // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
       // คู่ครองจริงเป็นพ่อ/แม่อีกคน: อายุตอนลูกเกิดจากปีเกิดจริง · ตายไปแล้วตอนเราตาย = ตายที่อายุนั้น · ไม่มีคู่จริง = สร้างแบบเดิม
       const year0 = st.birthYear + kidAge;
+      // ลูกเรียกผู้เล่นตามอัตลักษณ์ (หญิงข้ามเพศ = แม่) · คู่ชายเป็นพ่อ ⇒ บ้านมีแม่และพ่อครบเหมือนชีวิตอื่น · ไม่มีอัตลักษณ์ = เพศกำเนิดเท่าเดิม
+      const self = speechSex(st);
       parents = [
-        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
+        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...(me?.notMine && !isGone(st) ? NOT_BLOOD_DEATH : deathOf(st)) },
         spouse && spouse.born <= year0
           ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge, ...kinDeathOf(spouse) }), name: spouse.name }
-          : { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
+          : { sex: otherSex(self), age: spouseAge(rng, self, kidAge), alive: true },
       ];
-      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, st.sex) };
+      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, self) };
     } else {
       // รุ่นคั่นกลางเกิดห่างกันตามช่วงอายุแม่ตอนคลอด · พ่อ/แม่ของผู้เล่นใหม่เป็นลูก (หรือหลาน) ของรุ่นก่อน แก่และตายตามตารางชีพ
       // หลานจริง = เกิดปีของเขา พ่อ/แม่สายเลือดคือลูกจริงที่ให้กำเนิด · ไม่มีคนจริง = ห่างรุ่นสุ่มแบบเดิม (เริ่มจากปีเกิดลูกจริงถ้ามี)
@@ -620,7 +633,10 @@ function makeHeir(af, r) {
   const carried = r * (tier?.carry ?? 1);
   const ledger = carryLedger(af.st.ledger, net, carried);
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
-  const overlap = overlapOf(st) + (af.isekaiLives.length ? 1 : 0);
+  // ก้อนซ้อนทับล็อก = ไม่นับ (ปลดทีหลังเริ่มขั้น 0)
+  const overlap = overlapOf(st) + (af.isekaiLives.length && dlcOpen(st, 'overlap') ? 1 : 0);
+  // ค่าซ้อนทับขึ้นขั้นแรก = ดันเจียนปลด
+  if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
@@ -631,6 +647,7 @@ function makeHeir(af, r) {
     cls,
     region,
     province,
+    religion,
     birthYear,
     parents,
     legacy,
@@ -648,14 +665,19 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
-    // เกิดในตระกูล = รับหมวดโฟกัสหลักของรุ่นก่อนเป็นตัวเด็ก · เกิดที่อื่น/ไม่เคยโฟกัส = ตามน้ำ (ไม่มีฟิลด์ heir จึงเท่าเดิม)
-    ...(tier && lifeFocusKid(st) && { focus: lifeFocusKid(st) }),
+    ...(blood && heirSibs(st, blood).length && { sibs: heirSibs(st, blood) }),
+    // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
+    ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
+    // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
+    ...(tier && st.nature && { nature: st.nature }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
     fame,
     ...(overlap && { overlap }),
+    // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
+    dlc: dlcNext(st),
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),

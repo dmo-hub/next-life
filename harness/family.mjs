@@ -4,7 +4,9 @@
 // · ทางในตระกูลเกิดเป็นลูก/หลานจริงที่ยังอยู่ (ชื่อ/เพศ/ปีเกิดตรง)
 // B36a2: คนในบ้านจากไปเองมีการ์ดแจ้งครบ · คนเป้าของการ์ดสุ่ม · bond อยู่ใน floor–100 ทุกการ์ด (เนื้อหายังไม่มี op ลด bond) · การ์ดดูแลพา bond ขึ้นเกินค่าเริ่มได้จริง · ญาติช่วยเกิดได้จริง
 // · สัตว์เลี้ยงตายตรงอายุขัย · เพื่อนรุ่นเกิดปีเดียวกับเรา · สองบทบาทนี้ไม่ตั้งธง
+// #9: %เคยแต่ง (อยู่ถึง 45) ต่างกันระหว่างช่วงปีเกิดไม่เกิน 3 pp · อายุแต่งครั้งแรกเฉลี่ย 24–28
 import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR, FILIAL, openChoices, meritId, MERIT_LEVELS } from '../src/engine/index.mjs';
+import { readFileSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, random } from './bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort, FAMILY_OPEN_MIN } from './kin.mjs';
@@ -38,6 +40,19 @@ const whoLeft = (text) => WHO_FIXED.reduce((t, w) => t.split(w).join(''), text).
 // B165 รักครั้งใหม่หลังคู่ตาย: ไม่ขึ้นในช่วงไว้ทุกข์ 3 ปี · ขึ้นได้จริง · แต่งรอบสองได้คู่ใหม่ที่ยังอยู่
 const MOURN = 3;
 let loveCards = 0, loveEarly = 0, rewed = 0, rewedBad = 0;
+// #9 อัตราแต่งงานตามรุ่นเกิด (ด่าน ค): %เคยแต่งของคนอยู่ถึง 45 ต่างกันระหว่างช่วงปีเกิด 10 ปีทุกคู่ ≤ WED_SPREAD pp
+// · อายุแต่งครั้งแรกเฉลี่ยอยู่ใน WED_AGE · "เคยแต่ง" = flagAge.married (จดครั้งแรก ไม่ลบตอนคู่จากไป)
+// เทียบกันเองในเกม ไม่ใช่เทียบโลกจริง
+// ช่วงเล็กสุดต่ำกว่า WED_MIN คน (อยู่ถึง 45) = ข้ามข้อส่วนต่าง: noise ของตัวอย่างเล็กเกิน 3 pp เอง (--n 1000 ช่วงเล็กสุด ~350–500 คน ตก 2 ใน 3 seed)
+const WED_SPREAD = 3, WED_AGE = [24, 28], WED_MIN = 2000;
+const wedCohort = new Map();
+// ใบ 93 (B114 ข้อ 153 167): สัดส่วนคู่แรกของชีวิตที่หย่า แยกตามปีที่แต่ง · กรอบอยู่ data/divorce-rate.json
+const divBands = JSON.parse(readFileSync(new URL('../data/divorce-rate.json', import.meta.url), 'utf8')).bands.map((x) => ({ ...x, wed: 0, div: 0 }));
+// ใบ 94 (B114 ข้อ 153): ชีวิตคู่ที่มีนอกใจ (เราหรือคู่) ต่อชีวิตที่เคยแต่ง · ราวครึ่งจบหย่า · วัดเฉพาะบอทสุ่ม (สายบุญไม่เคยรับ สายบาปรับทุกใบ)
+const CHEAT = { from: 0.10, to: 0.15, divFrom: 0.30, divTo: 0.70, wed: 0, cheat: 0, div: 0, us: 0, them: 0 };
+// ใบ 97 (B114 ข้อ 158 161 162): ชีวิตที่เคยหย่า → คืนดีกับคู่เก่า · ไม่เกิน 1 ครั้งต่อชีวิต · ไม่เกิน 5 ปีหลังหย่า · วัดบอทสุ่ม (ทางคืนดีเป็น 1 ใน 4 ตัวเลือก)
+const REUNION = { from: 0.03, to: 0.20, div: 0, back: 0, twice: 0, late: 0 };
+const wedAges = [];
 const kidsAt50 = [];
 const roles = { spouse: 0, child: 0, grandchild: 0 };
 const fmt = (v) => v.toFixed(2);
@@ -93,7 +108,9 @@ for (const [bot, pick] of Object.entries(BOTS)) {
         }
       }
       const has = (role) => st.kin.some((m) => m.role === role && m.alive && !m.left);
-      if (st.kin.some((m) => m.role === 'spouse') && !!st.flags.married !== has('spouse')) flagBad++;
+      // แยกทาง (ใบ 89/92) = ออกจากบ้านแต่ยังเป็นคู่ตามกฎหมาย ธง married คง
+      const spouseKept = has('spouse') || st.kin.some((m) => m.role === 'spouse' && m.alive && m.status === 'apart');
+      if (st.kin.some((m) => m.role === 'spouse') && !!st.flags.married !== spouseKept) flagBad++;
       if (st.kin.some((m) => m.role === 'child') && !!st.flags.has_kids !== has('child')) flagBad++;
     };
     const { state: st } = playLife(mixSeed(seed, i * 7 + 1), content, pick, check);
@@ -128,6 +145,40 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     households++;
     if (new Set(names).size !== names.length) nameDup++;
     if (st.age >= 50) kidsAt50.push(st.kin.filter((m) => m.role === 'child').length);
+    const wedAge = st.flagAge?.married;
+    if (wedAge !== undefined) {
+      const wy = st.birthYear + wedAge, band = divBands.find((x) => wy >= x.from && wy <= x.to), first = st.kin.find((m) => m.role === 'spouse');
+      // คืนดีกับคู่เก่า (ใบ 97) สถานะกลับเป็น together แต่ชีวิตคู่นี้เคยจบด้วยการหย่าแล้ว — นับเป็นหย่า ไม่งั้นอัตราหย่าตามยุคต่ำเกินจริง
+      const ended = first?.status === 'divorced' || first?.reunited !== undefined;
+      if (band && first) {
+        band.wed++;
+        if (ended) band.div++;
+      }
+      if (bot === 'สุ่ม' && first) {
+        CHEAT.wed++;
+        const us = !!st.flags.we_cheated, them = !!st.flags.spouse_cheated;
+        if (us || them) {
+          CHEAT.cheat++;
+          if (us) CHEAT.us++;
+          if (them) CHEAT.them++;
+          if (ended) CHEAT.div++;
+        }
+      }
+    }
+    if (bot === 'สุ่ม') {
+      const back = st.kin.filter((m) => m.reunited !== undefined);
+      if (back.length || st.kin.some((m) => m.status === 'divorced')) REUNION.div++;
+      if (back.length) REUNION.back++;
+      if (back.length > 1) REUNION.twice++;
+      if (back.some((m) => m.reunitedGap < 1 || m.reunitedGap > 5)) REUNION.late++;
+    }
+    if (wedAge !== undefined) wedAges.push(wedAge);
+    if (st.age >= 45) {
+      const c = wedCohort.get(Math.floor(st.birthYear / 10) * 10) ?? { to45: 0, ever: 0 };
+      c.to45++;
+      if (wedAge !== undefined) c.ever++;
+      wedCohort.set(Math.floor(st.birthYear / 10) * 10, c);
+    }
     // ทางในตระกูล: ถ้ามีลูก/หลานจริงที่ยังอยู่ ผู้เล่นรุ่นถัดไปต้องเป็นหนึ่งในนั้น
     const af = playAfterlife(st, pick);
     if (af.path === 'child' && af.heir) {
@@ -179,6 +230,21 @@ check('  บรรทัดใครมาส่งไม่มีชื่อ�
 check('  ขึ้นได้ทั้งทางอยู่ช่วยงานและแวะครู่เดียว', whoCame && whoAway ? 0 : 1, ` อยู่ ${whoCame} · แวะ ${whoAway}`);
 check(`การ์ดรักใหม่ไม่ขึ้นใน ${MOURN} ปีหลังคู่ตาย (B165)`, loveEarly, ` ${loveCards} ใบ`);
 check('  การ์ดรักใหม่ขึ้นได้ · แต่งรอบสองได้คู่ใหม่', loveCards && rewed ? rewedBad : 1, ` แต่ง ${rewed} ชีวิต`);
+{
+  const rows = [...wedCohort].sort((a, b) => a[0] - b[0]).map(([from, c]) => ({ from, ...c, pct: (100 * c.ever) / Math.max(1, c.to45) }));
+  const spread = (rs) => Math.max(...rs.map((r) => r.pct)) - Math.min(...rs.map((r) => r.pct));
+  const ageMean = wedAges.reduce((s, v) => s + v, 0) / Math.max(1, wedAges.length);
+  const inAge = (v) => v >= WED_AGE[0] && v <= WED_AGE[1];
+  console.log(`แต่งงานตามรุ่นเกิด (#9) · %เคยแต่ง (อยู่ถึง 45): ${rows.map((r) => `${r.from} ${r.pct.toFixed(1)}% (${r.to45})`).join(' · ')}`);
+  const small = Math.min(...rows.map((r) => r.to45));
+  if (small < WED_MIN) console.log(`%เคยแต่งต่างกันระหว่างช่วงปีเกิด ≤ ${WED_SPREAD} pp ${spread(rows).toFixed(1)} pp → ข้าม (ช่วงเล็กสุด ${small} คน < ${WED_MIN} · รัน --n 5000)`);
+  else check(`%เคยแต่งต่างกันระหว่างช่วงปีเกิด ≤ ${WED_SPREAD} pp`, rows.length >= 2 && spread(rows) <= WED_SPREAD ? 0 : 1, ` ${spread(rows).toFixed(1)} pp · ${rows.length} ช่วง · ช่วงเล็กสุด ${small} คน`);
+  // ตัวควบคุม: ตัดคนเคยแต่งของช่วงแรกลงครึ่ง ส่วนต่างต้องเกินกรอบ
+  const cut = rows.map((r, i) => (i ? r : { ...r, pct: r.pct / 2 }));
+  check('  ตัวควบคุม ช่วงแรกแต่งครึ่งเดียว ต้องหลุดกรอบ', spread(cut) > WED_SPREAD ? 0 : 1, ` ${spread(cut).toFixed(1)} pp`);
+  check(`อายุแต่งครั้งแรกเฉลี่ย ${WED_AGE.join('–')}`, wedAges.length && inAge(ageMean) ? 0 : 1, ` ${fmt(ageMean)} ปี · ${wedAges.length} คน`);
+  check('  ตัวควบคุม อายุ +5 ปี ต้องหลุดกรอบ', inAge(ageMean + 5) ? 1 : 0, ` ${fmt(ageMean + 5)}`);
+}
 
 // สัตว์เลี้ยง/เพื่อนรุ่น: ยังไม่มีเนื้อหาใช้ — ทดสอบกับชีวิตจริงที่เติมสมาชิกเอง
 {
@@ -236,6 +302,20 @@ check('  การ์ดรักใหม่ขึ้นได้ · แต่�
   console.log(`  ญาติช่วยประคองหลัง ${FILIAL.at} ต่อชีวิต: กตัญญู ${fmt(g.aid)} · ละทิ้ง ${fmt(a.aid)} · step 0: ${fmt(g0.aid)} / ${fmt(a0.aid)}`);
   check(`  ส่วนต่าง bond ลูก (กตัญญู − ละทิ้ง) เกินตัวควบคุม ≥ 2×step`, g.cnt && a.cnt && dd >= 2 * FILIAL.step ? 0 : 1, ` ${fmt(dd)}`);
   check('  ญาติช่วยประคองตอนแก่: กตัญญูมากกว่าละทิ้ง และห่างกว่าตัวควบคุม', g.aid > a.aid && g.aid - a.aid > g0.aid - a0.aid ? 0 : 1);
+}
+for (const x of divBands) {
+  const r = x.div / Math.max(1, x.wed);
+  check(`หย่าตามยุค (ใบ 93) · แต่ง ${x.from}–${x.to} ใกล้ ${x.target} ±${x.tolerance}`, x.wed >= 300 && Math.abs(r - x.target) <= x.tolerance ? 0 : 1, ` ${x.div}/${x.wed} = ${fmt(r)}`);
+}
+{
+  const r = CHEAT.cheat / Math.max(1, CHEAT.wed), d = CHEAT.div / Math.max(1, CHEAT.cheat);
+  check(`นอกใจ (ใบ 94) · ชีวิตคู่ที่มีนอกใจ ${CHEAT.from}–${CHEAT.to} (เรา ${CHEAT.us} · คู่ ${CHEAT.them})`, CHEAT.wed >= 200 && r >= CHEAT.from && r <= CHEAT.to ? 0 : 1, ` ${CHEAT.cheat}/${CHEAT.wed} = ${fmt(r)}`);
+  check(`นอกใจ (ใบ 94) · จบหย่า ${CHEAT.divFrom}–${CHEAT.divTo}`, CHEAT.cheat >= 25 && d >= CHEAT.divFrom && d <= CHEAT.divTo ? 0 : 1, ` ${CHEAT.div}/${CHEAT.cheat} = ${fmt(d)}`);
+}
+{
+  const r = REUNION.back / Math.max(1, REUNION.div);
+  check(`คืนดีคู่เก่า (ใบ 97) · ชีวิตที่เคยหย่าแล้วคืนดี ${REUNION.from}–${REUNION.to}`, REUNION.div >= 100 && r >= REUNION.from && r <= REUNION.to ? 0 : 1, ` ${REUNION.back}/${REUNION.div} = ${fmt(r)}`);
+  check('คืนดีคู่เก่า (ใบ 97) · ไม่เกิน 1 ครั้งต่อชีวิต · อยู่ใน 1–5 ปีหลังหย่า', REUNION.twice + REUNION.late, ` ซ้ำ ${REUNION.twice} · นอกช่วง ${REUNION.late}`);
 }
 console.log(fail ? `ไม่ผ่าน ${fail} ข้อ` : 'ผ่านทั้งหมด');
 if (fail) process.exitCode = 1;

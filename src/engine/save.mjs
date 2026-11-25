@@ -2,9 +2,10 @@
 // เดินทั้งก้อนครั้งเดียว: เนื้อหาเกมไม่เก็บ (ผูกกลับตอนโหลด) · การ์ดเนื้อหาเก็บแค่ id · ตัวสุ่มเก็บสถานะภายใน
 // object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
 import { makeRng } from './rng.mjs';
-import { pickRealName } from './birth.mjs';
+import { pickRealName, pickReligion, DEFAULT_RELIGION } from './birth.mjs';
 import { REALMS } from './afterlife.mjs';
 import { pastFromLineage } from './past.mjs';
+import { lifeTreeMigrate, lifeGatesMigrate } from './life.mjs';
 
 export const SNAP_V = 1;
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
@@ -73,6 +74,8 @@ export function repairLife(st, card) {
   st.queue = q.filter((c) => !('ev' in c) || c.ev);
   // เซฟก่อนมีชื่อจริง (names-fun) — สุ่มจาก seed เดิม โหลดกี่ครั้งก็ได้ชื่อเดียวกัน
   st.realName ??= pickRealName(st.seed, st.sex, st.birthYear, st.content.era.names);
+  // เซฟก่อนมีศาสนา (B93) — สุ่มจาก seed+จังหวัดเดิมด้วย stream เดียวกับตอนเกิด โหลดกี่ครั้งก็ได้ค่าเดียว · ไม่มีจังหวัด/ตาราง = ค่าเริ่มต้น
+  st.religion ??= st.province ? pickReligion(makeRng(st.seed ^ 0x3b9aca07), st.content.era.birth, st.province) : DEFAULT_RELIGION;
   const occ = st.content.era.finance.occupations;
   if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
   const ladders = st.content.era.careers?.ladders;
@@ -88,5 +91,9 @@ export function repairLife(st, card) {
     const past = pastFromLineage(st.lineage, (name) => REALMS.find((r) => r.name === name)?.id ?? null);
     if (past) st.past = past;
   }
+  lifeTreeMigrate(st);
+  lifeGatesMigrate(st);
+  // เซฟก่อน ft15: กลไกโฟกัสรายปีถูกตัดแล้ว — ล้างสถานะค้าง (focusYears แปลงเป็น st.gates ใน lifeGatesMigrate แล้วตัด)
+  for (const k of ['focus', 'focusAt', 'focusMet', 'focusDoom', 'focusBorn', 'focusHeir', 'focusWarn']) delete st[k];
   return stale;
 }

@@ -2,9 +2,54 @@
 // ทั้งหน้าประกอบใน spoilers.mjs (catalogHtml)
 
 export const CATEGORY = { family: 'ครอบครัว', study: 'การเรียน', work_money: 'งานและเงิน', health: 'สุขภาพ', society: 'สังคม', belief: 'ความเชื่อ' };
+import { readdirSync, readFileSync } from 'node:fs';
+import { parse } from 'yaml';
 import { sinceTag } from './card-since.mjs';
 
 export const AFTER = 'ระหว่างชาติ';
+
+// ตารางการ์ดแต่ละหมวดบนหน้ารวมการ์ด: ไฟล์ content → หมวด ที่เดียว · ชื่อไฟล์ลงท้าย * = ขึ้นต้นด้วยคำนั้น
+// ไฟล์ที่ไม่ตรงหมวดไหนเลยทำ build และ site:check ตก (ไฟล์ใหม่ต้องเลือกหมวดก่อนถึงขึ้นตาราง) · ตรงหลายหมวด = หมวดแรกในลิสต์
+export const CARD_GROUPS = [
+  { name: 'สุขภาพ', files: ['*_health', 'stats_extremes'] },
+  { name: 'อาชีพเฉพาะทาง', files: ['job_*', '*_career', 'singer', 'boxer', 'pageant'] },
+  { name: 'งานและเงิน', files: ['work_*', 'business', 'debt*', 'corruption', 'lottery', 'grey_money', 'career_first', 'crop_rural', 'labor_abroad'] },
+  { name: 'สายเตรียมทหาร', files: ['cadet_*'] },
+  { name: 'ครอบครัว', files: ['child_family', 'child_far', 'old_family', 'echoes_family', 'life_divorce', 'life_not_mine', 'life_reconcile_ex', 'pets', 'remarry', 'heir', 'grief', 'funeral'] },
+  { name: 'ชีวิตประจำวัน', files: ['daily_*', 'life_*', 'street_*', 'tour_local'] },
+  { name: 'คนรอบตัว', files: ['people_*', 'nbr_home'] },
+  { name: 'วัฒนธรรม', files: ['culture_*', 'meme', 'festivals'] },
+  { name: 'ด่านชีวิต', files: ['ordeal_*', 'dilemmas', 'risky_cases', 'court', 'dungeon', 'overlap'] },
+  { name: 'สังคม', files: ['era_*', 'echoes', 'echoes_debt', 'sex_roles'] },
+  { name: 'ช่วงวัยและก้าวสำคัญ', files: ['young', 'mid', 'milestones*', 'time_capsule', 'prepared', 'drift', 'childhood_echoes'] },
+  { name: 'ความเชื่อ', files: ['belief'] },
+  { name: 'การเรียน', files: ['teen', 'scholarship_bond', 'pali_monk'] },
+  { name: AFTER, files: ['afterlife'] },
+];
+const fileHits = (pat, name) => (pat.endsWith('*') ? name.startsWith(pat.slice(0, -1)) : pat.startsWith('*') ? name.endsWith(pat.slice(1)) : name === pat);
+
+// นับการ์ดต่อหมวดจากไฟล์ content จริง · unmapped = ไฟล์ที่ไม่อยู่ในหมวดไหน
+export function cardGroupCounts(groups = CARD_GROUPS, dir = new URL('../../content/', import.meta.url)) {
+  const counts = groups.map((g) => ({ ...g, n: 0, hit: [] }));
+  const unmapped = [];
+  for (const f of readdirSync(dir).filter((n) => n.endsWith('.yaml')).sort()) {
+    const name = f.replace(/\.yaml$/, '');
+    const g = counts.find((c) => c.files.some((p) => fileHits(p, name)));
+    if (!g) {
+      unmapped.push(name);
+      continue;
+    }
+    g.n += parse(readFileSync(new URL(f, dir), 'utf8')).events.length;
+    g.hit.push(name);
+  }
+  return { rows: counts, unmapped, total: counts.reduce((s, g) => s + g.n, 0) };
+}
+
+export function cardGroupRows(groups, dir) {
+  const { rows, unmapped } = cardGroupCounts(groups, dir);
+  if (unmapped.length) throw new Error(`ไฟล์ content ไม่อยู่ในหมวดการ์ดบนหน้ารวมการ์ด (CARD_GROUPS ใน src/site/catalog.mjs): ${unmapped.join(', ')}`);
+  return rows.map((g) => `<tr><td>${esc(g.name)}</td><td>${g.n.toLocaleString('en-US')}</td><td>${esc(g.files.join(', '))}</td></tr>`).join('\n      ');
+}
 
 export const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 // ช่องแทนค่าเหลือเป็นคำในวงเล็บ ผู้อ่านรู้ว่าตรงนี้เกมเติมชื่อ/อายุของชีวิตนั้น

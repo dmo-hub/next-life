@@ -1,22 +1,23 @@
 # กลุ่ม work_money · หวยปกติ (ไม่ใช่สายลี้ลับ) ช่วงหนุ่มสาว–ชรา · ลุ้นทีละใบ ติดเป็นนิสัย หวยใต้ดิน ลงขัน และญาติที่โผล่มาตอนถูกใหญ่
 events:
   - id: lot_vendor_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 2
     multipliers: {parent_flags: {lottery_habit: 1.5}}
-    # เรื่องเปิดด้วยเงินเดือนก้อนแรก — อาชีพครบทุกตัว = มีงานของตัวเองแล้ว (ยังไม่ทำงานไม่ออก)
+    # เรื่องเปิดด้วยเงินก้อนแรก — อาชีพครบทุกตัว = มีงานของตัวเองแล้ว (ยังไม่ทำงานไม่ออก)
     when: {occupation: [farmer, labor, factory, craft, service, clerk, technician, professional, manager, officer, senior_officer]}
     title: "แผงล็อตเตอรี่หน้าโต๊ะ"
-    text: "แม่ค้าล็อตเตอรี่เดินถือแผงมาหยุดที่โต๊ะข้าวเที่ยง เพื่อนสี่คนกำลังหารกันซื้อเลขชุด ส่วน{ชื่อ}เพิ่งได้เงินเดือนมาหมาด ๆ ในกระเป๋ายังหนาอยู่"
+    text: "แม่ค้าล็อตเตอรี่เดินถือแผงมาหยุดที่โต๊ะข้าวเที่ยง เพื่อนสี่คนกำลังหารกันซื้อเลขชุด ส่วน{ชื่อ}เพิ่งได้เงินมาหมาด ๆ ในกระเป๋ายังหนาอยู่"
     choices:
       - id: buy_one
         text: "ซื้อใบเดียว ลุ้นเล่น ๆ"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 985, text: "ประกาศผลวันที่สิบหก ไม่ใกล้เลยสักตัว ฉีกทิ้งลงถังขยะหน้าออฟฟิศ", effects: {money: {unit: fixed_baht, amount: -80, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 985, text: "ประกาศผลวันที่สิบหก ไม่ใกล้เลยสักตัว ฉีกทิ้งลงถังขยะข้างโต๊ะ", effects: {money: {unit: fixed_baht, amount: -80, ref_year: 2560}}, merit: [{cat: neutral}]}
           - {weight: 13, ok: true, text: "ถูกเลขท้ายสองตัว! ได้คืนหลายสิบเท่าของค่าใบ เลี้ยงหมูกระทะเพื่อนทั้งโต๊ะจนหมดเกลี้ยง", effects: {happiness: 2, relations: 1, money: {unit: fixed_baht, amount: 2000, ref_year: 2560}}, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, text: "ตรวจซ้ำสามรอบ ทุกตัวตรงเป๊ะ ถูกรางวัลที่หนึ่ง มือสั่นจนต้องนั่งลงกับพื้น ชีวิตเปลี่ยนในบ่ายวันเดียว", effects: {happiness: 3, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560}}, merit: [{cat: neutral}]}
       - id: buy_every_draw
@@ -43,6 +44,7 @@ events:
           - {weight: 2, text: "ขายไม่ออกสักใบ ต้องเหมาที่เหลือเองตามที่ตกลง แล้วก็ไม่ถูกสักใบ", effects: {happiness: -1, money: {unit: fixed_baht, amount: -1600, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_pool_split_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -60,19 +62,20 @@ events:
         merit: [{cat: greed_harm, level: 3}]
         outcomes:
           - {weight: 1, text: "ไม่มีใครพิสูจน์ได้ เงินทั้งก้อนเป็นของคนเดียว แต่ตั้งแต่วันนั้นไม่มีเพื่อนเก่าคนไหนรับสายอีก", effects: {relations: -3, network: -2, happiness: -1, money: {unit: fixed_baht, amount: 6000000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 3}], sets_flags: [dirty_money]}
-          - {weight: 2, text: "เพื่อนเอาสลิปโอนเงินไปแจ้งความ ศาลสั่งคืนส่วนของทุกคนพร้อมค่าทนาย ชื่อเสียงพังทั้งแผนก", effects: {relations: -3, network: -3, happiness: -2, money: {unit: fixed_baht, amount: 600000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 3}], sets_flags: [dirty_money]}
+          - {weight: 2, text: "เพื่อนเอาสลิปโอนเงินไปแจ้งความ ศาลสั่งคืนส่วนของทุกคนพร้อมค่าทนาย ชื่อเสียงพังทั้งทีม", effects: {relations: -3, network: -3, happiness: -2, money: {unit: fixed_baht, amount: 600000, ref_year: 2560, grey: true}}, merit: [{cat: greed_harm, level: 3}], sets_flags: [dirty_money]}
       - id: split_by_stake
         text: "แบ่งตามเงินที่แต่ละคนลง"
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {relations: 1.5}}, text: "ทุกคนยอมรับ แม้คนที่ลงน้อยจะบ่นนิดหน่อย แต่ก็ยังนั่งกินข้าวโต๊ะเดียวกัน", effects: {relations: 1, happiness: 2, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "เถียงกันว่าใครลงเท่าไรจนลงไม้ลงมือ แบ่งเงินได้แต่แผนกแตกเป็นสองก๊ก", effects: {relations: -2, happiness: -1, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เถียงกันว่าใครลงเท่าไรจนลงไม้ลงมือ แบ่งเงินได้แต่ทีมแตกเป็นสองก๊ก", effects: {relations: -2, happiness: -1, money: {unit: fixed_baht, amount: 1200000, ref_year: 2560}}, merit: [{cat: neutral}]}
       - id: give_neediest
         text: "เพิ่มส่วนให้เพื่อนที่แม่ป่วย"
         effects: {relations: 3, happiness: 1, money: {unit: fixed_baht, amount: 900000, ref_year: 2560}}
         merit: [{cat: dana, level: 2}, {cat: help_others, level: 1}]
 
   - id: lot_pool_small_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -103,6 +106,7 @@ events:
           - {weight: 1, ok: true, text: "งวดหน้าถูกท้ายสามตัวซ้ำอีกใบ ทั้งกลุ่มเรียก{ชื่อ}ว่ามือขลัง ได้คนละพันกว่าบาทพร้อมเรื่องเล่าไปอีกนาน", effects: {relations: 2, happiness: 2, money: {unit: fixed_baht, amount: 1600, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_habit_drain_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -139,6 +143,7 @@ events:
           - {weight: 1, text: "ตำรวจบุกจับวงโพยวันหวยออก ต้องเสียค่าปรับ ข่าวไปถึงที่ทำงานก่อนตัวจะกลับถึงบ้าน", effects: {happiness: -2, network: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
 
   - id: lot_jackpot_kin_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -152,7 +157,7 @@ events:
         merit: [{cat: dana, level: 2}]
       - id: quit_open_shop
         text: "เอาเงินรางวัลเปิดกิจการตัวเอง"
-        gate: business
+        gate: mo5
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ร้านติดลมบน มีเงินทุนหนาไม่ต้องกู้ใคร ได้เป็นเถ้าแก่เต็มตัว", effects: {income_mult: 1.3, happiness: 2, network: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -176,6 +181,7 @@ events:
           - {weight: 3, text: "เพื่อนหายเงียบพร้อมเงินครึ่งหนึ่งของรางวัล เบอร์โทรใช้ไม่ได้ตั้งแต่สัปดาห์แรก", effects: {happiness: -3, network: -1, money: {unit: fixed_baht, amount: -3000000, ref_year: 2560}}, merit: [{cat: neutral}]}
 
   - id: lot_underground_mid_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -187,7 +193,7 @@ events:
     choices:
       - id: run_slips
         text: "รับเดินโพยแทนเจ๊"
-        gate: shortcut_money
+        gate: mo7
         hint: "ราคา: บาปเบา"
         merit: [{cat: greed_harm, level: 1}]
         outcomes:
@@ -243,6 +249,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ lot_underground_mid_01 (แจ้งตำรวจ ทั้งซอยรู้ว่าใครโทร) — ออกทาง next เท่านั้น
   - id: lot_snitch_soi_01
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: กลางคน

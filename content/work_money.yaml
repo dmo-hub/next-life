@@ -1,19 +1,21 @@
 # กลุ่ม work_money · ช่วงวัยทำงาน (31–45) · การ์ดกองสุ่มเรื่องงาน/เงิน ใช้ income_mult เป็นผลไกล
 events:
   - id: work_layoff_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [clerk, technician, professional, manager, factory], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional, manager, factory], ladder: [none, private], flags: {not: [own_business]}}
+    office_ok: "ลูกจ้างโรงงานก็ถูกลดเงินเดือนได้ ใบกรองอาชีพแล้ว"
     multipliers: {flags: {in_debt: 1.5}, occupation: {factory: 1.5, clerk: 1.3}}
     title: "กล่องกระดาษใบนั้น"
-    text: "เช้าวันจันทร์ HR เรียกเข้าห้องประชุม บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
+    text: "เช้าวันจันทร์ ฝ่ายบุคคลเรียกเข้าไปคุย บนโต๊ะมีซองเงินชดเชยกับกล่องกระดาษเปล่าวางรออยู่ อายุ {อายุ} ปี เพิ่งถูกเลย์ออฟ"
     choices:
       - id: open_shop
         text: "เอาเงินชดเชยเปิดร้านเอง"
-        gate: business
+        gate: mo5
         effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
@@ -32,8 +34,8 @@ events:
         effects: {severance: true}
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "คลิปไวรัล บริษัทคู่แข่งทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
-          - {weight: 2, text: "บริษัทเก่าส่งทนายมาฟ้องหมิ่นประมาท ต้องจ่ายค่าไกล่เกลี่ย", effects: {relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "คลิปไวรัล นายจ้างเจ้าอื่นทักมาเสนองานที่เงินดีกว่าเดิม", effects: {happiness: 2, income_mult: 1.4}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "นายจ้างเก่าส่งทนายมาฟ้องหมิ่นประมาท ต้องจ่ายค่าไกล่เกลี่ย", effects: {relations: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
       - id: use_savings
         text: "ใช้เงินสำรองระหว่างหางานใหม่"
         requires: {flags: {has: [kept_savings]}, reason: "ไม่มีเงินสำรองเก็บไว้"}
@@ -42,12 +44,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: work_promotion_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {occupation: [professional], ladder: [none, private, trade]}
+    when: {occupation: [professional], ladder: [none, private], flags: {not: [own_business]}}
     multipliers: {stats: {network: 1.3}, flags: {good_student: 1.5}}
     title: "เก้าอี้ผู้จัดการ"
     text: "หัวหน้าเกษียณ ผู้บริหารยื่นข้อเสนอให้ขึ้นเป็นผู้จัดการ เงินเดือนเกือบสองเท่า แต่มีเงื่อนไขเดียว ต้องย้ายไปประจำสาขาต่างจังหวัด"
@@ -106,6 +109,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: work_guarantor_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -139,12 +143,13 @@ events:
           - {weight: 1, text: "เพื่อนน้อยใจว่าไม่ไว้ใจกัน เลิกคบไปเลย", effects: {relations: -2}, merit: [{cat: neutral}]}
 
   - id: work_house_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     weight: 2
-    when: {flags: {has: [married], not: [has_kids, home_owner]}}
+    when: {spouse: {status: together}, flags: {has: [married], not: [has_kids, home_owner]}}
     multipliers: {flags: {guarantor: 0.5}}
     title: "บ้านหลังแรก"
     text: "คู่ชีวิตกระซิบข่าวดี กำลังจะมีเจ้าตัวเล็ก ห้องเช่าที่อยู่กันสองคนเริ่มแคบลงทุกวัน ถึงเวลาตัดสินใจเรื่องบ้าน"
@@ -179,6 +184,7 @@ events:
 
   # ช่วงกลางคน: กิจการส่วนใหญ่เปิดตอนกลางคน (ตัวเลือกเปิดกิจการติดประตูโฟกัสธุรกิจ) — อยู่ช่วงทำงานแทบไม่มีใครมีกิจการทันเห็นใบนี้
   - id: work_biz_boom_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -213,6 +219,7 @@ events:
           - {weight: 2, text: "นักรีวิวคนเดิมกลับมาแฉ ร้านร้างภายในเดือนเดียว", effects: {happiness: -2, relations: -1, income_mult: 0.7}, merit: [{cat: neutral}]}
 
   - id: work_biz_bust_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -247,6 +254,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: work_influencer_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -279,6 +287,7 @@ events:
         merit: [{cat: help_others, level: 2}]
 
   - id: work_online_shop_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -318,6 +327,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: work_guarantor_chase_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -349,6 +359,7 @@ events:
 
   # เรื่องต่อ work_biz_boom_01 — อยู่ช่วงกลางคนตามต้นทาง
   - id: work_franchise_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: กลางคน
@@ -379,6 +390,8 @@ events:
         merit: [{cat: help_others, level: 1}]
   # เรื่องต่อ work_online_shop_01 (ครีมค้างสต็อก) — ออกทาง next เท่านั้น
   - id: work_cream_stock_01
+    office_ok: "บริษัทในผลคือเจ้าของแบรนด์ครีมขายตรง ไม่ใช่ที่ทำงาน"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

@@ -1,6 +1,6 @@
 # 06 · Workflow, roles, roadmap, next steps
 
-Snapshot: v0.6.31 (2026-11-03). **Warning:** `~/.claude/work/thai-life-sim/build/` (LANES.md, backlog.md, WORK.md, B*-plan.md, gate.mjs) is not on this machine. The content below comes from CLAUDE.md, git history, gdd.html#tech and CONTRIBUTING on `origin/integrator/contrib`. Points marked "inferred" should be confirmed with the integrator.
+Snapshot: v0.6.31 (2026-11-03). **Warning:** `D:/Project/Mini Project/next-life-owner/build/` (LANES.md, backlog.md, WORK.md, B*-plan.md, gate.mjs) is not on this machine. The content below comes from CLAUDE.md, git history, gdd.html#tech and CONTRIBUTING on `origin/integrator/contrib`. Points marked "inferred" should be confirmed with the integrator.
 
 ## 1. Roles and rules (CLAUDE.md, mandatory)
 
@@ -12,7 +12,7 @@ Snapshot: v0.6.31 (2026-11-03). **Warning:** `~/.claude/work/thai-life-sim/build
 
 Working rules:
 - **Do not edit the GDD or balance numbers the owner set.** If you think one should change, propose it first.
-- **Do only what the ticket asks.** Write off-ticket ideas as one line in `~/.claude/work/thai-life-sim/build/backlog.md`, then carry on.
+- **Do only what the ticket asks.** Write off-ticket ideas as one line in `D:/Project/Mini Project/next-life-owner/build/backlog.md`, then carry on.
 - Game numbers live in `content/*.yaml` and engine constants. Never hard-code them in a screen.
 - After editing, run `node build.mjs`, open `docs/play.html` for real, and confirm **0 console errors**.
 - When unsure, ask. Don't guess.

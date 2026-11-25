@@ -1,0 +1,81 @@
+// ตก: การ์ดวัยทำงานที่มีคำออฟฟิศแต่ไม่ได้กรองอาชีพ/สาย ไม่ใช้คำแทน {ที่ทำงาน} {คนคุมงาน} และไม่มี office_ok
+// รายการคำเป็นของเลนนี้เอง ไม่ใช่ป้ายสายของ harness/work-lane.mjs · ที่นี่จับจากคำในข้อความ ไม่ใช่จากป้าย
+// การ์ดที่คำออฟฟิศถูกต้องอยู่แล้ว (ที่ประชุมหมู่บ้าน) ใส่ office_ok พร้อมเหตุผล · officeGaps ยังใช้นับใบในทดสอบ
+import { isObj, textsOf } from './util.mjs';
+
+export const OFFICE_STAGES = ['หนุ่มสาว', 'ทำงาน', 'กลางคน'];
+export const OFFICE_WORDS = ['ออฟฟิศ', 'ประชุม', 'เงินเดือน', 'โบนัส', 'บริษัท', 'แผนก', 'ใบลาออก', 'ลาพักร้อน', 'หัวหน้างาน'];
+// อาชีพ/สายที่คำออฟฟิศอ่านถูก · technician อยู่ด้วยเพราะการ์ดไฟมอดกลางประชุมกรองไว้แล้ว
+export const OFFICE_OCC = ['clerk', 'professional', 'manager', 'technician', 'officer', 'senior_officer'];
+export const OFFICE_LADDER = ['gov', 'private'];
+const PLACEHOLDER = /\{(ที่ทำงาน|คนคุมงาน)\}/;
+const EXEMPT_MIN = 6;
+
+const subsetOf = (v, ok) => Array.isArray(v) && v.length > 0 && v.every((x) => ok.includes(x));
+
+// ไทยไม่เว้นวรรคระหว่างคำ จับแค่ substring จะนับ "วางแผนก่อน" เป็น "แผนก" · ตัดตามขอบพยางค์แทน:
+// ตัวก่อนหน้าเป็นสระหน้า (เ แ โ ใ ไ) = พยัญชนะตัวแรกเป็นของพยางค์ก่อน · ตัวถัดไปเป็นสระหลัง/บน/ล่าง วรรณยุกต์ การันต์ = พยัญชนะตัวท้ายเป็นต้นพยางค์ถัดไป
+// ไม่ใช้ Intl.Segmenter เพราะพจนานุกรม ICU ต่างกันตามรุ่น Node ผลด่านจะไม่ตรงกันทุกเครื่อง
+const LEAD_VOWEL = /[เ-ไ]/;
+const TAIL_MARK = /[ะ-ฺๅ็-๎]/;
+export function hasWord(s, w) {
+  for (let i = s.indexOf(w); i >= 0; i = s.indexOf(w, i + 1)) {
+    if (!LEAD_VOWEL.test(s[i - 1] ?? '') && !TAIL_MARK.test(s[i + w.length] ?? '')) return true;
+  }
+  return false;
+}
+
+function officeHits(e) {
+  const hits = new Set();
+  for (const { s } of textsOf(e)) for (const w of OFFICE_WORDS) if (hasWord(s, w)) hits.add(w);
+  return [...hits];
+}
+
+// กรองอาชีพได้แค่กลุ่มออฟฟิศ หรือกรองสายได้แค่ gov/private ถึงจะอ่านคำออฟฟิศถูกกับทุกคนที่เจอใบนี้
+export function officeFiltered(e) {
+  const w = isObj(e.when) ? e.when : {};
+  if (w.occupation !== undefined) return subsetOf(w.occupation, OFFICE_OCC) && !(Array.isArray(w.ladder) && w.ladder.includes('trade'));
+  return subsetOf(w.ladder, OFFICE_LADDER);
+}
+
+export function officeGaps(docs) {
+  const missing = [];
+  let total = 0;
+  let exempt = 0;
+  for (const { file, doc } of docs) {
+    if (!isObj(doc) || !Array.isArray(doc.events)) continue;
+    for (const e of doc.events) {
+      if (!isObj(e) || !OFFICE_STAGES.includes(e.stage)) continue;
+      const words = officeHits(e);
+      if (!words.length) continue;
+      total++;
+      if (e.office_ok !== undefined) { exempt++; continue; }
+      if (PLACEHOLDER.test(JSON.stringify(e)) || officeFiltered(e)) continue;
+      missing.push({ file, id: e.id, words });
+    }
+  }
+  return { total, exempt, missing };
+}
+
+export const rules = [
+  {
+    id: 'office-filter',
+    desc: 'การ์ดวัยทำงานที่มีคำออฟฟิศ ต้องกรองอาชีพออฟฟิศ (clerk professional manager technician officer senior_officer · ไม่รวมสาย trade) หรือสาย gov/private · หรือใช้ {ที่ทำงาน} {คนคุมงาน} · หรือใส่ office_ok พร้อมเหตุผล',
+    event(e, ctx, r) {
+      if (!OFFICE_STAGES.includes(e.stage) || e.office_ok !== undefined) return;
+      const words = officeHits(e);
+      if (!words.length || PLACEHOLDER.test(JSON.stringify(e)) || officeFiltered(e)) return;
+      r('', `คำออฟฟิศ [${words.join(' ')}] แต่ไม่กรองอาชีพ · กรอง when.occupation ให้เหลือกลุ่มออฟฟิศ + ladder ไม่มี trade · หรือใช้ {ที่ทำงาน}/{คนคุมงาน} · หรือใส่ office_ok เหตุผล`);
+    },
+  },
+  {
+    id: 'office-exempt',
+    desc: `office_ok = เหตุผลที่การ์ดนี้ใช้คำออฟฟิศได้โดยไม่กรองอาชีพ (ข้อความอย่างน้อย ${EXEMPT_MIN} ตัวอักษร เช่น "ที่ประชุมหมู่บ้าน") · ใส่บนการ์ดช่วงหนุ่มสาว/ทำงาน/กลางคนที่มีคำออฟฟิศเท่านั้น`,
+    event(e, ctx, r) {
+      if (e.office_ok === undefined) return;
+      if (typeof e.office_ok !== 'string' || e.office_ok.trim().length < EXEMPT_MIN) { r('.office_ok', `ต้องเขียนเหตุผลอย่างน้อย ${EXEMPT_MIN} ตัวอักษร (ได้ ${JSON.stringify(e.office_ok)})`); return; }
+      if (!OFFICE_STAGES.includes(e.stage)) r('.office_ok', `ใช้ได้เฉพาะการ์ดช่วง ${OFFICE_STAGES.join(' ')} (ใบนี้ ${e.stage})`);
+      else if (!officeHits(e).length) r('.office_ok', 'การ์ดไม่มีคำออฟฟิศ ลบป้ายยกเว้นออก');
+    },
+  },
+];

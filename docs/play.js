@@ -1,7 +1,8 @@
 (() => {
-const APP_VERSION = "v0.6.128";
-const APP_BUILD = "2026-11-14";
-const RELEASE_NOTES = [{"v":"v0.6.128","items":["การ์ดอาชีพริมทาง 4 สาย ตัดรายละเอียดที่หาแหล่งยืนยันไม่ได้ออก","คนขายพวงมาลัยช่วงหนุ่มสาวเริ่มอายุ 19 ถึง 30 และผลของบางตัวเลือกปรับให้ตรงเรื่อง"]},{"v":"v0.6.127","items":["ไม่มีลวดลายชีวิตแล้ว ตอนจบชีวิตเห็นแต่ฉายา","ภาพแชร์ใช้ฉายาแรกเป็นหัว ถ้าไม่มีฉายาเป็นประโยคตามช่วงวัยและสาเหตุ","สมุดฉายาไม่มีชั้นแบบชีวิต"]},{"v":"v0.6.126","items":["อาชีพใหม่ 4 สาย กระเป๋ารถเมล์ ควาญช้าง คนเก็บขยะ และคนขายพวงมาลัย สายละ 18 ใบ","เรื่องในอาชีพใหม่อิงข้อมูลจริงที่ตรวจแหล่งแล้ว ท่อนที่หาแหล่งยืนยันไม่ได้ตัดออก"]},{"v":"v0.6.125","items":["เสียคู่ชีวิต ลูก หรือพ่อแม่ มีการ์ดไว้อาลัยของตัวเอง เลือกได้ว่าจะรับมือกับความสูญเสียแบบ…","อาชีพใหม่ 4 สาย ช่างซ่อมนาฬิกา สามล้อถีบ คนตัดอ้อย และช่างกุญแจ สายละ 15…","เรื่องในอาชีพใหม่อิงข้อมูลจริงที่ตรวจแหล่งแล้ว ท่อนที่หาแหล่งยืนยันไม่ได้ตัดออก"]},{"v":"v0.6.124","items":["การ์ดใหม่ 516 ใบ เป็นเรื่องรอบตัวคนไทยทั้งเล็กและใหญ่ เช่น เพลงดัง ตำนาน…","อาชีพที่มีเรื่องของตัวเองเพิ่ม ได้แก่ หมอ พยาบาล ครูและข้าราชการ นักบินและแอร์โฮสเตส…","ช่วงชีวิตหนักมีการ์ดเพิ่ม ทั้งเกณฑ์ทหาร งานแต่ง ติดคุก และน้ำท่วม…","การ์ดวัยรุ่นกับวัยผู้ใหญ่ชุดนี้ตั้งให้ออกน้อยกว่าการ์ดเดิม เรื่องเดิมที่เคยเจอจึงไม่ถูกกลบ","เมื่อมีการ์ดใหม่เข้ากองเดียวกัน เลขสุ่มเดิมจะได้ชีวิตไม่เหมือนรุ่นก่อน…"]},{"v":"v0.6.123","items":["เกิดใหม่แต่ละครั้งสุ่มลักษณะบ้านที่เกิดมา เช่น บ้านเข้มงวด บ้านปล่อยให้ตัดสินใจเอง…","เปลี่ยนคำเรียก \"สายมู\" เป็น \"สายลี้ลับ\" ทั่วทั้งเกม ทั้งข้อความในการ์ด หน้าเอกสาร…"]},{"v":"v0.6.122","items":["วางโครงต้นไม้โฟกัสของสายลี้ลับครั้งแรก มีโหนดเล็กให้ทุ่มเวลาปลดทีละขั้น…"]},{"v":"v0.6.121","items":["ชีวิตเดียวไม่ถูกเรื่องต่อกินจนไม่เหลือที่ให้เหตุการณ์สุ่ม…"]},{"v":"v0.6.120","items":["ส่งงานปิดเกตต่อให้ทีมอื่นแล้วปล่อยไว้ อีก 1-2 ปีเกตนั้นอาจแตกออกมาทั้งย่าน · เจอการ์ด…"]},{"v":"v0.6.119","items":["ห้องบอสในดันเจียนตายยากลงมาก: ทุกทางสู้บอสมีโอกาสตายต่ำลงจากเดิมราวสามเท่า…"]},{"v":"v0.6.118","items":["อาชีพสายยศ (ข้าราชการ ทหาร ตำรวจ) ไต่ขั้นตามบันไดยศของตัวเอง…","คนสายยศยังได้โบนัสนิสัยประจำงานเหมือนเดิม และเจอการ์ดหักกยศ.จากสลิปเงินเดือนกับคูปองตรวจส…"]},{"v":"v0.6.117","items":["เลิกใช้รายการคำต้องห้ามในเนื้อเรื่อง ทั้งด่านคำต้องห้าม ด่านห้ามสั่งสอน…","ห้องผู้พัฒนา: แผนออกแบบตรงกับงานจริงแล้ว เพิ่มหน้าต้นไม้โฟกัสและความจริงจางข้ามชาติ…"]},{"v":"v0.6.116","items":["เบื้องหลัง: ตระกูลที่ข้ามโลกแล้ว (ค่าซ้อนทับมากกว่า 0) เริ่มจำญาติที่ตายไปก่อน…"]},{"v":"v0.6.115","items":["สายนายร้อย: การ์ดชีวิตช่วงเตรียมสอบเพิ่ม 10 ใบ เช่น ตัดผมทรงนักเรียนเตรียมทหารครั้งแรก…","สายนายร้อย: ประกาศผลรอบสุดท้ายบอกคะแนนรวมและลำดับที่ เทียบกับที่นั่งจริงของแต่ละเหล่า…","สายนายร้อย: สละที่นั่งแล้วยังมีการ์ดชวนกลับไปสอบใหม่ปีหน้า · เลิกสอบแล้ว…","การ์ดที่นัดไว้ในสายนายร้อยกินโควตากองการ์ดแค่ครึ่ง การ์ดทั่วไปไม่หายไปในปีเตรียมสอบ","หน้าแคตตาล็อกบอกว่าการ์ดแต่ละใบเข้าเกมเวอร์ชันไหน กดไปดูแพตช์โน้ตของเวอร์ชันนั้นได้","เบื้องหลัง: ด่านตรวจฉายา ความต่อเนื่อง และความเชื่อ ตัดสินแม่นขึ้น ไม่เปลี่ยนการเล่น"]},{"v":"v0.6.114","items":["สายนางงาม: จากเวทีงานวัดถึงรอบตอบคำถามระดับประเทศ ผู้หญิงที่ตั้งใจเดินสายมีโอกาสได้มงกุฎ","เหตุบ้านเมืองครั้งใหญ่เล่าต่างกันตามอาชีพและภาค ชาวสวนภาคใต้ คนงานโรงงาน พนักงานออฟฟิศ…"]},{"v":"v0.6.113","items":["สายนายร้อย: การ์ดช่วงเตรียมสอบที่แทบไม่เคยโผล่ (ค่ายวันเด็ก ตัดผมทรงนักเรียนเตรียมทหาร…","เรื่องที่นัดไว้ถี่ ๆ ไม่ทำให้การ์ดทั่วไปหายไปหลายปีติดกันอีก","ปีที่เปลี่ยนจากตู้โทรศัพท์เป็นมือถือในสายนายร้อยตรงกับยุคจริงขึ้น"]},{"v":"v0.6.112","items":["เบื้องหลัง: ด่านตรวจโซ่โลกซ้อนทับตัดสินจากหลายรอบสุ่ม และตัวตรวจเนื้อหาจับการ์ดกู้เงินที่…"]},{"v":"v0.6.111","items":["ตั้งแต่ชีวิตที่สองของเซฟ บ้านเมืองเริ่มมีเหตุการณ์ที่โลกจริงไม่เคยเกิด…"]},{"v":"v0.6.110","items":["หน้าเว็บใหม่ \"โฟกัส\" อธิบายโฟกัสทุกแบบในเกมพร้อมป้ายเดียวกับในเกม แยกออกจากหน้าวิธีเล่น…"]},{"v":"v0.6.109","items":["ห้องผู้พัฒนามีหน้าทดลองเมนูล่างและราวซ้ายแบบใหม่ (T4) ให้ลองปรับก่อนลงเกมจริง"]}];
+const APP_VERSION = "v0.6.164";
+const APP_BUILD = "2026-11-24";
+const RELEASE_NOTES = [{"v":"v0.6.164","items":["การ์ดวัยเด็ก 17 ใบมีภาพของตัวเองแล้ว เป็นชุดแรกของภาพประจำการ์ดทั่วไป…"]},{"v":"v0.6.163","items":["คนที่เจอและกำลังจีบเป็นคนมีชื่ออยู่นอกบ้าน จีบได้ทีละไม่เกินสองคน อายุ 18 ขึ้นไป…","เมื่อสืบสายเลือดต่อเป็นลูกหรือหลาน พี่น้องที่ยังมีชีวิตตามมาด้วยชื่อเดิม เป็นพี่ น้อง…","ศาสนาตอนเกิดต่างตามจังหวัด ทายาทและเซฟเก่าสืบศาสนาเดิม · คำปิดหน้าจบต่างตามศาสนา…"]},{"v":"v0.6.162","items":["คู่ครองมีสถานะ อยู่ด้วยกัน แยกกันอยู่ หรือหย่าแล้ว · คนที่คบอยู่ขึ้นเป็นแฟนในครอบครัว…","การ์ดแยกทาง คืนดี และหย่า · หย่าแล้วแบ่งสินสมรสและตกลงว่าลูกอยู่กับใคร…","อัตราหย่าต่างตามยุคที่แต่งงาน · สาเหตุแยกกันอยู่เพราะทำงานไกลกันต่างตามยุค","นอกใจได้ทั้งสองฝ่าย มีการ์ดล่อใจและอาจถูกจับได้ · ผู้ชายเจอการ์ดลูกที่ไม่ใช่ลูก…","หน้าครอบครัว: คู่ที่แยกกันอยู่ยังอยู่ในบ้านพร้อมป้ายแยกกันอยู่…"]},{"v":"v0.6.161","items":["ห้องผู้พัฒนาบอกวิธีเพิ่มงานกำลังทำให้ใส่ใต้หัวเฟสของงานนั้น…"]},{"v":"v0.6.160","items":["หัวกำลังทำและวางแผนไว้ในแพตช์โน้ตแบ่งตามเฟสที่จะทำ เรียงตามลำดับจริง แทนการแบ่งตามหมวดเดิม","แถวลิงก์บนสุดพาไปหัวเฟสที่มีงานกำลังทำอยู่"]},{"v":"v0.6.159","items":["หน้าห้องผู้พัฒนามีกล่องสถานะเฟสบนสุด บอกว่าเฟสไหนปิดแล้วและเฟสไหนกำลังทำ…","หัวกำลังทำในแพตช์โน้ตมีเรื่องลูกเป็นการตัดสินใจ และศาสนาตอนเกิด ที่เริ่มทำแล้ว"]},{"v":"v0.6.158","items":["เกษตรกรที่เป็นลมระหว่างทำงานแล้วกลับไปทำงานวันแรก จะเจอเจ้าของที่นาแทนผู้ใหญ่บ้าน","การ์ดแผงล็อตเตอรี่หน้าโต๊ะข้าวเที่ยงบอกว่าเพิ่งได้เงินมา ไม่ใช่เงินเดือน คนทำนา ช่าง…"]},{"v":"v0.6.157","items":["การ์ดวัยทำงานจากหมวดอื่น ๆ (เงิน เทคโนโลยี มุกตลก ข่าวยุค ความรัก สุขภาพ) เลิกพูดถึงแผนก…","การ์ดที่เป็นเรื่องในบริษัทล้วน ๆ จะออกเฉพาะคนที่ทำงานบริษัทหรือราชการ…","บางการ์ดเปลี่ยนคำตามอาชีพ เช่น ที่ทำงานของเกษตรกรเป็นไร่นา ของตำรวจเป็นโรงพัก…"]},{"v":"v0.6.156","items":["ชีวิตในประเทศไทยใช้ต้นไม้โฟกัสอย่างเดียวแล้ว โฟกัสแบบเดิม…","เป้าชีวิต: ปลดโหนดใหญ่หรือโหนดหักเหตัวแรกของแต่ละแขนงนับเป็นเป้าที่ทำสำเร็จ…","เซฟเก่าเล่นต่อได้ ประตูสายงานที่เคยเปิดยังเปิดอยู่ แต่ชื่อเป้าแบบเก่าจะไม่แสดงในการ์ดตายแ…","ทายาทในตระกูลไม่รับโฟกัสของรุ่นก่อนแล้ว แต่ได้นิสัยของพ่อแม่ติดตัวมาเล็กน้อยตั้งแต่เกิด"]},{"v":"v0.6.155","items":["ช่วงวัยชรา เมื่อรู้ว่าตัวเองป่วยเรื้อรังและหมอบอกผลตรวจแล้ว อาจเจอการ์ดใหม่…","การ์ดการงานแบบลูกจ้างบริษัท เช่น ถูกบริษัทคู่แข่งทาบทาม คำสั่งย้ายด่วน…","หัววางแผนไว้เพิ่มเรื่องมอนสเตอร์อีกฟากของเกต"]},{"v":"v0.6.154","items":["ในหน้าอัปเดตนี้ ป้ายยังคิดอยู่มีกรอบเส้นประและพื้นลายเฉียง แยกจากป้ายวางแผนไว้ได้ด้วยตา…","หัววางแผนไว้เพิ่มเรื่องเลือกโฟกัสในวงปรโลก"]},{"v":"v0.6.153","items":["ในการ์ดทอดผ้าป่า (วัยทำงาน) มีตัวเลือกใหม่ ร่วมสร้างศาลาให้วัด…"]},{"v":"v0.6.152","items":["แก้ข้อความแผนข้างหน้าให้ตรงกับที่ตัดสินแล้ว 3 เรื่อง คือ การเมืองไต่บันได หลักไมล์ต่อสาย…"]},{"v":"v0.6.151","items":["หัววางแผนไว้เพิ่มอีก 20 เรื่องจากการไล่คำตัดสินของเรื่องรับเลี้ยง ต้นไม้โฟกัส หน้าจอ…","เรื่องที่ยังไม่ตัดสินใจติดป้ายยังคิดอยู่ 3 เรื่อง คือ ต้นไม้โฟกัสนอกชาติไทย…","แก้ข้อความเก่าที่ไม่ตรงแล้ว 4 จุด เช่น ผู้นำท้องถิ่น และสถานะของต้นไม้โฟกัส"]},{"v":"v0.6.150","items":["หัววางแผนไว้เพิ่มอีก 14 เรื่องจากการไล่คำตัดสินที่ค้างทั้งหมด เช่น นรกแปดขุม…","เรื่องที่ยังไม่ตัดสินใจติดป้ายยังคิดอยู่ 3 เรื่อง คือ บุญจากเงินโกง ยมบาลผลัดกะ…"]},{"v":"v0.6.149","items":["หัววางแผนไว้เพิ่ม 21 เรื่องที่คิดและเคาะไว้แต่ยังไม่เคยบอก เช่น สายอาชีพใหม่…","เรื่องที่ยังไม่ตัดสินใจว่าจะทำแบบไหนติดป้ายยังคิดอยู่ แยกจากเรื่องที่วางแผนไว้แล้ว"]},{"v":"v0.6.148","items":["หน้าอัปเดตล่าสุดเพิ่มรายการวางแผนไว้ 15 ข้อ เช่น โหมดเล่นด่วน งานแต่งไม่ซ้ำกัน…","เรื่องม่านระหว่างโลก เกตและดันเจียนในไทย และอาชีพนักล่า ย้ายจากกำลังทำไปอยู่วางแผนไว้…"]},{"v":"v0.6.147","items":["การ์ดวัยทำงานเรียกที่ทำงานและหัวหน้าตามอาชีพและขั้นงานของตัวละคร…","การ์ดทบทวนเงินเก็บมีแถวเลือกใช้จ่ายแบบประหยัด ปกติ หรือหรูหรา…","ระบบตรวจของทีมพัฒนามีด่านนับการ์ดวัยทำงานที่ไม่ตรงสายอาชีพ…","แก้ตัวตรวจบุญบาปที่จับคำว่า since ในชื่อสมาชิกครอบครัวผิดเป็นบาป"]},{"v":"v0.6.146","items":["ตัวเลือกที่เคยซ่อนจนกว่าจะทุ่มเทกับทางนั้น เช่น เปิดร้าน ลงการเมือง บวช และเรื่องลึกลับ…"]},{"v":"v0.6.145","items":["การ์ดติดป้ายได้ว่าเป็นจุดเปลี่ยนของชีวิตหรือเป็นเรื่องเศร้า…"]}];
+const ART_SRC = "play-art.js?h=bd0e9aa866";
 const CONTENT = self.NL_CONTENT;
 // mulberry32: เล็ก เร็ว และให้ลำดับเดิมทุกครั้งเมื่อ seed เท่ากัน (แทน Math.random ที่ตั้ง seed ไม่ได้)
 function makeRng(seed) {
@@ -27,6 +28,44 @@ function makeRng(seed) {
 function mixSeed(seed, i) {
   return (Math.imul(seed >>> 0, 1000003) + Math.imul(i + 1, 2654435761)) >>> 0;
 }
+
+// สวิตช์ DLC 4 ก้อน — ซ่อนของที่อยู่ในเกมแล้วหลังสวิตช์ โค้ดคงอยู่ · เงื่อนไขปลดอยู่ท้ายไฟล์ (dlcEarn)
+// st.dlc ใส่ช่องเฉพาะเมื่อมีก้อนล็อก ⇒ ชีวิตที่ปลดครบ (ค่าเริ่มของด่าน · เซฟเก่า) ได้สถานะเท่าเดิมทุกไบต์
+const DLC_KEYS = ['afterlife', 'isekai', 'overlap', 'dungeon'];
+const DLC_OPEN = Object.freeze(Object.fromEntries(DLC_KEYS.map((k) => [k, true])));
+const DLC_LOCKED = Object.freeze(Object.fromEntries(DLC_KEYS.map((k) => [k, false])));
+
+// ค่าที่ชีวิตใหม่ที่ไม่มีทายาทใช้ตอนเกิด · ด่านค่าเริ่ม = ปลดหมด · UI ตั้งจากสมุดระดับเครื่องก่อนเริ่มตระกูล
+let dlcDefault = DLC_OPEN;
+const setDlcDefault = (dlc) => {
+  dlcDefault = { ...DLC_OPEN, ...dlc };
+};
+const getDlcDefault = () => dlcDefault;
+
+// ชีวิตที่ไม่มีช่อง dlc = เกิดตอนปลดครบ (เซฟเก่า ทายาทของตระกูลเก่า) — ล็อกทีหลังไม่ดึงของที่เคยเล่นกลับ
+const dlcOpen = (st, key) => (st?.dlc ? st.dlc[key] === true : true);
+
+// ช่องที่เก็บลง st · ปลดครบ = undefined ให้ผู้เรียกไม่ใส่ช่อง
+const dlcStamp = (dlc) => (dlc && DLC_KEYS.some((k) => dlc[k] === false) ? { ...DLC_OPEN, ...dlc } : undefined);
+
+// ด่านตายตัว (NL_DLC=locked): ล็อกแล้วไม่ปลดเอง ไม่งั้นชุดล็อกของใบ 02 กลายเป็นชุดที่ปลดไปเรื่อย ๆ
+let dlcFrozen = false;
+const setDlcFrozen = (on) => {
+  dlcFrozen = !!on;
+};
+
+// เงื่อนไขปลด: ก้อน N ปลดได้เมื่อก้อน N-1 ปลดแล้ว ตั้งแต่ต้นชีวิตนี้ (ได้ระหว่างชีวิต/ปรโลก = จดไว้ มีผลรอบหน้า ไม่แตะชีวิตที่กำลังเล่น)
+// คืน true เมื่อเพิ่งได้ใหม่ · ผู้เรียกแจ้งผู้เล่นและเขียนค่าเครื่อง
+function dlcEarn(st, key) {
+  const i = DLC_KEYS.indexOf(key);
+  if (dlcFrozen || i < 0 || dlcOpen(st, key) || st.dlcEarned?.includes(key)) return false;
+  if (i > 0 && !dlcOpen(st, DLC_KEYS[i - 1])) return false;
+  (st.dlcEarned ??= []).push(key);
+  return true;
+}
+
+// สถานะที่ชีวิตถัดไปรับ: ของชีวิตนี้ + ที่เพิ่งได้ + ค่าเครื่อง (ปลดจากตระกูลอื่นในเครื่องเดียวกันแล้ว ตระกูลนี้ได้ด้วย)
+const dlcNext = (st) => Object.fromEntries(DLC_KEYS.map((k) => [k, dlcOpen(st, k) || !!st.dlcEarned?.includes(k) || dlcDefault[k] === true]));
 
 // ข้อมูลยุคในรูปที่แกนเกมใช้ (สร้างจาก data/*.json โดย src/node/load.mjs) — ฟังก์ชันล้วน ไม่แตะ DOM/ไฟล์
 const MAX_AGE = 120;
@@ -182,6 +221,33 @@ function pickProvince(rng, birth, regionName) {
   return list[list.length - 1].name;
 }
 
+// ศาสนาตอนเกิด (B93) ตามจังหวัดเกิด — ผู้เรียกส่ง rng แยกเสมอ · ไม่มีตารางในข้อมูล = ค่าเริ่มต้น ไม่ดึงเลขสุ่ม
+// birth.religion = { default, provinces: { <จังหวัด>: { <ศาสนา>: น้ำหนัก } } } · จังหวัดที่ไม่อยู่ในตาราง = default
+function pickReligion(rng, birth, province) {
+  const t = birth.religion;
+  if (!t) return DEFAULT_RELIGION;
+  const row = t.provinces?.[province];
+  if (!row) return t.default ?? DEFAULT_RELIGION;
+  const list = Object.entries(row);
+  let r = rng.next() * list.reduce((s, [, w]) => s + w, 0);
+  for (const [name, w] of list) {
+    r -= w;
+    if (r < 0) return name;
+  }
+  return list[list.length - 1][0];
+}
+
+const DEFAULT_RELIGION = 'พุทธ';
+
+// คำปิดหน้าจบ (B93) ศาสนาละ 1 ชุด · ไม่มีภาพ/คำตัดสินปรโลก · ศาสนานอกรายการใช้ชุด 'อื่น ๆ'
+const RELIGION_CLOSING = {
+  พุทธ: 'ชีวิตนี้จบลงแล้ว สิ่งที่ทำไว้ยังอยู่กับคนที่เหลือ',
+  อิสลาม: 'อินนาลิลลาฮิ วะอินนา อิลัยฮิ ราจิอูน — เราเป็นของพระเจ้า และสู่พระองค์เราจะกลับไป',
+  คริสต์: 'ขอให้เขาหลับในความสงบ คนที่รักเขายังจดจำ',
+  'อื่น ๆ': 'ชีวิตหนึ่งจบลง คนที่อยู่ต่อยังจดจำเขา',
+};
+const closingOf = (religion) => RELIGION_CLOSING[religion] ?? RELIGION_CLOSING['อื่น ๆ'];
+
 // ชื่อจังหวัดบนจอ: กรุงเทพฯ ไม่ใช่ "จังหวัด" จึงไม่นำหน้า จ.
 const placeName = (province) => (province === 'กรุงเทพมหานคร' ? province : `จ.${province}`);
 
@@ -243,8 +309,8 @@ const pickRealName = (seed, sex, birthYear, names) => makeRng(seed ^ 0x2c4e1a77)
 
 
 
-const KIN_ROLES = ['spouse', 'child', 'grandchild'];
-const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น' };
+const KIN_ROLES = ['partner', 'spouse', 'child', 'grandchild'];
+const FAMILY_ROLE_NAMES = { parent: 'พ่อแม่', partner: 'แฟน', spouse: 'คู่ครอง', child: 'ลูก', grandchild: 'หลาน', pet: 'สัตว์คู่ใจ', sibling: 'พี่น้อง', herd: 'ฝูงสัตว์', peer: 'เพื่อนรุ่น', courter: 'คนจีบ' };
 // ธงเดิมที่เนื้อหาอ่านอยู่ ↔ บทบาทที่ธงนั้นหมายถึง · ตั้งธงจากตัวเลือก = มีสมาชิกคนนั้นเพิ่มขึ้นจริง
 const KIN_FLAG_ROLE = { married: 'spouse', has_kids: 'child', raised_grandkids: 'grandchild' };
 // ลูกที่โตแล้วมีหลานให้เองปีละโอกาสนี้ ช่วงอายุนี้ ไม่เกินจำนวนนี้ต่อคน — ค่าตั้งของเกม (ไม่มีข้อมูลเจริญพันธุ์รายยุคในชุดข้อมูล)
@@ -252,12 +318,12 @@ const GRANDKID = { from: 22, to: 40, chance: 0.08, max: 3 };
 // คู่ครองอายุห่างจากเราได้เท่านี้ (ปีเกิด) · ค่าตั้งของเกม
 const KIN_SPOUSE_GAP = [-5, 5];
 // pet · herd (B44) · peer (B43) เป็นสมาชิกได้ แต่ไม่ใช่ทายาท ไม่ตั้งธง ไม่มีหลาน — สัตว์ตายตามอายุขัยของชนิด เพื่อนรุ่นตายตามตารางชีพแบบคน
-const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer'];
+const KIN_EXTRA_ROLES = ['pet', 'herd', 'peer', 'courter', 'sibling'];
 // คนในบ้าน = คนที่การ์ดครอบครัวดูแลถึง และคนที่นับว่า "ยังมีใคร" ตอนแก่ · เพื่อนรุ่นไม่นับ
-const KIN_HOUSEHOLD = ['spouse', 'child', 'grandchild', 'pet'];
+const KIN_HOUSEHOLD = ['partner', 'spouse', 'child', 'grandchild', 'pet'];
 
 // ความผูกพันรายคน 0–100 (B36a2): ปีที่ไม่ได้ดูแลลดเอง 1 แต่การลดเองไม่พาต่ำกว่า floor — ผลร้ายจากเนื้อหาพาต่ำกว่าได้
-const BOND_START = { parent: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50 };
+const BOND_START = { parent: 70, partner: 70, spouse: 70, child: 75, grandchild: 60, pet: 65, herd: 50, peer: 50, courter: 50, sibling: 60 };
 const BOND_FLOOR = 38;
 const BOND_LEVELS = [[80, 'ผูกพัน'], [60, 'สนิท'], [40, 'คุ้นเคย'], [20, 'เฉย ๆ'], [0, 'ห่างเหิน']];
 // การ์ดหมวด family ที่ตัวเลือกให้ความสัมพันธ์บวก = ดูแลคนในบ้านปีนั้น · bond ขึ้นเท่านี้ต่อระดับความสัมพันธ์ (1–3)
@@ -266,6 +332,16 @@ const BOND_CARE_PER_REL = 2;
 const KIN_AID = { from: 60, base: 50, span: 120, scale: 0.5, roles: ['spouse', 'child', 'grandchild'] };
 // แก่แล้วไม่เหลือคนในบ้านที่ยังอยู่ (คู่ ลูก หลาน สัตว์คู่ใจ) = เสียความสุข/สุขภาพต่อปี · ไม่ดึงเลขสุ่ม — ค่าตั้งของเกม (B167)
 const KIN_LONELY = { from: 65, happiness: 2, health: 0.3 };
+// ลูกอยู่ไกล (m.far): ยังเป็นคนในบ้านทุกเรื่อง ต่างจาก left ที่หลุดจากธง has_kids การ์ดเรียกชื่อ ญาติช่วย และความเหงา
+// ความผูกพันลดเพิ่มปีละเท่านี้ แม้ปีนั้นได้ดูแล · ไม่ทะลุ BOND_FLOOR
+const KIN_FAR = { decay: 2 };
+// ลูกหลังหย่าที่อยู่กับอีกฝ่าย (ใบ 92 ข้อ 154): ผูกพันกับเราจางเพิ่มปีละเท่านี้ · ไม่ทะลุ BOND_FLOOR · ยังเป็นทายาท
+const KIN_CUSTODY = { decay: 2, minorUntil: 18 };
+// หย่าแบ่งสินสมรส (ใบ 92 ข้อ 153 · AI ตัดสิน "แบ่งครึ่ง"): ส่วนสมรส = เงินที่งอกจากปีเริ่มอยู่ด้วยกัน (trail) ถึงวันหย่า · เสียสัดส่วนนี้ของส่วนนั้น
+const DIVORCE_SPLIT = 0.5;
+// ลูกไม่ใช่ลูก (ใบ 95 ข้อ 149 166): ผู้เล่นชายเท่านั้น · ลูกที่เกิดช่วงคู่นอกใจ (ปีเกิด − ปีที่จด spouse_cheated อยู่ใน [-before, after]) มีโอกาส p ที่ไม่ใช่ลูกทางสายเลือดของเรา
+// ทอยจาก seed+id ไม่ดึง kinRng · paternity: 'kept' ยังเป็นลูกเรา (ผูกพันขึ้น keepBond) · 'cut' ตัดขาด (ผูกพันตกเหลือ cutTo) · ทั้งสองทางทายาทเท่าเดิม ต่างแค่ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา
+const NOT_MINE = { p: 0.3, before: 1, after: 2, keepBond: 4, cutTo: 15 };
 // เราดูแลพ่อแม่แบบไหน (B167) — ตัวเลือกการ์ดดูแลพ่อแม่ติด filial · จดเฉพาะชีวิตนี้ ไม่ส่งต่อรุ่น
 // way = วิธีครั้งล่าสุด (การ์ดชราให้ลูกทำแบบเดียวกัน) · score = บุญดูแลพ่อแม่ − บาปทำร้ายผู้ใหญ่ ตามระดับของตัวเลือก
 // ถึงอายุ at ลูกที่ยังอยู่ได้ bond ± step × score (ไม่เกิน cap) — ลูกที่เห็นเราดูแลพ่อแม่ผูกพันกับเรามากขึ้น · kinAid ทำงานต่อเอง
@@ -312,6 +388,16 @@ const bondLabel = (b) => BOND_LEVELS.find(([min]) => b >= min)[1];
 const bondClamp = (b) => Math.max(0, Math.min(100, b));
 
 const kinOtherSex = (sex) => (sex === 'ชาย' ? 'หญิง' : 'ชาย');
+// อัตลักษณ์: ค่าเดียวที่เปิด (เจ้าของเคาะ decisions 423) · ได้จากการ์ดวัยรุ่นที่ผู้เล่นเลือก · ไม่มีช่อง = ตามเพศกำเนิด (ชีวิตเดิม/เซฟเก่าเท่าเดิม)
+// birth = เพศกำเนิดที่ตั้งค่านี้ได้ (lint ตรวจ when.sex ของการ์ดที่ตั้ง) · partner = เพศของคู่ · ตารางชีพยังตามเพศกำเนิด
+const BIRTH_IDENTITY = 'ตามเพศกำเนิด';
+const IDENTITY = { หญิงข้ามเพศ: { birth: ['ชาย'], partner: 'ชาย', speech: 'หญิง' } };
+const IDENTITIES = [BIRTH_IDENTITY, ...Object.keys(IDENTITY)];
+const identityOf = (st) => st.identity ?? BIRTH_IDENTITY;
+// เพศที่ตัวละครใช้พูดถึงตัวเอง (คำลงท้าย · สรรพนาม) — อัตลักษณ์ทับเพศกำเนิด
+const speechSex = (st) => IDENTITY[st.identity]?.speech ?? st.sex;
+// ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่มีอัตลักษณ์ได้คู่ต่างเพศกำเนิดเหมือนเดิมทุกหลัก
+const partnerSex = (st) => IDENTITY[st.identity]?.partner ?? kinOtherSex(st.sex);
 const kinInRange = (v, r) => !r || (v >= r[0] && v <= r[1]);
 const kinYearOf = (st) => st.birthYear + st.age;
 const memberAge = (st, m, year = kinYearOf(st)) => (m.alive ? year - m.born : m.diedAge);
@@ -321,7 +407,7 @@ function newKin(seed) {
 }
 
 // ชื่อทุกคนในบ้าน (รวมรุ่นก่อนในผังตระกูล) — ชื่อใหม่เลี่ยงชุดนี้
-const kinTakenNames = (st) => [st.name, ...st.parents.map((p) => p.name), ...st.kin.map((m) => m.name), ...(st.lineage ?? []).map((l) => l.name)].filter(Boolean);
+const kinTakenNames = (st) => [st.name, ...st.parents.map((p) => p.name), ...st.kin.flatMap((m) => [m.name, m.mate]), ...(st.lineage ?? []).map((l) => l.name)].filter(Boolean);
 
 // พ่อแม่ที่ยังไม่มีชื่อ (ชีวิตแรก/ทางเกิดใหม่) ได้ชื่อจาก seed ตามยุคปีเกิดของเขา — ไม่ดึงเลขสุ่ม ไม่แตะชื่อผู้เล่น
 function nameParents(st) {
@@ -332,20 +418,41 @@ function nameParents(st) {
 }
 
 // extra: of (หลาน = id ลูกที่เป็นพ่อแม่) · สัตว์เลี้ยง kind (ชนิด) + life [จาก, ถึง] (อายุขัยของชนิด) + name? (เนื้อหาตั้งให้ · ไม่ตั้ง = เรียกตามชนิด)
+// แฟน (ใบ 90) เข้ามากลางชีวิตได้โดยไม่ขยับลำดับสุ่ม/ชื่อของคนที่มาทีหลัง: id นับแยก (OWN_ID_BASE+) · ปีเกิด/ทอยตายใช้สุ่มจาก seed+id+ปี ไม่ใช่ kinRng/kinCauseRng · own = ติดตัวไปตลอดแม้แต่งแล้วเปลี่ยนบทเป็นคู่
+const OWN_ID_BASE = 10000;
+// พี่น้องของทายาท (ใบ tld14): id นับแยกอีกชุด + ผลสุ่มตายจาก seed+id ไม่ใช่ kinRng/kinCauseRng — เลขสุ่มของคนในบ้านจึงเท่ากับชีวิตที่ไม่มีพี่น้อง
+const SIB_ID_BASE = 20000;
+const ownRoll = (st, m, year, salt) => makeRng(mixSeed(st.seed ^ salt, m.id * 1000 + (year % 1000)));
 function addMember(st, role, extra = {}) {
   const year = kinYearOf(st);
-  const id = ++st.kinSeq;
+  // จีบซ้อนได้ไม่เกิน COURT_MAX คน (ใบ 172 ข้อ 307) · คนที่ 3 ไม่เข้า
+  if (role === 'courter' && livingOf(st, 'courter').length >= COURT_MAX) return null;
+  const own = role === 'partner' || role === 'courter' || role === 'sibling';
+  const id = role === 'sibling' ? SIB_ID_BASE + (st.sibSeq = (st.sibSeq ?? 0) + 1) : own ? OWN_ID_BASE + (st.ownSeq = (st.ownSeq ?? 0) + 1) : ++st.kinSeq;
   // สัตว์ติดบ้าน/ส่งต่อทายาทส่ง sex born maxAge มาเอง — ไม่ดึง kinRng ลำดับสุ่มของคนในบ้านจึงไม่ขยับ
-  const sex = extra.sex ?? (role === 'spouse' ? kinOtherSex(st.sex) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
-  const born = extra.born ?? (role === 'spouse' ? st.birthYear + st.kinRng.int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
+  const mate = role === 'spouse' || role === 'partner' || role === 'courter';
+  const sex = extra.sex ?? (mate ? partnerSex(st) : st.kinRng.next() < 0.5 ? 'ชาย' : 'หญิง');
+  const born0 = extra.born ?? (mate ? st.birthYear + (own ? makeRng(mixSeed(st.seed ^ 0x7a10, id)) : st.kinRng).int(...KIN_SPOUSE_GAP) : role === 'peer' ? st.birthYear : year);
+  // คนจีบต้องถึงเกณฑ์แฟน (≥18) เท่าผู้เล่น (ข้อ 309) · ย้ายปีเกิดหลังสุ่มแล้ว ไม่ดึงเลขเพิ่ม
+  // คู่ ≥20 ตอนแต่ง (ข้อ 309 · K4 เจ้าของเคาะ 11-23): ปีเกิดที่สุ่มได้ถูกย้ายให้ไม่น้อยกว่าเกณฑ์ ไม่ดึงเลขสุ่มเพิ่ม · ปีเกิดที่ส่งมาเอง (ทายาท) ไม่แตะ
+  const born = role === 'courter' ? Math.min(born0, year - COURT_MIN.partner) : role === 'spouse' && extra.born === undefined ? Math.min(born0, year - COURT_MIN.spouse) : born0;
   // ชื่อคู่ใจสุ่มจาก seed+id ไม่ดึงเลข · ฝูงไม่มีชื่อ
-  const name = role === 'herd' ? null : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
-  const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: extra.bond ?? BOND_START[role] };
+  const name = role === 'herd' ? null : role === 'sibling' && extra.name ? extra.name : role === 'pet' ? (extra.name ?? petName(st, extra.kind, id)) : pickName(mixSeed(st.seed, 0x4b1d + id), sex, born, st.content.era.names, kinTakenNames(st));
+  const m = { id, role, sex, born, alive: true, diedAge: null, name, bond: extra.bond ?? BOND_START[role], ...(own && { own: true }) };
   if (ANIMAL.includes(role)) {
     m.kind = extra.kind;
     m.maxAge = extra.maxAge ?? st.kinRng.int(...extra.life);
   }
-  if (role === 'child') m.order = st.kin.filter((x) => x.role === 'child').length + 1;
+  // อายุของเราตอนคู่เข้าบ้าน — ให้แผงบอก "อยู่ด้วยกัน N ปี" ของคู่เก่า · เซฟก่อนมีช่องนี้ไม่มี since
+  if (mate) m.since = st.age;
+  // คนจีบ (ใบ 172 ขั้น 2): เจอ → จีบ → แฟน เดินด้วยนัดล่วงหน้า (ปีที่ครบกำหนดสุ่มจาก seed+id ไม่ดึง kinRng) · extra.after = [น้อย, มาก] ปีถึงขั้นถัดไป
+  if (role === 'courter') { m.stage = 'met'; courtDue(st, m, extra.after); }
+  if (role === 'child') {
+    m.order = st.kin.filter((x) => x.role === 'child').length + 1;
+    // พ่อ/แม่อีกคน (ใบ 91 ข้อ 149 154 166): id ของคู่ปัจจุบันตอนลูกเกิด · null = ไม่มีคู่ (พ่อ/แม่เลี้ยงเดี่ยว) · ลูกจากเซฟเก่าไม่มีช่อง by = คิดย้อนจากปีเกิด (parentSpouseOf)
+    m.by = spouseOf(st)?.id ?? null;
+    if (notMineBorn(st, m)) m.notMine = true;
+  }
   if (role === 'grandchild') {
     // หลานจากเนื้อหา (รับหลานมาเลี้ยง) เป็นลูกของลูกที่ยังอยู่ ถ้ามี — ไม่มีลูกเหลือ = ไม่ระบุพ่อแม่
     const kids = st.kin.filter((x) => x.role === 'child' && x.alive);
@@ -357,7 +464,125 @@ function addMember(st, role, extra = {}) {
   return m;
 }
 
+// เงินของเราตอนคู่เข้าบ้าน (จาก trail รายปี) · ไม่มี since/trail (เซฟเก่า) = ไม่แบ่ง · ฐานติดลบนับ 0 · ไม่งอก = ไม่เสีย
+function splitMarital(st, m) {
+  if (m.since === undefined || !st.trail) return;
+  const at = st.trail.find((p) => p.year === st.birthYear + m.since);
+  if (!at) return;
+  const grew = st.money - Math.max(0, at.money);
+  if (st.money > 0 && grew > 0) st.money -= grew * DIVORCE_SPLIT;
+}
+// เงื่อนไขการ์ดตามคู่ปัจจุบัน (when.spouse): status = together|apart · bond [lo,hi] · together [lo,hi] ปีที่อยู่ด้วยกัน · apart [lo,hi] ปีที่แยกทางมาแล้ว · wed [lo,hi] ปี พ.ศ. ที่แต่งกับคู่นี้ (birthYear + since)
+// คู่ที่หย่าแล้วไม่นับ · เซฟเก่าไม่มี since/leftAge = เงื่อนไขช่วงปีไม่ผ่าน
+function spouseOk(st, w) {
+  const m = (st.kin ?? []).findLast((x) => x.role === 'spouse' && x.alive && spouseStatus(x) !== 'divorced');
+  if (!m) return false;
+  if (w.status && spouseStatus(m) !== w.status) return false;
+  if (w.bond && !kinInRange(m.bond ?? BOND_START.spouse, w.bond)) return false;
+  if (w.wed && (m.since === undefined || !kinInRange(st.birthYear + m.since, w.wed))) return false;
+  if (w.together && (m.left || m.since === undefined || !kinInRange(st.age - m.since, w.together))) return false;
+  if (w.apart && (spouseStatus(m) !== 'apart' || m.leftAge === undefined || !kinInRange(st.age - m.leftAge, w.apart))) return false;
+  return true;
+}
+
+// ลูกที่เกิดช่วงคู่นอกใจและทอยได้ว่าไม่ใช่ลูกเรา (ใบ 95) · เซฟก่อนมีช่องไม่มี notMine = ลูกเราทั้งหมด
+function notMineBorn(st, m) {
+  const at = st.flagAge?.spouse_cheated;
+  if (st.sex !== 'ชาย' || !st.flags.spouse_cheated || at === undefined || m.by === null) return false;
+  const d = st.age - at;
+  return d >= -NOT_MINE.before && d <= NOT_MINE.after && makeRng(mixSeed(st.seed ^ 0x95c1, m.id)).next() < NOT_MINE.p;
+}
+// when.child_not_mine = {age?: [lo, hi]} — ลูกที่ยังอยู่ ไม่ใช่ลูกเรา ยังไม่ได้ตัดสิน (ไม่มี paternity) · การ์ดเรียกลูกคนนั้น (โตสุดก่อน ไม่ดึงเลขสุ่ม)
+const childNotMineList = (st, w) => st.kin.filter((m) => m.role === 'child' && m.alive && !m.left && m.notMine && !m.paternity && kinInRange(kinYearOf(st) - m.born, w.age));
+const childNotMineOk = (st, w) => childNotMineList(st, w).length > 0;
+function focusChildNotMine(st, w) {
+  const m = childNotMineList(st, w)[0];
+  if (m) st.kinFocus.child = m.id;
+}
+
+// when.ex_spouse = {within: [lo, hi]} — คู่เก่าที่หย่าแล้วและยังอยู่ · หย่ามาแล้ว lo–hi ปี · เรายังโสด (ไม่มีคู่/แฟนอยู่ในบ้าน) · คืนดีได้ครั้งเดียวต่อชีวิต m.reunited (ใบ 97)
+// spouseOk ตัดคู่ที่หย่าทิ้ง จึงมีฟังก์ชันของตัวเอง · การ์ดเรียกคู่เก่าล่าสุด ไม่ดึงเลขสุ่ม
+const exSpouseOf = (st, w) => {
+  if (st.kin.some((m) => m.reunited !== undefined)) return null;
+  if (st.kin.some((m) => (m.role === 'spouse' && m.alive && !isDivorced(m)) || (m.role === 'partner' && m.alive && !m.left))) return null;
+  const m = st.kin.findLast((x) => x.role === 'spouse' && x.alive && isDivorced(x));
+  return m && m.divorcedAge !== undefined && kinInRange(st.age - m.divorcedAge, w.within) ? m : null;
+};
+const exSpouseOk = (st, w) => exSpouseOf(st, w) !== null;
+function focusExSpouse(st, w) {
+  const m = exSpouseOf(st, w);
+  if (m) st.kinFocus.spouse = m.id;
+}
+
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
+// สถานะคู่ (ใบ 89 B114 ข้อ 145 164): together อยู่ด้วยกัน · apart แยกทาง (ยังมีคู่ตามกฎหมาย แต่งใหม่ไม่ได้) · divorced หย่า · ม่าย = ตายแล้วและไม่ได้หย่า (derived)
+// ไม่มีช่อง = together (เซฟเก่า) · หย่าแล้วไม่นับเป็นคู่ในงานศพ/จดหมาย/ผู้ถูกหยิบเป็นพ่อแม่ทายาท และคู่ที่หย่าแล้วตายไม่ลงบันทึกสูญเสีย
+const spouseStatus = (m) => m.status ?? 'together';
+const isDivorced = (m) => m.role === 'spouse' && m.status === 'divorced';
+// พ่อ/แม่อีกคนของลูก (รวมคู่ที่หย่าไปแล้ว — เขายังเป็นพ่อ/แม่) · ลูกที่จด by ใช้ตามนั้น · เซฟเก่าไม่มี by = คู่ที่อยู่ตอนลูกเกิด (since ล่าสุดที่ไม่เกินอายุเราตอนลูกเกิด) ไม่เจอก็คู่ล่าสุด · ไม่มีคู่เลย = null
+function parentSpouseOf(st, child) {
+  const rows = (st.kin ?? []).filter((m) => m.role === 'spouse');
+  if (child?.by !== undefined) return rows.find((m) => m.id === child.by) ?? null;
+  if (!rows.length) return null;
+  const at = child.born - st.birthYear;
+  return rows.findLast((m) => (m.since ?? 0) <= at) ?? rows.at(-1);
+}
+// บทแฟน (ใบ 90 ข้อ 146 165): partner = คนมีชื่อในบ้าน ไม่ใช่สถานะของคู่ · เลิกกัน = status ex (ออกจากบ้าน · ชื่อยังอ้างได้) · แต่งกับแฟน = คนเดิมเปลี่ยนบทเป็น spouse
+const isEx = (m) => m.role === 'partner' && m.status === 'ex';
+const exPartnerOf = (st) => (st.kin ?? []).findLast((m) => isEx(m)) ?? null;
+// เกณฑ์อายุขั้นความสัมพันธ์ (ข้อ 309): แฟน ≥18 · คู่ ≥20 ทั้งผู้เล่นและอีกฝ่าย · จีบซ้อนพร้อมกัน ≤2 (ข้อ 307)
+const COURT_MIN = { partner: 18, spouse: 20 };
+const COURT_MAX = 2;
+const COURT_STAGES = ['met', 'courting'];
+const COURT_STEP_YEARS = [1, 2];
+// นัดขั้นถัดไปของคนจีบ: สุ่มจำนวนปีจาก seed+id+ปีที่นัด ไม่ใช่ kinRng/rng ชีวิต — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
+function courtDue(st, m, after = COURT_STEP_YEARS) {
+  m.due = st.age + ownRoll(st, m, kinYearOf(st), 0xc5ed).int(after[0], after[1]);
+}
+// เดินขั้นคนจีบปีละครั้ง (เรียกใน ageKin): ครบกำหนด met→courting→แฟน (becomePartner · เข้าบ้านตอนเป็นแฟนตามข้อ 305) · ขอแต่งเป็นของการ์ด/ใบ 173
+function stepCourtship(st) {
+  for (const m of st.kin) {
+    if (m.role !== 'courter' || !m.alive || m.left || m.due === undefined || st.age < m.due) continue;
+    if (m.stage === 'met') {
+      m.stage = 'courting';
+      courtDue(st, m);
+    } else if (m.stage === 'courting') {
+      // ยังไม่ถึงเกณฑ์แฟนทั้งสองฝ่าย = รอปีหน้า
+      if (st.age < COURT_MIN.partner || kinYearOf(st) - m.born < COURT_MIN.partner) { m.due = st.age + 1; continue; }
+      delete m.stage;
+      delete m.due;
+      becomePartner(st, m);
+    }
+  }
+}
+// รับคนที่มีอยู่แล้วนอกบ้าน (เช่น courter ของใบ 172 · peer) เป็นแฟน: id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบจากอายุตอนนี้ · ไม่ดึงเลขสุ่ม · คนในบ้านอยู่ในหมวดคู่/แฟนอยู่แล้ว = ไม่ทำอะไร
+function becomePartner(st, m) {
+  if (!m || !m.alive || m.role === 'partner' || m.role === 'spouse') return null;
+  // เลือกคนเดียวเป็นแฟน คนจีบที่เหลือหลุด (ข้อ 307) · ออกจากรายชื่อคนจีบแต่ชื่อยังอยู่ในบันทึก
+  for (const o of st.kin) if (o !== m && o.role === 'courter' && o.alive && !o.left) { o.left = true; o.leftAge = st.age; o.status = 'dropped'; }
+  m.role = 'partner';
+  m.since = st.age;
+  m.bond = m.bond ?? BOND_START.partner;
+  delete m.left;
+  delete m.leftAge;
+  delete m.status;
+  return m;
+}
+function marryPartner(st, m) {
+  m.born = Math.min(m.born, kinYearOf(st) - COURT_MIN.spouse);
+  m.dated = { since: m.since, ...(m.endedBy && { endedBy: m.endedBy }) };
+  m.role = 'spouse';
+  m.since = st.age;
+  delete m.status;
+  delete m.endedBy;
+  delete m.left;
+  delete m.leftAge;
+}
+// คู่ปัจจุบัน: อยู่ด้วยกัน > แยกทาง > ม่ายล่าสุด · ไม่รวมคู่ที่หย่า · ไม่มี = null
+function spouseOf(st) {
+  const rows = (st.kin ?? []).filter((m) => m.role === 'spouse' && !isDivorced(m));
+  return rows.findLast((m) => m.alive && !m.left) ?? rows.findLast((m) => m.alive) ?? rows.at(-1) ?? null;
+}
 // ลูกที่ยังมีชีวิต นับแบบเดียวกับที่ afterlife.mjs หารมรดก (ย้ายออกไปแล้วยังเป็นทายาท) · ไม่มีระบบครอบครัว = null
 const livingChildren = (st) => (st.kin ? st.kin.filter((m) => m.role === 'child' && m.alive).length : null);
 
@@ -365,10 +590,13 @@ const livingChildren = (st) => (st.kin ? st.kin.filter((m) => m.role === 'child'
 // ทอยเฉพาะบทบาทที่มีคนให้เลือก ≥2 — ชีวิตที่ไม่มีครอบครัว/มีคนเดียวไม่ดึงเลข
 function pickFocus(st) {
   st.kinFocus = {};
-  for (const role of ['spouse', 'child', 'grandchild', 'pet', 'herd']) {
+  for (const role of ['partner', 'spouse', 'child', 'grandchild', 'pet', 'herd']) {
     const live = livingOf(st, role);
     if (live.length) st.kinFocus[role] = (live.length > 1 ? live[st.kinRng.int(0, live.length - 1)] : live[0]).id;
   }
+  // คนจีบ (ใบ 172): จีบพร้อมกัน ≥2 คน เลือกคนเป้าจาก seed+ปีของเรา ไม่ดึง kinRng — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
+  const courting = livingOf(st, 'courter');
+  if (courting.length) st.kinFocus.courter = (courting.length > 1 ? courting[makeRng(mixSeed(st.seed ^ 0xc0e7, st.age)).int(0, courting.length - 1)] : courting[0]).id;
 }
 // คนเป้าของการ์ดใบปัจจุบัน (ยังคืนคนเดิมแม้ผลการ์ดใบนี้ทำให้เขาจากไป — การ์ดผลจะได้เรียกชื่อถูกคน) · นอกการ์ด = คนล่าสุดที่ยังอยู่
 function focusOf(st, role) {
@@ -381,7 +609,7 @@ function kinDie(st, m, cause) {
   m.diedAge = kinYearOf(st) - m.born;
   m.alive = false;
   if (m.role === 'pet') m.cause = cause ?? petCause(st, m);
-  else if (m.role !== 'herd') m.cause = cause ?? kinCause(st.content.era, st.seed, st.kinCauseRng, m.sex, kinYearOf(st), m.diedAge);
+  else if (m.role !== 'herd') m.cause = cause ?? kinCause(st.content.era, st.seed, m.own ? ownRoll(st, m, kinYearOf(st), 0x7a12) : st.kinCauseRng, m.sex, kinYearOf(st), m.diedAge);
 }
 
 // สัตว์คู่ใจ (B110 ชิ้น 3): แก่ · ป่วย · อุบัติเหตุ — ค่าตั้งของเกม (ไม่มีสถิติสาเหตุตายของสัตว์เลี้ยงไทย)
@@ -414,7 +642,11 @@ function bondTargets(st, role) {
 }
 
 function bondAdd(st, list, d) {
-  for (const m of list) m.bond = bondClamp((m.bond ?? BOND_START[m.role ?? 'parent']) + d);
+  for (const m of list) {
+    const b = m.bond ?? BOND_START[m.role ?? 'parent'];
+    // ลดไม่ทะลุ BOND_FLOOR (การ์ดทะเลาะใบ 92) — ด่าน family ถือช่วงพื้น–100 · บวกยังตัดที่ 100
+    m.bond = d < 0 ? (b > BOND_FLOOR ? Math.max(BOND_FLOOR, b + d) : b) : bondClamp(b + d);
+  }
   if (d > 0 && list.length) st.kinCared = true;
 }
 
@@ -428,7 +660,81 @@ function applyFamily(st, c, care = 0) {
     if (op.add === 'pet' && livingOf(st, 'pet').length) continue;
     if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
-    if (op.leave) for (const m of livingOf(st, op.leave)) m.left = true;
+    if (op.leave) for (const m of livingOf(st, op.leave)) {
+      m.left = true;
+      m.leftAge = st.age;
+    }
+    // เลิกกับแฟน: by = us (เราบอกเลิก · ค่าตั้งต้น) | them (เขาบอกเลิก) · แต่งกับแฟน = แฟนคนเดิมเป็นคู่ (id ชื่อเดิม) ไม่มีแฟน = เพิ่มคู่ใหม่
+    if (op.breakup) for (const m of livingOf(st, op.breakup)) {
+      m.status = 'ex';
+      m.left = true;
+      m.leftAge = st.age;
+      m.endedBy = op.by === 'them' ? 'them' : 'us';
+    }
+    if (op.marry) {
+      const m = livingOf(st, op.marry).at(-1);
+      if (m) marryPartner(st, m);
+      else if (!livingOf(st, 'spouse').length) addMember(st, 'spouse');
+    }
+    // แยกทาง: ออกจากบ้านแต่ยังเป็นคู่ (ธง married ไม่หาย) · หย่า: จบความเป็นคู่ + ธง divorced ให้เนื้อหาแต่งใหม่/คืนดีอ่าน
+    if (op.separate) for (const m of livingOf(st, op.separate)) {
+      m.status = 'apart';
+      m.left = true;
+      m.leftAge = st.age;
+    }
+    if (op.divorce) {
+      for (const m of st.kin.filter((x) => x.role === op.divorce && x.alive && spouseStatus(x) !== 'divorced')) {
+        m.status = 'divorced';
+        m.left = true;
+        m.leftAge ??= st.age;
+        m.divorcedAge = st.age;
+        splitMarital(st, m);
+      }
+      st.flags.divorced = true;
+      st.flagAge.divorced ??= st.age;
+    }
+    // คืนดีช่วงแยกทาง: กลับเข้าบ้าน สถานะ together · ผูกพันขยับด้วย op bond ในการ์ดเอง
+    if (op.reconcile) for (const m of st.kin.filter((x) => x.role === 'spouse' && x.alive && spouseStatus(x) === 'apart')) {
+      m.status = 'together';
+      m.left = false;
+      delete m.leftAge;
+      m.reconciledAge = st.age;
+    }
+    // คืนดีหลังหย่า (ใบ 97): คู่เก่าคนเดิม (id/ชื่อ/ผูกพันที่ค้างไว้) กลับเป็นคู่ · อายุแต่งนับรอบใหม่ · m.reunited กันซ้ำ · ex_bitter ของคู่คนนี้จบลง ไม่งั้นการ์ดแฟนเก่ากลับมา (B166) อ่านเป็นคนอื่น
+    if (op.remarry) {
+      const m = st.kin.find((x) => x.id === st.kinFocus?.spouse && isDivorced(x) && x.alive) ?? st.kin.findLast((x) => isDivorced(x) && x.alive);
+      if (m && !st.kin.some((x) => x.reunited !== undefined || (x.role === 'spouse' && x.alive && !isDivorced(x)))) {
+        m.status = 'together';
+        m.left = false;
+        delete m.leftAge;
+        m.since = st.age;
+        m.reunited = st.age;
+        m.reunitedGap = st.age - (m.divorcedAge ?? st.age);
+        delete m.divorcedAge;
+        for (const c of st.kin) if (c.role === 'child' && c.by === m.id) delete c.custody;
+        delete st.flags.ex_bitter;
+      }
+    }
+    // ลูกเล็กของคู่ที่หย่า: self = เราเลี้ยง · other = อยู่กับอีกฝ่าย (ผูกพันจางเร็วกว่า) · ทั้งสองทางยังเป็นทายาท
+    if (op.custody) for (const c of st.kin) {
+      if (c.role !== 'child' || !c.alive || memberAge(st, c) >= KIN_CUSTODY.minorUntil) continue;
+      if (!isDivorced(parentSpouseOf(st, c) ?? {})) continue;
+      c.custody = op.custody;
+    }
+    // ตัดสินลูกที่ไม่ใช่ลูกเรา (ใบ 95): keep = ยังเป็นลูกเรา · cut = ตัดขาด · จดครั้งเดียวต่อคน
+    if (op.paternity) {
+      const m = st.kin.find((x) => x.id === st.kinFocus?.child && x.notMine && !x.paternity && x.alive) ?? st.kin.find((x) => x.role === 'child' && x.notMine && !x.paternity && x.alive);
+      if (m) {
+        m.paternity = op.paternity === 'keep' ? 'kept' : 'cut';
+        m.paternityAge = st.age;
+        if (op.paternity === 'keep') bondAdd(st, [m], NOT_MINE.keepBond);
+        else m.bond = Math.min(m.bond ?? BOND_START.child, NOT_MINE.cutTo);
+      }
+    }
+    if (op.far || op.back) {
+      const m = focusOf(st, op.far ?? op.back);
+      if (m?.alive) m.far = !!op.far;
+    }
     if (op.die === 'parent') {
       const p = st.parents.find((x) => x.alive);
       if (p) {
@@ -445,7 +751,11 @@ function applyFamily(st, c, care = 0) {
     const role = KIN_FLAG_ROLE[f];
     if (!role || ops.some((op) => op.add === role)) continue;
     // แต่งงานซ้ำตอนคู่ยังอยู่ = คนเดิม ไม่เพิ่มคู่
-    if (role === 'spouse' && livingOf(st, 'spouse').length) continue;
+    if (role === 'spouse' && !livingOf(st, 'spouse').length && livingOf(st, 'partner').length && !ops.some((op) => op.marry)) {
+      marryPartner(st, livingOf(st, 'partner').at(-1));
+      continue;
+    }
+    if (role === 'spouse' && (livingOf(st, 'spouse').length || st.kin.some((m) => m.role === 'spouse' && m.alive && m.status === 'apart'))) continue;
     addMember(st, role);
   }
   if (care > 0) bondAdd(st, bondTargets(st, 'all'), care * BOND_CARE_PER_REL);
@@ -455,7 +765,7 @@ function applyFamily(st, c, care = 0) {
 // ธงเดิมตามสมาชิกจริง: married = มีคู่ที่ยังอยู่ด้วยกัน · has_kids = มีลูกที่ยังอยู่ · raised_grandkids เป็นเรื่องที่เคยทำ ไม่ถอด
 function kinSyncFlags(st) {
   for (const [f, role] of [['married', 'spouse'], ['has_kids', 'child']]) {
-    if (livingOf(st, role).length) {
+    if (livingOf(st, role).length || (role === 'spouse' && st.kin.some((m) => m.role === 'spouse' && m.alive && m.status === 'apart'))) {
       st.flags[f] = true;
       st.flagAge[f] ??= st.age;
     } else if (st.kin.some((m) => m.role === role)) delete st.flags[f];
@@ -467,12 +777,15 @@ function kinSyncFlags(st) {
 function kinYearlyBond(st) {
   if (!st.kinCared) {
     for (const m of [...st.parents, ...st.kin]) {
-      if (!m.alive || m.left) continue;
+      // พี่น้องของทายาท (tld14 ข้อ 3) ไม่ถือ bond: ไม่ลดรายปี เหมือนไม่เข้าความผูกพันของบ้าน
+      if (!m.alive || m.left || m.role === 'sibling') continue;
       const b = m.bond ?? BOND_START[m.role ?? 'parent'];
       m.bond = b > BOND_FLOOR ? Math.max(BOND_FLOOR, b - 1) : b;
     }
   }
   st.kinCared = false;
+  for (const m of st.kin) if (m.far && m.alive && m.bond > BOND_FLOOR) m.bond = Math.max(BOND_FLOOR, m.bond - KIN_FAR.decay);
+  for (const m of st.kin) if (m.custody === 'other' && m.alive && m.bond > BOND_FLOOR) m.bond = Math.max(BOND_FLOOR, m.bond - KIN_CUSTODY.decay);
   if (st.age >= KIN_LONELY.from && (KIN_LONELY.happiness || KIN_LONELY.health) && !st.kin.some((m) => KIN_HOUSEHOLD.includes(m.role) && m.alive && !m.left)) {
     st.happiness = bondClamp(st.happiness - KIN_LONELY.happiness);
     st.health = bondClamp(st.health - KIN_LONELY.health);
@@ -485,8 +798,9 @@ function kinLost(st, m, age, year, out) {
   m.diedAge = age;
   m.alive = false;
   if (!KIN_HOUSEHOLD.includes(m.role) && m.role !== 'herd') return;
+  if (isDivorced(m) || isEx(m)) return;
   if (m.role === 'pet') st.happiness = bondClamp(st.happiness - PET_GRIEF);
-  const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }), ...(m.cause && { cause: m.cause }) };
+  const loss = { id: m.id, role: m.role, name: m.name, age, year, ...(m.kind && { kind: m.kind }), ...(m.cause && { cause: m.cause }), ...(m.since !== undefined && { since: m.since }) };
   st.kinLoss.push(loss);
   out.push(loss);
 }
@@ -512,10 +826,13 @@ function ageKin(st, year, saving = 0) {
   filialMirror(st);
   const lost = [];
   if (!st.kin.length) return lost;
+  stepCourtship(st);
   petYear(st, saving);
   for (const m of [...st.kin]) {
     if (!m.alive) continue;
     const a = year - m.born - 1;
+    // คนจีบ (ใบ 172 ข้อ 305) อยู่นอกบ้านแบบเพื่อนรุ่น: ไม่ทอยตาย ไม่ดึง kinRng/kinCauseRng — ชีวิตที่มีคนจีบกับไม่มีจึงได้ญาติ/ผลตายชุดเดียวกัน
+    if (m.role === 'courter') continue;
     if (ANIMAL.includes(m.role)) {
       if (a + 1 >= m.maxAge) {
         if (m.role === 'pet') m.cause = petCause(st, m);
@@ -523,7 +840,9 @@ function ageKin(st, year, saving = 0) {
       }
       continue;
     }
-    const cause = kinDeathRoll(st.content.era, st.seed, st.kinCauseRng, m, year, a, st.kinRng.next());
+    const cause = m.own
+      ? kinDeathRoll(st.content.era, st.seed, ownRoll(st, m, year, 0x7a12), m, year, a, ownRoll(st, m, year, 0x7a11).next())
+      : kinDeathRoll(st.content.era, st.seed, st.kinCauseRng, m, year, a, st.kinRng.next());
     if (cause) {
       m.cause = cause;
       kinLost(st, m, a, year, lost);
@@ -538,7 +857,7 @@ function ageKin(st, year, saving = 0) {
 }
 
 // ข้อความการ์ดแจ้งการจากไป (แกนออกเองทุกครั้ง — เนื้อหาต่อยอดด้วย when.loss ได้)
-const LOSS_WHO = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
+const LOSS_WHO = { partner: 'แฟน', spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน' };
 const lossParentWord = (l) => (l.sex === 'หญิง' ? 'แม่' : 'พ่อ');
 const PET_LOSS_TEXT = {
   old: (who, age) => `${who}หลับไปอย่างสงบตามวัย ด้วยวัย ${age} ปี`,
@@ -591,11 +910,34 @@ const lastSpouseLoss = (st) => (st.kinLoss ?? []).findLast((l) => l.role === 'sp
 // ปีที่อยู่ด้วยกัน ({ปีคู่เก่า}): อายุตอนแต่ง = flagAge.married (ไม่ถูกลบตอนธงหลุด) · ไม่รู้อายุตอนแต่ง = ไม่บอกเลขปี
 function spouseYears(st) {
   const l = lastSpouseLoss(st);
-  const wed = st.flagAge?.married;
+  const wed = l?.since ?? st.flagAge?.married;
   return l && wed !== undefined ? Math.max(1, l.year - st.birthYear - wed) : null;
 }
 // ชื่อที่การ์ดสูญเสียเรียก — สัตว์เรียกแบบ petCall
 const lossCall = (l) => (ANIMAL.includes(l.role) ? petCall(l) : l.name);
+
+// ลูกที่การ์ดย้ายไกล/กลับพร้อมหลานพูดถึง: far = อยู่ไกลอยู่ไหม · age = อายุลูก · grandkids = ต้องมีหลานที่ยังอยู่จากลูกคนนี้
+const grandkidsOf = (st, m) => st.kin.filter((g) => g.role === 'grandchild' && g.of === m.id && g.alive && !g.left);
+const childFarList = (st, w) => {
+  const year = kinYearOf(st);
+  return st.kin.filter((m) => m.role === 'child' && m.alive && !m.left && !!m.far === w.far && kinInRange(year - m.born, w.age) && (!w.grandkids || grandkidsOf(st, m).length));
+};
+const childFarOk = (st, w) => childFarList(st, w).length > 0;
+// การ์ด when.child_far ต้องเรียกลูกคนที่ตรงเงื่อนไข ไม่ใช่คนที่ pickFocus สุ่มได้ · เอาคนโตสุด ไม่ดึงเลขสุ่ม
+function focusChildFar(st, w) {
+  const m = childFarList(st, w)[0];
+  if (!m) return;
+  st.kinFocus.child = m.id;
+  const g = grandkidsOf(st, m)[0];
+  if (g) st.kinFocus.grandchild = g.id;
+}
+// ชื่อคู่ของลูกอยู่บนตัวลูก ไม่ใช่สมาชิกอีกคน · สุ่มจาก seed+id ครั้งแรกที่ถูกเรียก ไม่ดึง kinRng เซฟเก่าจึงได้ชื่อเอง
+function childMate(st, m) {
+  if (!m) return null;
+  m.mate ??= pickName(mixSeed(st.seed, 0x3a7e + m.id), kinOtherSex(m.sex), m.born, st.content.era.names, kinTakenNames(st));
+  return m.mate;
+}
+const childMateWord = (m) => (m?.sex === 'หญิง' ? 'ลูกเขย' : 'ลูกสะใภ้');
 
 // เงื่อนไขครอบครัวของการ์ด (when.family / requires.family): บทบาท · เพศ · ยังอยู่ · ช่วงอายุ · จำนวน
 // ไม่ใส่ count = ต้องมีอย่างน้อย 1 คนที่ตรง · คู่ที่หย่าแล้วไม่นับเป็นคู่ครอง
@@ -604,8 +946,9 @@ function familyOk(st, f) {
   const year = kinYearOf(st);
   const pool = f.role === 'parent'
     ? st.parents.map((p) => ({ alive: p.alive, age: p.age, sex: p.sex }))
-    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex }));
-  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age)).length;
+    : (st.kin ?? []).filter((m) => m.role === f.role && !m.left).map((m) => ({ alive: m.alive, age: memberAge(st, m, year), sex: m.sex, stage: m.stage, years: m.since === undefined ? undefined : st.age - m.since }));
+  // stage (คนจีบ: met|courting) · years = ปีที่คบ/จีบมา (นับจาก since) — ไม่ใส่ช่อง = ไม่เช็ก · ใส่แล้วสมาชิกที่ไม่มีค่านั้นไม่ผ่าน
+  const n = pool.filter((m) => (f.alive === undefined || m.alive === f.alive) && (f.sex === undefined || m.sex === f.sex) && kinInRange(m.age, f.age) && (f.stage === undefined || [].concat(f.stage).includes(m.stage)) && (f.years === undefined || (m.years !== undefined && kinInRange(m.years, f.years)))).length;
   return f.count ? kinInRange(n, f.count) : n > 0;
 }
 
@@ -655,6 +998,21 @@ function kinAid(st) {
   if (!able.length) return null;
   const h = able.reduce((a, b) => (b.bond > a.bond ? b : a));
   return st.kinRng.next() < (h.bond - KIN_AID.base) / KIN_AID.span ? h : null;
+}
+
+// พี่น้องตามมาในชาติทายาท (ใบ tld14 · เจ้าของเคาะ 11-23): ทางสายเลือดเท่านั้น · ทายาทเป็นลูก = ลูกคนอื่นของผู้ตายที่ยังมีชีวิต (รวมที่ย้ายออก ทุกอายุ) · ทายาทเป็นหลาน = หลานคนอื่นที่ of เดียวกัน
+// ลุง/ป้า · คู่ของลูกคนอื่น · หลานของพี่น้อง ไม่ตามมา · เก็บเฉพาะ เพศ/ชื่อ/ปีเกิด/ย้ายออก (ความผูกพันเริ่มใหม่จากมุมทายาท)
+function heirSibs(st, blood) {
+  if (!blood || !st.kin) return [];
+  const same = (m) => m.id !== blood.id && m.alive && (blood.role === 'child' ? m.role === 'child' : m.role === 'grandchild' && m.of === blood.of);
+  return st.kin.filter(same).map((m) => ({ sex: m.sex, name: m.name, born: m.born, ...(m.left && { left: true }) }));
+}
+// เข้าบ้านทายาทตอนเกิด (ก่อน skipToAge) · ปีเกิดเท่าทายาท = แฝด · ไม่ดึง kinRng (id/ตายแยกสาย)
+function sibsAtBirth(st, heir) {
+  for (const s of heir?.sibs ?? []) {
+    const m = addMember(st, 'sibling', { sex: s.sex, name: s.name, born: s.born });
+    if (s.left) { m.left = true; m.leftAge = Math.max(0, st.age); }
+  }
 }
 
 // สัตว์ติดบ้านตอนเกิด (B44): ทางในตระกูลได้ตัวที่บ้านเดิมยังเลี้ยงอยู่ (heir.pets) · ที่เหลือสุ่มตามบ้านจาก stream แยก
@@ -711,6 +1069,30 @@ function deadKinOf(st) {
   ];
 }
 
+// ผีญาติ (ใบ 26): หยิบหนึ่งคนจากรายชื่อคนตายที่ตระกูลจำ (รายชื่อชาติก่อน ๆ + คนตายของชาตินี้ เหมือนที่ปรโลกส่งต่อ)
+// เจ้าของเคาะ 11-17: สีหน้าผีอ่านจากสาเหตุตาย + bond ที่เก็บอยู่แล้ว ไม่เพิ่มฟิลด์ deadKin · ตายผิดธรรมชาติหรือ bond ต่ำ = ทวง · ตายธรรมดาและ bond สูง = เตือน/ช่วย
+// ถ่วงรุ่นใกล้กับ bond สูง · stream แยกจาก seed ไม่ดึง st.rng ⇒ ชีวิตที่ไม่มีการ์ดผีญาติเดินเท่าเดิม · ไม่ผูกกับจำนวนการ์ดที่ออกแล้ว กันชื่อกับสีหน้าเปลี่ยนกลางการ์ด
+// self_harm ไม่ขึ้นจอ (เหมือนป้ายสาเหตุ) · สัตว์ไม่เป็นผีญาติ · คนไม่มีชื่อเรียกไม่ได้
+const KIN_GHOST = { salt: 0x6b1d9e57, haunt: { bond: 50, causes: ['road', 'accident', 'assault', 'training'] }, genDecay: 0.5 };
+const ghostWord = (st, e) => {
+  if (e.gen === (st.gen ?? 1)) {
+    const word = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อน' }[e.role];
+    return word ?? (st.parents.find((p) => p.name === e.name)?.sex === 'หญิง' ? 'แม่' : 'พ่อ');
+  }
+  return e.role === 'parent' ? 'บรรพบุรุษ' : e.role === 'spouse' ? 'ญาติผู้ใหญ่' : 'ญาติ';
+};
+function pickKinGhost(st) {
+  const list = [...(st.deadKin ?? []), ...deadKinOf(st)].filter((e) => e.name && !ANIMAL.includes(e.role) && e.cause !== 'self_harm');
+  if (!list.length) return null;
+  const gen = st.gen ?? 1;
+  const w = list.map((e) => KIN_GHOST.genDecay ** Math.max(0, gen - e.gen) * (0.2 + e.bond / 100));
+  let r = makeRng(mixSeed(st.seed ^ KIN_GHOST.salt, gen)).next() * w.reduce((a, b) => a + b, 0);
+  const i = Math.max(0, w.findIndex((x) => (r -= x) < 0));
+  const e = list[i];
+  const mood = KIN_GHOST.haunt.causes.includes(e.cause) || e.bond < KIN_GHOST.haunt.bond ? 'haunt' : 'warn';
+  return { name: e.name, role: e.role, gen: e.gen, bond: e.bond, mood, word: ghostWord(st, e) };
+}
+
 // มรณบัตร: ใครรับเลี้ยงสัตว์ต่อ — คู่ชีวิต > ลูก > หลาน ที่ยังอยู่ ไม่มีใคร = เพื่อนบ้าน
 function petsAfter(st) {
   const pets = (st.kin ?? []).filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
@@ -723,8 +1105,8 @@ function petsAfter(st) {
 // มรณบัตร: ใครมาส่ง (B164) — ผลย้อนของความสัมพันธ์ทั้งชีวิต เล่าเป็นคำ ไม่โชว์ค่าและไม่มีชื่อใคร (คนที่จากไปห้ามถูกเรียก)
 // คนที่ยังอยู่มาจากที่ไกลได้ (นับคนที่ย้ายออกด้วย) · bond ถึงเกณฑ์ = อยู่ช่วยงาน ต่ำกว่า = แวะมาครู่เดียว (พื้น bond แค่ "เฉย ๆ" ไม่ถึงขั้นไม่มา) · แขกที่เหลือแบ่งตามน้ำหนักเดียวกับสูตรแขก
 // ใช้ค่าเฉลี่ยวัยทำงาน ไม่ใช่ค่าตอนตาย — ค่าตกตามวัยชรา แต่คนที่เคยรู้จักกันยังมา · อ่าน state ล้วน ไม่ดึงเลขสุ่ม
-const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer'] };
-const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน' };
+const FUNERAL_WHO = { come: 40, adult: 18, roles: ['spouse', 'child', 'grandchild', 'peer', 'sibling'] };
+const WHO_WORD = { spouse: 'คู่ชีวิต', child: 'ลูก', grandchild: 'หลาน', peer: 'เพื่อนรุ่นเดียวกัน', sibling: 'พี่น้อง' };
 const whoList = (by) => {
   const parts = FUNERAL_WHO.roles.filter((r) => by[r]).map((r) => (r === 'spouse' ? WHO_WORD[r] : `${WHO_WORD[r]} ${by[r]} คน`));
   return parts.length > 1 ? `${parts.slice(0, -1).join(' ')} และ${parts.at(-1)}` : parts[0];
@@ -733,7 +1115,7 @@ function funeralWho(st, guests) {
   const came = {}, away = {};
   let n = 0;
   for (const m of st.kin ?? []) {
-    if (!FUNERAL_WHO.roles.includes(m.role) || !m.alive) continue;
+    if (!FUNERAL_WHO.roles.includes(m.role) || !m.alive || isDivorced(m)) continue;
     const to = (m.bond ?? BOND_START[m.role]) >= FUNERAL_WHO.come ? came : away;
     to[m.role] = (to[m.role] ?? 0) + 1;
     if (to === came) n++;
@@ -756,12 +1138,19 @@ const LETTER_TO = [['child', 'grandchild'], ['peer'], ['spouse']];
 const LETTER_BOND = 0;
 function letterTo(st) {
   for (const roles of LETTER_TO) {
-    const ok = (st.kin ?? []).filter((m) => roles.includes(m.role) && m.alive && (m.bond ?? BOND_START[m.role]) >= LETTER_BOND);
+    const ok = (st.kin ?? []).filter((m) => roles.includes(m.role) && m.alive && !isDivorced(m) && (m.bond ?? BOND_START[m.role]) >= LETTER_BOND);
     if (ok.length) return ok.reduce((a, m) => ((m.bond ?? BOND_START[m.role]) > (a.bond ?? BOND_START[a.role]) || ((m.bond ?? BOND_START[m.role]) === (a.bond ?? BOND_START[a.role]) && m.id < a.id) ? m : a));
   }
   return null;
 }
 const letterToText = (m) => (m.name ? `${WHO_WORD[m.role]} ${m.name}` : WHO_WORD[m.role]);
+
+// ปีที่อยู่ด้วยกันของคู่ที่จากไป/แยกทาง · ไม่มี since (เซฟเก่า) = ไม่ส่งช่องนี้ จอไม่โชว์ 0 ปี
+function spouseSpan(st, m) {
+  if (m.since === undefined || (m.alive && !m.left)) return null;
+  const end = m.left ? m.leftAge : (st.kinLoss ?? []).findLast((l) => l.id === m.id)?.year - st.birthYear;
+  return end === undefined || Number.isNaN(end) ? null : { since: m.since, together: Math.max(1, end - m.since), ...(m.leftAge !== undefined && { leftAge: m.leftAge }) };
+}
 
 // รายชื่อให้แผงครอบครัว (B36c) อ่านอย่างเดียว — ช่องที่ไล่ไว้เท่านั้น ไม่มีค่าบัญชีหรือค่าที่อนุมานกรรมได้
 function familyOf(st) {
@@ -775,7 +1164,8 @@ function familyOf(st) {
   // สาเหตุตาย (B110) ให้ผังตระกูลแสดง — มีเฉพาะคนที่จากไปแล้ว · เซฟก่อนมีสาเหตุไม่มีช่องนี้
   const causeOf = (m) => (!m.alive && m.cause ? { cause: m.cause } : {});
   const parents = st.parents.map((p) => ({ role: 'parent', name: p.name ?? null, sex: p.sex, age: p.alive ? p.age : diedOf(p), alive: p.alive, diedAge: diedOf(p), ...causeOf(p), ...bondOf(p) }));
-  const kin = (st.kin ?? []).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...bondOf(m), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }) }));
+  // คนจีบที่ยังอยู่ (ไม่หลุด) ส่งพร้อม stage ให้จอวาดหัวแยก "กำลังจีบ" นอกคนในบ้าน · ไม่ส่ง bond · แฟนที่ยังคบส่ง together (ปีที่คบ)
+  const kin = (st.kin ?? []).filter((m) => m.role !== 'courter' || (m.alive && !m.left)).map((m) => ({ id: m.id, role: m.role, name: m.name, sex: m.sex, age: memberAge(st, m, year), alive: m.alive, diedAge: m.diedAge, ...causeOf(m), ...(m.role !== 'courter' && bondOf(m)), ...(m.role === 'courter' && { stage: m.stage }), ...(m.role === 'partner' && !m.left && spouseStatus(m) === 'together' && m.since !== undefined && { together: st.age - m.since }), ...(m.kind && { kind: m.kind }), ...(m.order && { order: m.order }), ...(m.role === 'sibling' && { rank: m.born < st.birthYear ? 'elder' : m.born > st.birthYear ? 'younger' : 'twin' }), ...(m.of !== undefined && { of: m.of }), ...(m.left && { left: true }), ...((m.role === 'spouse' || m.role === 'partner') && m.status && m.status !== 'together' && { status: m.status }), ...(m.role === 'spouse' && spouseSpan(st, m)), ...(m.role === 'child' && m.by != null && { by: m.by }) }));
   return [...parents, ...kin];
 }
 
@@ -1203,6 +1593,8 @@ function schoolGate(st) {
       ...base,
       choices: [
         { text: 'เรียนต่อ ม.ต้นใกล้บ้าน', effects: { school: 'lower', knowledge: 1 } },
+        // ตัวเร่งต้นไม้โฟกัส (ใบ 08): แลกความรู้ +1 ของทางใกล้บ้านกับธงครู — ไม่เพิ่มการ์ด ไม่แตะโควตา
+        { text: 'ฝากตัวเป็นศิษย์ครูประจำชั้น', hint: 'ครูรับเป็นศิษย์ เรียนรู้อะไรได้เร็วขึ้น', sets_flags: ['tree_teacher'], effects: { school: 'lower' } },
         {
           text: 'อ่านหนังสือสอบโรงเรียนดังในเมือง',
           requires: { money: cash(0.3), reason: 'ที่บ้านไม่มีค่าเทอมค่ารถให้' },
@@ -1656,6 +2048,11 @@ function officeCard(st) {
   }
   if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
   choices.push(cur < 0 ? { text: 'ขอบคุณ แต่ไม่ลงสมัคร', effects: { office: -1 } } : { text: 'วางมือ ไม่ลงอีกแล้ว', effects: { office: -1, happiness: 1 } });
+  // ตำแหน่งบนสุดไม่มีขั้นให้ลงต่อ เหลือแค่ลงรักษากับวางมือ ทางที่เติมจึงแยกเป็นเส้นขอพรกับส่งไม้ต่อ
+  if (!canUp && cur >= 0) {
+    choices.push({ text: `ไหว้ขอพรก่อนลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, { ...lift, wish: RANK_WISH }, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
+    choices.push({ text: 'ดันคนสนิทลงแทน คุมอยู่เบื้องหลัง', effects: { office: -1, network: 1 } });
+  }
   return {
     id: `office_${up}`,
     category: 'society',
@@ -1931,6 +2328,36 @@ function causeHazards(st, py, age, k) {
   return era.causes.keys.map((key, j) => base * k * s[j] * (riskOf(st, key) / normOf(era, st.sex, key, b)));
 }
 
+// ใบ 190 (decisions 319 324 328 337): ตารางชีพไม่ฆ่าตรงแล้ว — ตายเมื่อหลอดสุขภาพหมดเท่านั้น
+// เหตุเฉียบพลัน/อุบัติเหตุ = เกิดเหตุแล้วกดหลอด hit = เส้นธรรมชาติ × สุ่ม lo–hi · hit ≥ หลอดที่เหลือ = ตาย ไม่ถึง = รอดเป็นแผล
+// โอกาสเกิดเหตุ = ส่วนของ qx ÷ โอกาสที่เหตุหนึ่งครั้งฆ่าคนบนเส้นธรรมชาติ ⇒ คนบนเส้นตายเท่าตารางเดิม · หลอดสูงกว่าเส้นรอดง่ายกว่าเอง
+// แทนตัวคูณสุขภาพเดิม (1−d/50) ที่ทำให้คนรอดเหตุเสี่ยงสูงตลอดชีวิต — แผลฟื้นคืนทีละปี (heal = สัดส่วนของแผลที่คืนต่อปี)
+// ส่วนเกินเส้นจางเอง excessFade ต่อปี · ส่วนขาดจากเหตุอื่น (การ์ด) ฟื้นเอง mend ต่อปี (decisions 398)
+// สองค่าต้องเท่ากัน — จางแต่ไม่ฟื้น หลอดของคนไม่ดูแลตัวไหลต่ำกว่าเส้นทั้งชีวิต อายุตายเฉลี่ยต่ำกว่าตารางหลายปี · ขนาดกดสุ่มจาก stream แยก (salt) ไม่ดึง st.rng/causeRng
+const HIT = { lo: 0.1, hi: 1.5, heal: 0.5, excessFade: 0.05, mend: 0.05, salt: 0x2545f491 };
+const HIT_KILL = (HIT.hi - 1) / (HIT.hi - HIT.lo);
+// สาเหตุที่มาแบบเหตุครั้งเดียว · other (แก่) ไม่ทอยแล้ว เป็นหลอดลดเงียบแทน (frailOf) · โรคเรื้อรังนัดล่วงหน้าตามเดิม
+const isAcute = (key) => key !== 'other' && !CHRONIC.includes(key);
+// ส่วนของเส้นธรรมชาติที่หลอดหายไปกับความแก่ — ขนาดที่ทำให้เหตุเฉียบพลันฆ่าเพิ่มเท่าส่วน other ของตารางพอดี
+// เหตุที่ฆ่าเพราะส่วนนี้ (ถ้าไม่แก่จะรอด) นับสาเหตุเป็น other ⇒ ทั้งอัตราตายและสัดส่วนสาเหตุยังตรงข้อมูล
+// คิดจากสัดส่วนของประชากร ไม่ผ่านปัจจัยเสี่ยงรายคน — หลอดส่วนแก่ไม่ฟื้น ถ้าใช้ค่ารายคน ปีที่เสี่ยงเฉียบพลันลดลงชั่วคราว
+// (เลิกงานเสี่ยง ฯลฯ) other/acute พุ่งแล้วค้างทั้งชีวิต ⇒ หลอดต่ำเกินเส้นตั้งแต่วัยกลางคน
+// สัดส่วนรายปีปฏิทินแกว่งแรง (ปีเดียวกระโดด 3–5 เท่า) — ค่าไม่ลดจึงต้องเฉลี่ยหน้าต่างย้อนหลังก่อน ไม่งั้นเก็บยอดแหลมไว้
+const FRAIL_WINDOW = 5;
+function frailOf(st, year, age) {
+  const era = st.content.era;
+  const keys = era.causes.keys;
+  const oj = keys.indexOf('other');
+  let acute = 0;
+  let other = 0;
+  for (let k = 0; k < FRAIL_WINDOW && age - k >= 0; k++) {
+    const s = causeShares(era, st.sex, protoYear(era, st.seed, year - k), age - k);
+    acute += s.reduce((sum, x, j) => sum + (isAcute(keys[j]) ? x : 0), 0);
+    other += s[oj] ?? 0;
+  }
+  return acute > 0 ? Math.min(1, ((HIT.hi - 1) * other) / acute) : 0;
+}
+
 // สุ่มสาเหตุตามน้ำหนัก · เฉพาะดัชนีที่ allow ยอม (ไม่ใส่ = ทุกตัว)
 function pickCause(rng, keys, w, allow = null) {
   let sum = 0;
@@ -1958,6 +2385,8 @@ function pickCause(rng, keys, w, allow = null) {
 const NEAR_DEATH = { band: 1, minAge: 15, causes: ['road', 'accident'], salt: 0x7f4a7c15 };
 // คำใบ้ยาวเกินจะเป็นหัวการ์ด ⇒ หัวสั้นคงที่ ข้อความลงเนื้อ
 const HINT_TITLE = 'ก่อนลืมตา';
+// ปฏิกิริยาล้วน ไม่มีผลลงบัญชี — ใบนี้ห้ามขยับ karmaMultiplier เหมือนใบเยือนอื่น
+const HINT_CHOICES = ['นิ่งฟังจนเสียงจางไป', 'ถามกลับว่าหมายความว่าอะไร', 'ยกมือไหว้ทั้งที่ยังมองไม่เห็นใคร', 'พยายามลืมตาให้เร็วที่สุด'];
 const COURT_SCENES = ['near', 'visit', 'summons'];
 // ระดับคำใบ้จากบัญชีสุทธิ (ช่วงเดียวกับ verdictLevel −1..1) · ขอบตามภูมิที่ปรโลก: นรก ≤ −0.5 · เปรต/ดิรัจฉาน < 0 · เทวดา > 2/3
 const NEAR_HINT_LEVELS = [
@@ -2006,11 +2435,15 @@ function courtCard(st) {
   while (c.i < c.steps.length) {
     const step = c.steps[c.i];
     if (step === 'hint') {
-      c.i++;
       const lines = st.content.nearHints?.[hintLevel(st.ledger)];
-      if (!lines?.length) continue;
+      if (!lines?.length) {
+        c.i++;
+        continue;
+      }
       const text = lines[Math.floor(courtRng(st).next() * lines.length)];
-      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [], fx: [], locked: [] };
+      c.ev = { id: 'court_hint', choices: HINT_CHOICES.map((x) => ({ text: x, merit: [] })) };
+      c.wait = true;
+      return { ...courtBase(st, c.mode), id: 'court_hint', title: HINT_TITLE, text, choices: [...HINT_CHOICES], fx: HINT_CHOICES.map(() => ''), locked: HINT_CHOICES.map(() => null) };
     }
     const ev = courtEvent(st, step);
     if (!ev) {
@@ -2264,7 +2697,7 @@ const CADET = (() => {
 
   // ---------- card shapes ----------
   const C = (id, title, text, options, extra = {}) => ({ id, title, text, options, ...extra });
-  const status = (title, text) => C('cadet_status', title, text, [{ label: 'ต่อ' }]);
+  const status = (title, text, labels = ['ต่อ']) => C('cadet_status', title, text, labels.map((label) => ({ label })));
   // B4: {คน} (Demo kinWord) ไม่มีใน FILL ของ life.mjs — แทนในเส้นนี้ก่อนส่งเข้า fill ทุกครั้ง (ข้อความ · ปุ่ม · คำใบ้ · การ์ดผล)
   // {ปีติดยศ} (เจ้าของเคาะ 2026-11-10 · X9 "อีกเจ็ดปี"): ปีจากรายงานตัวถึงติดยศของเหล่าที่เลือก เป็นคำไทย (ทหาร เจ็ด · ตำรวจ หก) — ไม่ฝังเลข
   const rankYearsWord = (st) => { const P = st.cadet?.p2; return numTh(commissionYears(st, P?.chosen ?? P?.final?.[0] ?? 'army')); };
@@ -2382,6 +2815,9 @@ const CADET = (() => {
       start(st, [['apply'], ['crit2'], ['reprep']]);
     }
     if (o._toggle) { I.order.push(o._toggle); K.steps.unshift(['apply']); }
+    if (o._undo) { I.order.pop(); K.steps.unshift(['apply']); }
+    if (o._clear) { I.order = []; K.steps.unshift(['apply']); }
+    if (o._reread) K.steps.unshift(['apply']);
     if (o._submit) st.log?.push({ id: 'cadet_apply', age: st.age, text: I.order.map((b) => BT(st, b)).join(' · ') });
     if (o._score != null) { P.scores[o._branch] = (P.scores[o._branch] ?? 0) + o._score; return; }
     if (o._iv != null) { P.iv = (P.iv ?? 0) + o._iv; if (!result) return; }
@@ -2480,9 +2916,14 @@ const CADET = (() => {
     const left = BR.filter((b) => !I.order.includes(b));
     const tog = (b) => (ap.toggles ?? []).find((t) => t.branch === b) ?? { label: `ติ๊กช่อง ${BT(st, b)}` };
     const picked = I.order.length ? `\n\nติ๊กแล้ว: ${I.order.map((b) => BT(st, b)).join(' → ')} (ลำดับนี้คือลำดับวันสอบ)` : '\n\nติ๊กตามลำดับที่อยากสอบ แต่ละเหล่าสอบคนละวัน';
-    return C('apply', ap.title ?? 'ช่องเหล่าในใบสมัคร', (ap.text ?? 'เลือกเหล่าที่จะสมัครสอบ') + picked, [
-      ...left.map((b) => ({ label: tog(b).label, hint: tog(b).hint, _toggle: b })),
-      { label: `ส่งใบสมัคร${I.order.length ? ` (${I.order.length} เหล่า)` : ''}`, _submit: true, lock: I.order.length ? null : ap.submit?.lockReason ?? 'ยังไม่ได้ติ๊กสักช่อง' }], { contextLines: ap.contextLines });
+    const options = [...left.map((b) => ({ label: tog(b).label, hint: tog(b).hint, _toggle: b })),
+      { label: `ส่งใบสมัคร${I.order.length ? ` (${I.order.length} เหล่า)` : ''}`, _submit: true, lock: I.order.length ? null : ap.submit?.lockReason ?? 'ยังไม่ได้ติ๊กสักช่อง' }];
+    // ยิ่งติ๊กช่องที่เหลือยิ่งน้อย เติมปุ่มแก้ใบให้ครบ 4 ไม่เกินนั้น
+    const extras = [{ label: 'ลบช่องที่ติ๊กล่าสุด', _undo: true },
+      { label: 'ล้างทุกช่อง เริ่มติ๊กใหม่', _clear: true },
+      { label: 'อ่านเกณฑ์ท้ายใบอีกรอบ', _reread: true, result: 'ไล่นิ้วตามตัวอักษรเล็กท้ายใบจนจบ ไม่มีข้อไหนเปลี่ยน' }];
+    return C('apply', ap.title ?? 'ช่องเหล่าในใบสมัคร', (ap.text ?? 'เลือกเหล่าที่จะสมัครสอบ') + picked,
+      [...options, ...extras.slice(0, Math.max(0, 4 - options.length))], { contextLines: ap.contextLines });
   };
 
   S.reprep = (st) => {
@@ -2604,7 +3045,10 @@ const CADET = (() => {
   };
   S.day = (st, b, n) => C(`day_${b}`, `วันสอบ ${BT(st, b)} · วันที่ ${n}`,
     [txt(D(st).dayHeader?.[b]), txt(D(st).dayIntro?.[b])].filter(Boolean).join(' ') || `วันสอบข้อเขียนของ ${BT(st, b)}`,
-    [{ label: 'เข้าห้องสอบ', result: 'แจกข้อสอบแล้ว ห้องเงียบจนได้ยินเสียงพัดลม' }]);
+    [{ label: 'เข้าห้องสอบ', result: 'แจกข้อสอบแล้ว ห้องเงียบจนได้ยินเสียงพัดลม' },
+      { label: 'ล้างหน้าก่อนเข้าห้อง', result: 'น้ำเย็นทำให้ตาสว่าง กลับมานั่งทันเวลาแจกข้อสอบพอดี' },
+      { label: 'ยืนทวนสูตรจนนาทีสุดท้าย', result: 'ปิดสมุดตอนกรรมการเรียกชื่อ สูตรสุดท้ายยังวนอยู่ในหัว' },
+      { label: 'ทักคนโต๊ะข้าง ๆ ให้หายเกร็ง', fx: { network: 1 }, result: 'เขาก็มือเย็นเหมือนกัน สองคนหัวเราะแห้ง ๆ แล้วก้มหน้าทำข้อสอบ' }]);
   S.q = (st, b, k) => {
     const q = D(st).quiz[b][k];
     return C(`q_${b}_${k + 1}`, `ข้อสอบ ${BT(st, b)} · ข้อ ${k + 1}/5`, q.q, shuffle(st, q.options.map((o) => ({ label: o.label, _score: o.score, _branch: b }))));
@@ -2951,15 +3395,20 @@ const CADET = (() => {
     const waitRes = left === 1 ? (iv ? 'วันสุดท้ายผ่านไป ห้องสัมภาษณ์ปิดรับคิว' : 'วันสุดท้ายผ่านไป สนามปิดประตูตอนห้าโมงเย็น')
       : iv ? 'ซ้อมพูดหน้ากระจกแล้วก็เลื่อนไปอีกวัน' : ['นอนมองเพดาน บอกตัวเองว่าพรุ่งนี้ค่อยไป', 'ออกไปวิ่งเหยาะ ๆ แล้วกลับมานอนต่อ', 'หยิบรองเท้าวิ่งขึ้นมาดู แล้ววางลงที่เดิม'][n % 3];
     return C(iv ? 'ivask' : 'physask', n === 0 ? `${place}เปิดแล้ว` : `${place} · เหลือ ${left} วัน`, text, iv
-      ? [{ label: 'ไปสอบสัมภาษณ์เลย', _phys: 'go', _round: round, result: 'ยื่นชื่อขอคิว ได้คิวสัมภาษณ์วันมะรืน' }, { label: 'ยังไม่ไป ขอเตรียมตัวอีกวัน', _phys: 'wait', _round: round, result: waitRes }]
-      : [{ label: 'ไปสอบพรุ่งนี้', _phys: 'go', _round: round, result: 'วงวันพรุ่งนี้ไว้ในปฏิทิน เตรียมชุดกีฬาไว้ข้างเตียง' }, { label: 'ขอพักอีกวัน ค่อยไป', _phys: 'wait', _round: round, result: waitRes }]);
+      ? [{ label: 'ไปสอบสัมภาษณ์เลย', _phys: 'go', _round: round, result: 'ยื่นชื่อขอคิว ได้คิวสัมภาษณ์วันมะรืน' }, { label: 'ยังไม่ไป ขอเตรียมตัวอีกวัน', _phys: 'wait', _round: round, result: waitRes },
+        { label: 'ไปขอคิววันนี้ แล้วแวะตัดผมเลย', _phys: 'go', _round: round, fx: { happiness: 1 }, result: 'ได้คิววันมะรืน เดินออกจากร้านตัดผมแล้วดูเป็นผู้เป็นคนขึ้นมาก' },
+        { label: 'ยังไม่ไป ให้เพื่อนช่วยถามซ้อมก่อน', _phys: 'wait', _round: round, fx: { relations: 1 }, result: waitRes }]
+      : [{ label: 'ไปสอบพรุ่งนี้', _phys: 'go', _round: round, result: 'วงวันพรุ่งนี้ไว้ในปฏิทิน เตรียมชุดกีฬาไว้ข้างเตียง' }, { label: 'ขอพักอีกวัน ค่อยไป', _phys: 'wait', _round: round, result: waitRes },
+        { label: 'ไปพรุ่งนี้ ชวนเพื่อนไปด้วย', _phys: 'go', _round: round, fx: { relations: 1 }, result: 'เพื่อนรับปากจะไปยืนจับเวลาให้ที่ขอบสนาม' },
+        { label: 'ยังไม่ไป ถามคนที่สอบแล้วก่อน', _phys: 'wait', _round: round, fx: { network: 1 }, result: waitRes }]);
   };
   S.noShow = (st, round = 'phys') => {
     const P = st.cadet.p2, iv = round === 'iv', max = N(st).ask_max ?? 5;
     P.failStage = iv ? 'noshow_iv' : 'noshow';
     P.steps = [['letDown', round], ['failed']];
     return status(iv ? 'ไม่ได้เข้าสัมภาษณ์' : 'ไม่ได้เข้าสอบพลศึกษา', iv ? `ครบ ${max} วันแล้ว ไม่ได้ไปขอคิวสัมภาษณ์เลยสักวัน\nชื่อในรอบสุดท้ายถูกขีดออก ปีนี้ถือว่าสอบตก`
-      : `ครบ ${max} วันแล้ว ไม่ได้ไปสนามพลศึกษาเลยสักวัน\nชื่อในรายชื่อรอบสองถูกขีดออก ปีนี้ถือว่าสอบตก`);
+      : `ครบ ${max} วันแล้ว ไม่ได้ไปสนามพลศึกษาเลยสักวัน\nชื่อในรายชื่อรอบสองถูกขีดออก ปีนี้ถือว่าสอบตก`,
+    ['นั่งนิ่งอยู่พักใหญ่', 'โทษตัวเองที่ผัดไปเรื่อย', 'บอกตัวเองว่าไม่ได้อยากไปตั้งแต่แรก', 'เก็บบัตรประจำตัวสอบลงลิ้นชัก']);
   };
   // ครอบครัวผิดหวัง: ความสุข/ความสัมพันธ์ลดตาม numbers.letdown ไม่ว่าเลือกทางไหน (เจ้าของเคาะ)
   S.letDown = (st, round = 'phys') => {
@@ -2979,7 +3428,8 @@ const CADET = (() => {
     { label: 'ออกกำลังกายเบา ๆ', fx: { health: 0.4 }, result: 'วิ่งเหยาะ ๆ กับยืดเส้น ตัวเบาแต่ไม่ล้า' },
     { label: 'พักเตรียมร่างกาย', fx: { happiness: 1 }, result: 'นอนให้พอ กินให้ครบ ไม่ฝืนอะไร' },
     { label: 'ไปเดินดูสนามสอบล่วงหน้า', fx: { network: 1 }, result: 'นับระยะลู่วิ่งกับขอบสระไว้ในหัว' }]);
-  S.injury = (st) => { st.cadet.p2.failStage = 'injury'; return status('สอบพละไม่ไหว', 'เช้าวันสอบไปถึงสนามทั้งที่ข้อเท้ายังพันผ้า ครูคุมสอบให้ลองวิ่งแค่สิบเมตรก็เห็นว่าไม่ไหว\nปีนี้จึงถือว่าไม่ผ่านรอบพลศึกษา'); };
+  S.injury = (st) => { st.cadet.p2.failStage = 'injury'; return status('สอบพละไม่ไหว', 'เช้าวันสอบไปถึงสนามทั้งที่ข้อเท้ายังพันผ้า ครูคุมสอบให้ลองวิ่งแค่สิบเมตรก็เห็นว่าไม่ไหว\nปีนี้จึงถือว่าไม่ผ่านรอบพลศึกษา',
+    ['ขอลองวิ่งอีกครั้ง', 'ก้มหน้ารับแต่โดยดี', 'นั่งแกะผ้าพันข้างสนาม', 'ยืนดูคนอื่นสอบจนจบ']); };
   S.bodyDay = (st) => {
     const c = firstOk(st, D(st).physical) ?? {};
     return { ...c, id: 'body_day', title: 'วันพลศึกษาและตรวจร่างกาย', text: `${c.text ?? 'สนามพลศึกษาเริ่มเจ็ดโมงเช้า'}\nบ่ายลงสระว่ายน้ำห้าสิบเมตร ต่อด้วยห้องตรวจร่างกายห้าห้อง จบในวันเดียว`,
@@ -3022,7 +3472,10 @@ const CADET = (() => {
     { label: 'อ่านประวัติเหล่าที่สมัครไว้', fx: { knowledge: 1 }, result: 'จำชื่อสถาบันกับปีที่ก่อตั้งได้ขึ้นใจ' },
     { label: 'นอนเร็วกว่าทุกวัน', fx: { health: 1 }, result: 'หลับไปก่อนคิดคำตอบเสร็จ' }]);
   S.ivIntro = (st) => C('iv_intro', 'ห้องสัมภาษณ์', 'ห้องสัมภาษณ์มีโต๊ะยาวตัวเดียว กรรมการสามคน ผู้กององอาจนั่งกลาง เสียงดังกว่าพัดลม จ่าขมลมโชยนั่งซ้าย หน้านิ่ง ผู้กองบูรพานั่งขวา ยิ้มให้ก่อน\n"นั่ง" ผู้กององอาจชี้เก้าอี้ "ห้าข้อ ตอบตามจริง"',
-    [{ label: 'นั่งตัวตรง วางมือบนเข่า', result: 'เก้าอี้ดังเอี๊ยด ทั้งห้องเงียบ' }]);
+    [{ label: 'นั่งตัวตรง วางมือบนเข่า', result: 'เก้าอี้ดังเอี๊ยด ทั้งห้องเงียบ' },
+      { label: 'ยกมือไหว้กรรมการก่อนนั่ง', result: 'ผู้กองบูรพาพยักหน้ารับ ผู้กององอาจเปิดแฟ้ม' },
+      { label: 'ยิ้มตอบผู้กองบูรพา', result: 'ผู้กองบูรพาจดอะไรบางอย่าง จ่าขมลมโชยยังไม่กะพริบตา' },
+      { label: 'สูดหายใจลึก ๆ แล้วค่อยนั่ง', result: 'ได้ยินเสียงหัวใจตัวเองชัดกว่าเสียงพัดลม' }]);
   // สัมภาษณ์: 4 ข้อจริงจัง (สุ่มจากคลัง ผู้กองสองคนผลัดกันถาม) + ข้อตลกของจ่าขมลมโชยเป็นข้อ 3 หรือ 4 (ได้เต็มเสมอ) · ผ่าน ≥ iv_min
   // X7 (เจ้าของเคาะ 2026-11-10 Q1 ก): การ์ด "คำถามข้อเดียว" แทนคำถามข้อแรกของชุด ยังเป็นห้าข้อ · ไม่มี variant ตรง = ใช้คลัง 4 ข้อเหมือนเดิม
   // แบบที่ยังไม่มีตัวเลือก (เช่น X7-ก′ คนสละที่นั่ง รอบท S1) ข้ามไปแบบถัดไปก่อน
@@ -3065,7 +3518,8 @@ const CADET = (() => {
     P.ivOk = ok;
     if (!ok) P.failStage = 'interview';
     P.steps = [['announce', 'final'], ['finalBoard']];
-    return status('จบการสัมภาษณ์', 'ผู้กององอาจปิดแฟ้ม บอกว่าผลรอบสุดท้ายประกาศบ่ายนี้ จ่าขมลมโชยยังหน้านิ่งเหมือนเดิม ผู้กองบูรพาจดบรรทัดสุดท้ายแล้ววางปากกา');
+    return status('จบการสัมภาษณ์', 'ผู้กององอาจปิดแฟ้ม บอกว่าผลรอบสุดท้ายประกาศบ่ายนี้ จ่าขมลมโชยยังหน้านิ่งเหมือนเดิม ผู้กองบูรพาจดบรรทัดสุดท้ายแล้ววางปากกา',
+      ['ลุกยืนตรง ทำความเคารพ', 'กล่าวขอบคุณกรรมการทั้งสาม', 'เดินออกโดยไม่หันกลับ', 'แอบเหลือบดูแฟ้มก่อนออก']);
   };
   S.finalBoard = (st) => {
     const P = st.cadet.p2, pass = P.ivOk ? P.branches.filter((b) => P.written[b] && P.body?.[b]) : [], none = !pass.length, who = checker(st);
@@ -3095,7 +3549,9 @@ const CADET = (() => {
     const P = st.cadet.p2;
     if (P.final.length === 1) return S.passNews(st, P.final[0]);   // X9 ก่อนหนังสือแจ้ง (เจ้าของเคาะ 2026-11-10 Q3 ก)
     const c = firstOk(st, D(st).chooseBranch) ?? { title: 'ติดหลายเหล่า', text: 'เลือกได้เหล่าเดียว' };
-    return { ...c, id: 'choose_branch', options: [...P.final.map((b) => ({ label: `เลือก ${BT(st, b)}`, _pick: b })), { label: 'สละสิทธิ์ทั้งหมด', _pick: 'none' }] };
+    const options = [...P.final.map((b) => ({ label: `เลือก ${BT(st, b)}`, _pick: b })), { label: 'สละสิทธิ์ทั้งหมด', _pick: 'none' }];
+    if (options.length < 4) options.push({ label: 'ไม่เซ็นช่องไหน เดินออกไปทางอื่น', _pick: 'none', result: 'วางปากกาไว้บนโต๊ะ เจ้าหน้าที่มองตามจนพ้นประตู' });
+    return { ...c, id: 'choose_branch', options };
   };
   // สละสิทธิ์ทุกเหล่า (งาน a · เจ้าของเคาะ 2026-11-06 · บท cadet-voice-joy-pass.md ท้ายไฟล์): การ์ด "ใบแจ้งที่ไม่ได้ใช้" แทนการ์ดตก
   // Q-A1: ปีหน้ายังสอบใหม่ได้ถ้าอายุไม่เกิน → ห้ามตั้ง cadet_let_go · ตั้ง cadet_declined_seat + ล้างธงฝัน
@@ -3167,7 +3623,7 @@ const CADET = (() => {
     const P = st.cadet.p2, d = N(st).report_days ?? 2;
     P.chosen = b;
     P.steps = [['farewellSchool'], ['farewellFriends'], ['reportAsk', 0]];
-    return status('หนังสือแจ้งรายงานตัว', `โรงเรียนเตรียมทหาร (ต่อ ${BT(st, b)}) เปิดรับรายงานตัวที่${campus(st)} ${d * 2} วัน ใช้ ${d} วันแรกเก็บของและบอกลาได้\nเตรียมเสื้อผ้าตามรายการ ตัดผมสั้นเกรียน เอาบัตรประชาชนกับหนังสือแจ้งฉบับนี้มาด้วย`);
+    return status('หนังสือแจ้งรายงานตัว', `โรงเรียนเตรียมทหาร (ต่อ ${BT(st, b)}) เปิดรับรายงานตัวที่${campus(st)} ${d * 2} วัน ใช้ ${d} วันแรกเก็บของและบอกลาได้\nเตรียมเสื้อผ้าตามรายการ ตัดผมสั้นเกรียน เอาบัตรประชาชนกับหนังสือแจ้งฉบับนี้มาด้วย`, ['อ่านรายการของซ้ำอีกรอบ', 'พับหนังสือแจ้งใส่กระเป๋าเสื้อ', 'เอาไปให้คนที่บ้านดู', 'ไปร้านตัดผมทันที']);
   };
   S.farewellSchool = (st) => C('farewell_school', 'วันที่ 1 · โรงเรียนเก่า', 'ไปยื่นเรื่องลาออกที่ห้องธุรการ ครูประจำชั้นเซ็นให้แล้วถามว่า "จะไปแล้วเหรอ"', [
     { label: 'ไปกราบลาครูประจำชั้น', fx: { relations: 1 }, result: 'ครูลูบหัวที่เพิ่งตัดเกรียน บอกว่ากลับมาเยี่ยมด้วยนะ' },
@@ -3184,7 +3640,10 @@ const CADET = (() => {
     return C(last ? 'report_last' : 'report_ask', last ? 'วันสุดท้ายของการรายงานตัว' : 'ครบสองวันแล้ว',
       last ? 'วันนี้เป็นวันสุดท้ายที่โรงเรียนเตรียมทหารรับรายงานตัว ไม่ไปวันนี้ สิทธิ์จะหลุดไปถึงตัวสำรอง' : `ครบ ${d} วันแล้ว กระเป๋าพร้อม หนังสือแจ้งอยู่ในซอง จะออกเดินทางไป${campus(st)}เลยไหม`, [
         { label: 'ไปเลย', _report: 'go', result: 'ยกกระเป๋าขึ้นรถ ไม่หันกลับไปมองบ้าน กลัวจะไม่อยากไป' },
-        { label: last ? 'ไม่ไป' : 'ขออีกสองวัน', _report: last ? 'no' : 'wait', result: last ? 'นั่งดูนาฬิกาจนเลยเวลาปิดรับรายงานตัว' : 'วางกระเป๋าไว้ที่เดิม บอกตัวเองว่าขอเวลาอีกนิด' }]);
+        { label: last ? 'ไม่ไป' : 'ขออีกสองวัน', _report: last ? 'no' : 'wait', result: last ? 'นั่งดูนาฬิกาจนเลยเวลาปิดรับรายงานตัว' : 'วางกระเป๋าไว้ที่เดิม บอกตัวเองว่าขอเวลาอีกนิด' },
+        { label: `ให้${elder(st)}ไปส่งถึงประตู`, _report: 'go', fx: { relations: 1 }, result: `${elder(st)}ยืนส่งอยู่หน้าประตูจนรถของรุ่นพี่มารับ` },
+        last ? { label: 'ไม่ไป แล้วบอกที่บ้านตรง ๆ', _report: 'no', fx: { relations: 1 }, result: 'พูดจบ บ้านเงียบไปนาน แต่ไม่มีใครลุกหนี' }
+          : { label: 'โทรถามรุ่นพี่ก่อนตัดสินใจ', _report: 'wait', fx: { network: 1 }, result: 'รุ่นพี่บอกว่าใครก็กลัวทั้งนั้น แล้ววางสายไปซ้อมต่อ' }]);
   };
   S.extraDays = (st) => C('extra_days', 'สองวันที่ขอไว้', 'กระเป๋ายังตั้งอยู่กลางห้อง ไม่มีใครในบ้านพูดถึงมัน ทุกคนเดินอ้อม', [
     { label: 'นั่งคิดว่ากลัวอะไรอยู่', result: 'กลัวคิดถึงบ้าน กลัวสู้รุ่นพี่ไม่ได้ กลัวทุกอย่างพร้อมกัน' },
@@ -3192,7 +3651,7 @@ const CADET = (() => {
     { label: 'โทรหารุ่นพี่ที่เคยผ่าน', fx: { network: 1 }, result: 'รุ่นพี่บอกว่าคืนแรกทุกคนร้องไห้ คืนที่สามจะหลับเป็นตาย' },
     { label: 'ออกไปเดินเล่นให้หัวโล่ง', fx: { happiness: 1 }, result: 'เดินจนมืด กลับมากระเป๋ายังอยู่ที่เดิม' }]);
   // ไม่ไปรายงานตัว = เอาธง "ติดเหล่านี้" ที่ตั้งตอนข่าวถึงบ้านออก (เจ้าของเคาะ 2026-11-10 ผลตรวจ S3)
-  S.noReport = (st) => { for (const k of Object.keys(st.flags)) if (k.startsWith('cadet_pass:')) delete st.flags[k]; st.cadet.p2.failStage = 'noreport'; return status('ไม่มารายงานตัว', 'เลยกำหนดรายงานตัวแล้ว สิทธิ์ถูกส่งต่อให้ตัวสำรองลำดับถัดไป\nปีนี้ถือว่าสอบตก เพราะไม่มารายงานตัว'); };
+  S.noReport = (st) => { for (const k of Object.keys(st.flags)) if (k.startsWith('cadet_pass:')) delete st.flags[k]; st.cadet.p2.failStage = 'noreport'; return status('ไม่มารายงานตัว', 'เลยกำหนดรายงานตัวแล้ว สิทธิ์ถูกส่งต่อให้ตัวสำรองลำดับถัดไป\nปีนี้ถือว่าสอบตก เพราะไม่มารายงานตัว', ['รื้อกระเป๋าออกทีละตัว', 'ทิ้งกระเป๋าไว้อย่างนั้น', 'ฉีกหนังสือแจ้งทิ้ง', 'เก็บหนังสือแจ้งไว้ก้นลิ้นชัก']); };
   // รายงานตัว = จบเส้นสอบ · ธงบอกเหล่าและปีติดยศให้เนื้อหาต่อไป (ชีวิตใน รร.เตรียมทหาร/บันไดยศ = งานถัดไป)
   S.arrive = (st, b) => {
     // วันรายงานตัวได้คำนำหน้า "นรม." (นักเรียนใหม่) ก่อน ได้ชุดปกติแล้วจึงเป็น "นตท." (เจ้าของเคาะ 2026-11-11 แทนของเดิมที่ให้ นตท. ทันที)
@@ -3221,7 +3680,7 @@ const CADET = (() => {
     const y = year(st), gate = y >= (N(st).campus_nayok_year ?? 2543) ? 'รถจอดหน้าประตูโรงเรียนเตรียมทหารตอนเช้ามืด รุ่นพี่ในชุดฝึกยืนเรียงรับ'
       : `รถเมล์จอดหน้าประตูโรงเรียนเตรียมทหารริมถนน${y < (N(st).campus_rama4_year ?? 2504) ? 'ราชดำเนิน' : 'พระรามที่ 4'} ตอนเช้ามืด รถเริ่มติดตั้งแต่ฟ้ายังไม่สว่าง รุ่นพี่ในชุดฝึกยืนเรียงรับ`;
     // B4 (Demo arriveCard 12950 · บท S1): วันแรกที่ถูกเรียก นตท. · {ชื่อเต็ม} = ชื่อ (เกมยังไม่มีนามสกุล)
-    return status(`รายงานตัวที่${campus(st)}`, `${gate}\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีกหลายปีจะได้ติดยศ\n${A(st).reportIn ?? ''}`);   // ⚠ ชั่วคราว: ไม่ระบุจำนวนปีจนเปิดเฟส 3 (ตอนนี้ติดยศที่ 22 ตายตัว ไม่ตรง commissionYears)
+    return status(`รายงานตัวที่${campus(st)}`, `${gate}\nเขียนชื่อลงสมุดรายงานตัว ช่องเหล่าเขียนว่า ${BT(st, b)} อีกหลายปีจะได้ติดยศ\n${A(st).reportIn ?? ''}`, ['ยืนตรงรอคำสั่ง', 'แอบมองหน้ารุ่นเดียวกัน', 'จับกระเป๋าให้แน่นขึ้น', 'เงยหน้ามองป้ายโรงเรียน']);   // ⚠ ชั่วคราว: ไม่ระบุจำนวนปีจนเปิดเฟส 3 (ตอนนี้ติดยศที่ 22 ตายตัว ไม่ตรง commissionYears)
   };
   // การ์ดชั่วคราว "ชุดปกติชุดแรก" ถูกแทนด้วยฉาก SB-27b ในชีวิตโรงเรียน (เฟส 3 · ฮับเคาะ 2026-11-16)
   // เซฟเก่าที่ค้างขั้นนี้ไว้: แค่เปลี่ยนคำนำหน้าเป็น นตท. แล้วไปต่อ ไม่มีการ์ด
@@ -3347,7 +3806,7 @@ const CADET = (() => {
     const m = SC(st).medicalOut ?? {};
     setFlags(st, m);   // cadet_medical_out (ตั้งจากบท)
     exitSchool(st);
-    return status(m.title ?? 'ออกจากโรงเรียนเพราะบาดเจ็บ', schoolSub(st, m.text));
+    return status(m.title ?? 'ออกจากโรงเรียนเพราะบาดเจ็บ', schoolSub(st, m.text), ['เก็บของออกจากห้องนอน', 'นั่งนิ่งอยู่ที่ขอบเตียง', 'โทรบอกที่บ้านเอง', 'เดินดูสนามฝึกเป็นครั้งสุดท้าย']);
   };
 
   function chooseSchool(st, o) {
@@ -3562,9 +4021,14 @@ function focusWords(def, labels) {
 // ไม่เคยทุ่ม = ไม่มี h.tree: ชีวิตที่ไม่แตะต้นไม้เดินเท่าเดิมทุกหลัก (ไม่ดึงเลขสุ่ม ไม่ถ่วงการ์ด)
 // ทุ่มได้แค่โหนดที่ยังไม่ปลด (ข้อ 36) · ปลดแล้วเลื่อนไปโหนดถัดไปเอง ไม่เสียปี · เปลี่ยนเองทีหลังได้ ไม่เสียปี (ข้อ 43) · ทางแยกไม่ล็อก เวลาเป็นราคา (ข้อ 8)
 
+
 // ตัวควบคุมของ harness: ปิดการนับการ์ด → โหนดที่ต้องตอบการ์ดต้องปลดไม่ได้เลย
 // anyCat / cardsFree = ทางเลือกที่ harness ใช้ทำตารางเสนอเจ้าของเท่านั้น (นับทุกหมวด · ไม่ต้องตอบการ์ด) ห้ามเปิดนอก harness
-const treeCtl = { cards: true, anyCat: false, cardsFree: false };
+// passive = ผลติดตัวหลังปลด (ผลเบารายปี · ทอย · ถ่วงการ์ด · ใบ 04) ปิด = ปลดแล้วไม่ให้อะไรเลย (ตัวควบคุมของด่านงบ)
+// rust = สนิม (ใบ 09) ปิด = ผลเบาไม่จางเลย (ตัวควบคุมของ harness)
+const treeCtl = { cards: true, anyCat: false, cardsFree: false, passive: true, rust: true };
+// ตัวเร่ง/ชะลอการปลด (ใบ 08) แยกเปิด/ปิดทีละตัว: ตัวควบคุมของ harness `tree-pace` ปิดตัวที่วัดแล้วต้องเท่าเดิมเป๊ะ
+const treePaceCtl = { teacher: true, cls: true, learn: true, age: true };
 
 // ต้นทางผ่านแล้ว: ไม่มีต้นทาง = เปิดอยู่ · ในแขนงเดียวกันปลดอันใดอันหนึ่งก็พอ (ข้อ 72) · โหนดกลาง (and) ต้องครบทุกต้นทาง
 const treeReach = (h, def) => {
@@ -3584,32 +4048,195 @@ function treeInvest(h, defs, id, stage) {
 }
 
 // นับการ์ดที่ตอบ: เฉพาะโหนดที่กำลังทุ่ม และหมวดการ์ดตรงหมวดของโหนด
-function treeCard(h, defs, category) {
+// "ใช้" โหนดที่ปลดแล้ว (ใบ 09 ข้อ 63) = ตอบการ์ดหมวดตรง ไม่ต้องทุ่ม · จดอายุล่าสุดไว้กันสนิม · ไม่ส่ง age = ไม่จด
+function treeCard(h, defs, category, age) {
   const t = h.tree;
+  if (t && age !== undefined) for (const id of Object.keys(t.done)) if (defs[id]?.cat.includes(category)) (t.used ??= {})[id] = age;
   if (!treeCtl.cards || !t?.cur) return;
   if (treeCtl.anyCat || defs[t.cur].cat.includes(category)) t.cards[t.cur] = (t.cards[t.cur] ?? 0) + 1;
 }
 
+// ความเร็วปลดต่อปี (ใบ 08): 1 = ปีเต็มเท่าเดิม · ไม่ส่ง cfg = 1 ทุกหลัก (ชีวิตเก่า/โลกที่ไม่มีตัวเร่งเดินเท่าเดิม)
+// ยิ่งแก่ยิ่งช้า: ลดเชิงเส้นถึง age_end_mul ที่อายุ age_end (สูตรเรียนวิชาอสงไขยย่อสเกลอายุไทย) · ฐานะอ่านจากฐานะตอนเกิด (standing[0]) ทายาท/โลกที่ไม่มี = ไม่ปรับ
+function treePace(h, cfg, age) {
+  if (!cfg) return 1;
+  let m = 1;
+  if (treePaceCtl.age) m *= 1 - (1 - cfg.age_end_mul) * Math.min(age, cfg.age_end) / cfg.age_end;
+  if (treePaceCtl.teacher && h.flags?.tree_teacher) m *= cfg.teacher;
+  if (treePaceCtl.learn && h.nature === 'learn') m *= cfg.learn;
+  const born = h.standing?.[0]?.cls;
+  if (treePaceCtl.cls && born !== undefined) m *= 1 + cfg.class_step * (born - cfg.class_mid);
+  return m;
+}
+
 // ปิดปีที่อายุ age: คืน { id, unlocked } ของโหนดที่ทุ่มปีนี้ · ไม่ได้ทุ่ม/โหนดหลุดช่วงวัยแล้ว = null (ปีนั้นไม่นับให้ใคร)
 // ปลด = ปีเต็มครบ + การ์ดหมวดตรงครบ · ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อทันที ปีถัดไปนับเลย ไม่เสียปี
-function treeYearEnd(h, defs, stage, age) {
+function treeYearEnd(h, defs, stage, age, pace = null) {
   const t = h.tree;
   if (!t?.cur) return null;
+  // ปีที่ล้างโหนด หลอดไม่ขยับ (ใบ 09 ข้อ 68)
+  if (t.respec === age) return null;
   const id = t.cur;
   if (!treeOpen(h, defs[id], id, stage)) {
     t.cur = null;
     return null;
   }
-  t.yrs[id] = (t.yrs[id] ?? 0) + 1;
+  // การ์ดด่านของโหนดนี้รอตอบอยู่ (ใบ 05): ปีนี้ไม่นับให้ใคร
+  if (t.pend === id) return null;
+  // ปีเศษส่วนปัดทศนิยม 3 ตำแหน่ง กันเลขลอยสะสมจนปลดเพี้ยนปี · ไม่มีตัวเร่ง = +1 เป๊ะเท่าเดิม
+  // t.carry = เศษเกินปีของโหนดที่เพิ่งปลด ทบเข้าปีแรกของโหนดถัดไป (ตัวเร่งเล็กจึงมีผลเฉลี่ยแม้โหนดปีเป็นจำนวนเต็ม) · มีแต่เมื่อความเร็วไม่ใช่จำนวนเต็ม
+  const carry = t.carry ?? 0;
+  if (carry) t.carry = 0;
+  t.yrs[id] = Math.round(((t.yrs[id] ?? 0) + treePace(h, pace, age) + carry) * 1000) / 1000;
   t.hist.push([age, id]);
   const def = defs[id];
-  const unlocked = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
-  if (unlocked) {
-    t.done[id] = age;
-    t.cur = treeOffers(h, defs, stage).find((x) => x !== id && !defs[x].hidden) ?? null;
+  const ready = t.yrs[id] >= def.years && (treeCtl.cardsFree || (t.cards[id] ?? 0) >= def.cards);
+  // โหนดใหญ่มีการ์ดด่าน: ปีครบ = การ์ดด่านโผล่ ยังไม่ปลด · ปลดตอนตอบการ์ดด่าน (treeGateDone)
+  if (ready && def.gate) {
+    t.pend = id;
+    return { id, unlocked: false, gate: true };
   }
-  return { id, unlocked };
+  if (ready) {
+    t.done[id] = age;
+    // เศษเกินเฉพาะส่วนทศนิยม: ปีเต็มที่ค้างเพราะรอการ์ดไม่ทบ (ไม่ให้การรอการ์ดกลายเป็นโบนัสโหนดถัดไป)
+    const over = Math.round((t.yrs[id] - def.years) * 1000) / 1000 % 1;
+    if (over > 0) t.carry = over;
+    t.cur = treeNext(h, defs, stage, id);
+  }
+  return { id, unlocked: ready };
 }
+
+// ปลดแล้วเลื่อนไปโหนดแรกที่ทุ่มได้ต่อ · ไม่เลื่อนเข้าโหนดซ่อน และไม่เลื่อนเข้า keystone เอง (ใบ 05 · ข้อ 28: ต้องเลือกทุ่มเองหลังเห็นข้อเสีย)
+// แขนงเดียวกับโหนดที่เพิ่งปลดมาก่อน (ต้นไม้หลายแขนงต้นแขนงอื่นเปิดอยู่เสมอ ห้ามเลื่อนข้ามแขนงเอง) · แขนงเดียวกันหมดแล้วค่อยหาแขนงอื่น
+const treeNext = (h, defs, stage, id) => {
+  const open = treeOffers(h, defs, stage).filter((x) => x !== id && !defs[x].hidden && !defs[x].keystone);
+  return open.find((x) => defs[x].branch === defs[id].branch) ?? open[0] ?? null;
+};
+
+// ── สนิม + ล้างโหนด (ใบ 09 ข้อ 31 34 56 63 68 94) ── ทุกตัวไม่ดึงเลขสุ่ม · ไม่มี cfg (rust) = ไม่มีสนิม
+// สนิม: ไม่ได้ "ใช้" (ตอบการ์ดหมวดตรง) ครบ cfg.years ปีนับจากครั้งล่าสุด/ตอนปลด → ผลเบาลงเหลือ cfg.floor เท่า · ตัวเลือกที่ปลดไม่หาย · ใช้อีกครั้งผลกลับเต็ม
+const treeRusty = (h, id, age, cfg) => {
+  const t = h?.tree;
+  const done = t?.done?.[id];
+  return !!cfg && treeCtl.rust && done !== undefined && age - Math.max(done, t.used?.[id] ?? done) >= cfg.years;
+};
+const treeRustMul = (h, id, age, cfg) => (treeRusty(h, id, age, cfg) ? cfg.floor : 1);
+
+// ล้างโหนดที่ปลดแล้ว: ปีละ 1 โหนด · keystone ล้างไม่ได้ (ข้อ 60) · ปีที่ล้างหลอดไม่ขยับ (treeYearEnd) · โหนดกลับไปทุ่มใหม่ได้ ต้องเริ่มปี/การ์ดใหม่ทั้งหมด
+// t.gone = โหนดที่เคยปลดแล้วล้าง (อายุที่ล้างครั้งล่าสุด) ให้ฉายานับทุกโหนดที่เคยปลด (ข้อ 56)
+function treeRespec(h, defs, id, age) {
+  const t = h.tree;
+  if (t?.done?.[id] === undefined) throw new Error(`ล้างโหนดที่ยังไม่ปลดไม่ได้: ${id}`);
+  if (defs[id].keystone) throw new Error(`keystone ล้างไม่ได้: ${id}`);
+  if (t.respec === age) throw new Error('ปีนี้ล้างโหนดไปแล้ว (ปีละ 1 โหนด)');
+  delete t.done[id];
+  delete t.yrs[id];
+  delete t.cards[id];
+  if (t.used) delete t.used[id];
+  if (t.gate) delete t.gate[id];
+  (t.gone ??= {})[id] = age;
+  t.respec = age;
+}
+// เคยปลดทั้งหมด = ที่ปลดอยู่ + ที่ล้างไปแล้ว (ฐานของฉายา ข้อ 56)
+const treeEver = (h) => [...new Set([...Object.keys(h?.tree?.done ?? {}), ...Object.keys(h?.tree?.gone ?? {})])];
+
+// แขนงหลักของชีวิต = แขนงที่ปลดมากสุด (นับโหนดใน done ไม่รวมโหนดกลาง · เกณฑ์เดียวกับถ่วงการ์ด) · เสมอกัน = แขนงที่ปลดโหนดล่าสุด (ทายาทต้องได้แขนงเดียวเสมอ ต่างจากถ่วงการ์ดที่เสมอ = ไม่ถ่วง)
+function treeMainBranch(h, defs) {
+  const done = h?.tree?.done;
+  if (!done) return null;
+  const n = {}, last = {};
+  for (const [id, age] of Object.entries(done)) {
+    const b = defs[id] && !defs[id].and ? defs[id].branch : null;
+    if (!b) continue;
+    n[b] = (n[b] ?? 0) + 1;
+    last[b] = Math.max(last[b] ?? age, age);
+  }
+  let best = null;
+  for (const b of Object.keys(n)) if (best === null || n[b] > n[best] || (n[b] === n[best] && last[b] > last[best])) best = b;
+  return best;
+}
+
+// ── การ์ดด่าน + keystone (ใบ 05) ── ทุกตัวไม่ดึงเลขสุ่ม · ผลของการ์ดด่านลงผ่านตัวเลือกของการ์ด (ผลเต็มครั้งเดียว) ไม่ผ่านงบผลเบา
+// ปีครบแต่การ์ดหมวดยังไม่ครบ (ข้อ 46): ใช้บอกขั้น "รอโอกาส" ที่หน้าต้นไม้ · ไม่แตะสถานะ
+const treeWaiting = (h, defs) => {
+  const t = h?.tree;
+  const id = t?.cur;
+  return !!id && t.pend !== id && t.done[id] === undefined && (t.yrs[id] ?? 0) >= defs[id].years && (t.cards[id] ?? 0) < defs[id].cards;
+};
+// การ์ดด่านของโหนด id เป็นเหตุการณ์ตัวเลือก 2–3 ทาง (ไม่มี weight/category → ไม่ใช่การ์ดกองสุ่ม ไม่ขยับโควตาการ์ดโลกหลัก ไม่นับเป็นการ์ดหมวดของโหนดไหน)
+function treeGateEvent(defs, id) {
+  const g = defs[id].gate;
+  return {
+    id: `tree_gate_${id}`,
+    type: g.type ?? 'A',
+    treeGate: id,
+    title: g.title,
+    text: g.text,
+    choices: g.results.map((r) => ({ text: r.text, effects: r.fx, ...(r.flags && { sets_flags: r.flags }) })),
+  };
+}
+// ตอบการ์ดด่านแล้ว = ปลดโหนด · จดว่าเลือกผลทางไหน · เลื่อนไปโหนดถัดไป
+function treeGateDone(h, defs, stage, id, idx, age) {
+  const t = h.tree;
+  if (t?.pend !== id) throw new Error(`ไม่มีการ์ดด่านรอของโหนด ${id}`);
+  t.done[id] = age;
+  (t.gate ??= {})[id] = idx;
+  t.pend = null;
+  t.cur = treeNext(h, defs, stage, id);
+}
+
+// ── จุดเกิด (ใบ 06 · ข้อ 15 39 17 · ข้อ 97) ── ทุกชีวิตเริ่ม 1 แขนง: ถ่วงน้ำหนักตาม ฐานะ > อาชีพ > แขนงพ่อแม่ (ตัวเลขใน tree.yaml start)
+// ฟังก์ชันล้วนจาก seed (stream แยก ไม่ดึงเลขสุ่มของโลก · ไม่เขียนสถานะ) · พ่อแม่ไม่มีโหนดเลย (ไม่มี parentBranch) = ไม่มีน้ำหนักแขนงพ่อแม่ ส่วนที่เหลือยังถ่วงตามฐานะ/อาชีพ (ข้อ 67 73)
+const START_SALT = 0x5bd1e995;
+const treeStartWeights = (cfg, cls, occ = null, parentBranch = null) => {
+  const band = cls <= 3 ? 'low' : cls <= 6 ? 'mid' : 'high';
+  return Object.fromEntries(Object.keys(cfg.class[band]).map((b) => [b, cfg.base + cfg.class[band][b] + (cfg.job[occ]?.[b] ?? 0) + (b === parentBranch ? cfg.parent_branch : 0)]));
+};
+function treeStartBranch(cfg, seed, cls, occ = null, parentBranch = null) {
+  const w = treeStartWeights(cfg, cls, occ, parentBranch);
+  const keys = Object.keys(w);
+  let x = makeRng(mixSeed(seed ^ START_SALT, 0)).next() * keys.reduce((a, b) => a + w[b], 0);
+  for (const b of keys) if ((x -= w[b]) < 0) return b;
+  return keys[keys.length - 1];
+}
+// ต้นแขนง = โหนดไม่มีต้นทางของแขนงนั้น (เปิดอยู่ตั้งแต่เด็ก)
+const treeStartNode = (defs, branch) => Object.keys(defs).find((id) => defs[id].branch === branch && !(defs[id].pre ?? []).length && !defs[id].hidden) ?? null;
+
+// ── ผลติดตัว (ใบ 04) ── ทุกตัวเป็นฟังก์ชันล้วน ไม่ดึงเลขสุ่ม · ไม่เคยปลดอะไร = 1 เท่าเดิมทุกหลัก
+// ทอยทุกโหนดตามหมวดการ์ด คิดรวมต่อแขนง (ข้อ 58): ระดับ = Σ roll ของโหนดที่ปลดแล้วและหมวดตรง · ตัวคูณ = 1 + k × ระดับ (แบบ thaiSkillMul) · ชนเพดาน okMax ที่ปลายทางเอง
+// อาชีพตรง (ข้อ 17 50 53): โหนดที่ระบุ jobs ให้ job_roll เพิ่มอีกชั้นเดียวเมื่ออาชีพที่ทำอยู่ตรง · ซ้อนกี่โหนดก็นับสูงสุดตัวเดียว ไม่ซ้อน 2 ชั้น
+function treeRollLevel(h, defs, cat, occ = null) {
+  const done = h?.tree?.done;
+  if (!done || !cat || !treeCtl.passive) return 0;
+  let lv = 0, job = 0;
+  for (const id of Object.keys(done)) {
+    const d = defs[id];
+    if (!d?.cat.includes(cat)) continue;
+    lv += d.roll ?? 0;
+    if (occ && d.jobs?.includes(occ)) job = Math.max(job, d.job_roll ?? 0);
+  }
+  return lv + job;
+}
+const treeRollMul = (h, defs, k, cat, occ = null) => (k > 0 ? 1 + k * treeRollLevel(h, defs, cat, occ) : 1);
+
+// ถ่วงการ์ดถาวรเฉพาะแขนงที่ปลดมากสุด (ข้อ 42): แขนงอื่น = 1 · เสมอกัน = ไม่ถ่วงใคร (ไม่มีแขนงที่ "มากสุด") · ถ่วงหมวดการ์ดที่โหนดของแขนงนั้นนับ
+// จำค่าไว้ต่อสถานะต้นไม้ (เรียกต่อใบในกองทุกปี) — คีย์ = จำนวนโหนดที่ปลด · ไม่เขียนลง st.tree จึงไม่เข้าเซฟ
+const topCache = new WeakMap();
+function topCats(t, defs) {
+  const n = Object.keys(t.done).length;
+  const hit = topCache.get(t);
+  if (hit && hit.n === n && hit.defs === defs) return hit.cats;
+  const cnt = {};
+  for (const id of Object.keys(t.done)) if (defs[id] && !defs[id].and) cnt[defs[id].branch] = (cnt[defs[id].branch] ?? 0) + 1;
+  const best = Math.max(0, ...Object.values(cnt));
+  const top = Object.keys(cnt).filter((b) => cnt[b] === best);
+  const cats = new Set();
+  if (best > 0 && top.length === 1) for (const d of Object.values(defs)) if (d.branch === top[0]) for (const c of d.cat) cats.add(c);
+  topCache.set(t, { n, defs, cats });
+  return cats;
+}
+const treeCardMul = (h, defs, mul, cat) => (treeCtl.passive && h?.tree?.done && mul > 1 && topCats(h.tree, defs).has(cat) ? mul : 1);
+const treeTopCats = (h, defs) => (h?.tree?.done ? [...topCats(h.tree, defs)] : []);
 
 // ตายสงบย้อนความทรงจำ (B168): ตายตอนขึ้นปีด้วยวัยชราหรือโรคเรื้อรังที่หมอบอกไว้ อายุ 60 ขึ้นไป → การ์ดย้อนชีวิตใบเดียวก่อนคำสั่งเสีย
 // คัดแบบกำหนดได้จาก log/ญาติของชีวิตนั้น ไม่ดึงเลขสุ่ม ไม่ตั้งธง ไม่ให้ผลค่า ⇒ บอทและผลเกมเดินเท่าเดิม ต่างแค่การ์ดหนึ่งใบกับบรรทัดบนมรณบัตร
@@ -3776,6 +4403,36 @@ function pastFromLineage(lineage, realmId) {
   return { lives: rows.length, province: last.province ?? null, job: null, jobYears: 0, cause: last.gone ? PAST_GONE : last.cause ?? 'other', realm: realmId(last.realm), realms, jobs: [], treasures: [], wish: null, barami: 0 };
 }
 
+// คำแทนตามงาน (ใบ 181 · ข้อ 296 312): {ที่ทำงาน} {คนคุมงาน} ให้การ์ดวัยทำงานเขียนครั้งเดียวแล้วอ่านถูกกับทุกอาชีพ
+// สายราชการ/ทหาร/ตำรวจ/นักล่า ใช้คำของสาย · สายเอกชน/สายอาชีพ ใช้คำของอาชีพ · ไม่ได้ทำงานอยู่ (ก่อนทำงาน · เกษียณ) ได้คำกลาง
+// อาชีพที่ไม่มีคนคุมงานตรง ๆ (เกษตรกร) มีคำสำรอง · ต่างโลกไม่ใช้ช่องนี้
+const JOB_NEUTRAL = { ที่ทำงาน: 'ที่ทำงาน', คนคุมงาน: 'หัวหน้างาน' };
+const JOB_WORDS_BY_LADDER = {
+  gov: { ที่ทำงาน: 'ที่ทำการ', คนคุมงาน: 'หัวหน้าส่วน' },
+  army: { ที่ทำงาน: 'ค่าย', คนคุมงาน: 'ผู้บังคับบัญชา' },
+  police: { ที่ทำงาน: 'โรงพัก', คนคุมงาน: 'ผู้บังคับบัญชา' },
+  hunter: { ที่ทำงาน: 'ทีมล่า', คนคุมงาน: 'หัวหน้าทีม' },
+};
+const JOB_WORDS_BY_OCC = {
+  farmer: { ที่ทำงาน: 'ไร่นา', คนคุมงาน: 'เจ้าของที่นา' }, // ไม่มีนาย · คำสำรอง = คนที่คุมนาที่ทำอยู่ (คนเช่านา/รับจ้างทำนาอ่านตรง)
+  labor: { ที่ทำงาน: 'ไซต์งาน', คนคุมงาน: 'หัวหน้าคนงาน' },
+  factory: { ที่ทำงาน: 'โรงงาน', คนคุมงาน: 'หัวหน้าไลน์' },
+  craft: { ที่ทำงาน: 'ร้านช่าง', คนคุมงาน: 'หัวหน้าช่าง' },
+  service: { ที่ทำงาน: 'ร้าน', คนคุมงาน: 'เจ้าของร้าน' },
+  clerk: { ที่ทำงาน: 'ออฟฟิศ', คนคุมงาน: 'หัวหน้าแผนก' },
+  technician: { ที่ทำงาน: 'โรงซ่อม', คนคุมงาน: 'หัวหน้าช่าง' },
+  professional: { ที่ทำงาน: 'สำนักงาน', คนคุมงาน: 'หัวหน้าทีม' },
+  manager: { ที่ทำงาน: 'บริษัท', คนคุมงาน: 'กรรมการบริษัท' },
+  officer: { ที่ทำงาน: 'ที่ทำการ', คนคุมงาน: 'หัวหน้าส่วน' },
+  senior_officer: { ที่ทำงาน: 'หน่วยงาน', คนคุมงาน: 'ผู้บังคับบัญชา' },
+};
+// working = ทำงานอยู่จริงตอนนี้ (isWorking) · ladder = st.ladder?.id · occ = st.occupation
+const jobWord = (key, { working, ladder, occ }) => {
+  if (!working) return JOB_NEUTRAL[key];
+  return (JOB_WORDS_BY_LADDER[ladder] ?? JOB_WORDS_BY_OCC[occ] ?? JOB_NEUTRAL)[key];
+};
+
+
 
 
 
@@ -3892,7 +4549,7 @@ function signPact(st, p) {
 // น้ำหนักทางผลหลังเอียงตาม multipliers และอารมณ์ · การ์ดที่มีทั้งทางสำเร็จและไม่สำเร็จ ตัดโอกาสสำเร็จรวมไว้ okMin–okMax (B112) โดยปรับสองกลุ่มตามสัดส่วน
 // (ไม่ดึงเลขสุ่มเพิ่ม · ป้าย % กับผลจริงใช้ตัวเดียวกัน)
 const outcomeWeights = (st, ev, c) => {
-  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category);
+  const m = (moodCard(ev) ? moodMul(st) : 1) * pactLuck(st) * thaiSkillMul(st.skills, ev?.category) * lifeTreeRoll(st, ev?.category);
   const w = c.outcomes.map((o) => o.weight * poolMultiplier(st, o.multipliers) * (o.ok ? m : 1));
   const ok = w.reduce((a, x, i) => a + (c.outcomes[i].ok ? x : 0), 0);
   const all = w.reduce((a, x) => a + x, 0);
@@ -3942,6 +4599,45 @@ function yearlySaving(st, year = st.birthYear + st.age) {
   return monthlyIncome(st, year) * 12 * era.birth.saveRate;
 }
 
+// ตัวคูณระดับการใช้จ่าย (B29 · ใบ 52): คูณเฉพาะเงินเก็บที่เข้ากระเป๋าแต่ละปี — ไม่แตะ yearlySaving
+// (ราคาการ์ด income_x/เงินติดตัวใช้ yearlySaving ตรง ๆ จึงเท่าเดิมทุกเกม) · normal = ×1 = ค่าเดิม
+const spendMult = (st) => st.content.spending?.levels?.[st.spendLevel]?.save_mult ?? 1;
+
+// แถวเลือกระดับใช้จ่ายบนการ์ดทบทวนเงิน — ป้ายบอกแค่ทิศ ไม่บอกตัวเลข (ห้ามอ่านเป็นคำแนะนำการเงิน)
+// อยู่นอก choices จึงไม่ขยับเลขตัวเลือกของการ์ดทบทวนเงิน · บอท/ผู้เล่นที่ไม่แตะแถวนี้ = ชีวิตเดิมทุกบิต
+const dir = (v, up, down) => (v > 0 ? up : v < 0 ? down : null);
+function spendRow(st) {
+  const levels = st.content.spending?.levels;
+  if (!levels) return null;
+  return {
+    cur: st.spendLevel ?? 'normal',
+    levels: Object.entries(levels).map(([id, l]) => ({
+      id,
+      name: l.name,
+      fx: [dir(l.save_mult - 1, 'เงิน ↑', 'เงิน ↓'), dir(l.happy, 'ความสุข ↑', 'ความสุข ↓')].filter(Boolean).join(' · ') || 'เท่าเดิม',
+    })),
+  };
+}
+
+// เลือกระดับระหว่างการ์ดทบทวนเงินยังเปิดอยู่ · ผลลงตอนกดตัวเลือกของการ์ด (choose) — กดแถวซ้ำกี่ครั้งก็ได้ความสุขครั้งเดียว
+function chooseSpend(st, id) {
+  if (!st.pending?.alloc) throw new Error('ยังไม่ถึงการ์ดทบทวนเงิน');
+  if (!st.content.spending?.levels?.[id]) throw new Error('ระดับการใช้จ่ายไม่ถูกต้อง');
+  st.pending.spend = id;
+}
+
+// หรูหราติดกันหลายช่วง สุขเพิ่มน้อยลงเรื่อย ๆ (luxury_decay ต่อครั้ง) · เปลี่ยนไประดับอื่น = เริ่มนับใหม่
+function applySpend(st, id) {
+  const sp = st.content.spending;
+  const l = sp.levels[id];
+  const streak = id === 'luxury' ? (st.luxuryStreak ?? 0) : 0;
+  st.happiness = clamp(st.happiness + l.happy * sp.luxury_decay ** streak);
+  st.luxuryStreak = id === 'luxury' ? streak + 1 : 0;
+  // ลงบันทึกเฉพาะตอนเปลี่ยนระดับ — คงระดับเดิมทุก 5 ปีไม่ใช่เรื่องที่ควรขึ้นในสรุปชีวิต
+  if (id !== (st.spendLevel ?? 'normal')) st.log.push({ id: 'spend', age: st.age, text: `ใช้จ่ายแบบ${l.name}` });
+  st.spendLevel = id;
+}
+
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างอาชีพ × ตัวคูณรายได้ถาวรจากเหตุการณ์
 // รายได้/เดือนของชีวิตนี้: ค่าจ้างงาน (ขั้นในสายยศทับค่าจ้างอาชีพ) × ตัวคูณรายได้ถาวร
 // ตำแหน่งการเมือง: ท้องถิ่นได้ค่าตอบแทนบวกจากงาน · เต็มเวลาได้อย่างที่มากกว่า (ลาออกจากงานเดิมไปนั่งตำแหน่ง)
@@ -3989,6 +4685,8 @@ function newLife(seed, content, heir = null) {
   if (heir) ({ birthYear, sex, region, cls } = heir);
   // จังหวัดสุ่มจาก stream แยกในภาคที่ได้ (B34) — ไม่กินเลขสุ่มของโลก · ทางเป็นลูกเกิดบ้านเดิม · เซฟเก่าไม่มีจังหวัด สุ่มซ้ำจาก seed ได้ค่าเดิม
   const province = heir?.province ?? pickProvince(makeRng(seed ^ 0xa54ff53a), era.birth, region.name);
+  // ศาสนา (B93): ทายาทถือศาสนาของบ้าน · เกิดใหม่สุ่มตามจังหวัดจาก stream แยก ไม่แตะเลขสุ่มจังหวัด/โลก · คู่ครองและลูกถือศาสนาเดียวกับตัวเอก (ไม่มีช่องศาสนาต่อญาติ)
+  const religion = heir?.religion ?? pickReligion(makeRng(seed ^ 0x3b9aca07), era.birth, province);
   // ค่าเริ่มสุ่มจาก stream แยก — ไม่กินเลขสุ่มของโลก ลำดับสุ่มการตายจึงเหมือนก่อนมีการสุ่มนี้
   const jit = makeRng(seed ^ 0x6a09e667);
   const s = Object.fromEntries(Object.entries(startStats(cls)).map(([k, v]) => [k, clamp(v + (jit.next() * 2 - 1) * START_JITTER + (heir?.bonus[k] ?? 0))]));
@@ -4001,6 +4699,7 @@ function newLife(seed, content, heir = null) {
     { sex: 'หญิง', age: motherAge, alive: true },
     { sex: 'ชาย', age: motherAge + famRng.int(0, 8), alive: true },
   ];
+  const dlc = dlcStamp(heir?.dlc ?? getDlcDefault());
   const st = {
     rng,
     seed,
@@ -4014,6 +4713,7 @@ function newLife(seed, content, heir = null) {
     realName: pickRealName(seed, sex, birthYear, era.names),
     region: region.name,
     province,
+    religion,
     ses: region.ses,
     cls,
     // ก่อนได้งาน occupation = อาชีพของครอบครัว เป็นฐานของเงินในผลการ์ด (income_x) · ได้งานแล้วเปลี่ยนเป็นงานของตัวเอง
@@ -4064,6 +4764,8 @@ function newLife(seed, content, heir = null) {
     fame: heir?.fame ?? 0,
     // ค่าซ้อนทับของตระกูล (overlapOf) — ใส่ช่องเฉพาะเมื่อ > 0 ⇒ ตระกูลที่ไม่เคยข้ามโลกได้สถานะเท่าเดิมทุกไบต์ · เซฟเก่าไม่มีช่อง = 0
     ...(heir?.overlap && { overlap: heir.overlap }),
+    // ก้อน DLC ที่ล็อกของตระกูลนี้ · ทายาทรับต่อจากรุ่นก่อน · ปลดครบ = ไม่มีช่อง (ไบต์เท่าเดิม) · ทายาทที่ไม่ส่ง dlc ใช้ค่าเริ่ม
+    ...(dlc && { dlc }),
     // ความจำข้ามชาติ (past.mjs) + อาชีพที่ติดพรสวรรค์มา — ชีวิตแรกไม่มีช่อง
     ...(heir?.past && { past: heir.past }),
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
@@ -4133,6 +4835,7 @@ function newLife(seed, content, heir = null) {
   // พ่อ/แม่ที่จากไปก่อนเราเกิด (ทางในตระกูล) เป็นประวัติครอบครัวตั้งแต่แรก
   for (const p of st.parents) if (!p.alive) inherit(st, p.cause);
   petsAtBirth(st, heir, CLASSES.indexOf(cls));
+  sibsAtBirth(st, heir);
   if (heir?.start) skipToAge(st, heir.start.age);
   // เริ่มกลางวัย = เงินของบ้านเป็นบาทของปีที่เริ่ม (yearlySaving อ่านปีจาก st.age)
   st.money = era.birth.startMoney[CLASSES.indexOf(cls)] * yearlySaving(st);
@@ -4145,7 +4848,8 @@ function newLife(seed, content, heir = null) {
   st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
   st.stageMark = markStage(st);
-  lifeFocusBorn(st, heir?.focus);
+  lifeTreeBorn(st, heir?.treeParent);
+  naturePoint(st, heir?.nature, st.content.nature?.heir_nature);
   if (heir?.gates?.length) st.gates = [...heir.gates];
   overlapPlan(st);
   driftPlan(st);
@@ -4269,7 +4973,7 @@ function fixedFx(ev, c) {
 // ตัวคูณอิงส่วนต่างจากเส้นสุขภาพตามธรรมชาติของชีวิตนั้น ไม่ใช่ค่าคงที่ — ชีวิตที่ไม่มีเหตุการณ์จึงได้ qx จริงพอดี
 // และสุขภาพที่ไหลลงตามวัยไม่ถูกนับซ้ำกับ qx ที่สูงขึ้นตามวัยอยู่แล้ว · สุขภาพแย่เพิ่มความเสี่ยงแรงกว่าสุขภาพดีลด
 function healthMultiplier(st) {
-  const d = st.health - st.healthNatural;
+  const d = st.health - (st.healthNatural - (st.frail ?? 0));
   return d < 0 ? 1 - d / 50 : Math.max(0.6, 1 - d / 150);
 }
 
@@ -4277,16 +4981,58 @@ function healthMultiplier(st) {
 // ทุกที่ที่อ่านตารางชีพ/สัดส่วนสาเหตุ/ช่วงป่วยใช้อายุนี้ (B110) ไม่งั้นคนกลับจากต่างโลกตายตามอายุไทย
 const bodyAge = (st) => st.age + (st.away ?? 0);
 
-// ผลรวมทุกสาเหตุ (B110) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตายรวม
+// หลอดรายปี (ใบ 190 · decisions 324 328 337) หลังไหลตามวัย: แผลจากเหตุเฉียบพลันฟื้นคืนหาเส้น · ส่วนเกินเส้นจางช้า ส่วนขาดอื่นฟื้นช้าเท่ากัน
+// ความแก่ (สาเหตุ other) กดหลอดเงียบไม่ฟื้น ไม่มีการ์ด · เส้นที่ผู้เล่นเห็น = เส้นธรรมชาติ − ส่วนแก่ · ไม่ดึงเลขสุ่ม
+function barYear(st) {
+  const line = st.healthNatural - (st.frail ?? 0);
+  if (st.wound > 0) {
+    const back = st.wound * HIT.heal;
+    st.wound -= back;
+    if (st.health < line) st.health = clamp(Math.min(line, st.health + back));
+  }
+  if (st.health > line) st.health = clamp(st.health - (st.health - line) * HIT.excessFade);
+  else if (st.health < line) st.health = clamp(st.health + (line - st.health) * HIT.mend);
+  const era = st.content.era;
+  const py = protoYear(era, st.seed, st.birthYear + st.age);
+  const age = bodyAge(st);
+  if (age >= MAX_AGE || qx(era, st.sex, py, age) >= 1) return;
+  const want = st.healthNatural * frailOf(st, st.birthYear + st.age, age);
+  if (want > (st.frail ?? 0)) {
+    st.health = clamp(st.health - (want - (st.frail ?? 0)));
+    st.frail = want;
+  }
+}
+
+// ส่วนเหตุของปีนี้ (ใบ 190): โรคเรื้อรังส่วนที่ยังไม่มีนัด (เด็กเล็ก) ตายตรงตามเดิม · เหตุเฉียบพลันเป็นโอกาสเกิดเหตุที่กดหลอด
+// ตัวคูณมีแค่กรรม — สุขภาพมีผลผ่านหลอดที่เหลือตอนโดนกดแทน
+function yearHazards(st, py, age) {
+  const keys = st.content.era.causes.keys;
+  const hz = causeHazards(st, py, age, karmaMultiplier(st.ledger));
+  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
+  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
+  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
+  const chronic = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : 0));
+  const acute = hz.map((x, j) => (isAcute(keys[j]) ? x : 0));
+  const cSum = chronic.reduce((s, x) => s + x, 0);
+  const event = Math.min(1 - cSum, acute.reduce((s, x) => s + x, 0) / HIT_KILL);
+  return { keys, hz, chronic, acute, cSum, event };
+}
+// โอกาสที่เหตุหนึ่งครั้งฆ่าคนที่หลอดเหลือ h (hit สุ่มเท่ากันช่วง lo–hi เท่าของเส้นธรรมชาติ)
+const hitKills = (st) => Math.max(0, Math.min(1, (HIT.hi - st.health / Math.max(st.healthNatural, 1e-9)) / (HIT.hi - HIT.lo)));
+const hitRng = (st) => (st.hitRng ??= makeRng(st.seed ^ HIT.salt));
+
+// โอกาสตายรวมของปีนี้ (B110 · ใบ 190) — ปัจจัยเสี่ยงเอียงทั้งสาเหตุและโอกาสตาย · หลอดยิ่งต่ำยิ่งตายง่าย
 function deathChance(st) {
   const py = protoYear(st.content.era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
-  if (qx(st.content.era, st.sex, py, age) >= 1) return 1;
-  return Math.min(1, causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger)).reduce((s, x) => s + x, 0));
+  if (st.health <= 0 || qx(st.content.era, st.sex, py, age) >= 1) return 1;
+  const { cSum, event } = yearHazards(st, py, age);
+  return Math.min(1, cSum + event * hitKills(st));
 }
 
 // ตายปีนี้ด้วยสาเหตุอะไร · null = รอด — ดึง st.rng ครั้งเดียวต่อปีเท่าเดิม สาเหตุและนัดป่วยใช้ causeRng แยก
 // โรคเรื้อรังไม่ตายปีที่สุ่มโดน แต่นัดตายอีก 1–3 ปีข้างหน้าด้วยโอกาสของอายุนั้น (scheduleIllness) — ผลรวมยังตรงตารางชีพ
+// เหตุเฉียบพลัน (ใบ 190): กดหลอด เกินหลอด = ตาย · ไม่เกิน = รอดเป็นแผล (st.wound ฟื้นใน stepYear)
 function deathRoll(st) {
   const u = st.rng.next();
   if (st.terminal && st.age >= st.terminal.age) return st.terminal.cause;
@@ -4294,16 +5040,17 @@ function deathRoll(st) {
   const py = protoYear(era, st.seed, st.birthYear + st.age);
   const age = bodyAge(st);
   if (qx(era, st.sex, py, age) >= 1) return 'other';
-  const keys = era.causes.keys;
-  const hz = causeHazards(st, py, age, healthMultiplier(st) * karmaMultiplier(st.ledger));
-  // เด็กเล็กยังไม่มีนัดจากปีก่อนครบทุกระยะ — ส่วนที่นัดไม่ถึงของโรคเรื้อรังตายปีนี้เลย
-  const span = ILL_YEARS[1] - ILL_YEARS[0] + 1;
-  const unscheduled = (span - Math.max(0, Math.min(span, age - ILL_YEARS[0] + 1))) / span;
-  const now = hz.map((x, j) => (CHRONIC.includes(keys[j]) ? x * unscheduled : x));
-  const sum = now.reduce((s, x) => s + x, 0);
-  if (u < sum) return pickCause(st.causeRng, keys, now);
-  // เฉียดตาย (B153) ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
-  nearMiss(st, u - sum, keys, now);
+  const { keys, hz, chronic, acute, cSum, event } = yearHazards(st, py, age);
+  if (u < cSum) return pickCause(st.causeRng, keys, chronic);
+  if (u < cSum + event) {
+    const hit = st.healthNatural * (HIT.lo + (HIT.hi - HIT.lo) * hitRng(st).next());
+    if (hit >= st.health) return hit < st.health + (st.frail ?? 0) ? 'other' : pickCause(st.causeRng, keys, acute);
+    st.health = clamp(st.health - hit);
+    st.wound = (st.wound ?? 0) + hit;
+  }
+  // เฉียดตาย (B153) ช่องต่อจากช่องเกิดเหตุ ขนาดเท่าเดิม ⇒ อัตราเฉียดตายไม่ขยับ
+  // ต้องไหลต่อไปนัดป่วยเหมือนรอดปกติ — ข้ามแล้ว causeRng ขาดหนึ่งครั้ง นัดโรคทั้งชีวิตเลื่อน
+  else nearMiss(st, u - cSum - event, keys, hz);
   if (!st.terminal) scheduleIllness(st);
   return null;
 }
@@ -4328,8 +5075,6 @@ function faceDeath(st, cause, opts = {}) {
   if (st.pact?.survive === true) {
     // สัญญาจ่ายบาปแล้วจึงได้ของจริง · สุขภาพกลับค่าธรรมชาติ ไม่งั้นหมดตัวแล้วตายซ้ำทันที
     st.pact.survive = 'used';
-    // เสี่ยงของโฟกัสที่ทอยตายไว้ต้องหายด้วย ไม่งั้นรอดปีนี้แล้วปีถัดไปตายด้วยเหตุเดิมทันที
-    st.focusDoom = undefined;
     st.health = Math.max(st.health, st.healthNatural, 1);
     return { fate: 'survive', card: { kind: 'result', type: 'B', age: st.age, stage: stageOf(st.age), text: PACT.surviveText, tag: 'survive' } };
   }
@@ -4340,6 +5085,8 @@ function faceDeath(st, cause, opts = {}) {
   }
   st.dead = true;
   st.cause = cause;
+  // ตายเมื่อหลอดหมดเท่านั้น (ใบ 190) — การ์ดตายเห็นหลอด 0 ทุกทาง
+  st.health = 0;
   return { fate: 'dead' };
 }
 
@@ -4397,18 +5144,28 @@ const FILL = {
   ชื่อเต็ม: (st) => (st.surname ? `${st.name} ${st.surname}` : st.name),
   ชื่อลูก: (st) => focusOf(st, 'child')?.name ?? 'ลูก',
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
+  ชื่อแฟน: (st) => focusOf(st, 'partner')?.name ?? 'แฟน',
+  ชื่อแฟนเก่า: (st) => exPartnerOf(st)?.name ?? 'แฟนเก่า',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
+  // ผีญาติ (ใบ 26): คนที่การ์ดผีญาติเลือกจากรายชื่อคนตายของตระกูล — ว่างเมื่อไม่มีรายชื่อ (การ์ดไม่ออกอยู่แล้วเพราะ when.kin_ghost)
+  ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
+  ผีญาติบทบาท: (st) => pickKinGhost(st)?.word ?? 'ญาติ',
   แจ้งการจากไป: (st) => (st.grief ? lossText(st.grief) : 'คนในบ้านจากไปแล้ว'),
+  // คำแทนตามงาน (ใบ 181): ก่อนทำงาน/เกษียณ = คำกลาง · ทำงานอยู่ = ตามสาย/อาชีพ (jobwords.mjs)
+  ที่ทำงาน: (st) => jobWord('ที่ทำงาน', { working: isWorking(st), ladder: st.ladder?.id, occ: st.occupation }),
+  คนคุมงาน: (st) => jobWord('คนคุมงาน', { working: isWorking(st), ladder: st.ladder?.id, occ: st.occupation }),
   ทางกลับ: (st) => (st.age < GRIEF.adultAge ? 'กลับไปเรียน' : isWorking(st) ? 'กลับไปทำงาน' : 'กลับไปใช้ชีวิตตามเดิม'),
   บวชหน้าไฟ: (st) => (st.age < GRIEF.novice ? 'บวชเณรหน้าไฟ' : 'บวชหน้าไฟ'),
+  ชื่อคู่ลูก: (st) => childMate(st, focusOf(st, 'child')) ?? 'คู่ของลูก',
+  คำคู่ลูก: (st) => (focusOf(st, 'child') ? childMateWord(focusOf(st, 'child')) : 'คู่ของลูก'),
   ชื่อผู้จากไป: (st) => (lastLoss(st) ? lossCall(lastLoss(st)) : 'คนในบ้าน'),
   ชื่อคู่เก่า: (st) => lastSpouseLoss(st)?.name ?? 'คู่ชีวิตคนก่อน',
   ปีคู่เก่า: (st) => (spouseYears(st) ? `${spouseYears(st)} ปี` : 'หลายปี'),
   ชื่อสัตว์: (st) => (focusOf(st, 'pet') ? petCall(focusOf(st, 'pet')) : 'เจ้าตัวเล็ก'),
   ชนิดสัตว์: (st) => focusOf(st, 'pet')?.kind ?? 'สัตว์',
   ชื่อฝูง: (st) => (focusOf(st, 'herd') ? petCall(focusOf(st, 'herd')) : 'สัตว์ในคอก'),
-  ครับ: (st) => (st.sex === 'หญิง' ? 'ค่ะ' : 'ครับ'),
-  ผม: (st) => (st.sex === 'หญิง' ? 'ฉัน' : 'ผม'),
+  ครับ: (st) => (speechSex(st) === 'หญิง' ? 'ค่ะ' : 'ครับ'),
+  ผม: (st) => (speechSex(st) === 'หญิง' ? 'ฉัน' : 'ผม'),
   ลูกดูแลแบบเรา: (st) => filialMirrorText(st),
   พ่อแม่ที่ป่วย: (st) => illParentWord(st),
   // จดหมายคำฝาก (afterfall-3): ฝั่งผู้ฝากอ่านคนรอบตัวตอนตาย · ฝั่งทายาทอ่าน st.letter ที่ระหว่างชาติสร้างไว้
@@ -4417,6 +5174,10 @@ const FILL = {
   // ไม่บอกเหตุ (self_harm · other ก่อนชรา) ก็ยังต้องได้คำ — "ที่จากไปแล้ว" ไม่เผยเหตุ และช่องไม่ว่าง
   เหตุผู้ฝาก: (st) => st.letter?.cause?.join('') ?? 'แล้ว',
   ผู้ยื่นซอง: (st) => st.letter?.by ?? 'คนในบ้าน',
+  ชื่อบรรพบุรุษ: (st) => ancestorOf(st)?.name ?? 'คนรุ่นก่อน',
+  บรรพบุรุษ: (st) => ancestorWho(ancestorOf(st)),
+  จังหวัดบรรพบุรุษ: (st) => (ancestorOf(st)?.province ? placeName(ancestorOf(st).province) : 'ที่ไหนสักแห่ง'),
+  อายุตายบรรพบุรุษ: (st) => ancestorOf(st)?.age ?? 'ไม่รู้',
 };
 
 // สาเหตุการตาย (B110 · เจ้าของเคาะ): ป้ายสั้นภาษาคน [คำเชื่อม, คำนาม] — หน้าจอและจดหมายคำฝากใช้ตารางเดียวกัน
@@ -4551,6 +5312,11 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     const m = nat?.job && fx.income_mult > 1 ? ((hit = true), 1 + (fx.income_mult - 1) * nat.mul) : fx.income_mult;
     st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * m ** s));
   }
+  // การ์ดที่ตั้งต้องกั้นเพศกำเนิดให้ตรง (lint) · ตามเพศกำเนิด = ล้างช่อง ⇒ ชีวิตที่ไม่ตั้งไม่มีช่องนี้
+  if (fx.identity) {
+    if (fx.identity === BIRTH_IDENTITY) delete st.identity;
+    else st.identity = fx.identity;
+  }
   if (fx.school) {
     st.school = fx.school === 'none' ? null : fx.school;
     if (!st.school && st.workFrom === null) st.needJob = true;
@@ -4573,7 +5339,7 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     // วัดพรสวรรค์หลังเข้าสาย — อาชีพเปลี่ยนตามขั้นแรกของสาย
     st.incomeMult = talentStart(st);
     // ทางแรกของสาย (B170): การ์ด first_of ออกปีที่เข้าสาย ครั้งเดียวต่อชีวิต (เข้าสายซ้ำไม่ออกอีก) · แทนการ์ดกองสุ่มหนึ่งใบแบบผลย้อน ชีวิตจึงไม่ยาวขึ้น
-    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id]);
+    const first = st.content.events.find((e) => e.first_of === fx.ladder && !st.done[e.id] && awayOk(st, e));
     if (first) {
       st.done[first.id] = true;
       st.due.push({ kind: 'eraEvent', ev: first, age: st.age });
@@ -4581,6 +5347,8 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
     }
   }
   if (fx.promote !== undefined) promote(st, fx.promote);
+  if (fx.away_enter !== undefined) st.outside = { kind: fx.away_enter, from: st.age };
+  if (fx.away_leave) delete st.outside;
   if (fx.office !== undefined) setOffice(st, fx.office);
   for (const [k, v] of Object.entries(fx.chronic ?? {})) {
     const lv = Math.max(-CHRONIC_MAX, Math.min(CHRONIC_MAX, (st.chronic[k] ?? 0) + v));
@@ -4732,8 +5500,15 @@ function invest(st, { asset, share }) {
 // จบช่วงเรียน: ได้วุฒิ แล้วออกด่านเรียนต่อ หรือการ์ดหางานถ้าเป็นช่วงสุดท้าย
 function finishTrack(st, year) {
   const track = st.school && TRACKS[st.school];
-  if (!track || st.age !== track.until) return;
+  // คนที่ด่านถูกเลื่อน อาจพ้นอายุจบของช่วงเรียนที่เลือกหลังสึกแล้ว ⇒ เทียบตรงตัวจะไม่ออกด่านอีกเลย
+  if (!track || (st.age !== track.until && !(st.schoolHeld && st.age > track.until))) return;
   if (eduRank(track.edu) > eduRank(st.edu)) st.edu = track.edu;
+  // ด่านเรียนต่อ/หางานเป็นทางเลือกของฆราวาส ⇒ บวชอยู่ได้วุฒิก่อน แล้วรอออกปีแรกหลังสึก
+  if (st.outside && (st.outside.kind === 'monk' || st.schoolHeld)) {
+    st.schoolHeld = true;
+    return;
+  }
+
   // เส้นเตรียมทหาร (OQ-1 เจ้าของเคาะ): ยังถือธงฝัน/กำลังอยู่ในสนามสอบ = ด่านจบ ม.6/ปวช. รอจนรู้ผล (trackExit ออกทีหลังใน afterChoice)
   // เฉพาะ ม.ปลาย/ปวช. — ด่านจบ ม.ต้น (เลือกเรียนต่อ) ต้องออกตามเวลา ไม่งั้นเลือก ม.ปลายช้าเกินอายุจบแล้วค้างในโรงเรียน
   if (cadetLive(st) && (st.school === 'upper' || st.school === 'voc')) {
@@ -4769,6 +5544,7 @@ function skipToAge(st, age) {
     const r = healthDecay(st.age);
     st.health = clamp(st.health * (1 - r));
     st.healthNatural *= 1 - r;
+    barYear(st);
     st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
     st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
     st.relations = clamp(st.relations * (1 - RELATION_FADE));
@@ -4839,7 +5615,6 @@ const HEIR_UNI_KNOW = 55;
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
 function stepYear(st) {
   const prevStage = stageOf(st.age);
-  lifeFocusYear(st);
   lifeTreeYear(st);
   natureLock(st);
   // ปีสุดท้ายที่ทำงานต้องวัดก่อนขึ้นอายุ — ขึ้นแล้ว isWorking เป็นเท็จ
@@ -4869,6 +5644,7 @@ function stepYear(st) {
   const r = healthDecay(st.age);
   st.health = clamp(st.health * (1 - r));
   st.healthNatural *= 1 - r;
+  barYear(st);
   st.happiness = clamp(st.happiness + (st.baseHappiness - st.happiness) * HAPPY_PULL);
   st.knowledge = clamp(st.knowledge + (knowledgeGain(st.age) * moodMul(st) * (100 - st.knowledge)) / 100);
   st.relations = clamp(st.relations * (1 - RELATION_FADE));
@@ -4889,8 +5665,10 @@ function stepYear(st) {
   if (st.money > 0) {
     st.money *= 1 + portfolioReturn(era, st.seed, st.alloc, year);
   } else if (st.money < 0) st.money *= 1 + lendingRate(era, st.seed, year);
-  if (isWorking(st)) st.money += yearlySaving(st, year);
-  else if (st.retireBase !== null) st.money -= retireSpend(st, year) - st.pension * st.price;
+  if (isWorking(st)) st.money += yearlySaving(st, year) * spendMult(st);
+  // เกษียณยังเลือกได้ (เจ้าของเคาะ): ระดับใช้จ่ายมีผลกับรายจ่ายเกษียณ — ประหยัดใช้เงินเก็บช้าลง หรูหราใช้เร็วขึ้น
+  // (ทิศเดียวกับตัวคูณเงินเก็บ: save_mult สูง = ออมมาก = รายจ่ายน้อย) · ค่าเริ่ม normal = ÷1 = ค่าเดิม
+  else if (st.retireBase !== null) st.money -= retireSpend(st, year) / spendMult(st) - st.pension * st.price;
   let paid = 0;
   for (const d of st.debts) {
     const p = payDebt(era, st.seed, d, year);
@@ -5032,7 +5810,7 @@ const HERALD_FLAG = 'braced:';
 function preludes(st, exam, year) {
   const out = [];
   for (const ev of st.content.events) {
-    if (ev.prelude?.before !== exam || st.done[ev.id] || !inYears(ev, year) || !whenOk(st, ev.when) || !beliefOk(st, ev)) continue;
+    if (ev.prelude?.before !== exam || st.done[ev.id] || !inYears(ev, year) || !whenOk(st, ev.when) || !beliefOk(st, ev) || !awayOk(st, ev)) continue;
     if (st.rng.next() >= ev.prelude.chance) continue;
     st.done[ev.id] = true;
     st.fired[ev.id] = { n: 1, age: st.age };
@@ -5239,7 +6017,11 @@ const ERA_NEWS = { merge: true };
 
 // news = ข่าวบ้านเมืองที่รวมมาเป็นบรรทัดนำ (B58) — การ์ดยังเป็นของเหตุการณ์ ตัวเลือก/เซฟเดินเหมือนเดิม
 function eventCard(st, ev, news = null, echoFrom = undefined) {
+  ev = awayCallCard(st, ev);
   pickFocus(st);
+  if (ev.when?.child_far) focusChildFar(st, ev.when.child_far);
+  if (ev.when?.child_not_mine) focusChildNotMine(st, ev.when.child_not_mine);
+  if (ev.when?.ex_spouse) focusExSpouse(st, ev.when.ex_spouse);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -5367,7 +6149,7 @@ function lockReason(st, c, extra = 0) {
   if (q.age && st.age < (q.age.min ?? 0)) return `อายุยังไม่ถึง ${q.age.min} ปี`;
   if (q.age && st.age > (q.age.max ?? Infinity)) return `อายุเกิน ${q.age.max} ปี`;
   // ตัวเลือกวัยโตของนิสัย (B41) — บอกนิสัยที่ขาดเป็นคำ ผู้เล่นจึงรู้ว่าวัยเด็กแบบไหนเปิดทางนี้
-  if (q.nature && st.nature !== q.nature) return `ต้องเป็นคน${st.content.focus?.natures?.[q.nature]?.name ?? ''}`;
+  if (q.nature && st.nature !== q.nature && !st.natureAlso?.includes(q.nature)) return `ต้องเป็นคน${st.content.nature?.natures?.[q.nature]?.name ?? ''}`;
   // why = [ข้อที่ไม่ผ่าน, ข้อความ] · requires.reasons ใส่เหตุแยกตามข้อได้ (B1 เช่น flags = "ต้องให้ที่บ้านเซ็นยินยอม" · money = เงินไม่พอ)
   const why = [];
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
@@ -5378,6 +6160,8 @@ function lockReason(st, c, extra = 0) {
     if (b.max !== undefined && st[k] > b.max) why.push(['stats', `${STAT_LABELS[k]}มากเกินไป`]);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push(['flags', 'ยังไม่เข้าเงื่อนไข']);
+  // ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยไปแล้วกลับบ้าน (world-overlap 22 · ข้อ 83) — ตัวเดียวกับที่ส่งค่าซ้อนทับเข้าต่างโลก
+  if (q.isekai_lineage && !overlapLeftIsekai(st)) why.push(['isekai_lineage', 'ยังไม่มีใครในสายเลือดเคยข้ามไปต่างโลก']);
   if (q.edu && eduRank(st.edu) < eduRank(q.edu)) why.push(['edu', 'วุฒิไม่ถึง']);
   if (q.family && !q.family.every((f) => familyOk(st, f))) why.push(['family', familyWhy(q.family)]);
   if (!why.length) return null;
@@ -5411,6 +6195,7 @@ function drawCard(st) {
     if (c.mode !== 'summons') return nextCard(st);
     st.dead = true;
     st.cause = c.cause;
+    st.health = 0;
     return queueFuneral(st) ? nextCard(st) : deathCard(st);
   }
   if (st.trip) {
@@ -5445,6 +6230,8 @@ function drawCard(st) {
     if (card.kind === 'alloc') {
       const options = allocOptions(st.content.era, st.birthYear + st.age);
       card.choices = options.map((o) => o.label);
+      const spend = spendRow(st);
+      if (spend) card.spend = spend;
       st.pending = { alloc: options };
     }
     if (card.kind === 'warn') st.pending = { warn: true, choices: card.choices };
@@ -5472,7 +6259,7 @@ function drawCard(st) {
     if (st.advance) {
       // สุ่มตายของปีที่อายุ st.age ก่อนขึ้นปีใหม่ — ทารกจึงตายได้ตั้งแต่ขวบปีแรกตามอัตราตายทารกจริง และอายุบนการ์ดตายเป็นปีเต็ม
       // สุขภาพหมดตัว = ตายด้วยสาเหตุตามสัดส่วนของอายุนั้น ไม่มีช่วงป่วย
-      const cause = st.focusDoom ?? (st.health <= 0 ? healthCause(st) : deathRoll(st));
+      const cause = st.health <= 0 ? healthCause(st) : deathRoll(st);
       const d = cause && faceDeath(st, cause);
       if (d?.fate === 'survive') {
         st.queue.push(d.card);
@@ -5519,9 +6306,10 @@ function drawCard(st) {
     // years ของเหตุการณ์กั้นปีปฏิทินจริง — ด่าน build ตรวจปีสินทรัพย์/ระบบจาก years จึงต้องบังคับที่นี่ด้วย
     const year = st.birthYear + st.age;
     arcDefer(st);
-    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e));
+    awayDefer(st);
+    let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && awayOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
-    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
+    if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age && !x.milestone)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
     // กองสุ่มจับได้ปีละ poolRounds รอบ หลังหลักไมล์/นัดของปีนั้นหมดแล้ว · การ์ดที่จับได้อาจนัดตอนต่อปีเดียวกัน — ค้นนัดก่อนรอบถัดไป
     poolTurn(st);
     while (!ev && st.poolLeft > 0) {
@@ -5598,6 +6386,38 @@ function arcDefer(st) {
   }
 }
 
+// สถานะอยู่นอกบ้าน (ใบ 237 · ข้อ 426–428 443–445): ไม่มี st.away = อยู่บ้าน ⇒ ชีวิตที่ไม่ไปไหนไม่ถูกแตะเลขสุ่มหรือช่องเซฟเลย
+// ป้าย away_block เป็นรายใบรายชนิด เพราะกองสุ่มไม่รู้ว่าใบไหนต้องอยู่บ้าน และ pool_focus_flag ล็อกทั้งกองใช้แทนไม่ได้
+// away_only = การ์ดที่เล่าชีวิตช่วงนอกบ้าน กดกลับบ้านกลางทางแล้วนัดที่ค้างจึงไม่ออก ไม่ต้องตามลบจากตารางนัด
+const awayOk = (st, e) => (!e.away_only || e.away_only.includes(st.outside?.kind)) && (!st.outside || !e.away_block?.includes(st.outside.kind));
+
+// นัดและหลักไมล์ที่ตกช่วงนอกบ้านเลื่อนทีละปีจนกลับ (เจ้าของเคาะข้อ 444) — ไม่รู้ล่วงหน้าว่าจะกลับปีไหน จึงตั้งอายุเป้าตรง ๆ แบบ arcDefer ไม่ได้
+// หลักไมล์ต้องจดเป็นนัด เพราะ byAge ผูกอายุเดียว พ้นปีแล้วไม่ถูกค้นอีก · ติด milestone ไว้ไม่ให้หักโควตาแบบผลย้อน
+function awayDefer(st) {
+  if (!st.outside) return;
+  const events = st.content.events;
+  const ix = lifeEventIndex(events);
+  for (const x of st.scheduled) {
+    const e = x.age === st.age && ix.pos.has(x.event) && events[ix.pos.get(x.event)];
+    if (!e || st.done[e.id] || awayOk(st, e)) continue;
+    // จดปีที่เลื่อนไว้บนนัด: ปีนั้นอาจไม่มีการ์ดออกเลย ผู้ตรวจจึงอ่านสถานะนอกบ้านย้อนหลังจากการ์ดไม่ได้
+    (x.held ??= []).push({ age: st.age, kind: st.outside.kind });
+    x.age = st.age + 1;
+  }
+  for (const i of ix.byAge.get(st.age) ?? []) {
+    const e = events[i];
+    if (!st.done[e.id] && !awayOk(st, e) && !st.scheduled.some((x) => x.event === e.id)) st.scheduled.push({ event: e.id, age: st.age + 1, milestone: true });
+  }
+}
+
+// โทรมาบอก (ข้อ 427 443): ตัวเลือกเดิมคงลำดับเดิมเพราะ harness/เซฟ/ผลย้อนจับด้วยเลขลำดับ ปุ่มกลับบ้านจึงต่อท้ายเสมอ · สำเนาใบ ไม่แก้เนื้อหากลาง
+function awayCallCard(st, ev) {
+  if (!st.outside || !ev.away_call) return ev;
+  const kind = st.content.away.kinds[st.outside.kind];
+  const back = { text: kind.return_text, effects: { money: { unit: 'income_x', amount: -kind.return_cost }, away_leave: true }, merit: [{ cat: 'neutral' }] };
+  return { ...ev, text: ev.away_call.text, choices: [...ev.choices, back] };
+}
+
 // จดตอนตอนการ์ดออก (eventCard จุดเดียว ทุกทางเข้า) · ช่องใส่เมื่อมีค่า
 function arcFired(st, ev) {
   const a = st.arcs?.[ev.arc];
@@ -5614,7 +6434,7 @@ function drawPool(st, year) {
   // เฟส 3 ชีวิตในโรงเรียนเตรียมทหาร (ฮับเคาะ P6): ระหว่าง 2 ปีนี้ขึ้นเฉพาะฉากโรงเรียน การ์ดกองปกติพักไว้
   if (st.cadet?.school) return null;
   const stage = stageOf(st.age);
-  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e));
+  let pool = (lifeEventIndex(st.content.events).pool.get(stage) ?? []).filter((e) => (!st.done[e.id] || canRepeat(st, e)) && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && arcPoolOk(st, e) && awayOk(st, e));
   // เส้นเตรียมทหาร (เจ้าของ 2026-11-06): ถือธงนี้อยู่ = จั่วเฉพาะใบที่ต้องมีธงนี้ เรื่องชีวิตวัยรุ่นทั่วไปพักไว้ก่อน
   // ถือธงอยู่: จั่วถี่ขึ้นตาม numbers.dream_pool_chance (รอบต่อปีตั้งใน poolTurn) · กองเฉพาะว่าง = กลับไปกองปกติ ด้วยโอกาสและรอบของชีวิตปกติ
   let chance = POOL_CHANCE[stage];
@@ -5633,113 +6453,116 @@ function drawPool(st, year) {
   return weighted(st.rng, pool, pool.map((e) => e.weight * poolMultiplier(st, e.multipliers) * (e.type === 'B' ? b : 1) * lifeFocusMul(st, e)));
 }
 
-// โฟกัสชีวิตโลกหลัก (B163): เนื้ออยู่ content.focus · กติกากลางอยู่ focus.mjs · เนื้อหาชุดทดสอบที่ไม่มี focus = ตามน้ำเสมอ
-// need = สถานะที่ when ของการ์ดเขียนไม่ได้ (หรือ · ไม่มี · ช่วงไว้ทุกข์) — ทะเบียนอ้างชื่อ lint ตรวจชื่อกับรายการนี้
-const alive = (role, age) => (st) => familyOk(st, { role, alive: true, ...(age && { age }) });
-const hasSpouse = alive('spouse');
-const hasChild = alive('child');
-// ไว้ทุกข์ = คู่จากไปปีนี้หรือปีก่อน
-const mourning = (st) => (st.kinLoss ?? []).some((l) => l.role === 'spouse' && st.birthYear + st.age - l.year <= FOCUS_MOURN);
-const FOCUS_MOURN = 1;
-const FOCUS_NEEDS = {
-  working: (st) => isWorking(st),
-  single: (st) => !hasSpouse(st) && !mourning(st),
-  partnered_or_kids: (st) => hasSpouse(st) || hasChild(st),
-  has_kids: hasChild,
-  kids_or_grandkids: (st) => hasChild(st) || alive('grandchild')(st),
-  old_parent: alive('parent', [60, 200]),
-  savings_or_credit: (st) => st.money > 0 || isWorking(st),
-};
-const lifeFocusOk = (st) => (w, def) => whenOk(st, w) && (def?.need ?? []).every((k) => FOCUS_NEEDS[k](st));
-const lifeFocusDefs = (st) => st.content.focus?.focuses ?? {};
-// ตามน้ำอยู่หัวรายการเสมอ แล้วตามลำดับในเนื้อหา
-const lifeFocusOffers = (st) => [FOCUS_FLOW, ...focusOffers(lifeFocusDefs(st), stageOf(st.age), lifeFocusOk(st), st)];
-function setLifeFocus(st, id) {
-  if (!lifeFocusOffers(st).includes(id)) throw new Error(`โฟกัสนี้เลือกตอนนี้ไม่ได้: ${id}`);
-  // ผู้เล่นเปลี่ยนเองแล้ว ปีทุ่มเทหลังจากนี้นับแต้มนิสัยเต็ม · กดตัวเดิมที่รับจากพ่อแม่ไม่ใช่การเปลี่ยน
-  if ((st.focus ?? FOCUS_FLOW) !== id) delete st.focusBorn;
-  focusSet(st, id, st.age);
-  delete st.focusHeir;
+// ชื่อปณิธานที่สำเร็จของชีวิตนี้ — การ์ดตายกับสมุดอนุสรณ์ใช้ชุดเดียวกัน
+// รูปใหม่ (ft15): id = แขนงของต้นไม้ · ชื่อ = โหนดใหญ่/keystone ที่ปลดเป็นตัวแรกของแขนง (st.goalNode) · รูปเก่า (เซฟก่อน ft15): id ต้นสายโฟกัส "ต้นสาย → ปลายสาย"
+const goalNames = (st) => (st.goalsDone ?? []).map((id) => {
+  const node = st.goalNode?.[id];
+  if (node) return st.content.tree.nodes[node].name;
+  return null;
+}).filter(Boolean);
+// เป้าชีวิต (ft15 · เจ้าของเคาะข้อ 1 = B): ปลดโหนดใหญ่ (size b) หรือ keystone (size k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง (สูงสุดเท่าจำนวนแขนง · จำกัดต่อแขนงกันความสุขล้นจากโหนดใหญ่ 18 ตัว) · จดไว้ให้การ์ดตายเล่า
+// ไม่ดึงเลขสุ่ม · เรียกหลังปลดโหนดทุกทาง (ปีเต็ม · การ์ดด่านของโหนดใหญ่)
+const GOAL_SIZES = ['b', 'k'];
+function lifeTreeGoals(st) {
+  const c = st.content.tree;
+  if (!st.tree || !c?.goal_joy) return;
+  for (const id of Object.keys(st.tree.done).sort((a, b) => st.tree.done[a] - st.tree.done[b])) {
+    const def = c.nodes[id];
+    if (!GOAL_SIZES.includes(def.size) || def.branch === 'mid' || st.goalsDone?.includes(def.branch)) continue;
+    st.happiness = clamp(st.happiness + levelValue(c.goal_joy));
+    (st.goalsDone ??= []).push(def.branch);
+    (st.goalNode ??= {})[def.branch] = id;
+  }
 }
-// ปิดปีก่อนขึ้นอายุ: ผลของปีที่อายุ st.age ตามโฟกัสตอนนี้ · ตามน้ำไม่ดึงเลขสุ่มใด
-function lifeFocusYear(st) {
-  const c = st.content.focus;
-  // โฟกัสที่รับจากพ่อแม่แต่ยังเปิดไม่ได้ (เช่นยังไม่เข้าเรียน) รอจนเปิด แล้วนับปีนั้นเต็ม · ผู้เล่นตั้งเองก่อน = ทิ้ง
-  if (!st.focus && st.focusHeir && focusOpen(c.focuses[st.focusHeir], stageOf(st.age), lifeFocusOk(st), st)) {
-    focusSet(st, st.focusHeir, st.age - 1);
-    delete st.focusHeir;
-  }
-  if (!st.focus) return;
-  const full = st.focusAt < st.age;
-  const id = focusYearEnd(st, c.focuses, stageOf(st.age), lifeFocusOk(st), st.age, c.chain_years);
-  if (!id) return;
-  const def = c.focuses[id];
-  if (full) naturePoint(st, def.nature, st.focusBorn ? c.heir_nature : 1);
-  // ผลเงินเป็นเท่าของรายได้ จึงคิดเฉพาะปีที่มีรายได้ของตัวเอง · ค่าใช้จ่ายหรี่ด้วย spend_scale และหักได้ไม่เกินส่วนหนึ่งของเงินเก็บ (ไม่กู้มาทุ่ม)
-  // เจ้าของเคาะ "ผลเงินชนด่าน finance = finance ชนะ": หักเต็มกินเงินเก็บไว้ใช้ยามเกษียณ ชีวิตที่ทุ่มยาวล้มละลายเกินกรอบ
-  const { money, ...rest } = def.fx;
-  applyEffects(st, rest, c.year_scale);
-  if (money && isWorking(st)) {
-    const v = moneyValue(st, money) * c.year_scale;
-    st.money += v < 0 ? Math.max(v * c.spend_scale, -FOCUS_SPEND_CAP * Math.max(0, st.money)) : v;
-  }
-  if (def.career && isWorking(st)) {
-    if (st.ladder) st.ladder.prog = Math.max(0, st.ladder.prog + def.career.rank);
-    st.incomeMult = Math.max(INCOME_MULT[0], Math.min(INCOME_MULT[1], st.incomeMult * (1 + def.career.raise)));
-  }
-  (def.risk ?? []).forEach((r, i) => lifeFocusRisk(st, id, r, i));
-}
-
 // ต้นไม้โฟกัส (ใบ 03): กติกากลางอยู่ tree.mjs · เนื้อ content.tree · ไม่เคยทุ่ม = ไม่แตะอะไร (ไม่ดึงเลขสุ่ม)
 // ทุ่มอยู่: ผลเต็มของโหนดที่ทุ่มปีนี้ · ปลดแล้ว: ผลเบาถาวรของทุกโหนดที่ปลด ต่อปี (ผลของโหนดที่เพิ่งปลดปีนี้เริ่มปีหน้า)
 const lifeTreeDefs = (st) => st.content.tree?.nodes ?? {};
-const treeInvestNode = (st, id) => treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+// keystone (ใบ 05): ทุ่มได้เมื่อผู้เล่นรับรู้ข้อเสียแล้วเท่านั้น (ack) — ไม่มี ack = ไม่ทุ่ม · UI ต้องแสดง def.warn ก่อนส่ง ack
+const treeInvestNode = (st, id, ack = false) => {
+  if (lifeTreeDefs(st)[id]?.keystone && !ack) throw new Error(`โหนด ${id} เป็น keystone ต้องรับรู้ข้อเสียก่อนทุ่ม`);
+  treeInvest(st, lifeTreeDefs(st), id, stageOf(st.age));
+};
+// จุดเกิดของชีวิต (ใบ 06): แขนงที่ถ่วงตามฐานะ > อาชีพ > แขนงพ่อแม่ + ต้นแขนง · ไม่เขียนสถานะ ผู้เล่น/บอทใช้เป็นค่าตั้งต้นของการทุ่ม
+function lifeTreeStart(st) {
+  const c = st.content.tree;
+  if (!c?.start) return null;
+  const branch = treeStartBranch(c.start, st.seed, CLASSES.indexOf(st.cls), st.occupation ?? null, st.treeParent ?? null);
+  return { branch, node: treeStartNode(c.nodes, branch) };
+}
+// ทายาท (ใบ ft13 · ข้อ 4 18 38 99): ได้ต้นแขนงของแขนงหลักพ่อแม่เป็นโหนดปลดแล้วตั้งแต่เกิด · ไม่ใช่นิสัย (ไม่ป้อนแต้ม treeNature) · ไม่มีผลทางสืบ · ไม่ดึงเลขสุ่ม
+// treeV = เซฟนี้เกิดหลังมีกติกาต้นไม้ · เซฟก่อนหน้าไม่มีธงนี้ ให้ repairLife ย้ายนิสัยเป็นโหนด
+const lifeTreeMain = (st) => (st.tree && st.content.tree ? treeMainBranch(st, st.content.tree.nodes) : null);
+function lifeTreeBorn(st, parentBranch) {
+  const c = st.content.tree;
+  if (!c) return;
+  st.treeV = 1;
+  const node = parentBranch ? treeStartNode(c.nodes, parentBranch) : null;
+  if (!node) return;
+  st.treeParent = parentBranch;
+  st.tree = { cur: null, done: { [node]: 0 }, yrs: {}, cards: {}, hist: [] };
+}
+// เซฟเก่า (ข้อ 13 48 99): ต้นไม้ว่าง · เก็บ st.gates ไว้เฉย ๆ · ปลดโหนดต้นของนิสัยที่ล็อกแล้ว (natures[*].nodes[0]) ให้ตรงกัน
+// เซฟก่อน ft15: ประตูเคยเปิดจากชื่อโฟกัสเดิม (focusYears ครบ chain_years · st.gates เก็บชื่อโฟกัส · ธง gate:<ชื่อโฟกัส>) → แปลงเป็นรหัสโหนดประตูตอนโหลดแล้วตัด focusYears · ไม่ปลดโหนด ไม่ผุดผลติดตัว (decisions ข้อ 99 · เจ้าของเคาะ C′)
+const LEGACY_CHAIN_YEARS = 3;
+const LEGACY_GATE = { business: 'mo5', shortcut_money: 'mo7', politics_base: 'r5', ordain: 'o5', occult: 'm4' };
+function lifeGatesMigrate(st) {
+  const chain = LEGACY_CHAIN_YEARS;
+  const open = new Set(st.gates ?? []);
+  for (const [old, id] of Object.entries(LEGACY_GATE)) {
+    if ((st.focusYears?.[old] ?? 0) >= chain || open.has(old)) open.add(id);
+    open.delete(old);
+    if (st.flags?.[GATE_FLAG + old]) { st.flags[GATE_FLAG + id] = true; delete st.flags[GATE_FLAG + old]; }
+  }
+  if (open.size) st.gates = [...open];
+  delete st.focusYears;
+}
+function lifeTreeMigrate(st) {
+  const t = st.content.tree, f = st.content.nature;
+  if (!t || st.treeV) return;
+  st.treeV = 1;
+  if (st.tree || !f?.natures) return;
+  for (const id of [st.nature, ...(st.natureAlso ?? [])]) {
+    const node = id && f.natures[id]?.nodes?.[0];
+    if (node && t.nodes[node]) (st.tree ??= { cur: null, done: {}, yrs: {}, cards: {}, hist: [] }).done[node] = Math.min(st.age, f.nature_age);
+  }
+}
 const treeOffersNow = (st) => treeOffers(st, lifeTreeDefs(st), stageOf(st.age));
+// สนิม + ล้างโหนด (ใบ 09): ล้างจ่ายด้วยเวลา = ปีนั้นหลอดไม่ขยับ · ผู้เรียกเช็กมีชีวิตอยู่
+const lifeTreeRespec = (st, id) => treeRespec(st, lifeTreeDefs(st), id, st.age);
+const lifeTreeRusty = (st, id) => treeRusty(st, id, st.age, st.content.tree?.rust);
+// ทอยตามแขนง (ใบ 04) ตัวคูณทางสำเร็จของการ์ดหมวด cat · อาชีพนับเมื่อมีงานของตัวเองแล้ว (เหมือน when.occupation)
+const lifeTreeRoll = (st, cat) => (st.tree && st.content.tree ? treeRollMul(st, st.content.tree.nodes, st.content.tree.roll_k, cat, st.workFrom !== null ? st.occupation : null) : 1);
 function lifeTreeYear(st) {
   const c = st.content.tree;
   if (!st.tree || !c) return;
   const light = Object.keys(st.tree.done).filter((id) => st.tree.done[id] < st.age);
-  const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age);
+  const r = treeYearEnd(st, c.nodes, stageOf(st.age), st.age, c.pace);
   if (r) applyEffects(st, c.nodes[r.id].fx, c.year_scale);
-  for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size]);
-}
-
-// เสี่ยงสุ่มของโฟกัส: ทอยจาก stream ของ (seed · อายุ · ข้อ) ไม่แตะ rng ของโลก ชีวิตจึงต่างจากตามน้ำแค่ผลที่เกิดจริง
-// เสี่ยงตาย (cause): ครั้งแรกเป็นการ์ดเตือน (ผลเจ็บตาม fx) · โดนซ้ำหลังเตือน = ตายต้นปีถัดไปด้วยสาเหตุนั้น — ไม่มีใครตายจากโฟกัสโดยไม่ได้เห็นสัญญาณก่อน
-const FOCUS_RISK_SALT = 0x6f0c5a17;
-const FOCUS_SPEND_CAP = 0.1;
-function lifeFocusRisk(st, id, r, i) {
-  if (makeRng(mixSeed(st.seed ^ FOCUS_RISK_SALT, st.age * 8 + i)).next() >= r.chance) return;
-  const key = `${id}:${i}`;
-  if (r.cause && st.focusWarn?.[key] !== undefined) {
-    st.focusDoom = r.cause;
-    return;
-  }
-  if (r.cause) (st.focusWarn ??= {})[key] = st.age;
-  applyEffects(st, r.fx ?? {});
-  for (const f of r.flags ?? []) raiseFlag(st, f);
-  st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: r.cause ? r.warn : r.text, focusRisk: key, tag: r.cause ? 'sick' : fxTag(r.fx) });
-}
-
-// ทายาททางสายเลือด (โฟกัสใบ 03): เริ่มชาติด้วยตัวเด็กของหมวดโฟกัสหลักของพ่อแม่ (kid ในทะเบียน) · ไม่มีหมวด/ไม่มีตัวเด็ก = ตามน้ำ
-function lifeFocusKid(st) {
-  const defs = lifeFocusDefs(st);
-  const main = focusMain(st, defs);
-  return (main && defs[main].kid) || null;
-}
-function lifeFocusBorn(st, kid) {
-  if (!kid || !lifeFocusDefs(st)[kid]) return;
-  if (lifeFocusOffers(st).includes(kid)) focusSet(st, kid, -1);
-  else st.focusHeir = kid;
-  st.focusBorn = true;
+  if (r?.unlocked) treeNature(st, r.id);
+  lifeTreeGoals(st);
+  if (treeCtl.passive) for (const id of light) applyEffects(st, c.nodes[id].light, c.light_unit[c.nodes[id].size] * treeRustMul(st, id, st.age, c.rust));
+  // keystone ที่ปลดแล้วเสียถาวรทุกปี (ใบ 05 · ข้อ 28) · ไม่ผ่านตัวควบคุม passive: ล้างไม่ได้ (ข้อ 60) ปิดไม่ได้
+  for (const id of light) if (c.nodes[id].cost) applyEffects(st, c.nodes[id].cost, c.light_unit[c.nodes[id].size]);
+  // ปีครบของโหนดใหญ่ = การ์ดด่านเข้าคิวต้นปีถัดไป (st.due) · ไม่ผ่านกองสุ่ม
+  if (r?.gate) st.due.push({ kind: 'eraEvent', ev: treeGateEvent(c.nodes, r.id), age: st.age });
 }
 
 // นิสัยจากวัยเด็ก (B41): แต้มสะสมถึงอายุ nature_age แล้วล็อกตัวเดียวถาวร · เนื้อหาที่ไม่มีทะเบียนนิสัย = ไม่มีระบบนี้ ชีวิตเดินเหมือนเดิมทุกหลัก
-// ทายาทเริ่มชาติด้วยทุ่มเทตัวเด็กของพ่อแม่ — นับปีเต็มเท่าลูกที่เลือกเอง ทายาทแทบทุกคนจะได้นิสัยพ่อแม่ จึงนับแค่ heir_nature จนผู้เล่นเปลี่ยนเอง
+// ทายาทรับแต้มนิสัยพ่อแม่ครั้งเดียวตอนเกิด (ft15 · heir.nature × heir_nature · แต้มเงียบ) ที่เหลือเหมือนคนทั่วไป
 // ตัวที่ได้แต้มล่าสุดย้ายไปท้าย naturePts เสมอ แต้มเสมอกันจึงเลือกตัวท้าย (ตัวที่ได้แต้มล่าสุด)
 const NATURE_NONE = 'ยังไม่รู้ว่าตัวเองเป็นคนแบบไหน';
+// โหนดเด็กที่ผูกนิสัยปลดถึงอายุ nature_age: ป้อนแต้ม node_pts เข้ากองเดียวกับทุ่มเทเด็ก + จดนิสัยที่มีโหนดปลดไว้ (ใบ ft07 ข้อ 16 19 51) · นิสัยเด่นยังเป็นตัวแต้มสูงสุดตัวเดียว ตัวอื่นเปิดแค่ตัวเลือก
+function treeNature(st, node) {
+  const c = st.content.nature;
+  if (!c?.natures || !c.node_pts || st.age > c.nature_age) return;
+  const id = Object.keys(c.natures).find((k) => c.natures[k].nodes?.includes(node));
+  if (!id) return;
+  naturePoint(st, id, c.node_pts);
+  const got = (st.natureNodes ??= []);
+  if (!got.includes(id)) got.push(id);
+}
 function naturePoint(st, id, n) {
-  const c = st.content.focus;
+  const c = st.content.nature;
   if (!id || !n || !c?.natures?.[id] || st.age > c.nature_age) return;
   const pts = (st.naturePts ??= {});
   const v = (pts[id] ?? 0) + n;
@@ -5748,40 +6571,47 @@ function naturePoint(st, id, n) {
 }
 // ปิดปีอายุ nature_age: การ์ดบอกนิสัยออกก่อนการ์ดเข้าช่วงวัยถัดไป · ไม่มีแต้ม (ตามน้ำ ไม่กดป้าย) = ไม่มีนิสัยเด่น
 function natureLock(st) {
-  const c = st.content.focus;
+  const c = st.content.nature;
   if (!c?.natures || st.age !== c.nature_age) return;
   const pts = st.naturePts ?? {};
   let id = null;
   for (const [k, v] of Object.entries(pts)) if (v > 0 && (!id || v >= pts[id])) id = k;
   delete st.naturePts;
-  delete st.focusBorn;
   if (id) st.nature = id;
+  // นิสัยที่มีโหนดปลดแต่ไม่ใช่ตัวเด่น = ปลดตัวเลือกวัยโต ไม่ได้ผลคูณ
+  const also = (st.natureNodes ?? []).filter((k) => k !== id);
+  delete st.natureNodes;
+  if (also.length) st.natureAlso = also;
   st.due.push({ kind: 'result', type: 'A', age: st.age, stage: stageOf(st.age), text: id ? `คุณโตมาเป็นคน${c.natures[id].name}` : NATURE_NONE, nature: id, tag: 'nature' });
 }
 // ตัวคูณนิสัยของการ์ดใบนี้: ค่าตรงนิสัย (เงินนับเฉพาะการ์ดหมวดใน cards) + การ์ดขึ้นเงินเดือนเมื่ออาชีพตรงสาย · ไม่มีนิสัย = null คูณ 1 ทุกค่า
 function natureBoost(st, ev) {
-  const n = st.nature && st.content.focus?.natures?.[st.nature];
+  const n = st.nature && st.content.nature?.natures?.[st.nature];
   if (!n) return null;
   const stat = n.stat && (n.stat !== 'money' || !n.cards || n.cards.includes(ev.category)) ? n.stat : null;
   const job = !!n.jobs?.includes(st.occupation) && isWorking(st);
   if (!stat && !job) return null;
-  return { stat, job, mul: st.content.focus.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
+  return { stat, job, mul: st.content.nature.nature_mul, text: `เพราะคุณเป็นคน${n.name} ผลดีเมื่อกี้เลยมากขึ้นอีกนิด` };
 }
-// ประตูเข้าสาย (โฟกัสใบ 04 · เจ้าของเคาะ: ล็อกแค่ประตู): เปิดเมื่อโฟกัสนั้นสะสมครบ chain_years · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
-// · การ์ดชวน (ธง gate:<โฟกัส>) เปิดให้ได้โดยไม่ต้องโฟกัส เช่น นักธุรกิจถูกชวนลงการเมือง
+// ประตูเข้าสาย (ใบ 04 → ใบ 10): id = โหนดประตูใน tree.yaml gates · เปิดเมื่อปลดโหนดนั้น · ทายาทในตระกูลรับประตูที่รุ่นก่อนเปิดไว้
+// · การ์ดชวน (ธง gate:<โหนด>) เปิดให้ได้โดยไม่ต้องปลด เช่น นักธุรกิจถูกชวนลงการเมือง
+// · เซฟเก่าที่เก็บชื่อโฟกัส แปลงเป็นรหัสโหนดใน lifeGatesMigrate ตอนโหลด (ใบ 15)
 const GATE_FLAG = 'gate:';
-const lifeGateOpen = (st, id) => (st.focusYears?.[id] ?? 0) >= (st.content.focus?.chain_years ?? Infinity) || !!st.gates?.includes(id) || !!st.flags[GATE_FLAG + id];
-const lifeGatesOpen = (st) => Object.entries(lifeFocusDefs(st)).filter(([id, d]) => d.group === 'gate' && lifeGateOpen(st, id)).map(([id]) => id);
-// การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง
-const OFFICE_GATE = 'politics_base';
+const lifeGateOpen = (st, id) => {
+  if (st.tree?.done?.[id] !== undefined) return true;
+  return !!st.gates?.includes(id) || !!st.flags[GATE_FLAG + id];
+};
+const lifeGatesOpen = (st) => (st.content.tree?.gates ?? []).filter((id) => lifeGateOpen(st, id));
+// การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูสายการเมือง (โหนดเสียงของชุมชน)
+const OFFICE_GATE = 'r5';
 const gateShut = (st, c) => !!c.gate && ![c.gate].flat().some((id) => lifeGateOpen(st, id));
 const GATE_LOCK = 'ยังไม่เคยทุ่มเทกับทางนี้';
 // ซ่อนจากเพศอื่น ไม่ใช่แค่ล็อก เพราะผู้เล่นทำให้เปิดไม่ได้ · เลขลำดับตัวเลือกยังคงเดิม
 const sexShut = (st, c) => !!c.only_sex && !c.only_sex.includes(st.sex);
 const SEX_LOCK = 'ไม่ใช่ทางของคุณ';
 function lifeFocusMul(st, e) {
-  if (!st.focus) return 1;
-  return focusCardMul(lifeFocusDefs(st)[st.focus], [e.category, ...(e.focus ?? [])], st.content.focus.card_mul);
+  const t = st.tree && st.content.tree ? treeCardMul(st, st.content.tree.nodes, st.content.tree.card_mul, e.category) : 1;
+  return t;
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
@@ -5873,14 +6703,22 @@ function whenOk(st, when) {
   if (when.loss && !lossOk(st, when.loss)) return false;
   if (when.illness && !illnessOk(st, when.illness)) return false;
   if (when.kin_illness && !kinIllOk(st, when.kin_illness)) return false;
+  if (when.child_far && !childFarOk(st, when.child_far)) return false;
+  if (when.child_not_mine && !childNotMineOk(st, when.child_not_mine)) return false;
+  if (when.ex_spouse && !exSpouseOk(st, when.ex_spouse)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
+  if (when.spouse && !spouseOk(st, when.spouse)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
   if (!inRange(st.age, when.age) || !inRange(st.birthYear + st.age, when.year)) return false;
   if (when.class && !when.class.includes(classNow(st))) return false;
   if (when.region && !when.region.includes(st.region)) return false;
   if (when.province && !when.province.includes(st.province)) return false;
   if (when.sex && !when.sex.includes(st.sex)) return false;
+  if (when.identity && !when.identity.includes(identityOf(st))) return false;
   if (when.overlap_stage && !inRange(overlapStageOf(st), when.overlap_stage)) return false;
+  // ผีญาติ: ขั้นซ้อนทับ ≥ 1 ถึงจะมีผีญาติ · สีหน้าของคนที่ถูกเลือกต้องตรงกับที่การ์ดขอ (haunt | warn)
+  if (when.kin_ghost && !(overlapStageOf(st) >= 1 && when.kin_ghost.includes(pickKinGhost(st)?.mood))) return false;
+  if (when.ancestor && !ancestorOf(st)) return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
@@ -5894,6 +6732,7 @@ function whenOk(st, when) {
   if (when.home_flags && !homeFlagsOk(st, when.home_flags)) return false;
   if (when.dark_gate && !darkGateOk(st)) return false;
   if (when.past_life && !pastLifeOk(st, when.past_life)) return false;
+  if (when.tree && !when.tree.every((id) => st.tree?.done?.[id] !== undefined)) return false;
   return !when.flags || flagsOk(st, when.flags);
 }
 
@@ -5973,6 +6812,7 @@ function choose(st, idx, loan) {
     if (!opt) throw new Error('ตัวเลือกไม่ถูกต้อง');
     st.pending = null;
     if (opt.alloc) st.alloc = opt.alloc;
+    if (ev.spend) applySpend(st, ev.spend);
     st.lastAllocYear = st.birthYear + st.age;
     st.log.push({ id: 'alloc', age: st.age, choice: idx, text: opt.label });
     return;
@@ -6062,7 +6902,11 @@ function choose(st, idx, loan) {
   let because = applyEffects(st, c.effects, s, ss, 1, nat);
   const gotC = c.effects?.loot && gainLoot(st, c.effects.loot);
   applyChoice(st, ev, c, text);
-  if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category);
+  if (st.tree && st.content.tree) treeCard(st, st.content.tree.nodes, ev.category, st.age);
+  if (ev.treeGate) {
+    treeGateDone(st, st.content.tree.nodes, stageOf(st.age), ev.treeGate, idx, st.age);
+    lifeTreeGoals(st);
+  }
   naturePoint(st, c.nature, 1);
   if (c.filial) filialNote(st, c.filial, filialScore(c.merit));
   if (c.pact) signPact(st, c.pact);
@@ -6092,9 +6936,9 @@ function choose(st, idx, loan) {
     const follow = o.next && st.content.events.find((e) => e.id === o.next);
     // นับสายเฉพาะตอนมีเพดาน — ปิดกติกาแล้ว state ต้องไม่มีช่องเพิ่ม ไม่งั้นตัวควบคุมเทียบฐานไม่ได้
     const capped = DRAW_RULES.nextCap !== Infinity;
-    const start = capped && !st.inStory?.[ev.id];
+    const start = capped && !st.inStory?.[ev.id] && follow?.run === undefined;
     const stage = stageOf(st.age);
-    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
+    if (follow && inYears(follow, st.birthYear + st.age) && whenOk(st, follow.when) && beliefOk(st, follow) && awayOk(st, follow) && arcNextOk(st, ev, follow) && !(start && (st.stories?.[stage] ?? 0) >= DRAW_RULES.nextCap)) {
       if (start) (st.stories ??= {})[stage] = (st.stories[stage] ?? 0) + 1;
       if (capped) (st.inStory ??= {})[follow.id] = true;
       st.done[follow.id] = true;
@@ -6197,6 +7041,7 @@ function deathCard(st) {
     card.note = `ยุคนั้นเด็ก${st.sex}อายุ ${st.age} ปีจากไปราว ${Math.max(1, Math.round(q * 10000))} คนในทุก 10,000 คนต่อปี`;
   }
   if (st.age < STAGES[1].from) card.short = true;
+  if (st.goalsDone?.length) card.goals = goalNames(st);
   const pets = petsAfter(st);
   if (pets) card.pets = pets;
   if (st.funeral) {
@@ -6261,17 +7106,23 @@ function tripSettle(st, isk) {
 
 // ค่าซ้อนทับ (โลกซ้อนทับ): ตัวนับเดียวของตระกูล ขึ้นทีละ 1 ทุกครั้งที่กลับเข้าโลกที่เคยออกไป ไม่มีทางลด · ไปกับทายาทเหมือนบัญชีบุญบาป
 // ไม่ดึงเลขสุ่ม — ชีวิตที่ไม่ข้ามโลกเดินเท่าเดิม · เริ่มตระกูลใหม่ (newLife ไม่มี heir) = 0
-const overlapOf = (st) => st?.overlap ?? 0;
+// ก้อนซ้อนทับล็อก = ไม่นับ อ่านได้ 0 เสมอ (ตัวนับเดิมที่เซฟไว้ไม่ถูกลบ ปลดแล้วกลับมาอ่านได้)
+const overlapOf = (st) => (dlcOpen(st, 'overlap') ? st?.overlap ?? 0 : 0);
 function overlapStep(st) {
+  if (!dlcOpen(st, 'overlap')) return;
   st.overlap = overlapOf(st) + 1;
 }
-// ขั้นของค่าซ้อนทับ 0–4: การ์ดอ่านแค่ขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 ล็อก · ขั้น 2–4 ไปไม่ถึงจนใบ 16 วัดบอทอัตราจริงแล้วใส่เลข
-const OVERLAP_STAGE_MIN = [0, 1, Infinity, Infinity, Infinity];
+// ขั้นของค่าซ้อนทับ 0–4: การ์ดอ่านแค่ขั้น ไม่อ่านค่าดิบ · ขั้น 1 = ค่า 1 ล็อก · ขั้น 2–4 วัดจากบอทอัตราจริง (harness/overlap.mjs --real) ให้ค่ากลางถึงขั้นราวรุ่น 4/8/15
+const OVERLAP_STAGE_MIN = [0, 1, 2, 6, 12];
 // อ่านค่าสดทุกครั้ง — ขึ้นขั้นกลางชีวิต (ทริปกลับบ้าน) การ์ดขั้นใหม่ออกได้ปีถัดไปเลย
 const overlapStageOf = (st) => OVERLAP_STAGE_MIN.findLastIndex((min) => overlapOf(st) >= min);
 // ตระกูลเคยออกจากต่างโลกมาแล้ว = มีชาติต่างโลกลงผัง (กลับมาเกิดแล้ว) หรือทริปที่กลับถึงบ้าน · ทริปหลงตายในต่างโลก ไม่นับว่าออก
 // เข้าต่างโลกอีกเมื่อจริง = กลับเข้าโลกที่เคยออกไป +1 (เกิด · ถูกเรียก · ทริป)
 const overlapLeftIsekai = (st) => [...(st.lineage ?? []), { trips: st.trips }].some((l) => l.isekai || l.trips?.some((t) => t.home));
+// ผีบรรพบุรุษ (when.ancestor): แถวชาติไทยล่าสุดในผังตระกูล = ชาติก่อนของตัวเราเอง ไม่ใช่วิญญาณอื่น ⇒ การ์ดเล่า/เตือนได้ ทวงบุญบาปไม่ได้
+// เลือกแถวตายตัว ไม่ดึงเลขสุ่ม · ชาติต่างโลกไม่มีจังหวัด/อายุแบบผังไทยจึงข้าม · ข้ามโลกด้วยทริปตั้งแต่ชาติแรก = ยังไม่มีแถว ไม่มีผีให้ขึ้น
+const ancestorOf = (st) => (st.lineage ?? []).findLast((l) => !l.isekai && l.name);
+const ancestorWho = (l) => (!l ? 'เงาคนคนหนึ่ง' : l.sex === 'หญิง' ? (l.age >= 60 ? 'หญิงชรา' : 'ผู้หญิง') : l.age >= 60 ? 'ชายชรา' : 'ผู้ชาย');
 
 // ตารางนัดการ์ดซ้อนทับต่อชีวิต: ลอกแบบตารางนัดการ์ดชวนต่างโลก — สุ่มจาก stream แยกของ seed ไม่ดึง st.rng
 // ขั้น 0 ไม่มีตารางและไม่เพิ่มช่องใด ⇒ ตระกูลค่า 0 เดินเท่าเดิมทุกหลัก · การ์ดซ้อนทับไม่อยู่ในกองสุ่ม ออกทางนัดนี้ทางเดียว
@@ -6303,7 +7154,7 @@ const driftFired = (st) => Object.keys(st.done).filter((id) => id.startsWith(DRI
 // st.drift = ขั้นตอนวางแผน · ชีวิตจากเซฟเก่าไม่มีช่องนี้ ⇒ ทริปกลับบ้านไม่วางแผนให้ชีวิตที่เล่นค้าง (เซฟเก่าเริ่มนับชีวิตถัดไป)
 // ทริปกลับบ้านวางใหม่ด้วย stream ของรอบนั้น หักเหตุที่ออกไปแล้ว ⇒ ทั้งชีวิตไม่เกินจำนวนของขั้นล่าสุด
 function driftPlan(st, run = 0, stage = driftStageOf(st)) {
-  if (!stage || (run && !st.drift)) return;
+  if (!stage || (run && !st.drift) || !dlcOpen(st, 'overlap')) return;
   st.drift = stage;
   st.scheduled = st.scheduled.filter((x) => !x.drift);
   const rng = makeRng(mixSeed(st.seed ^ DRIFT_PLAN.salt, run));
@@ -6407,9 +7258,9 @@ function playLife(seed, content, pickChoice, onCard, st = newLife(seed, content)
     const card = nextCard(st);
     onCard?.(card, st);
     if (card.kind === 'death') return { age: card.age, cards: st.cards + 1, state: st };
-    // บอทที่มีนโยบายโฟกัส (ใบ 04) ตั้งโฟกัสหลังเห็นการ์ด — นโยบายสุ่มจาก stream ของตัวเอง ไม่แตะ rng ของโลก
-    if (pickChoice.focus && !st.dead && !st.trip && !st.court) pickChoice.focus(st);
     if (pickChoice.tree && !st.dead && !st.trip && !st.court) pickChoice.tree(st);
+    // บอทที่ประกาศนโยบายใช้จ่ายเลือกระดับบนการ์ดทบทวนเงิน · บอทที่ไม่ประกาศไม่แตะ ⇒ ชีวิตเท่าเดิม
+    if (pickChoice.spend && card.spend) chooseSpend(st, pickChoice.spend(card, st));
     // บอทที่ไม่ได้ประกาศ isekai ปฏิเสธการ์ดชวนโดยไม่ดึงเลขสุ่ม ⇒ ชีวิตเดินเท่าเดิม
     // การ์ดในทริป (B68m) ไม่มีป้ายบุญบาปแบบชีวิตไทย — บอทที่ประกาศ trip เลือกเอง ที่เหลือสุ่มตัวที่ไม่ล็อก
     if (card.court) {
@@ -6760,6 +7611,7 @@ const contLifeMul = (race) => CONT_RACES[race].pace;
 
 
 
+
 const ISEKAI_STAT = { str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค' };
 const ISEKAI_FX = { hp: 'ชีวิต', str: 'พลัง', mag: 'เวท', cha: 'บารมี', luk: 'โชค', gold: 'ทอง', fame: 'ชื่อเสียง' };
 // ค่าตั้งของเกม: stay = อยู่ต่างโลกต่อติดกันได้กี่รอบ (กันบอทวนไม่จบ) · chance = โอกาสเทพธิดาโผล่เองตอนถึงทางเกิด
@@ -7076,7 +7928,7 @@ const ISEKAI_FOCUS = {
 };
 
 // อาชีพตามโฟกัส (05a): โฟกัสต้นทางรวมกันสะสมปีเต็มครบ years ⇒ ได้อาชีพนั้นติดตัวทั้งชาติ · ได้หลายอาชีพพร้อมกันได้ (เจ้าของเคาะ)
-// ISEKAI_CAREER_T.years = chain_years ของโลกหลัก (content/rules/focus.yaml · เจ้าของเคาะใช้ค่าเดียวกัน — harness-test เทียบให้)
+// ISEKAI_CAREER_T.years = ค่าของโลกต่างโลกเอง (เท่า chain_years ของโลกหลักตอนเคาะ · ใบ ft15a ตัดการผูกกันเพื่อให้ลบโฟกัสเดิมของโลกหลักได้โดยไม่ลากค่านี้ไปด้วย)
 // gain = ผลต่อปีของอาชีพ คิดแบบเดียวกับทุ่มเท ซ้อนกับโฟกัสที่ถืออยู่ · เจ้าของเคาะชุด T1 = ราว ¼ ของโฟกัสต้นทาง
 const ISEKAI_CAREER_T = { years: 3 };
 const ISEKAI_CAREERS = {
@@ -8234,37 +9086,37 @@ const ENTRY_EVENTS = {
   circle: {
     bands: [0, 1, 2], gone: true,
     text: 'เดินกลับบ้านตอนค่ำ จู่ ๆ ใต้เท้าก็มีวงกลมเรืองแสงสีฟ้าขึ้นมา มีเสียงผู้หญิงเรียกชื่อคุณอยู่ในวง',
-    choices: ['ก้าวเข้าไปในวง', 'ถอยออกมาแล้วรีบเดินกลับบ้าน'],
+    choices: ['ก้าวเข้าไปในวง', 'ถอยออกมาแล้วรีบเดินกลับบ้าน', 'ยกมือถือถ่ายวงไว้เป็นหลักฐาน', 'ตะโกนถามว่าใครเรียก'],
   },
   puzzle: {
     bands: [0], gone: true,
     text: 'เกมมือถือที่ไม่เคยโหลดโผล่ขึ้นมาในเครื่อง ด่านสุดท้ายถามว่าถ้าแก้ปริศนาข้อนี้ได้ จะยอมไปช่วยโลกอื่นไหม',
-    choices: ['พิมพ์คำตอบแล้วกดยอม', 'ลบแอปทิ้ง'],
+    choices: ['พิมพ์คำตอบแล้วกดยอม', 'ลบแอปทิ้ง', 'แคปหน้าจอส่งให้เพื่อนดู', 'ปิดเครื่องแล้ววางไว้ห่างตัว'],
   },
   rescue: {
     bands: [0, 1, 2],
     text: 'เด็กคนหนึ่งวิ่งตามลูกบอลลงไปกลางถนน รถกำลังมา ไม่มีใครอยู่ใกล้กว่าคุณ',
-    choices: ['วิ่งเข้าไปผลักเด็กออก', 'ตะโกนเรียก เด็กหันมาทันพอดี'],
+    choices: ['วิ่งเข้าไปผลักเด็กออก', 'ตะโกนเรียก เด็กหันมาทันพอดี', 'โบกมือสุดแขนให้รถชะลอ', 'กดแตรรถที่จอดอยู่ข้างทาง'],
   },
   overwork: {
     bands: [1],
     text: 'ทำงานติดกันมาเป็นเดือน คืนนี้ง่วงจนตาจะปิด รู้สึกแปลก ๆ ว่าถ้าหลับตอนนี้คงไม่ได้ตื่นที่เดิม',
-    choices: ['ปล่อยให้หลับไป', 'ลุกไปล้างหน้า พรุ่งนี้ขอลาพัก'],
+    choices: ['ปล่อยให้หลับไป', 'ลุกไปล้างหน้า พรุ่งนี้ขอลาพัก', 'ชงกาแฟแก้วใหญ่แล้วลุยงานต่อ', 'โทรหาเพื่อนให้คุยเป็นเพื่อน'],
   },
   dream: {
     bands: [2],
     text: 'คืนนี้หลับสบายเป็นพิเศษ ในฝันมีประตูไม้บานหนึ่งแง้มอยู่ แสงอุ่น ๆ ลอดออกมา',
-    choices: ['เดินเข้าประตู', 'หันหลังกลับ ตื่นมาตอนเช้าตามปกติ'],
+    choices: ['เดินเข้าประตู', 'หันหลังกลับ ตื่นมาตอนเช้าตามปกติ', 'ยืนมองอยู่ตรงนั้นจนฝันจบ', 'จำทางไปประตูไว้ในหัว'],
   },
   truck: {
     bands: [1, 2],
     text: 'รถบรรทุกคันหนึ่งพุ่งมาทางม้าลาย ในหัวแวบขึ้นมาว่า แบบนี้ในนิยายเขาได้ไปต่างโลกกันนี่นา',
-    choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ'],
+    choices: ['ยืนนิ่ง ลองดูสักตั้ง', 'กระโดดหลบตามสัญชาตญาณ', 'ตะโกนเตือนคนขับสุดเสียง', 'ยกแขนบังหน้าแล้วถอยหลัง'],
   },
   door: {
     bands: [1, 2], trip: true, gone: true,
     text: 'ประตูห้องเก็บของที่ปิดตายมาหลายปีแง้มออกเอง ข้างในเป็นทุ่งหญ้ากับท้องฟ้าที่มีดวงจันทร์สองดวง ลมพัดกลิ่นดอกไม้แปลก ๆ ออกมา',
-    choices: ['ก้าวข้ามธรณีประตูไปดู', 'ปิดประตูแล้วล็อกกุญแจ'],
+    choices: ['ก้าวข้ามธรณีประตูไปดู', 'ปิดประตูแล้วล็อกกุญแจ', 'แง้มส่องดูจากข้างนอก', 'เคาะถามว่ามีใครอยู่ไหม'],
   },
 };
 
@@ -8334,6 +9186,8 @@ function entryOffers(seed) {
 
 // การ์ดชวนของอายุนี้ (ใบละครั้ง) · ไม่ผ่าน emit ⇒ เลขการ์ดของชีวิตไม่เลื่อน
 function entryCard(st, stage) {
+  // ล็อก = ไม่มีการ์ดชวน ไม่ตั้งตารางนัด · ตารางนัดสุ่มจาก stream แยก จึงไม่เลื่อนเลขสุ่มของชีวิต
+  if (!dlcOpen(st, 'isekai')) return null;
   st.isekaiEntry ??= entryOffers(st.seed);
   const o = st.isekaiEntry.find((x) => x.age === st.age && !x.seen);
   if (!o) return null;
@@ -8344,7 +9198,7 @@ function entryCard(st, stage) {
     kind: 'event', id: `isekai_${o.id}`, entry: o.id, gone: !!e.gone, ...(e.trip && { trip: true }), type: 'B', national: false, funeral: false,
     age: st.age, stage, title: null, text: e.text, choices: [...e.choices],
     // ปุ่มไม่บอกว่าตาย หายตัว หรือได้กลับ — ผู้เล่นรู้จากเรื่องหลังกดรับ
-    fx: ['', ''], locked: [null, null],
+    fx: e.choices.map(() => ''), locked: e.choices.map(() => null),
   };
 }
 
@@ -9195,6 +10049,7 @@ const isekaiLineage = (isk, gen) => ({ gen, name: isk.name, isekai: true, world:
 
 
 
+
 // ระดับกรรมที่ปรโลก (−1..1) = บัญชีสุทธิ ÷ ref · ref แยกจากตัวคูณกรรมระหว่างชีวิต (KARMA.ref) เพราะบัญชีทั้งชีวิตสะสมไกลกว่า
 // จุดอิ่มของตัวคูณการตายมาก — ใช้ ref เดียวกันแล้วเกือบทุกคนชนเพดาน ภูมิกับฐานะชาติหน้าจะไม่แยกคน
 const VERDICT_REF = 30;
@@ -9352,14 +10207,12 @@ function thaiEarn(st) {
   const map = st.content.skillMap;
   if (!map || Object.values(map).every((m) => !Object.keys(m).length)) return [];
   const t = titlesOf(st);
-  const chain = st.content.focus?.chain_years ?? Infinity;
   const src = {
     job: st.occupation ? [st.occupation] : [],
     title: t.titles.map((x) => x.id),
     cause: isGone(st) || !st.cause ? [] : [st.cause],
     goal: goalsMet(st, (st.estate?.money ?? 0) < 0),
-    focus: Object.keys(st.focusYears ?? {}).filter((id) => st.focusYears[id] >= chain),
-    lifeGoal: [],
+    lifeGoal: st.goalsDone ?? [],
   };
   const got = new Set(Object.entries(src).flatMap(([k, ids]) => ids.flatMap((id) => map[k]?.[id] ?? [])));
   return Object.keys(ISEKAI_SKILLS).filter((id) => got.has(id)).map((id) => ({ id, name: ISEKAI_SKILLS[id].name, lv: 1 }));
@@ -9379,6 +10232,8 @@ function verdictCard(af) {
   const back = af.from ? `ดวงวิญญาณของ${af.from.name}ถูกดึงกลับจากต่างโลกมายืนหน้าปรโลกอีกครั้ง ` : '';
   // ชาติต่างโลกให้สกิลบนการ์ดจบของมันแล้ว — ตอนกลับมาปรโลกจึงไม่ให้ซ้ำจากชีวิตไทยเดิม
   const earn = af.from ? [] : thaiEarn(af.st);
+  // ศาลครั้งแรก = ปรโลกปลด (มีผลชาติหน้า)
+  dlcEarn(af.st, 'afterlife');
   return emitAfter(af, {
     kind: 'verdict',
     type: 'B',
@@ -9408,6 +10263,7 @@ const FROM_ISEKAI_PATHS = {
 };
 const pathLocked = (af, id) => {
   if (id === 'child') return af.from ? 'ลูกหลานในโลกเดิมห่างไปหลายรุ่นแล้ว' : hasKids(af.st) ? null : 'ไม่มีลูกหลานให้กลับไปเกิด';
+  if (id === 'isekai' && !dlcOpen(af.st, 'isekai')) return 'ยังไม่ปลดภาคเสริมต่างโลก';
   if (id === 'isekai' && af.from && af.from.run >= ISEKAI.stay) return 'เทพธิดาบอกว่าวิญญาณนี้อยู่ต่างโลกนานพอแล้ว';
   if (id === 'blood' && !pathHeirs(af).length) return 'ไม่มีลูกหลานวัยที่เล่นต่อได้';
   return null;
@@ -9424,9 +10280,11 @@ function pathCard(af) {
   return emitAfter(af, {
     kind: 'path',
     type: 'B',
-    text: af.blessed && !af.from ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
+    text: af.blessed && !af.from && dlcOpen(af.st, 'isekai') ? `${base} · มีหญิงผมสีเงินยืนโบกมือรออยู่ข้างทาง บอกว่าเป็นเทพธิดาจากอีกโลกหนึ่ง` : base,
     choices: paths.map((p) => (af.from ? FROM_ISEKAI_PATHS[p.id] : p.text)),
     locked: paths.map((p) => pathLocked(af, p.id)),
+    // ปุ่มที่ซ่อนตอนล็อก DLC ยังอยู่ในแถว — เลขลำดับปุ่มที่เซฟเก็บ (afterPick) ไม่เลื่อน · UI ข้ามปุ่มนี้
+    ...(!dlcOpen(af.st, 'isekai') && { hidden: paths.map((p) => p.id === 'isekai') }),
     // ปุ่มสายเลือดคนกดได้ บอทไม่กด (openChoices) · หน้าเลือกคนอ่าน heirs แล้วส่ง id กลับทาง chooseAfter
     ...(heirs.length && { manual: paths.map((p) => p.id === 'blood'), heirs }),
   });
@@ -9462,6 +10320,8 @@ const lineageText = (lineage) => lineage.map((l) => l.isekai ? `รุ่นท�
 // ยมทูต/เทวทูตเป็นฉากของชีวิตไทย (เนื้อหาอ่านค่าชาติไทย) จึงเริ่มที่คำตัดสิน
 function closeIsekai(af) {
   const isk = af.isekai;
+  // จบชาติต่างโลก 1 ชาติ = ซ้อนทับปลด
+  dlcEarn(af.st, 'overlap');
   af.isekaiLives.push(isekaiLineage(isk, (af.st.gen ?? 1) + 1 + af.isekaiLives.length));
   // บัญชีเดียวของดวงวิญญาณ (B26 · B68a-2): ชาติต่างโลกที่จบแล้วเขียนกลับลง af.st.ledger ปรโลกรอบใหม่และบันทึกการกระทำ (noteDeed) จึงอ่านที่เดียวกัน
   af.st.ledger = isk.ledger;
@@ -9549,6 +10409,8 @@ function loopCard(af) {
 
 function loopEndCard(af) {
   const l = af.loop;
+  // จบวงภูมิ 1 รอบในชีวิตที่เริ่มด้วยปรโลกปลดแล้ว = ต่างโลกปลด
+  dlcEarn(af.st, 'isekai');
   l.end = l.health <= 0 ? 'spent' : 'served';
   const text = l.end === 'spent'
     ? `ชีวิตทิพย์หมดลงในปีที่ ${l.year} ก่อนครบกำหนด ${l.years} ปี ดวงวิญญาณจึงถูกพาไปรอเกิดเร็วกว่าที่ชี้ไว้`
@@ -9689,6 +10551,8 @@ const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
+// ลูกที่ไม่ใช่ลูกทางสายเลือดของเรา (ใบ 95) ไม่ได้ประวัติโรคกรรมพันธุ์ฝั่งเรา — สาเหตุที่ส่งต่อเป็น other (ไม่ถ่ายทอด ไม่นัดป่วย) · ปีตาย/ชื่อ/บทบาทเท่าเดิม
+const NOT_BLOOD_DEATH = { cause: 'other' };
 const deathOf = (st) => (isGone(st) ? { gone: true } : { cause: st.cause ?? 'other', ...illOf(st.cause, st.age, st.terminal?.cause === st.cause ? (st.terminal.toldAge ?? st.age - 1) : st.age) });
 const kinDeathOf = (m) => (m.cause ? { cause: m.cause, ...illOf(m.cause, m.diedAge, m.ill?.cause === m.cause ? (m.ill.toldAt ?? m.diedAge - 1) : m.diedAge) } : {});
 
@@ -9707,7 +10571,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -9726,13 +10590,14 @@ function makeHeir(af, r) {
     const pickOne = (list) => (list.length ? list[st.kinRng.int(0, list.length - 1)] : null);
     const me = blood ?? (st.kin ? (tier.tier === 1 ? pickOne(kids) : tier.tier === 2 ? pickOne(grand) : null) : null);
     const link = me?.role === 'grandchild' ? st.kin.find((m) => m.id === me.of) ?? null : tier.tier > 1 ? pickOne(kids) : null;
-    const spouse = (st.kin ?? []).filter((m) => m.role === 'spouse').at(-1) ?? null;
+    const spouse = me?.role === 'child' ? parentSpouseOf(st, me) : spouseOf(st);
     if (me) ({ sex, name } = me);
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
+    religion = st.religion;
     // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
     const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
     const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
@@ -9745,13 +10610,15 @@ function makeHeir(af, r) {
       // ผู้เล่นรุ่นก่อนตายตามชะตาเดิมของตัวเอง (diesAt) · อีกคนแก่และตายตามตารางชีพแบบพ่อแม่ทั่วไป
       // คู่ครองจริงเป็นพ่อ/แม่อีกคน: อายุตอนลูกเกิดจากปีเกิดจริง · ตายไปแล้วตอนเราตาย = ตายที่อายุนั้น · ไม่มีคู่จริง = สร้างแบบเดิม
       const year0 = st.birthYear + kidAge;
+      // ลูกเรียกผู้เล่นตามอัตลักษณ์ (หญิงข้ามเพศ = แม่) · คู่ชายเป็นพ่อ ⇒ บ้านมีแม่และพ่อครบเหมือนชีวิตอื่น · ไม่มีอัตลักษณ์ = เพศกำเนิดเท่าเดิม
+      const self = speechSex(st);
       parents = [
-        { sex: st.sex, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...deathOf(st) },
+        { sex: self, age: kidAge, alive: true, diesAt: st.age, ancestor: true, name: st.name, ...(me?.notMine && !isGone(st) ? NOT_BLOOD_DEATH : deathOf(st)) },
         spouse && spouse.born <= year0
           ? { sex: spouse.sex, age: year0 - spouse.born, alive: spouse.diedAge === null || spouse.diedAge > year0 - spouse.born, ...(spouse.diedAge !== null && { diesAt: spouse.diedAge, ...kinDeathOf(spouse) }), name: spouse.name }
-          : { sex: otherSex(st.sex), age: spouseAge(rng, st.sex, kidAge), alive: true },
+          : { sex: otherSex(self), age: spouseAge(rng, self, kidAge), alive: true },
       ];
-      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, st.sex) };
+      legacy = { age: st.age - kidAge, units, debt, from: elderWord(1, null, self) };
     } else {
       // รุ่นคั่นกลางเกิดห่างกันตามช่วงอายุแม่ตอนคลอด · พ่อ/แม่ของผู้เล่นใหม่เป็นลูก (หรือหลาน) ของรุ่นก่อน แก่และตายตามตารางชีพ
       // หลานจริง = เกิดปีของเขา พ่อ/แม่สายเลือดคือลูกจริงที่ให้กำเนิด · ไม่มีคนจริง = ห่างรุ่นสุ่มแบบเดิม (เริ่มจากปีเกิดลูกจริงถ้ามี)
@@ -9800,7 +10667,10 @@ function makeHeir(af, r) {
   const carried = r * (tier?.carry ?? 1);
   const ledger = carryLedger(af.st.ledger, net, carried);
   // ทายาทเกิดในโลกปกติเสมอ — รอบนี้มีชาติต่างโลกคั่น = กลับเข้าโลกที่เคยออกไป +1 (ชาติต่างโลกติดกันหลายรอบก็กลับครั้งเดียว) · ปรโลกคั่นชาติไม่นับ
-  const overlap = overlapOf(st) + (af.isekaiLives.length ? 1 : 0);
+  // ก้อนซ้อนทับล็อก = ไม่นับ (ปลดทีหลังเริ่มขั้น 0)
+  const overlap = overlapOf(st) + (af.isekaiLives.length && dlcOpen(st, 'overlap') ? 1 : 0);
+  // ค่าซ้อนทับขึ้นขั้นแรก = ดันเจียนปลด
+  if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   return {
@@ -9811,6 +10681,7 @@ function makeHeir(af, r) {
     cls,
     region,
     province,
+    religion,
     birthYear,
     parents,
     legacy,
@@ -9828,14 +10699,19 @@ function makeHeir(af, r) {
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
     pets: heirPets(st, birthYear, tier),
-    // เกิดในตระกูล = รับหมวดโฟกัสหลักของรุ่นก่อนเป็นตัวเด็ก · เกิดที่อื่น/ไม่เคยโฟกัส = ตามน้ำ (ไม่มีฟิลด์ heir จึงเท่าเดิม)
-    ...(tier && lifeFocusKid(st) && { focus: lifeFocusKid(st) }),
+    ...(blood && heirSibs(st, blood).length && { sibs: heirSibs(st, blood) }),
+    // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
+    ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
+    // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
+    ...(tier && st.nature && { nature: st.nature }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
     fame,
     ...(overlap && { overlap }),
+    // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
+    dlc: dlcNext(st),
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),
@@ -10026,9 +10902,14 @@ function horoscope(st) {
 
 const placeLabel = (name) => (name.startsWith('กรุงเทพ') ? name : `ภาค${name}`);
 
-// บรรทัดเล่าใต้หัวข้อการ์ดบ้านเมือง — เศรษฐกิจ/ภัยพิบัติเท่านั้น (MAP ไม่แตะการเมือง) · ภัยที่มีภาคเล่าต่างกันตามที่ผู้เล่นอยู่
+// บรรทัดเล่าใต้หัวข้อการ์ดบ้านเมือง — เศรษฐกิจ/ภัยพิบัติ/อุบัติภัย/สุขภาพ/เมือง/กีฬา (MAP ไม่แตะการเมือง) · ภัยที่มีภาคเล่าต่างกันตามที่ผู้เล่นอยู่
+// สุขภาพที่มีภาค (ฝุ่น PM2.5) ใช้ข้อความสุขภาพ ไม่เข้ากิ่งภาค — เป็นข่าวถึงทุกบ้าน
 function eraStory(st, e) {
   if (e.kind === 'economy') return 'เศรษฐกิจทั้งประเทศสะดุด ข้าวของแพง งานหายาก หลายบ้านต้องรัดเข็มขัด เงินเก็บและการลงทุนปีนี้ได้รับผลไปด้วย';
+  if (e.kind === 'health') return 'ข่าวสุขภาพนี้ถึงทุกบ้าน หลายครอบครัวต้องระวังตัวและปรับชีวิตประจำวันตาม';
+  if (e.kind === 'accident') return 'ข่าวอุบัติภัยครั้งใหญ่ทำให้คนทั้งประเทศสะเทือนใจ หลายแห่งเร่งตรวจความปลอดภัยของที่อยู่และที่ทำงานตาม';
+  if (e.kind === 'city') return 'เมืองและชีวิตประจำวันของผู้คนเปลี่ยนไปตามเรื่องนี้ แม้บ้านคุณจะอยู่ไกลก็ได้ยินข่าวถึง';
+  if (e.kind === 'sport') return 'งานใหญ่ของประเทศที่คนทั้งบ้านทั้งเมืองจับตาดูไปพร้อมกัน';
   if (!e.regions?.length) return 'ข่าวนี้อยู่ในความสนใจของคนทั้งประเทศ หลายบ้านต้องระวังตัวและปรับชีวิตตาม';
   if (e.regions.includes(st.region)) return `${areaLabel(st)}ที่คุณอยู่เป็นพื้นที่ที่โดนหนัก บ้านเรือนและการทำมาหากินของคนแถวนี้เสียหาย`;
   return `เหตุหนักอยู่ที่${e.regions.map(placeLabel).join(' ')} ข่าวความเสียหายไปถึงทั่วประเทศ`;
@@ -10038,6 +10919,7 @@ function eraStory(st, e) {
 // คิดย้อนหลังตอนตายจากสิ่งที่ชีวิตนั้นเลือกจริง (st.log) + สถานะท้ายชีวิต — ไม่เก็บอะไรเพิ่มระหว่างเล่น ไม่ดึงเลขสุ่ม
 // ห้ามอ่านยอดบัญชีบุญบาป (ledger) — ฉายาขึ้นบนการ์ดตายก่อนปรโลกเฉลยบัญชี · อ่านได้เฉพาะป้ายของตัวเลือกที่ผู้เล่นกดเอง
 // (การกระทำนั้นผู้เล่นเห็นในข้อความอยู่แล้ว) ไม่รวมยอด ไม่หักกลบ ไม่บอกฝั่งที่หนักกว่า
+
 
 
 
@@ -10217,7 +11099,10 @@ function lifeFacts(st) {
   }
   // เหตุบ้านเมืองที่ทันตอนเป็นผู้ใหญ่ นับเฉพาะกลุ่มที่ขึ้นการ์ดให้เห็น — ปีที่กลุ่มเหตุถูกซ่อน (ออกแล้ว/เว้นช่วง) ผู้เล่นไม่รู้ว่ารอดอะไรมา
   const crises = new Set(), disasters = new Set();
-  for (const { e, age } of erasShown(st, st.age)) if (age >= 20) (e.kind === 'economy' ? crises : disasters).add(e.id);
+  for (const { e, age } of erasShown(st, st.age)) if (age >= 20) {
+    if (e.kind === 'economy') crises.add(e.id);
+    else if (e.kind === 'disaster') disasters.add(e.id);
+  }
   const worth = netWorth(st);
   return {
     st,
@@ -10235,19 +11120,33 @@ function lifeFacts(st) {
     wealth: worth / (nationalIncome(era, st.seed, st.birthYear + st.age) * 12),
     workYears: st.workFrom === null ? 0 : Math.max(0, Math.min(st.age, RETIRE_AGE) - st.workFrom),
     expected: expectedDeathAge(era, st.sex, st.birthYear, st.seed),
+    ...treeShape(st),
   };
+}
+
+// รูปต้นไม้ตอนตาย (ใบ ft14) — นับโหนดที่เคยปลดรวมที่ล้างแล้ว (ข้อ 56) · ความลึก = ห่วง pre ยาวสุดของโหนดที่เคยปลด · กายใจ = แขนง skill
+const depthMemo = new WeakMap();
+const nodeDepth = (defs, id) => {
+  let m = depthMemo.get(defs);
+  if (!m) depthMemo.set(defs, (m = {}));
+  return (m[id] ??= 1 + Math.max(0, ...(defs[id]?.pre ?? []).map((p) => nodeDepth(defs, p))));
+};
+function treeShape(st) {
+  const defs = st.content.tree?.nodes ?? {};
+  const ever = treeEver(st).filter((id) => defs[id]);
+  return { treeDepth: Math.max(0, ...ever.map((id) => nodeDepth(defs, id))), treeSkill: ever.filter((id) => defs[id].branch === 'skill').length };
 }
 
 const has = (f, ...k) => k.some((x) => f.flags[x]);
 // ฉายาตามเงื่อนไข (ใบ 04) — ทุกตัวตรวจแยกกัน ได้หลายตัวพร้อมกัน ไม่มีลำดับ · ด้านลบใช้คำเห็นใจ ไม่ตำหนิ
-// harness ต้องพิสูจน์ทุกตัว ≥0.1% · ระดับตั้งจากอัตราที่วัดได้ (ทั่วไป >10% · หายาก 1.5–10% · ตำนาน <1.5% รวมทุกบุคลิก) ไม่ใช่ความยากที่คิดเอา
+// harness ต้องพิสูจน์ทุกตัว ≥0.1% · ระดับตั้งจากอัตรา raw ก่อนตัดเพดาน (ทั่วไป ≥10% · หายาก 1–<10% · ตำนาน <1% รวมทุกบุคลิก) ไม่ใช่ความยากที่คิดเอา
 const TITLES = [
   { id: 'hard_worker', tier: 'ทั่วไป', name: 'มือไม่เคยว่าง', hint: 'ทำงานยาวนานหลายสิบปี', test: (f) => f.workYears >= 40 },
-  { id: 'boss', tier: 'ทั่วไป', name: 'เถ้าแก่ตัวเล็ก', hint: 'เคยเปิดกิจการของตัวเอง', test: (f) => has(f, 'own_business') },
+  { id: 'boss', tier: 'หายาก', name: 'เถ้าแก่ตัวเล็ก', hint: 'เคยเปิดกิจการของตัวเอง', test: (f) => has(f, 'own_business') },
   { id: 'vendor', tier: 'ทั่วไป', name: 'คนค้าขายหัวใจสู้', hint: 'หาเลี้ยงชีพด้วยการค้าขายรายวัน', test: (f) => has(f, 'street_vendor', 'online_seller') },
   { id: 'grateful', tier: 'ทั่วไป', name: 'ลูกกตัญญู', hint: 'เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก', test: (f) => (f.tagCount.care_parents ?? 0) >= 2 },
   { id: 'giver', tier: 'ทั่วไป', name: 'มือที่ไม่เคยหุบ', hint: 'ให้ทานบ่อยจนเป็นนิสัย', test: (f) => (f.tagCount.dana ?? 0) >= 3 },
-  { id: 'parent', tier: 'ทั่วไป', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
+  { id: 'parent', tier: 'หายาก', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
   { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 2 },
   { id: 'homeowner', tier: 'ทั่วไป', name: 'มีบ้านเป็นของตัวเอง', hint: 'ได้บ้านมาด้วยน้ำพักน้ำแรง', test: (f) => has(f, 'home_owner') },
   { id: 'runner', tier: 'ทั่วไป', name: 'นักวิ่งตอนเช้า', hint: 'ดูแลร่างกายเป็นกิจวัตร', test: (f) => has(f, 'sporty') },
@@ -10256,21 +11155,24 @@ const TITLES = [
   { id: 'scarred', tier: 'หายาก', name: 'แผลในใจที่ผ่านมาได้', hint: 'เคยถูกรังแก แต่จากไปอย่างมีความสุข', test: (f) => has(f, 'bullied') && f.st.happiness >= 75 },
   { id: 'kind_fooled', tier: 'ทั่วไป', name: 'ใจดีจนโดนหลอก', hint: 'ไว้ใจคนผิดเรื่องเงิน', test: (f) => has(f, 'ponzi_victim') },
   // caught_fraud = ทุจริตเองแล้วถูกจับ/ไล่ออก — แยกจากฉายาเหยื่อ ใช้คำเห็นใจแบบเดียวกับด้านลบตัวอื่น
-  { id: 'stumbled', tier: 'หายาก', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', test: (f) => has(f, 'caught_fraud') },
+  { id: 'stumbled', tier: 'ทั่วไป', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', test: (f) => has(f, 'caught_fraud') },
   { id: 'guarantor', tier: 'หายาก', name: 'ผู้แบกหนี้แทนคนอื่น', hint: 'เซ็นค้ำให้คนที่ไว้ใจ', test: (f) => has(f, 'guarantor') },
   { id: 'lone_walker', tier: 'หายาก', name: 'ผู้เดินทางคนเดียว', hint: 'อยู่จนแก่โดยไม่มีครอบครัวของตัวเอง', test: (f) => f.age >= 70 && !has(f, 'has_kids', 'married') && f.st.relations < 20 },
   { id: 'comeback', tier: 'ตำนาน', name: 'ล้มแล้วลุก', hint: 'ล้มละลายแล้วกลับมามีเงินเหลือ', test: (f) => f.st.bankruptcies >= 1 && f.debt <= 0 && f.worth >= 0 },
   { id: 'quiet_rich', tier: 'หายาก', name: 'เศรษฐีเงียบ', hint: 'เกิดไม่สูง แต่จากไปพร้อมทรัพย์ก้อนใหญ่', test: (f) => f.clsIdx <= 4 && f.wealth >= 10 },
   { id: 'folk_sage', tier: 'หายาก', name: 'ปราชญ์ชาวบ้าน', hint: 'รู้มากโดยไม่ต้องมีปริญญา', test: (f) => f.st.knowledge >= 95 && (!f.st.edu || f.st.edu === 'ประถม') },
-  { id: 'outlived', tier: 'หายาก', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
+  { id: 'outlived', tier: 'ทั่วไป', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
   { id: 'clean_hands', tier: 'หายาก', name: 'มือสะอาดในที่สกปรก', hint: 'เจอทางลัดหลายครั้งแต่ไม่เคยเลือก', test: (f) => f.declined >= 10 && f.sinPicks === 0 },
   { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 3 },
   { id: 'lucky_number', tier: 'ทั่วไป', name: 'ผู้รอเลขเด็ด', hint: 'ซื้อหวยจนเป็นนิสัย', test: (f) => has(f, 'lottery_habit') },
-  { id: 'grandparent', tier: 'หายาก', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
-  { id: 'centenarian', tier: 'ตำนาน', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },
-  { id: 'rags_riches', tier: 'ตำนาน', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
+  { id: 'grandparent', tier: 'ตำนาน', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
+  { id: 'centenarian', tier: 'หายาก', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },
+  { id: 'rags_riches', tier: 'หายาก', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
   { id: 'never_dark', tier: 'หายาก', name: 'ผู้ไม่เคยเลือกทางมืด', hint: 'ทั้งชีวิตไม่เคยเลือกทางผิดเลยสักครั้ง', test: (f) => f.age >= 60 && f.sinPicks === 0 && f.declined >= 11 },
   { id: 'peaceful', tier: 'ตำนาน', name: 'จากไปอย่างสงบ', hint: 'แก่เฒ่า ไม่มีหนี้ มีคนรักรายล้อม และมีความสุข', test: (f) => f.age >= 80 && f.debt <= 0 && f.worth >= 0 && f.st.relations >= 70 && f.st.happiness >= 70 && has(f, 'has_kids') },
+  // ฉายารูปต้นไม้ (ใบ ft14) — อ่านแค่ความลึกกับแขนงกายใจ ไม่ซ้ำแกนฉายาแบบชีวิต
+  { id: 'tree_deep', tier: 'หายาก', name: 'รากหยั่งลึก', hint: 'ปลดโหนดต้นไม้ไล่ลงไปลึกถึงสี่ชั้น', test: (f) => f.treeDepth >= 4 },
+  { id: 'tree_mind', tier: 'หายาก', name: 'ฝึกกายฝึกใจ', hint: 'ปลดโหนดสายกายใจครบสามโหนด', test: (f) => f.treeSkill >= 3 },
 ];
 
 // ฉายาตระกูล (ใบ 04) — ข้ามรุ่น · ch = ผังตระกูลรุ่นก่อน + ชีวิตนี้ · lin = รุ่นก่อนเท่านั้น
@@ -10326,6 +11228,7 @@ function titlesOf(st) {
 // เซฟแบบภาพถ่ายสถานะ (B128): เก็บสถานะชีวิตจริงแทน seed + ลำดับปุ่ม — อัปเดตเนื้อหาแล้วชีวิตที่ค้างยังเล่นต่อได้
 // เดินทั้งก้อนครั้งเดียว: เนื้อหาเกมไม่เก็บ (ผูกกลับตอนโหลด) · การ์ดเนื้อหาเก็บแค่ id · ตัวสุ่มเก็บสถานะภายใน
 // object ที่ถูกอ้างหลายที่ (af.st = st · kinLoss ชี้คนใน kin · thaiVerdict) เก็บครั้งเดียวแล้วอ้างด้วยเลข — ต่อกลับเป็นตัวเดียวกัน
+
 
 
 
@@ -10397,6 +11300,8 @@ function repairLife(st, card) {
   st.queue = q.filter((c) => !('ev' in c) || c.ev);
   // เซฟก่อนมีชื่อจริง (names-fun) — สุ่มจาก seed เดิม โหลดกี่ครั้งก็ได้ชื่อเดียวกัน
   st.realName ??= pickRealName(st.seed, st.sex, st.birthYear, st.content.era.names);
+  // เซฟก่อนมีศาสนา (B93) — สุ่มจาก seed+จังหวัดเดิมด้วย stream เดียวกับตอนเกิด โหลดกี่ครั้งก็ได้ค่าเดียว · ไม่มีจังหวัด/ตาราง = ค่าเริ่มต้น
+  st.religion ??= st.province ? pickReligion(makeRng(st.seed ^ 0x3b9aca07), st.content.era.birth, st.province) : DEFAULT_RELIGION;
   const occ = st.content.era.finance.occupations;
   if (st.occupation && !occ.some((o) => o.id === st.occupation)) st.occupation = occ[0].id;
   const ladders = st.content.era.careers?.ladders;
@@ -10412,6 +11317,10 @@ function repairLife(st, card) {
     const past = pastFromLineage(st.lineage, (name) => REALMS.find((r) => r.name === name)?.id ?? null);
     if (past) st.past = past;
   }
+  lifeTreeMigrate(st);
+  lifeGatesMigrate(st);
+  // เซฟก่อน ft15: กลไกโฟกัสรายปีถูกตัดแล้ว — ล้างสถานะค้าง (focusYears แปลงเป็น st.gates ใน lifeGatesMigrate แล้วตัด)
+  for (const k of ['focus', 'focusAt', 'focusMet', 'focusDoom', 'focusBorn', 'focusHeir', 'focusWarn']) delete st[k];
   return stale;
 }
 
@@ -10457,6 +11366,19 @@ const artVirus = (cx, cy, r) => {
   return [artLine(artCirc(cx, cy, r)), artLine(spikes, { w: 1.2 }), artFill(knobs), artFill(artCirc(cx - 3, cy - 2, 1.6) + artCirc(cx + 4, cy + 3, 1.3), ART_INK.gold)];
 };
 const artHouse = (x, base, s = 1) => artLine(`M${x} ${base}v${-14 * s}l${12 * s} ${-10 * s}l${12 * s} ${10 * s}v${14 * s}zM${x + 9 * s} ${base}v${-7 * s}h${6 * s}v${7 * s}`);
+
+const artPerson = (x, base, s = 1) => [
+  artLine(artCirc(x, base - 16 * s, 3 * s), { w: 1.2 }),
+  artLine(`M${x} ${base - 13 * s}v${7 * s}l${-3 * s} ${6 * s}M${x} ${base - 6 * s}l${3 * s} ${6 * s}M${x - 4 * s} ${base - 10 * s}h${8 * s}`, { w: 1.2 }),
+];
+const artFlame = (x, y) => artFill(`M${x} ${y}c3 4 4 7 0 9c-4-2-3-5 0-9z`);
+const artBox = (x, y, w, h) => artLine(`M${x} ${y}h${w}v${h}h${-w}zM${x + w / 2} ${y}v${h * 0.4}`, { w: 1.2 });
+const artBag = (x, y) => artLine(`M${x} ${y}h12q2 0 2 3t-2 3h-12q-2 0-2-3t2-3z`, { w: 1 });
+const artFish = (x, y) => [artFill(`M${x} ${y}q8-6 16 0q-8 6-16 0zM${x} ${y}l-5-4v8z`), artFill(artCirc(x + 12, y - 1, 0.9), ART_INK.lacquer2)];
+const artPlane = (x, y) => artLine(`M${x} ${y}h26q6 0 8 3q-2 3-8 3h-26zM${x + 4} ${y}l-4-8h4l6 8M${x + 12} ${y + 3}l6 8h4l-2-8`, { w: 1.2 });
+const artPalm = (x, base) => [artLine(`M${x} ${base}q-2-18 8-32`, { w: 2 }), artLine(`M${x + 8} ${base - 32}q-12-4-18 6M${x + 8} ${base - 32}q12-6 18 4M${x + 8} ${base - 32}q-4-10-14-10`)];
+const artStilt = (x) => artLine(`M${x - 2} 40l14-12l14 12zM${x} 40v12h24v-12M${x + 2} 52v10M${x + 22} 52v10M${x + 9} 52v-7h6v7`, { w: 1.2 });
+const artWheel = (cx, cy, r) => artLine(artCirc(cx, cy, r), { w: 1.2 });
 
 // ยุคละภาพเดียว ใช้กับทุกการ์ดของยุคนั้น — คีย์ตาม id เหตุการณ์ใน data/era-events.json
 const ERA_SCENES = {
@@ -10514,6 +11436,107 @@ const ERA_SCENES = {
     artLine('M128 46h6v-6M152 46h-6v-6', { stroke: ART_INK.cream, w: 1 }),
     artFill(artCirc(140, 40, 2.2)),
   ],
+  aids_first_case: [
+    ART_GROUND,
+    artLine('M40 66V36l20-14l20 14v30zM54 66V50h12v16'),
+    artLine('M100 20h40v34h-40zM108 30h24M108 38h24M108 46h14', { w: 1.2 }),
+    artFill(artCirc(166, 36, 5)),
+    artLine('M160 66V46q6-4 12 0v20', { w: 1.2 }),
+  ],
+  aids_idu_wave: [
+    ART_GROUND,
+    artLine('M30 66V30h30v36M38 40h14M38 48h14'),
+    ...artVirus(100, 38, 9),
+    artLine('M136 66V36h26v30M142 44h14', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M170 28v16M162 36h16', { w: 2 }),
+  ],
+  kathun_landslide: [
+    artLine('M24 66L70 24L108 40L176 66', { stroke: ART_INK.bronze2 }),
+    artLine('M70 24C78 40 70 54 56 62M92 34C98 46 90 56 80 64', { stroke: ART_INK.cream, w: 1.2 }),
+    artFill('M96 54l8-4l6 6l-6 6zM112 58l6-3l5 5l-7 3z'),
+    artHouse(136, 64, 0.9),
+    artLine(artWave(24, 176, 70, 12, 3), { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  mobile_phone_boom: [
+    ART_GROUND,
+    artLine('M44 66V16M36 66h16M38 30l6-6l6 6M36 42l8-8l8 8'),
+    artLine('M60 24q8 6 0 14M68 20q12 10 0 22', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M110 18h30q4 0 4 4v42q0 4-4 4h-30q-4 0-4-4V22q0-4 4-4zM112 26h26v22h-26zM119 56h12', { w: 1.2 }),
+    artFill(artCirc(125, 37, 3), ART_INK.gold),
+    artLine('M156 30q8 8 0 18M164 26q12 12 0 26', { stroke: ART_INK.cream, w: 1.2 }),
+  ],
+  aids_condom_campaign: [
+    ART_GROUND,
+    artLine('M30 62V18h56v44zM36 24h44M36 32h30', { w: 1.2 }),
+    artFill('M50 42h16v14h-16z', ART_INK.cream),
+    artLine('M108 50q0-10 8-10t8 10q0 8-8 8t-8-8zM124 50h12', { w: 1.2 }),
+    ...artPerson(150, 66, 1.4),
+    artLine('M164 40h14M171 33v14', { stroke: ART_INK.cream, w: 1.6 }),
+  ],
+  toy_factory_fire: [
+    ART_GROUND,
+    artLine('M40 66V34h60v32M46 66V46h14v20M72 66V46h14v20'),
+    artFlame(56, 24), artFlame(76, 20), artFlame(90, 26),
+    artLine('M110 30q8-6 6-14q10 6 6 16M118 24q8-6 4-14', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M132 66V50h20v16M138 58h8', { w: 1.2 }),
+    artBox(160, 46, 14, 20),
+  ],
+  hotel_collapse: [
+    ART_GROUND,
+    artLine('M36 66V22h40v14l-6 8v22M40 30h8M56 30h8M40 40h8M40 50h8'),
+    artLine('M84 66l10-10l12 6l10-14l14 10l12-2l12 10', { stroke: ART_INK.cream }),
+    artFill('M96 62l6-4l6 4zM120 62l6-4l6 4z'),
+    artLine('M150 40l10-8l8 8M156 66V46', { w: 1.2 }),
+    artLine('M60 12v6M70 14l-2 5M50 14l2 5', { stroke: ART_INK.cream, w: 1 }),
+  ],
+  asian_games_bangkok: [
+    ART_GROUND,
+    artLine('M30 66V44q0-12 14-12h112q14 0 14 12v22M44 66V50h112v16'),
+    artLine('M60 50V38M80 50V38M100 50V38M120 50V38M140 50V38', { stroke: ART_INK.cream, w: 1 }),
+    artLine('M70 20a8 8 0 1 0 0.01 0M90 20a8 8 0 1 0 0.01 0M110 20a8 8 0 1 0 0.01 0M80 26a8 8 0 1 0 0.01 0M100 26a8 8 0 1 0 0.01 0', { w: 1.1 }),
+    artFill(artCirc(166, 16, 3), ART_INK.gold),
+  ],
+  bts_opening: [
+    ART_GROUND,
+    artLine('M20 30h160M20 36h160', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M40 36V66M100 36V66M160 36V66', { w: 2 }),
+    artLine('M54 26h44q4 0 4 4v6H50v-6q0-4 4-4zM58 26v10M70 26v10M82 26v10M94 26v10', { w: 1.2 }),
+    artFill(artCirc(60, 34, 1) + artCirc(94, 34, 1), ART_INK.gold),
+    artLine('M120 66V46h30v20M128 54h14', { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  internet_commercial: [
+    ART_GROUND,
+    artLine('M50 20h60v34h-60zM56 26h48v22h-48zM70 54v8h20v-8M62 62h36'),
+    artLine('M64 34h20M64 40h30', { stroke: ART_INK.cream, w: 1 }),
+    artLine(artCirc(150, 36, 14), { w: 1.2 }),
+    artLine('M136 36h28M150 22q-8 14 0 28M150 22q8 14 0 28', { stroke: ART_INK.cream, w: 1 }),
+    artLine('M112 36h22', { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  avian_flu: [
+    ART_GROUND,
+    artLine('M30 66V44l14-10l14 10v22M44 66V54h6v12'),
+    artLine('M86 56q10-18 24-10q6-4 10 2l6 0l-4 4q-2 12-14 14q-14 2-22-10zM116 46l-4-2', { w: 1.3 }),
+    artFill(artCirc(118, 48, 1), ART_INK.gold),
+    ...artVirus(160, 30, 6),
+    artLine('M140 60h30', { stroke: ART_INK.bronze2, w: 1 }),
+  ],
+  suvarnabhumi_opening: [
+    ART_GROUND,
+    artLine('M24 66h152'),
+    artLine('M30 52h140v14M30 52q0-12 20-12h100q20 0 20 12', { w: 1.2 }),
+    artLine('M70 40V18h16v22M62 18h32', { w: 1.2 }),
+    artPlane(112, 22),
+    artLine('M104 28q-12 4-24 12', { stroke: ART_INK.cream, w: 1 }),
+    artLine('M36 58h8M52 58h8M68 58h8M84 58h8M100 58h8M116 58h8M132 58h8M148 58h8', { stroke: ART_INK.cream, w: 1 }),
+  ],
+  pm25_haze: [
+    artLine(artWave(20, 180, 20, 8, 5), { stroke: ART_INK.cream, w: 1.2 }),
+    artLine(artWave(20, 180, 32, 8, 5), { stroke: ART_INK.bronze2, w: 1.2 }),
+    ART_GROUND,
+    artLine('M30 66V48h18v18M60 66V36h22v30M92 66V44h16v22M124 66V30h24v36M156 66V46h16v20'),
+    artLine('M64 42h6M64 50h6M128 38h8M128 46h8', { stroke: ART_INK.cream, w: 1 }),
+    artLine(artCirc(100, 17, 5), { stroke: ART_INK.cream, w: 1 }),
+  ],
 };
 
 function eraArt(id) {
@@ -10521,18 +11544,6 @@ function eraArt(id) {
   return scene ? [...ERA_FRAME, ...scene] : null;
 }
 
-const artPerson = (x, base, s = 1) => [
-  artLine(artCirc(x, base - 16 * s, 3 * s), { w: 1.2 }),
-  artLine(`M${x} ${base - 13 * s}v${7 * s}l${-3 * s} ${6 * s}M${x} ${base - 6 * s}l${3 * s} ${6 * s}M${x - 4 * s} ${base - 10 * s}h${8 * s}`, { w: 1.2 }),
-];
-const artFlame = (x, y) => artFill(`M${x} ${y}c3 4 4 7 0 9c-4-2-3-5 0-9z`);
-const artBox = (x, y, w, h) => artLine(`M${x} ${y}h${w}v${h}h${-w}zM${x + w / 2} ${y}v${h * 0.4}`, { w: 1.2 });
-const artBag = (x, y) => artLine(`M${x} ${y}h12q2 0 2 3t-2 3h-12q-2 0-2-3t2-3z`, { w: 1 });
-const artFish = (x, y) => [artFill(`M${x} ${y}q8-6 16 0q-8 6-16 0zM${x} ${y}l-5-4v8z`), artFill(artCirc(x + 12, y - 1, 0.9), ART_INK.lacquer2)];
-const artPlane = (x, y) => artLine(`M${x} ${y}h26q6 0 8 3q-2 3-8 3h-26zM${x + 4} ${y}l-4-8h4l6 8M${x + 12} ${y + 3}l6 8h4l-2-8`, { w: 1.2 });
-const artPalm = (x, base) => [artLine(`M${x} ${base}q-2-18 8-32`, { w: 2 }), artLine(`M${x + 8} ${base - 32}q-12-4-18 6M${x + 8} ${base - 32}q12-6 18 4M${x + 8} ${base - 32}q-4-10-14-10`)];
-const artStilt = (x) => artLine(`M${x - 2} 40l14-12l14 12zM${x} 40v12h24v-12M${x + 2} 52v10M${x + 22} 52v10M${x + 9} 52v-7h6v7`, { w: 1.2 });
-const artWheel = (cx, cy, r) => artLine(artCirc(cx, cy, r), { w: 1.2 });
 
 // สมุดภาพบ้านเมือง (B130): ภาพละช่อง ปลดตามวัยที่เจอการ์ดของเหตุการณ์ หรือการ์ดตามมา (sp) · กรอบเดียวกับภาพยุค
 // [ช่อง, ป้ายช่อง, คำบรรยายภาพ, รูปทรง] · ภาพหลักของเหตุการณ์คือภาพยุคเดิม ไม่อยู่ในรายการนี้
@@ -10782,6 +11793,94 @@ const ART_SCENE_IDS = Object.keys(ART_SCENES);
 function sceneArt(id) {
   const s = ART_SCENES[id];
   return s ? { label: s[0], parts: [...ERA_FRAME, ...s[1]] } : null;
+}
+
+// ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 120): 10 หมวด กรอบ ERA_FRAME ชุดเดียวกับภาพฉาก · ข้อห้ามภาพ (ข้อ 156): ไม่มีพระ/พระพุทธรูป/ศพ/สถาบัน · คนในบ้านจากไปเป็นธูปควัน
+const artDrops = (xs, y) => xs.map((x, i) => `M${x} ${y + (i % 2) * 6}l-3 7`).join('');
+const CAT_ART = {
+  after: ['ดอกบัวบานบนเมฆ', [
+    artLine('M40 58q10-10 22-4q6-10 18-4q12-2 14 8H40z', { stroke: ART_INK.cream, w: 1.2 }),
+    artLine('M106 58q8-8 18-3q8-9 18-2q10 0 12 5h-48z', { stroke: ART_INK.cream, w: 1.2 }),
+    artLotus(100, 44),
+    artLine('M82 46q18 6 36 0', { w: 1.4 }),
+    artLine('M100 14v-4M86 18l-3-3M114 18l3-3', { stroke: ART_INK.cream, w: 1 }),
+  ]],
+  far: ['ประตูโค้งที่มีแสงลอดออกมา', [
+    ART_GROUND,
+    artLine('M78 66V34a22 22 0 0 1 44 0v32'),
+    artLine('M86 66V36a14 14 0 0 1 28 0v30', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M72 26l-10-7M128 26l10-7M68 40H54M132 40h14M74 54l-12 4M126 54l12 4', { stroke: ART_INK.cream, w: 1 }),
+    artFill(artCirc(100, 48, 3), ART_INK.cream),
+  ]],
+  loss: ['กระถางธูป ควันลอยขึ้น', [
+    ART_GROUND,
+    artLine('M78 66l4-14h36l4 14'),
+    artLine('M76 52h48', { w: 1.2 }),
+    artLine('M94 52V30M100 52V28M106 52V30', { stroke: ART_INK.bronze2, w: 1 }),
+    artFill(artCirc(94, 30, 1.3) + artCirc(100, 28, 1.3) + artCirc(106, 30, 1.3), ART_INK.cream),
+    artLine('M94 26q-4-6 0-10q4-4 0-8M100 24q4-6 0-10q-4-4 0-8M106 26q-4-6 0-10', { stroke: ART_INK.cream, w: 1 }),
+  ]],
+  ill: ['ขวดยา เม็ดยา และกากบาท', [
+    ART_GROUND,
+    artLine('M70 66V36h24v30zM74 36v-6h16v6M70 46h24'),
+    artLine('M112 34h10v-10h8v10h10v8h-10v10h-8v-10h-10z', { stroke: ART_INK.cream, w: 1.4 }),
+    artFill(artCirc(146, 58, 4) + artCirc(158, 60, 4)),
+  ]],
+  pet: ['แมวนั่งข้างชามข้าว', [
+    ART_GROUND,
+    artLine('M86 66q-4-22 8-30l-2-10l8 6h8l8-6l-2 10q12 8 8 30z'),
+    artLine('M122 62q14 2 14-10', { w: 1.4 }),
+    artFill(artCirc(98, 40, 1.5) + artCirc(110, 40, 1.5), ART_INK.cream),
+    artLine('M140 66q0-8 12-8t12 8z', { stroke: ART_INK.bronze2, w: 1.2 }),
+  ]],
+  self: ['ทางแยกกับป้ายบอกทาง', [
+    artLine('M56 66l34-14M144 66l-34-14', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M100 66V20'),
+    artLine('M100 26h30l6 5l-6 5h-30zM100 40h-28l-6 5l6 5h28z', { stroke: ART_INK.cream, w: 1.2 }),
+    ART_GROUND,
+  ]],
+  luck: ['สลากกับดาวโชค', [
+    artLine('M58 26h64v32h-64zM72 26v32', { w: 1.4 }),
+    artLine('M80 36h32M80 44h24M80 50h28', { stroke: ART_INK.cream, w: 1 }),
+    artFill('M146 22l4 9l10 1l-8 6l3 10l-9-6l-9 6l3-10l-8-6l10-1z'),
+    artLine('M38 30v6M35 33h6M168 54v6M165 57h6', { stroke: ART_INK.cream, w: 1 }),
+  ]],
+  good: ['พระอาทิตย์ขึ้นพ้นขอบฟ้า', [
+    ART_GROUND,
+    artLine('M70 66a30 30 0 0 1 60 0'),
+    artLine('M100 28v-12M74 40l-9-8M126 40l9-8M62 56H50M138 56h12', { stroke: ART_INK.cream, w: 1.2 }),
+    artFill('M84 66a16 16 0 0 1 32 0z'),
+  ]],
+  bad: ['เมฆฝน ฟ้าแลบ', [
+    artLine('M60 42q-14 0-14-11q0-12 15-11q4-12 18-10q8-10 22-4q14-4 18 9q14 0 14 14t-14 13z', { stroke: ART_INK.cream, w: 1.4 }),
+    artFill('M104 42l-10 14h8l-6 12l14-18h-8l6-8z'),
+    artLine(artDrops([66, 78, 128, 140, 152], 48), { stroke: ART_INK.bronze2, w: 1.2 }),
+  ]],
+  mid: ['สมุดบันทึกเปิดค้างไว้', [
+    ART_GROUND,
+    artLine('M100 60V24q-20-8-40-2v38q20-6 40 2q20-8 40-2V22q-20-6-40 2'),
+    artLine('M68 32q12-3 24 0M68 40q12-3 24 0M68 48q12-3 24 0M108 32q12-3 24 0M108 40q12-3 24 0', { stroke: ART_INK.bronze2, w: 1 }),
+    artLine('M142 30l14-12l4 4l-14 12z', { stroke: ART_INK.cream, w: 1.2 }),
+  ]],
+};
+const CAT_IDS = Object.keys(CAT_ART);
+function catArt(k) {
+  const c = CAT_ART[k];
+  return c ? { label: c[0], parts: [...ERA_FRAME, ...c[1].flat()] } : null;
+}
+
+// หมวดของการ์ดผลจากข้อมูลบนการ์ด (ข้อ 83 · ป้าย tag ใบ 60) — ลำดับตัดสินเดียวกับ resultCat ใน harness/result-cats.mjs ที่เจ้าของเห็นสัดส่วนในข้อ 120
+function resultArtCat(card) {
+  if (card.tag === 'afterlife') return 'after';
+  if (card.trip || card.tag === 'trip') return 'far';
+  // สัตว์ในบ้านตาย (loss.role pet/herd) เป็นหมวดสัตว์เลี้ยง ไม่ใช่คนในบ้านจากไป — ไม่งั้นหมวด pet ไม่มีวันขึ้น
+  if (card.loss && ['pet', 'herd'].includes(card.loss.role)) return 'pet';
+  if (card.digest === 'kin_loss' || card.tag === 'loss') return 'loss';
+  if (card.digest === 'kin_ill' || card.illness || (card.tag === 'sick' && !card.focusRisk)) return 'ill';
+  if (card.digest === 'pet' || card.tag === 'pet') return 'pet';
+  if ('nature' in card || card.focusRisk) return 'self';
+  if (card.tag === 'belief') return 'luck';
+  return card.tag === 'good' || card.tag === 'bad' ? card.tag : 'mid';
 }
 
 // ฐานะ 10 ระดับของ standingOf → จน/กลาง/รวย ตามชื่อระดับ (ยากไร้–ค่อนข้างจน · ชนชั้นกลางล่าง–กลางบน · มีอันจะกิน–มั่งคั่ง)
@@ -11286,6 +12385,198 @@ const STAT_HELP = [
   ['ทุกค่า', 'บางทางเลือกต้องมีค่าถึงก่อนจึงกดได้ (ปุ่มบอกเหตุผล) · ค่าที่สูงหรือต่ำมากทำให้ผลบางเรื่องเอียงดีหรือร้าย และเปลี่ยนเรื่องที่จะเจอ'],
 ];
 
+// จอต้นไม้โฟกัส (ใบ 12 · แบบ 4 กลุ่มดาว): ผังกับตัววาด SVG ล้วน ไม่แตะ DOM/สถานะเกม — แอปกับหน้าเว็บโฟกัสใช้ชุดเดียวกัน
+// ชื่อระดับบนสุดขึ้นต้น tv/TREE_VIEW ทั้งหมด — build ต่อทุกโมดูลเป็นสคริปต์เดียว ชื่อซ้ำกับโมดูลอื่นไม่ได้
+
+// แขนงที่ตั้งชื่อ/สีไว้ · แขนงใหม่ในทะเบียน (content/rules/tree.yaml) ที่ไม่อยู่ที่นี่ = หน้าเว็บหยุด build (site focus.mjs) แทนวาดแขนงไร้ชื่อ
+const TREE_VIEW_BRANCH = { money: { name: 'เงิน', color: '#C77A1E' }, rel: { name: 'ความสัมพันธ์', color: '#D0457A' }, know: { name: 'ความรู้', color: '#3F73D6' }, skill: { name: 'ทักษะ', color: '#1F9A72' }, occ: { name: 'ลึกลับ', color: '#B0509A' }, mid: { name: 'โหนดกลาง', color: '#64748B' } };
+
+const TV_GAP_X = 118;
+const TV_GAP_Y = 76;
+// กันป้ายชื่อโหนดล้นขอบ: ขอบ viewBox = ขอบของโหนดนอกสุด + ครึ่งความกว้างป้ายที่ยาวสุด (ข้อ 88 ภาพเจ้าของป้ายกลุ่มขวาโดนตัด)
+const TV_PAD_X = 84;
+const TV_PAD_TOP = 30;
+const TV_PAD_BOTTOM = 52;
+const TV_R = 14;
+
+// ป้ายชื่อโหนดไม่ทับเส้น/โหนด/ป้ายอื่น/ป้ายแขนง: ลองวางล่าง บน ขวา ซ้ายตามลำดับ เอาที่แรกที่ไม่ชน (ต้นไม้แตกลงล่างเสมอ ป้ายใต้โหนดจึงถูกเส้นลูกตัด)
+// ความกว้างป้ายประมาณจากจำนวนตัวอักษร (ไม่นับสระ/วรรณยุกต์ลอย) เพราะผังคำนวณก่อนมีฟอนต์
+// ต้นเต็มมีเส้นข้ามแขนงหนาแน่น 4 ทิศไม่พอ: ต่อด้วยป้ายเยื้องมุมและระยะไกลขึ้น (ลองตามลำดับ เอาที่ไม่ชนที่แรก)
+const TV_POS = ['below', 'above', 'right', 'left', 'belowR', 'belowL', 'aboveR', 'aboveL', 'below2', 'above2', 'right2', 'left2',
+  ...[30, 44, 60, 78, 100, 124].flatMap((r) => Array.from({ length: 16 }, (_, i) => `p:${i * 22.5}:${r}`))];
+const TV_COMB = /[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]/g;
+const tvLabelW = (name) => 7 * String(name).replace(TV_COMB, '').length;
+const tvLabelAt = (pos, x, y, w) => {
+  const gap = TV_R + 8;
+  const o = TV_R + 6;
+  // p:องศา:ระยะ = ป้ายวางกึ่งกลางที่ระยะนั้นรอบโหนด (เหลือทางเลือกสุดท้ายเมื่อ 12 ทิศข้างบนชนเส้นหมด) · ต้องพ้นวงโหนดตัวเอง
+  if (pos.startsWith('p:')) {
+    const [, deg, rad] = pos.split(':').map(Number);
+    const cx = x + rad * Math.cos((deg * Math.PI) / 180), cy = y + rad * Math.sin((deg * Math.PI) / 180);
+    const box = { x0: cx - w / 2, x1: cx + w / 2, y0: cy - 8, y1: cy + 8 };
+    const own = !(box.x0 > x + TV_R + 2 || box.x1 < x - TV_R - 2 || box.y0 > y + TV_R + 2 || box.y1 < y - TV_R - 2);
+    return { dx: cx - x, dy: cy - y + 4, anchor: 'middle', box, own };
+  }
+  if (pos === 'belowR') return { dx: 6, dy: TV_R + 17, anchor: 'start', box: { x0: x + 6, x1: x + 6 + w, y0: y + o, y1: y + o + 15 } };
+  if (pos === 'belowL') return { dx: -6, dy: TV_R + 17, anchor: 'end', box: { x0: x - 6 - w, x1: x - 6, y0: y + o, y1: y + o + 15 } };
+  if (pos === 'aboveR') return { dx: 6, dy: -(TV_R + 9), anchor: 'start', box: { x0: x + 6, x1: x + 6 + w, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
+  if (pos === 'aboveL') return { dx: -6, dy: -(TV_R + 9), anchor: 'end', box: { x0: x - 6 - w, x1: x - 6, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
+  if (pos === 'below2') return { dx: 0, dy: TV_R + 33, anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y + TV_R + 22, y1: y + TV_R + 37 } };
+  if (pos === 'above2') return { dx: 0, dy: -(TV_R + 25), anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y - TV_R - 36, y1: y - TV_R - 21 } };
+  if (pos === 'right2') return { dx: gap + 14, dy: 4, anchor: 'start', box: { x0: x + gap + 14, x1: x + gap + 14 + w, y0: y - 7, y1: y + 8 } };
+  if (pos === 'left2') return { dx: -gap - 14, dy: 4, anchor: 'end', box: { x0: x - gap - 14 - w, x1: x - gap - 14, y0: y - 7, y1: y + 8 } };
+  if (pos === 'above') return { dx: 0, dy: -(TV_R + 9), anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y - TV_R - 20, y1: y - TV_R - 5 } };
+  if (pos === 'right') return { dx: gap, dy: 4, anchor: 'start', box: { x0: x + gap, x1: x + gap + w, y0: y - 7, y1: y + 8 } };
+  if (pos === 'left') return { dx: -gap, dy: 4, anchor: 'end', box: { x0: x - gap - w, x1: x - gap, y0: y - 7, y1: y + 8 } };
+  return { dx: 0, dy: TV_R + 17, anchor: 'middle', box: { x0: x - w / 2, x1: x + w / 2, y0: y + TV_R + 6, y1: y + TV_R + 21 } };
+};
+const tvHit = (a, b, pad) => a.x0 - pad < b.x1 && b.x0 - pad < a.x1 && a.y0 - pad < b.y1 && b.y0 - pad < a.y1;
+// เส้นโค้งเดียวกับ tvEdge แต่เป็นจุดถี่ ๆ ไว้เช็กชน
+const tvEdgePts = (a, b) => {
+  const cx = (a.x + b.x) / 2 - (b.y - a.y) * 0.12, cy = (a.y + b.y) / 2 + (b.x - a.x) * 0.12;
+  return Array.from({ length: 25 }, (_, i) => { const t = i / 24, u = 1 - t; return { x: u * u * a.x + 2 * u * t * cx + t * t * b.x, y: u * u * a.y + 2 * u * t * cy + t * t * b.y }; });
+};
+
+const tvEsc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const tvPolar = (deg, r, cx, cy) => ({ x: cx + r * Math.cos((deg * Math.PI) / 180), y: cy + r * Math.sin((deg * Math.PI) / 180) });
+
+// โหนดกลาง (and) อยู่ระหว่างแขนงของต้นทาง ไม่นับเป็นสมาชิกกลุ่มไหน
+const treeViewBranches = (defs) => [...new Set(Object.values(defs).filter((d) => !d.and).map((d) => d.branch))];
+
+// ผัง: กลุ่มของแต่ละแขนงรวมเป็นก้อนเดียว วางรอบวง (แขนงเดียว = กลางจอ) · ลึกในกลุ่ม = ห่างจากรากของแขนงตามขอบ pre ที่อยู่แขนงเดียวกัน
+// คืน { W, H, P:{id:{x,y}}, pills:{branch:{x,y}}, boxes:{branch:{x0,y0,x1,y1}} } พิกัดเลื่อนให้มุมซ้ายบนเป็น 0,0
+// labelPos = บังคับตำแหน่งป้ายทุกโหนด (ไว้ให้ด่านใน site-check ทำตัวควบคุม) · ไม่ส่ง = เลือกเองที่ไม่ชน
+// overlaps = [{ id, kind: 'edge'|'node'|'label'|'pill', with }] ของป้ายที่ยังชนหลังเลือกแล้ว (ผังจริงต้องว่าง)
+function treeViewLayout(defs, { labelPos = null } = {}) {
+  const ids = Object.keys(defs);
+  const branches = treeViewBranches(defs);
+  const depth = {};
+  const depthOf = (id) => {
+    if (depth[id] !== undefined) return depth[id];
+    depth[id] = 0;
+    const same = (defs[id].pre ?? []).filter((p) => defs[p] && defs[p].branch === defs[id].branch && !defs[p].and);
+    depth[id] = same.length ? 1 + Math.max(...same.map(depthOf)) : 0;
+    return depth[id];
+  };
+  const local = {};
+  const size = {};
+  for (const b of branches) {
+    const mine = ids.filter((id) => !defs[id].and && defs[id].branch === b);
+    const rows = [];
+    for (const id of mine) (rows[depthOf(id)] ??= []).push(id);
+    rows.forEach((row, r) => row?.forEach((id, i) => { local[id] = { x: (i - (row.length - 1) / 2) * TV_GAP_X, y: r * TV_GAP_Y }; }));
+    size[b] = { w: Math.max(0, ...rows.map((r) => ((r?.length ?? 1) - 1) * TV_GAP_X)), h: (rows.length - 1) * TV_GAP_Y };
+  }
+  const ring = branches.length > 1 ? 150 + 70 * branches.length : 0;
+  const P = {};
+  const pills = {};
+  branches.forEach((b, i) => {
+    const c = ring ? tvPolar(-90 + (i * 360) / branches.length, ring, 0, 0) : { x: 0, y: 0 };
+    for (const id of ids) if (local[id] && !defs[id].and && defs[id].branch === b) P[id] = { x: c.x + local[id].x, y: c.y + local[id].y - size[b].h / 2 };
+    pills[b] = { x: c.x, y: c.y - size[b].h / 2 - 44 };
+  });
+  for (const id of ids) if (defs[id].and) {
+    const ps = (defs[id].pre ?? []).map((p) => P[p]).filter(Boolean);
+    P[id] = { x: ps.reduce((s, p) => s + p.x, 0) / (ps.length || 1), y: ps.reduce((s, p) => s + p.y, 0) / (ps.length || 1) };
+  }
+  const edges = [];
+  for (const id of ids) for (const p of defs[id].pre ?? []) if (P[p]) edges.push({ id, pts: tvEdgePts(P[p], P[id]) });
+  const pillBox = (p) => ({ x0: p.x - 44, x1: p.x + 44, y0: p.y - 12, y1: p.y + 12 });
+  const labels = {};
+  const overlaps = [];
+  for (const id of ids) if (P[id]) {
+    const w = tvLabelW(defs[id].name);
+    const tries = (labelPos ? [labelPos] : TV_POS).map((pos) => {
+      const L = { pos, ...tvLabelAt(pos, P[id].x, P[id].y, w) };
+      const hit = [];
+      if (L.own) hit.push({ id, kind: 'node', with: id });
+      for (const e of edges) if (e.pts.some((q) => tvHit({ x0: q.x, x1: q.x, y0: q.y, y1: q.y }, L.box, 2))) hit.push({ id, kind: 'edge', with: e.id });
+      for (const o of ids) if (o !== id && P[o] && tvHit({ x0: P[o].x - TV_R - 2, x1: P[o].x + TV_R + 2, y0: P[o].y - TV_R - 2, y1: P[o].y + TV_R + 2 }, L.box, 0)) hit.push({ id, kind: 'node', with: o });
+      for (const [o, l] of Object.entries(labels)) if (tvHit(l.box, L.box, 3)) hit.push({ id, kind: 'label', with: o });
+      for (const [b, p] of Object.entries(pills)) if (tvHit(pillBox(p), L.box, 3)) hit.push({ id, kind: 'pill', with: b });
+      return { L, hit };
+    });
+    const best = tries.find((t) => !t.hit.length) ?? tries.reduce((a, t) => (t.hit.length < a.hit.length ? t : a));
+    labels[id] = best.L;
+    overlaps.push(...best.hit);
+  }
+  const all = Object.values(P);
+  const px = Object.values(pills);
+  const lb = Object.values(labels).map((l) => l.box);
+  const x0 = Math.min(Math.min(...all.map((p) => p.x), ...px.map((p) => p.x - 50)) - TV_PAD_X, ...lb.map((b) => b.x0 - 6));
+  const x1 = Math.max(Math.max(...all.map((p) => p.x), ...px.map((p) => p.x + 50)) + TV_PAD_X, ...lb.map((b) => b.x1 + 6));
+  const y0 = Math.min(...all.map((p) => p.y - TV_PAD_TOP), ...px.map((p) => p.y - 16), ...lb.map((b) => b.y0 - 4));
+  const y1 = Math.max(Math.max(...all.map((p) => p.y)) + TV_PAD_BOTTOM, ...lb.map((b) => b.y1 + 4));
+  for (const p of all) { p.x -= x0; p.y -= y0; }
+  for (const p of px) { p.x -= x0; p.y -= y0; }
+  for (const b of lb) { b.x0 -= x0; b.x1 -= x0; b.y0 -= y0; b.y1 -= y0; }
+  const boxes = {};
+  for (const b of branches) {
+    const mineIds = ids.filter((id) => P[id] && !defs[id].and && defs[id].branch === b);
+    const mine = mineIds.map((id) => P[id]);
+    const mlb = mineIds.map((id) => labels[id].box);
+    boxes[b] = {
+      x0: Math.max(0, Math.min(Math.min(...mine.map((p) => p.x), pills[b].x - 50) - TV_PAD_X, ...mlb.map((l) => l.x0 - 6))),
+      x1: Math.min(x1 - x0, Math.max(Math.max(...mine.map((p) => p.x), pills[b].x + 50) + TV_PAD_X, ...mlb.map((l) => l.x1 + 6))),
+      y0: Math.max(0, pills[b].y - 22),
+      y1: Math.min(y1 - y0, Math.max(Math.max(...mine.map((p) => p.y)) + TV_PAD_BOTTOM, ...mlb.map((l) => l.y1 + 4))),
+    };
+  }
+  return { W: x1 - x0, H: y1 - y0, P, pills, boxes, labels, overlaps };
+}
+
+// โหนดล็อกเพราะต้นทางยังไม่ปลด: คำบอกชื่อต้นทางที่ยังขาด · คืน { names, joint } หรือ null (บอกชื่อไม่ได้ ให้ใช้คำกลาง ๆ เดิม)
+// reach(id) = ต้นทางของโหนดนั้นผ่านแล้วหรือยัง (กติกาอยู่ที่แกน treeReach) · done = { id: อายุที่ปลด }
+// โหนดกลาง (and) ต้องครบทุกตัว ใช้ "และ" · นอกนั้นตัวใดตัวหนึ่งก็พอ ใช้ "หรือ" — ตรงกับ treeReach
+// ต้นทางที่ตัวเองยังซ่อนอยู่ (hidden และยังไม่ถึง) ห้ามเผยชื่อ ข้อ 29/61 · มีตัวเดียวก็ไม่ได้ ⇒ null ทั้งชุด
+function treeViewNeed(defs, id, done, reach) {
+  const d = defs[id];
+  const unmet = (d?.pre ?? []).filter((p) => defs[p] && done?.[p] === undefined);
+  if (!unmet.length) return null;
+  if (unmet.some((p) => defs[p].hidden && !reach(p))) return null;
+  return { names: unmet.map((p) => defs[p].name), joint: d.and ? 'และ' : 'หรือ' };
+}
+const treeViewNeedText = (need, tail) => `${tail === 'ก่อน' ? 'ต้องปลด' : 'ปลด'} ${need.names.map((n) => `"${n}"`).join(` ${need.joint} `)} ${tail === 'ก่อน' ? 'ก่อน' : 'แล้วจะเห็น'}`;
+
+// เส้นโค้งเบาๆ ให้เส้นข้ามกลุ่มไม่ทับกันเป็นเส้นตรงเดียว (แบบ 4)
+const tvR = Math.round;
+const tvEdge = (a, b) => {
+  const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y;
+  return `M${tvR(a.x)} ${tvR(a.y)}Q${tvR(mx - dy * 0.12)} ${tvR(my + dx * 0.12)} ${tvR(b.x)} ${tvR(b.y)}`;
+};
+
+// info(id) → { st: 'done'|'act'|'open'|'wait'|'lock'|'hid'|'plain', g: 0..1 } · ไม่ส่ง = ทุกโหนด plain (หน้าเว็บ)
+// st 'hid' = ช่อง "?" ของโหนดซ่อน (ไม่บอกชื่อ · ข้อ 61) · g = ความเต็มของหลอดรอบโหนดที่ทุ่มอยู่ ไม่มีตัวเลข (ข้อ 46)
+function treeViewSvg(defs, { info = () => ({ st: 'plain', g: 0 }), only = null, sel = null, interactive = true } = {}) {
+  const L = treeViewLayout(defs);
+  const box = only ? L.boxes[only] : { x0: 0, y0: 0, x1: L.W, y1: L.H };
+  const color = (id) => TREE_VIEW_BRANCH[defs[id].branch]?.color ?? '#8a8a8a';
+  let s = '';
+  for (const id of Object.keys(defs)) for (const p of defs[id].pre ?? []) if (L.P[p]) {
+    const cross = !defs[id].and && defs[p].branch !== defs[id].branch;
+    s += `<path class="tv-e${cross ? ' x' : ''}" d="${tvEdge(L.P[p], L.P[id])}" style="--tvc:${color(id)}"/>`;
+  }
+  for (const [id, d] of Object.entries(defs)) {
+    const q = L.P[id], i = info(id);
+    const hid = i.st === 'hid';
+    const shape = d.keystone ? `<rect class="tv-n k" x="-12" y="-12" width="24" height="24" transform="rotate(45)"/>` : `<circle class="tv-n" r="${TV_R}"/>`;
+    const ring = i.st === 'act' || i.st === 'wait' ? `<circle class="tv-ring" r="${TV_R + 5}" transform="rotate(-90)" stroke-dasharray="${tvR(Math.min(1, i.g) * 2 * Math.PI * (TV_R + 5))} 999"/>` : '';
+    const mark = hid ? '<text class="tv-q" y="4" text-anchor="middle">?</text>' : '';
+    const pick = sel === id ? `<circle class="tv-pick" r="${TV_R + 10}"/>` : '';
+    const lp = L.labels[id];
+    const label = hid ? '' : `<text class="tv-l"${lp.dx ? ` x="${tvR(lp.dx)}"` : ''} y="${tvR(lp.dy)}" text-anchor="${lp.anchor}">${tvEsc(d.name)}</text>`;
+    const attrs = interactive ? ` tabindex="0" role="button" data-tv="${tvEsc(id)}" aria-label="${tvEsc(hid ? 'ช่องที่ยังซ่อนอยู่' : d.name)}"` : '';
+    s += `<g class="tv-g s-${i.st}${d.size === 'b' ? ' big' : ''}"${attrs} style="--tvc:${color(id)}" transform="translate(${tvR(q.x)} ${tvR(q.y)})">${pick}${shape}${ring}${mark}${label}</g>`;
+  }
+  for (const [b, p] of Object.entries(L.pills)) {
+    const name = TREE_VIEW_BRANCH[b]?.name ?? b;
+    s += `<g class="tv-pill" transform="translate(${tvR(p.x)} ${tvR(p.y)})" style="--tvc:${TREE_VIEW_BRANCH[b]?.color ?? '#8a8a8a'}"><rect x="-44" y="-12" width="88" height="24" rx="12"/><text y="4" text-anchor="middle">${tvEsc(name)}</text></g>`;
+  }
+  const vb = `${tvR(box.x0)} ${tvR(box.y0)} ${tvR(box.x1 - box.x0)} ${tvR(box.y1 - box.y0)}`;
+  return { svg: `<svg class="tv-svg" viewBox="${vb}" role="group" aria-label="ต้นไม้โฟกัส">${s}</svg>`, w: tvR(box.x1 - box.x0), h: tvR(box.y1 - box.y0) };
+}
+
+
 
 
 
@@ -11295,6 +12586,8 @@ const STAT_HELP = [
 const GAME_NAME = 'เกิดใหม่ทั้งที ชาตินี้ขอชิงมาเกิด';
 
 const root = document.getElementById('app');
+// ลิงก์ "ข้ามไปเนื้อหา" ย้ายโฟกัสมาที่เนื้อหาได้ทุกเบราว์เซอร์ · ตั้งที่นี่ ไม่ใส่ใน HTML เพราะด่านโครงหน้าเปิดจับ <main id="app"> ตรงตัว
+root.tabIndex = -1;
 const appVer = document.getElementById('appVer');
 appVer.textContent = `${APP_VERSION} · ${APP_BUILD}`;
 // เลขรุ่นพาไปแพตช์โน้ตของรุ่นนั้น (B121) — หน้า whatsnew ไม่มี id ต่อรุ่น จึงเลื่อนด้วย text fragment ซึ่งตกไปหัวหน้าเองถ้าเบราว์เซอร์ไม่รองรับ
@@ -11474,41 +12767,165 @@ function meterLi(label, v, low, shown = String(v), icon = null) {
 
 // แท็บโฟกัสชาติไทย (ui-redo 50 · ข้อ 65 68 69 · JSON 47 แบบ ก รายการเดียว): ตอนนี้ · เปลี่ยนเป็น · ปณิธาน
 // ไม่ใช่ตัวเลือกของการ์ด (ไม่มีเลขปุ่มลัด) · เปลี่ยนแล้วเซฟทันที ผลไปคิดตอนสิ้นปี
-const focusName = (id) => (id === FOCUS_FLOW ? FOCUS_FLOW_NAME : lifeFocusDefs(st)[id].name);
-const focusFx = (id) => (id === FOCUS_FLOW ? 'ไม่ทุ่มเรื่องไหนเป็นพิเศษ' : focusWords(lifeFocusDefs(st)[id], STAT_LABELS));
 // ปีสะสมเป็นคำ ไม่บอกเลขเกณฑ์ (ข้อ 68) · ชำนาญแล้ว = ครบปีที่ต่อสายได้ ตัวเดียวกับที่แกนใช้เปิดปลายสาย
 function focusWord(id, h = st) {
   const n = h.focusYears?.[id] ?? 0;
   if (!n) return null;
-  return n >= st.content.focus.chain_years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
+  return n >= ISEKAI_CAREER_T.years ? el('span', 'ft-word full', 'ชำนาญแล้ว') : el('span', 'ft-word', 'เริ่มชำนาญ');
 }
 const stageIdx = (name) => STAGES.findIndex((s) => s.name === name);
-// ปณิธาน = สายต้น → ปลาย (after ในทะเบียน) ที่ยังมีความหมายตอนนี้: เลือกได้อยู่ · เคยทุ่มต้นสายแล้ว · หรือยังทันช่วงวัยของปลายสาย
-// สถานะอ่านจาก focusMet ตัวเดียวกับที่แกนเปิดปลายสาย — ครบในช่วงวัยไหนเปิดตั้งแต่ช่วงถัดไป
-function focusGoals(offers) {
-  const defs = lifeFocusDefs(st);
-  const stage = stageOf(st.age);
-  const now = stageIdx(stage);
-  const later = (d) => !d.stages || d.stages.some((s) => stageIdx(s) > now);
-  const rows = [];
-  for (const [id, d] of Object.entries(defs)) {
-    if (!d.after) continue;
-    const from = d.after;
-    const met = st.focusMet?.[from];
-    const tried = (st.focusYears?.[from] ?? 0) > 0;
-    let cls = '', text;
-    if (offers.includes(id)) [cls, text] = ['open', `${focusName(from)}ชำนาญแล้ว · เลือกได้ในช่วงนี้`];
-    else if (met === stage) text = `${focusName(from)}ชำนาญแล้ว · เลือกได้ตั้งแต่ช่วงวัยถัดไป`;
-    else if (met !== undefined) [cls, text] = later(d) || d.stages?.includes(stage) ? ['', `${focusName(from)}ชำนาญแล้ว · ยังไม่เข้าเงื่อนไขตอนนี้`] : ['gone', `${focusName(from)}ชำนาญแล้ว · ช่วงวัยที่เลือกได้ผ่านไปแล้ว`];
-    else if (!later(d)) continue;
-    else if (tried) text = `${focusName(from)}เริ่มชำนาญ · ทุ่มต่ออีกหน่อยจะเปิด`;
-    else if (offers.includes(from)) text = 'ยังไม่ได้ทุ่ม';
-    else continue;
-    const li = el('li', cls || null);
-    li.append(el('b', null, `${focusName(from)} → ${d.name}`), el('span', 'st', text));
-    rows.push(li);
+// จอต้นไม้โฟกัส (ใบ 12 · ข้อ 88 แบบ 4 กลุ่มดาว) แทนรายการปณิธาน · ผังกับตัววาดอยู่ treeview.mjs
+// สถานะหน้าจอ (แขนงที่ดู ซูม โหนดที่เลือก) อยู่ในหน่วยความจำ ไม่ลงเซฟ · ทุ่ม/เปลี่ยนโหนดเซฟทันทีเหมือนโฟกัสเดิม
+const tvUi = { view: 'branch', br: null, z: 100, sel: null };
+// ชีวิตใหม่/ทายาท/โหลดเซฟ (ใบ 19): เปิดจอต้นไม้ที่ต้นแขนงตามจุดเกิด · ไม่มีจุดเกิด = คงแขนงเดิม · ล้างโหนดที่เลือก + กลับมุมดูทีละแขนง
+const tvReset = () => {
+  tvUi.view = 'branch';
+  tvUi.sel = null;
+  tvUi.br = lifeTreeStart(st)?.branch ?? tvUi.br;
+};
+const TV_ZOOM = [60, 180, 20];
+const tvNeed = (defs, id) => treeViewNeed(defs, id, st.tree?.done, (p) => treeReach(st, defs[p]));
+// สถานะโหนดเป็นคำ ไม่มีตัวเลขปีหรือจำนวนการ์ด (ข้อ 46) · g = ความเต็มของวงรอบโหนดที่ทุ่มอยู่
+function tvNodeInfo(id) {
+  const defs = lifeTreeDefs(st), d = defs[id], t = st.tree;
+  if (t?.done?.[id] !== undefined) return { st: 'done', g: 1, word: lifeTreeRusty(st, id) ? 'ปลดแล้ว · เริ่มจาง' : 'ปลดแล้ว' };
+  const reach = treeReach(st, d);
+  if (d.hidden && !reach) return { st: 'hid', g: 0 };
+  const g = Math.min(1, (t?.yrs?.[id] ?? 0) / d.years);
+  if (t?.cur === id) {
+    if (t.pend === id) return { st: 'wait', g: 1, word: 'รอการ์ดด่าน' };
+    if (treeWaiting(st, defs)) return { st: 'wait', g, word: 'รอโอกาส' };
+    return { st: 'act', g, word: 'กำลังทุ่มอยู่' };
   }
-  return rows;
+  if (treeOffersNow(st).includes(id)) return { st: 'open', g, word: 'ทุ่มได้ตอนนี้' };
+  if (!reach) { const need = tvNeed(defs, id); return { st: 'lock', g: 0, word: need ? treeViewNeedText(need, 'ก่อน') : 'ต้องปลดโหนดก่อนหน้า' }; }
+  const now = stageIdx(stageOf(st.age));
+  return { st: 'lock', g: 0, word: d.stages.some((s) => stageIdx(s) > now) ? 'ยังไม่ถึงช่วงวัยที่ทุ่มได้' : 'พ้นช่วงวัยที่ทุ่มได้แล้ว' };
+}
+// โหนดที่ปลดแล้ว (ใบ 09): บอกคำ "เริ่มจาง" + วิธีกันสนิม · ปุ่มล้างต้องกดยืนยัน 2 ครั้ง (ล้างจ่ายด้วยเวลา: ปีนั้นหลอดไม่ขยับ · ปีละ 1 โหนด) · keystone ล้างไม่ได้
+function tvRespec(box, card, id, d, redraw) {
+  if (lifeTreeRusty(st, id)) box.append(el('p', 'ft-note', 'ผลติดตัวเริ่มจางเพราะไม่ได้ใช้นาน · ตอบการ์ดหมวดนี้อีกครั้งผลจะกลับมา · ตัวเลือกที่ปลดแล้วยังอยู่'));
+  if (d.keystone) {
+    box.append(el('p', 'ft-note', 'โหนดหักเหล้างไม่ได้'));
+    return;
+  }
+  if (st.tree?.respec === st.age) {
+    box.append(el('p', 'ft-note', 'ปีนี้ล้างโหนดไปแล้ว · ล้างได้ปีละโหนด'));
+    return;
+  }
+  const b = el('button', 'tv-go', 'ล้างโหนดนี้');
+  b.type = 'button';
+  let sure = false;
+  b.onclick = () => {
+    if (!sure) {
+      sure = true;
+      b.textContent = 'ยืนยัน: ล้างโหนดนี้ · ปีนี้ต้นไม้ไม่ขยับ ต้องทุ่มใหม่ถ้าอยากได้คืน';
+      return;
+    }
+    lifeTreeRespec(st, id);
+    saveWrite(card);
+    redraw(id);
+  };
+  box.append(b);
+}
+// แผงของโหนดที่แตะ: ชื่อ · สถานะ · ผลเป็นทิศ (ไม่มีเลข) · keystone บอกข้อเสียก่อนทุ่ม (ข้อ 60) · ปุ่มทุ่ม
+function tvPanel(card, id, redraw) {
+  const d = lifeTreeDefs(st)[id], i = tvNodeInfo(id);
+  const box = el('div', 'tv-sel');
+  if (i.st === 'hid') {
+    const need = tvNeed(lifeTreeDefs(st), id);
+    box.append(el('b', null, 'ช่องที่ยังซ่อนอยู่'), el('p', 'ft-note', `ยังไม่รู้ว่ามีอะไรรออยู่ · ${need ? treeViewNeedText(need, 'แล้วจะเห็น') : 'ปลดโหนดก่อนหน้าแล้วจะเห็น'}`));
+    return box;
+  }
+  box.append(el('b', null, d.name), el('span', `ft-word${i.st === 'done' ? ' full' : ''}`, i.word));
+  const row = (label, text) => text && box.append(el('span', 'ft-fx', `${label}${text}`));
+  row('ระหว่างทุ่ม: ', focusWords({ fx: d.fx }, STAT_LABELS));
+  row('ปลดแล้วติดตัว: ', focusWords({ fx: d.light }, STAT_LABELS));
+  row('ช่วงวัยที่ทุ่มได้: ', d.stages.join(' · '));
+  if (d.keystone) {
+    box.append(el('p', 'tv-warn', d.warn));
+    row('เสียถาวรทุกปี: ', focusWords({ fx: d.cost }, STAT_LABELS));
+  }
+  if (i.st === 'done') tvRespec(box, card, id, d, redraw);
+  if (i.st === 'open') {
+    const b = el('button', 'tv-go', d.keystone ? 'รับรู้ข้อเสียแล้ว · ทุ่มโหนดนี้' : 'ทุ่มโหนดนี้');
+    b.type = 'button';
+    b.onclick = () => {
+      treeInvestNode(st, id, !!d.keystone);
+      saveWrite(card);
+      redraw(id);
+    };
+    box.append(b);
+  }
+  return box;
+}
+function treeScreen(card) {
+  const defs = lifeTreeDefs(st);
+  const brs = treeViewBranches(defs);
+  if (!brs.includes(tvUi.br)) tvUi.br = brs[0];
+  const wrap = el('div', 'tv');
+  const redraw = (focusId) => {
+    const next = treeScreen(card);
+    wrap.replaceWith(next);
+    if (focusId) next.querySelector(`[data-tv="${focusId}"]`)?.focus();
+  };
+  const btn = (text, on, fn, label) => {
+    const b = el('button', null, text);
+    b.type = 'button';
+    if (on !== null) b.setAttribute('aria-pressed', String(on));
+    if (label) b.setAttribute('aria-label', label);
+    b.onclick = fn;
+    return b;
+  };
+  const full = tvUi.view === 'full';
+  const bar = el('div', 'tv-bar');
+  bar.append(btn('ดูทีละแขนง', !full, () => { tvUi.view = 'branch'; redraw(); }), btn('ดูต้นเต็ม', full, () => { tvUi.view = 'full'; redraw(); }));
+  if (full) {
+    const zb = (text, label, dz) => {
+      const b = btn(text, null, () => { tvUi.z = Math.max(TV_ZOOM[0], Math.min(TV_ZOOM[1], tvUi.z + dz)); redraw(); }, label);
+      b.disabled = dz < 0 ? tvUi.z <= TV_ZOOM[0] : tvUi.z >= TV_ZOOM[1];
+      return b;
+    };
+    bar.append(zb('−', 'ซูมออก', -TV_ZOOM[2]), zb('+', 'ซูมเข้า', TV_ZOOM[2]));
+  }
+  wrap.append(bar);
+  if (!full && brs.length > 1) {
+    const tabs = el('div', 'tv-tabs');
+    for (const b of brs) tabs.append(btn(TREE_VIEW_BRANCH[b]?.name ?? b, b === tvUi.br, () => { tvUi.br = b; redraw(); }));
+    wrap.append(tabs);
+  }
+  const { svg, w } = treeViewSvg(defs, { info: tvNodeInfo, only: full ? null : tvUi.br, sel: tvUi.sel });
+  const zs = el('div', full ? 'tv-zs full' : 'tv-zs');
+  zs.innerHTML = svg;
+  if (full) zs.firstElementChild.style.width = `${Math.round((w * tvUi.z) / 100)}px`;
+  const pick = (e) => {
+    const g = e.target.closest('[data-tv]');
+    if (!g) return;
+    tvUi.sel = g.dataset.tv;
+    redraw(tvUi.sel);
+  };
+  // เมาส์ลากเลื่อนต้นเต็ม (นิ้วใช้เลื่อนของเบราว์เซอร์เอง) · ลากแล้วปล่อยไม่นับเป็นการแตะโหนด
+  let drag = null;
+  zs.addEventListener('pointerdown', (e) => { if (full && e.pointerType === 'mouse' && e.button === 0) drag = { x: e.clientX, y: e.clientY, sx: zs.scrollLeft, sy: zs.scrollTop, moved: false }; });
+  zs.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
+    drag.moved = true;
+    zs.scrollLeft = drag.sx - dx;
+    zs.scrollTop = drag.sy - dy;
+  });
+  const dragEnd = () => { setTimeout(() => { drag = null; }, 0); };
+  zs.addEventListener('pointerup', dragEnd);
+  zs.addEventListener('pointerleave', dragEnd);
+  zs.addEventListener('click', (e) => { if (!drag?.moved) pick(e); });
+  zs.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); }
+  });
+  wrap.append(zs);
+  if (tvUi.sel && defs[tvUi.sel]) wrap.append(tvPanel(card, tvUi.sel, redraw));
+  else wrap.append(el('p', 'ft-note', 'แตะโหนดเพื่อดูรายละเอียดและเลือกทุ่ม'));
+  return wrap;
 }
 // ส่วนร่วมของแท็บโฟกัสสองโลก: ตอนนี้ + เปลี่ยนเป็น · ชาติไทยต่อปณิธาน ต่างโลกไม่มีสายต้น–ปลาย
 // rows = { id, name, fx, on, tags } · pick เปลี่ยนค่าของโลกนั้น · draw วาดแผงใหม่ทั้งก้อนเพราะ "ตอนนี้" ต้องตาม
@@ -11537,47 +12954,12 @@ function focusRows(wrap, now, rows, pick, draw) {
 function focusPanel(card) {
   const wrap = el('div', 'ft');
   if (st.dead || card.kind === 'death') {
-    wrap.append(...focusSummary());
+    wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), el('p', 'ft-note', 'ชาตินี้จบแล้ว'));
     return wrap;
   }
-  const cur = st.focus ?? FOCUS_FLOW;
-  const defs = lifeFocusDefs(st);
-  const offers = lifeFocusOffers(st);
-  const tagsOf = (id) => [focusWord(id)].filter(Boolean);
-  const rows = offers.map((id) => ({ id, name: focusName(id), fx: focusFx(id), on: id === cur, tags: [...tagsOf(id), ...(defs[id]?.after ? [el('span', 'ft-new', 'ปลายสาย')] : [])] }));
-  focusRows(wrap, { name: focusName(cur), fx: focusFx(cur), tags: tagsOf(cur) }, rows, (id) => {
-    setLifeFocus(st, id);
-    saveWrite(card);
-  }, () => focusPanel(card));
-  const goals = focusGoals(offers);
-  const chain = el('ul', 'ft-chain');
-  chain.append(...goals);
-  wrap.append(el('h3', null, 'ปณิธาน'), goals.length ? chain : el('p', 'ft-note', 'ช่วงวัยนี้ไม่มีสายที่ต่อได้'));
+  wrap.append(el('h3', null, 'ต้นไม้โฟกัส'), treeScreen(card));
   return wrap;
 }
-// ตอนตาย/ปรโลก (ข้อ 69): เรื่องที่ทุ่มมากสุด = focusMain ตัวเดียวกับที่ทายาทรับ · เรื่องอื่นเรียงตามปีที่ทุ่ม ไม่บอกตัวเลข
-function focusSummary() {
-  const defs = lifeFocusDefs(st);
-  const main = focusMain(st, defs);
-  const head = el('h3', null, af ? 'ชาติที่แล้วทุ่มเทมากสุด' : 'ชาตินี้ทุ่มเทมากสุด');
-  if (!main) return [head, el('p', 'ft-note', `${FOCUS_FLOW_NAME} ไม่ได้ทุ่มเรื่องไหนเต็มปี`)];
-  const box = el('div', 'ft-now');
-  box.append(el('b', null, focusName(main)), ...[focusWord(main)].filter(Boolean));
-  const kid = defs[main].kid;
-  if (kid && defs[kid]) box.append(el('span', 'ft-fx', `ทายาทในตระกูลเริ่มชาติด้วย${defs[kid].name}`));
-  const ys = st.focusYears ?? {};
-  const rest = Object.keys(defs).filter((id) => id !== main && ys[id] > 0).sort((a, b) => ys[b] - ys[a]);
-  if (!rest.length) return [head, box];
-  const ul = el('ul', 'ft-ro ft-list');
-  for (const id of rest) {
-    const li = el('li', null, `${focusName(id)} `);
-    const w = focusWord(id);
-    if (w) li.append(w);
-    ul.append(li);
-  }
-  return [head, box, el('h3', null, 'เรื่องอื่นที่เคยทุ่ม'), ul];
-}
-
 // แถบเมนูล่าง (ui-redo ใบ 04): ทางเข้าระบบที่เดียว ค้างทุกฉากของชาติไทยและต่างโลก · กดแล้วแผงขึ้นทับการ์ด ไม่วาดการ์ดใหม่ ปิดแล้วการ์ดเดิมรออยู่
 // ไม่ใช่ตัวเลือกของเกม — ไม่มีเลขปุ่มลัด ไม่ลงเซฟ
 // โฟกัสแยกแท็บถัดจากตัวฉัน (ui-redo 50 51) · ทุกปุ่มทุกโลกมีไอคอนคู่ป้าย (ข้อ 260)
@@ -11593,10 +12975,13 @@ function lifeMenu(card, box, after = false) {
   sheetClose = null;
   const nav = el('nav', 'mnav');
   nav.setAttribute('aria-label', 'เมนู');
+  // ยังไม่ตาย = ชั้นสมุดคงราวกับแผงค้างไว้ · มรณบัตรกับปรโลกเปิดสมุดแบบเดิม (แทนทั้งหน้า)
+  if (!after && card.kind !== 'death') nav.dataset.keepShelf = '1';
   const isk = card.kind === 'isekai';
   const sheets = { me: () => (isk ? isekaiMePanel(card.status) : mePanel(card)), focus: () => (isk ? isekaiFocusPanel(card) : focusPanel(card)), skill: () => isekaiSkillPanel(card.status), family: after ? clanPanel : familyPanel, more: morePanel, past: pastPanel };
   // ชั้นสมุดมีแท็บ ปุ่มลบ และหน้ายืนยันของตัวเอง จึงเปิดเต็มหน้าแบบทางเข้าอื่น ไม่ยัดลงแผง · กลับแล้วคืนการ์ดเดิมทั้งก้อน
-  const views = { shelf: () => openShelf() };
+  // กลางชีวิตกด "สมุด" ซ้ำ = กลับการ์ด (ชั้นสมุดวาดแค่ช่องกลาง ราวกับแผงค้างคงอยู่)
+  const views = { shelf: () => (shelfBack && root.querySelector('.shelf-view') ? shelfBack() : openShelf()) };
   // ต่างโลกช่วงยังไม่มีร่าง (ไม่มีหน้าต่างสถานะ) ไม่มีอะไรให้แผงตัวฉันกับสกิลโชว์
   // ห้องสีขาวเลือกสกิลมีร่างแล้วแต่รายการโฟกัสเริ่มที่ใบตาแรก จึงกรองแท็บโฟกัสด้วยรายการ ไม่ใช่ร่าง
   const items = after ? AFTER_MENU : isk ? ISEKAI_MENU.filter(([id]) => (id === 'focus' ? (af?.isekai ?? st?.trip)?.focusOffers?.length : (id !== 'me' && id !== 'skill') || card.status)) : LIFE_MENU;
@@ -11789,7 +13174,8 @@ function kitList() {
   const reg = st.content.items;
   const name = (id) => reg.list[id].name;
   const dl = el('dl', 'kit');
-  for (const [k, label] of Object.entries(reg.slots)) dl.append(el('dt', null, label), el('dd', null, it.wear[k] ? name(it.wear[k]) : 'ว่าง'));
+  // ช่องอาวุธเป็นของดันเจียน — ซ่อนจนปลดก้อนนั้น (ช่องเครื่องราง/เครื่องแต่งกายอยู่เกมหลัก)
+  for (const [k, label] of Object.entries(reg.slots)) if (k !== 'weapon' || dlcOpen(st, 'dungeon')) dl.append(el('dt', null, label), el('dd', null, it.wear[k] ? name(it.wear[k]) : 'ว่าง'));
   dl.append(el('dt', null, `กระเป๋า ${it.bag.length}/${it.cap}`), el('dd', null, it.bag.map(name).join(' · ') || 'ว่าง'));
   return dl;
 }
@@ -12096,7 +13482,11 @@ function lineageList(all, brief = all.length) {
 }
 
 // ผังตระกูลเป็นภาพ (เจ้าของสั่ง) · ข้อความเดิมพับไว้ใต้ภาพ — ชื่อ จังหวัด ฉายา และ screen reader ยังอ่านได้
-function lineageView(all, now, brief = all.length, youWord) {
+// คำใบ้กำแพงโลกใต้ผังตระกูล: เลือกจากขั้น (overlapStageOf) ไม่อ่านค่าดิบ เกณฑ์ขั้นเปลี่ยนแล้ว UI ไม่ต้องแก้ · ขั้น 0 ไม่ขึ้น · ไม่แสดงตัวเลข
+const OVERLAP_VEIL = ['', 'ม่านระหว่างโลก: บาง', 'ม่านระหว่างโลก: ขาด', 'ม่านระหว่างโลก: ฉีกกว้าง'];
+const overlapVeil = (src) => OVERLAP_VEIL[Math.min(overlapStageOf(src), OVERLAP_VEIL.length - 1)];
+
+function lineageView(all, now, brief = all.length, youWord, src) {
   const box = el('div', 'lineage-view');
   const shown = all.slice(-brief);
   const draw = () => shelfLineageArt(box, shown, all.length - shown.length, now, CLASSES, youWord, all.findLast((l) => !l.isekai));
@@ -12104,6 +13494,8 @@ function lineageView(all, now, brief = all.length, youWord) {
   const d = el('details', 'lineage-text');
   d.append(el('summary', null, 'อ่านเป็นข้อความ'), lineageList(all, brief));
   box.append(d);
+  const veil = src && overlapVeil(src);
+  if (veil) box.append(el('p', 'sub', veil));
   // การ์ดสร้างก่อนติดหน้า (และจอหมุน/ย่อได้ภายหลัง) ภาพที่วาดไว้ถูก CSS ยืดจนวงกลมเป็นวงรี — วาดใหม่ทุกครั้งที่ความกว้างจริงเปลี่ยน
   if (cv && typeof ResizeObserver === 'function') {
     let shown = false;
@@ -12405,7 +13797,17 @@ const ERA_OF = new Map(CONTENT.events.filter((c) => c.era).map((c) => [c.id, c.e
 // แรกเกิดเลือกตามฐานะบ้าน (ชุดเดียวกับรูปตัวละคร) · การ์ดตาย/หายตัวผูกในหน้าการ์ดตาย · การ์ดอื่นไม่มีภาพ หน้าตาเดิม
 const SCENE_OF = new Map([['young_wedding_01', 'wed_ask'], ['remarry_wedding_work_01', 'wed_rite'], ['remarry_wedding_mid_01', 'wed_rite'], ['remarry_wedding_old_01', 'wed_rite'], ['young_baby_01', 'baby_news'], ['work_house_01', 'baby_home'], ['retirement', 'retire_home'], ['early_retire', 'retire_early']]);
 const BIRTH_SCENE = ['birth_poor', 'birth_mid', 'birth_rich'];
+// ภาพหมวดการ์ดผล (ui-redo 62 · ข้อ 89): การ์ดผลที่ต่อจากการ์ดมีภาพฉาก/ภาพยุคไม่ใส่ภาพหมวด — ไม่มีภาพสองใบติดกัน · ตัวเดียวกับที่ harness/result-cats.mjs นับ
+let lastBase = null;
+const hasScene = (c) => !!c && (c.kind === 'era' || (c.kind === 'event' && (ERA_OF.has(c.id) || SCENE_OF.has(c.id))));
 // ภาพเล็ก (sm) บนการ์ดแรกเกิด/การ์ดตาย: ปุ่มไปต่อยังอยู่จอแรก 390 · data-scene ให้ด่านจอหาเจอ
+function catSvg(k) {
+  const s = catArt(k);
+  if (!s) return null;
+  const svg = artSvg('era-art scene-art scene-sm cat-art', ERA_ART_W, ERA_ART_H, s.parts);
+  svg.dataset.cat = k;
+  return svg;
+}
 function sceneSvg(id, sm) {
   const s = sceneArt(id);
   if (!s) return null;
@@ -12449,7 +13851,7 @@ function memoAdd(t) {
   const m = memoRead();
   const k = `${save.seed}:${st.gen}`;
   if (m.l.some((x) => x.k === k)) return 'ok';
-  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '' });
+  m.l.push({ k, n: st.name, r: fullName(), g: st.gen, a: st.age, p: provinceLabel(st), t: t.titles[0]?.name ?? '', ...(st.goalsDone?.length && { o: goalNames(st) }) });
   for (const x of eraSeen) if (!m.e.includes(x.id)) m.e.push(x.id);
   const r = memoWrite(m);
   shelfDot();
@@ -12484,6 +13886,7 @@ function memoUnseen() {
 // ผู้เล่นเดิมจึงได้ภาพหลักย้อนหลัง · n = ภาพที่เพิ่งได้แต่ยังไม่เปิดดู (จุดแดงแบบสมุดฉายา)
 const PICS_KEY = 'next-life-pics-v1';
 // วิกฤตน้ำมันครั้งแรกเกิดก่อนปีเกิดแรกสุดของเกม ไม่มีชีวิตไหนทันเห็น — ไม่ตั้งช่องที่ปลดไม่ได้ตลอดกาล
+const ERA_KIND_LABEL = { economy: 'เศรษฐกิจ', disaster: 'ภัยพิบัติ', accident: 'อุบัติภัย', health: 'สุขภาพ', city: 'เมือง', sport: 'กีฬา' };
 const PIC_EVENTS = ERA_EVENTS.filter((e) => ERA_PICS[e.id]);
 const PIC_ALL = PIC_EVENTS.reduce((n, e) => n + 1 + ERA_PICS[e.id].length, 0);
 // การ์ดตามมาของเหตุการณ์ไม่มีช่อง era ในเนื้อหา จึงผูกด้วย id การ์ด · การ์ดยุคใช้ช่วงวัยของการ์ดเป็นช่อง
@@ -12575,7 +13978,7 @@ function skillsSeen() {
 }
 const skillsGot = (k) => Object.keys(k.s).length;
 // คำใบ้ของ ??? บอกชนิดแหล่งที่ได้ ไม่บอกชื่อ — ชี้ทางแบบคำใบ้ฉายา · ทุกสกิลเป็นของขวัญเทพธิดาในต่างโลกได้
-const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', focus: 'โฟกัส', lifeGoal: 'เป้าชีวิต' };
+const SKILL_SRC = { job: 'อาชีพ', title: 'ฉายา', cause: 'วิธีจากไป', goal: 'เป้าตระกูล', lifeGoal: 'ปณิธาน' };
 function skillHint(id) {
   const kinds = Object.entries(CONTENT.skillMap ?? {}).filter(([, m]) => Object.values(m).some((xs) => xs.includes(id))).map(([k]) => SKILL_SRC[k]).filter(Boolean);
   return kinds.length ? `ของขวัญเทพธิดาในต่างโลก หรือชีวิตไทยที่มี${kinds.join('/')}ที่ใช่` : 'ของขวัญเทพธิดาในต่างโลก';
@@ -12660,18 +14063,42 @@ const SHELF_ICON = {
   p: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="9" r="1.5"/>',
   d: '<path d="M12 21v-7"/><path d="M12 14c-4 0-6-3-6-6 3 0 5 1 6 3 1-2 3-3 6-3 0 3-2 6-6 6z"/><path d="M9 21h6"/>',
 };
-function openShelf(tab, prev = [...root.childNodes], onBack, fresh = shelfFresh()) {
+// กลางชีวิตมีราวเมนู (.mnav) กับแผงค้าง (.sheet) อยู่ใน root — ชั้นสมุดแทนเฉพาะการ์ด ราวกับแผงไม่ถูกแตะ (ui-redo ใบ 82)
+const shelfKeep = () => !!root.querySelector(':scope > .mnav[data-keep-shelf]');
+const shelfCardNodes = () => [...root.childNodes].filter((n) => !(n.matches?.('.mnav, .sheet') && shelfKeep()));
+let shelfBack = null;
+function openShelf(tab, prev = shelfCardNodes(), onBack, fresh = shelfFresh()) {
   // เปิดจากเมนู/ท้ายหน้า/หน้าเล่นต่อ: ไปแท็บที่มีของใหม่ก่อน
   tab ??= SHELF_TABS.find(([k]) => fresh[k].length)?.[0] ?? 'm';
   const again = (t = tab) => openShelf(t, prev, onBack, fresh);
+  const keep = shelfKeep();
+  const shelfBtn = () => root.querySelector(':scope > .mnav [data-menu="shelf"]');
   const back = () => {
-    root.replaceChildren(...prev);
+    if (keep) {
+      for (const n of [...root.children]) if (!n.matches('.mnav, .sheet')) n.remove();
+      root.querySelector(':scope > .mnav').before(...prev);
+      shelfBtn()?.setAttribute('aria-pressed', 'false');
+    } else root.replaceChildren(...prev);
+    shelfBack = null;
     // จุดบนปุ่มเมนูที่คืนมายังเป็นของตอนก่อนเปิด
     shelfDot();
     onBack?.();
+    if (keep) shelfBtn()?.focus();
   };
-  const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด']);
-  root.firstChild.classList.add('shelf-view');
+  shelfBack = back;
+  const reopen = !!root.querySelector('.shelf-view');
+  const choices = homeCard('ชั้นสมุด', ['ชั้นสมุด'], keep);
+  const card = root.querySelector(':scope > .card');
+  card.classList.add('shelf-view');
+  if (keep) {
+    shelfBtn()?.setAttribute('aria-pressed', 'true');
+    // เข้าสมุดครั้งแรกโฟกัสหัวสมุด · สลับแท็บคงโฟกัสไว้ที่แท็บ ไม่ดึงกลับหัว
+    if (!reopen) {
+      const h = card.querySelector('.lead');
+      h.tabIndex = -1;
+      h.focus({ preventScroll: true });
+    }
+  }
   const body = root.querySelector('.body');
   const tabs = el('div', 'bk-tabs');
   tabs.setAttribute('role', 'group');
@@ -12705,7 +14132,7 @@ function memoShelf(body, choices, fresh, again) {
   // ลบทีละแถวได้ทันที (สรุปสั้น ไม่ใช่เซฟ ไม่ต้องถามซ้ำ)
   for (const x of [...m.l].reverse()) {
     const li = el('li');
-    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`].filter(Boolean).join(' · '));
+    const txt = el('span', null, [`${x.g > 1 ? `รุ่นที่ ${x.g} · ` : ''}${x.r || x.n}`, `อายุ ${x.a} ปี`, x.p, x.t && `ฉายา ${x.t}`, x.o?.length && `ปณิธาน ${x.o.join(' · ')}`].filter(Boolean).join(' · '));
     if (fresh.includes(x.k)) txt.append(newTag());
     li.append(txt);
     const del = el('button', 'more', 'ลบ');
@@ -12771,7 +14198,7 @@ function picShelf(body, fresh) {
     const h = el('div', 'h', met ? e.name : '???');
     if (met && fresh.includes(`e:${e.id}`)) h.firstChild.after(newTag());
     h.append(el('small', null, `${n}/${1 + slots.length}`));
-    s.append(h, el('div', 'yr', `${e.kind === 'economy' ? 'เศรษฐกิจ' : 'ภัยพิบัติ'} · พ.ศ. ${e.from}${e.to !== e.from ? `–${e.to}` : ''}`));
+    s.append(h, el('div', 'yr', `${ERA_KIND_LABEL[e.kind] ?? e.kind} · พ.ศ. ${e.from}${e.to !== e.from ? `–${e.to}` : ''}`));
     const grid = el('div', 'pic-slots');
     const main = el('div', `pic-slot main${met ? '' : ' lock'}`);
     if (met) main.append(artSvg('era-art', ERA_ART_W, ERA_ART_H, eraArt(e.id)));
@@ -13146,6 +14573,27 @@ const followIcon = (k) => {
   return s;
 };
 
+// แถวระดับใช้จ่ายบนการ์ดทบทวนเงิน (B29): เลือกค้างไว้ ยังไม่เดินเกม — ลงผลตอนกดตัวเลือกเงินเก็บ · คืนตัวอ่านลำดับที่เลือก
+// เริ่มที่ระดับปัจจุบัน ผู้เล่นที่ไม่แตะจึงได้ระดับเดิมต่อ
+const SPEND_ASK = 'ช่วงนี้จะใช้เงินแบบไหน';
+function spendRowEl(spend, body) {
+  let k = Math.max(0, spend.levels.findIndex((l) => l.id === spend.cur));
+  const row = el('div', 'spend');
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', SPEND_ASK);
+  const btns = spend.levels.map((l, j) => {
+    const b = button(l.name, l.fx, () => {
+      k = j;
+      btns.forEach((x, m) => x.setAttribute('aria-pressed', String(m === k)));
+    });
+    b.setAttribute('aria-pressed', String(j === k));
+    return b;
+  });
+  row.append(...btns);
+  body.append(el('h4', null, SPEND_ASK), row);
+  return () => k;
+}
+
 function button(label, fx, onclick, hint = null) {
   const b = el('button', 'choice');
   const main = el('span', null, label);
@@ -13176,7 +14624,23 @@ const numbered = (b, n) => {
   b.prepend(k);
   return b;
 };
+// ลิ้นชัก (dialog โมดัล) ไม่ปล่อย Tab ออกไปหัวเว็บ ราวเมนู หรือการ์ดใต้แผง · ราวเมนูยังกดด้วยเมาส์/นิ้วได้ (กดปุ่มใด = ปิดลิ้นชัก) จึงดักที่คีย์ ไม่ใช้ inert ทั้งราว
+// ตรวจก่อนด่าน repeat ข้างล่าง ไม่งั้นกด Tab ค้างหลุดออกนอกแผง
+const TAB_STOPS = 'a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])';
+function trapSheetTab(e) {
+  const sheet = root.querySelector('.sheet:not(.pin)');
+  if (!sheet || e.key !== 'Tab' || e.altKey || e.ctrlKey || e.metaKey) return;
+  const stops = [...sheet.querySelectorAll(TAB_STOPS)].filter((n) => !n.disabled && !n.closest('[hidden], [inert]') && n.getClientRects().length);
+  if (!stops.length) return;
+  const at = document.activeElement;
+  const edge = e.shiftKey ? stops[0] : stops.at(-1);
+  if (!sheet.contains(at) || at === edge) {
+    e.preventDefault();
+    (e.shiftKey ? stops.at(-1) : stops[0]).focus();
+  }
+}
 document.addEventListener('keydown', (e) => {
+  trapSheetTab(e);
   // กดค้าง = repeat — ไม่นับ ไม่งั้นเลือกรัวข้ามการ์ด
   if (e.repeat || e.altKey || e.ctrlKey || e.metaKey || e.isComposing) return;
   const t = e.target;
@@ -13213,6 +14677,65 @@ function artSvg(cls, w, h, parts) {
   const svg = svgEl('svg', { class: cls, viewBox: `0 0 ${w} ${h}`, 'aria-hidden': 'true' });
   for (const p of parts) svg.append(svgEl('path', { d: p.d, fill: p.fill ?? 'none', ...(p.stroke && { stroke: p.stroke, 'stroke-width': p.w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }) }));
   return svg;
+}
+// ภาพประจำการ์ด (ใบ 210 · ข้อ 410 492): ข้อมูลอยู่ไฟล์แยกที่ขอหลังการ์ดแรก — ยังไม่มา/โหลดไม่ได้ = การ์ดไม่มีภาพ ไม่รอ
+// ไม่วาดใบที่กำลังเปิดซ้ำเมื่อภาพมาถึง: ภาพโผล่กลางการอ่านดันข้อความกับปุ่มกระโดด · สีของแต่ละบทบาทอยู่ CSS (.cp .r-*)
+let cardArt = null;
+let artAsked = false;
+function askArt() {
+  if (artAsked) return;
+  artAsked = true;
+  const sc = document.createElement('script');
+  sc.src = ART_SRC;
+  sc.async = true;
+  sc.onload = () => (cardArt = self.NL_CARD_ART ?? null);
+  document.head.append(sc);
+}
+function cardPic(id) {
+  const parts = cardArt?.pics?.[id];
+  if (!parts) return null;
+  const svg = svgEl('svg', { class: 'cp', viewBox: `0 0 ${cardArt.w} ${cardArt.h}`, 'aria-hidden': 'true' });
+  for (const [r, d, w] of parts) svg.append(svgEl('path', { class: `r-${r}`, d, ...(w !== undefined && { 'stroke-width': w }) }));
+  const box = el('div', 'cpic');
+  box.dataset.pic = id;
+  box.append(svg);
+  return box;
+}
+// ข้อ 429: ปุ่มล่างสุดต้องอยู่ในจอแรกก่อนภาพ (แนว B131) — ภาพดันปุ่มพ้นจอ = หดภาพพอให้ปุ่มขึ้น · หดถึงขั้นต่ำแล้วยังพ้น = ถอดภาพ
+// เฉพาะเมื่อภาพเป็นต้นเหตุ (ข้อ 493):ถอดภาพแล้วปุ่มก็ยังพ้นจอ (หัวเว็บ + แถบสถานะ + เรื่องยาวกินจอเอง) = คงภาพเต็มขนาด
+// ขอบล่างของจอแรก = ขอบบนเมนูล่าง (ลอยทับเนื้อการ์ด) · วัดเป็นพิกัดหน้า ไม่ขึ้นกับระยะเลื่อนตอนวาด
+// data-fit บอกผลให้ตัววัดนับได้: full · long (ปุ่มพ้นจอเพราะเรื่องยาว คงภาพ) · shrunk · hid
+const PIC_MIN_H = 48;
+function fitPic(box) {
+  const pic = box.querySelector('.cpic');
+  if (!pic) return;
+  box.dataset.pic = pic.dataset.pic;
+  const over = () => {
+    const last = [...box.querySelectorAll('.choices button')].filter((b) => b.offsetParent).pop();
+    if (!last) return 0;
+    const nav = document.querySelector('.mnav');
+    return last.getBoundingClientRect().bottom + scrollY - (nav ? nav.getBoundingClientRect().top : innerHeight);
+  };
+  const cut = over();
+  box.dataset.fit = 'full';
+  box.dataset.cut = Math.round(cut);
+  if (cut <= 0) return;
+  pic.hidden = true;
+  const bare = over();
+  pic.hidden = false;
+  if (bare > 0) {
+    box.dataset.fit = 'long';
+    return;
+  }
+  const { width, height } = pic.getBoundingClientRect();
+  const keep = height - cut - 1;
+  if (keep >= PIC_MIN_H) {
+    pic.style.width = `${Math.floor((width * keep) / height)}px`;
+    box.dataset.fit = 'shrunk';
+    if (over() <= 0) return;
+  }
+  pic.remove();
+  box.dataset.fit = 'hid';
 }
 function artDraw(ctx, parts, x, y, size) {
   ctx.save();
@@ -13389,7 +14912,7 @@ const FX = {
     build: (ov, o) => {
       ov.innerHTML = `<div class="fx-veil"></div>${fxSvg(120, 120, `<path class="fx-smoke" d="M60 44c-6-8 6-14 0-22s6-14 0-20" fill="none" stroke="${FX_INK.cream}" stroke-width="1.4" stroke-linecap="round" pathLength="100" stroke-dasharray="100"/><g class="fx-flame" style="transform-origin:60px 58px"><path d="M60 34c7 9 9 15 6 20q-2 4-6 4t-6-4c-3-5-1-11 6-20z" fill="${FX_INK.gold2}"/><path d="M60 44c3 4 4 7 2 10q-1 2-2 2t-2-2c-2-3-1-6 2-10z" fill="${FX_INK.cream}"/></g><path d="M36 64h48q-4 18-24 18t-24-18z" fill="${FX_INK.bronze2}" stroke="${FX_INK.gold}" stroke-width="1.4"/><path d="M58 64v-6h4v6" fill="${FX_INK.lacquer2}"/><path d="M44 90h32" stroke="${FX_INK.gold}" stroke-width="1.4"/>`, 'fx-lamp')}<div class="fx-cap"></div>`;
       const cap = ov.querySelector('.fx-cap');
-      cap.append(o.head, el('small', null, o.sub));
+      cap.append(o.head, el('small', null, o.sub), ...(o.closing ? [el('small', null, o.closing)] : []));
       return { ov, flame: ov.querySelector('.fx-flame'), smoke: ov.querySelector('.fx-smoke'), veil: ov.firstChild, cap };
     },
     frame: (p, t) => {
@@ -13509,7 +15032,7 @@ function fxCard(box, card) {
   const top = lifeTitles(card).titles[0];
   const tier = top && FX_TIER[top.tier];
   const gone = isGone(st);
-  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}` }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
+  fxPlay(fxOv(), 'deathA', { head: gone ? 'หายไปจากบ้าน' : 'จากไปอย่างสงบ', sub: `${genLabel()}${lifeEndWord(gone)} ${card.age}`, closing: closingOf(st.religion) }, tier && (() => fxPlay(fxOv(), 'title', { tier, name: top.name })));
 }
 const fxGate = (e) => {
   if (!fxCur) return;
@@ -13524,6 +15047,8 @@ window.addEventListener('keydown', (e) => [' ', 'Enter', 'ArrowRight', 'ArrowLef
 function render(card) {
   // ไปกลับกลางชีวิต (B68m): ทริปยังเป็นชีวิตนี้ ปุ่มจึงเดินผ่านปุ่มชีวิต — จอเต็มของทริปเป็นงานเลน C
   if (card.kind === 'isekai') return renderIsekai(card);
+  const prevBase = lastBase;
+  if (card.kind !== 'result') lastBase = card;
   root.replaceChildren();
   const s = statsOf(st);
   const box = el('article', `card ${styleOf(card)}`);
@@ -13586,6 +15111,8 @@ function render(card) {
     if (from) sum.push(el('p', 'sub', from.day ? `ชาติประจำวัน ${from.day} · ทุกคนที่เล่นวันนั้นเกิดแบบเดียวกันนี้ ทางที่เลือกต่างกันได้` : 'ชีวิตจากลิงก์เพื่อน · เกิดแบบเดียวกับเพื่อนทุกอย่าง ทางที่เลือกต่างกันได้'));
     // สมุดเต็มต้องให้ผู้เล่นลงมือเอง จึงอยู่แท็บที่เปิดอยู่แล้ว ไม่ซ่อนไว้แท็บอนุสรณ์
     if (card.memo === 'full') sum.push(memoFull(card));
+    // ปณิธานที่สำเร็จ (life-goal 02): ไม่มีสักอัน = ไม่มีบรรทัด
+    if (card.goals?.length) sum.push(el('p', 'sub', `ปณิธานที่ทำสำเร็จ: ${card.goals.join(' · ')}`));
     sum.push(helpBox());
     // บัญชีบุญบาปเฉลยที่ปรโลกในระหว่างชาติ ไม่ใช่การ์ดตาย · กราฟทั้งชีวิตแทนสรุปช่วงวัยสุดท้าย (B38a) ชีวิตสั้นก็มีกราฟ
     const chart = card.life && lifeChart(card.life, card.age, card.cause);
@@ -13627,7 +15154,11 @@ function render(card) {
       if (bg) body.classList.add('has-bg'), body.append(bg);
     } else {
       const scene = SCENE_OF.has(card.id) && sceneSvg(SCENE_OF.get(card.id), false);
+      // ภาพประจำการ์ด (ใบ 210): ภาพยุค/ฉากมาก่อน · การ์ดผลยังใช้ภาพหมวด (ข้อ 492)
+      const pic = !scene && card.kind === 'event' && cardPic(card.id);
       if (scene) body.append(scene);
+      else if (pic) body.append(pic);
+      else if (card.kind === 'result' && !card.isekai && !hasScene(prevBase) && !digestRest(card).length) body.append(catSvg(resultArtCat(card)));
     }
     // ข่าวบ้านเมืองที่รวมกับการ์ดรับมือ (B58): ชื่อเหตุการณ์ต่อท้ายป้าย · เรื่องข่าวเป็นบรรทัดนำก่อนเรื่องของเรา
     body.append(el('span', 'kicker', card.news ? `${kicker} · ${card.news.text}` : kicker));
@@ -13655,7 +15186,7 @@ function render(card) {
         const box = el('div', 'recap');
         box.append(el('div', 'h', card.age > 0 ? 'สิ่งที่สืบทอดจากรุ่นก่อน' : 'สิ่งที่สืบทอดจากชาติก่อน'), list(card.inherit, 'picks'));
         // เจ้าของสั่งไม่ย่อรุ่นต้นทางซ้าย — ผังบนการ์ดแรกเกิดโชว์ครบทุกรุ่น (ภาพบีบป้ายเองเมื่อรุ่นถี่)
-        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls));
+        if (card.lineage.length) box.append(el('div', 'h', 'ผังตระกูล'), lineageView(st.lineage, st.cls, undefined, undefined, st));
         body.append(box);
       }
       // ใบสืบทอดยาว/จอเตี้ยดันปุ่มหลุดใต้เมนูล่าง — ปุ่มติดจอแทนการพับเนื้อ (เจ้าของสั่งผังตระกูลครบทุกรุ่น)
@@ -13677,7 +15208,10 @@ function render(card) {
       if (card.story) body.append(el('p', null, card.story));
       // ตรวจเจอโรค (B110): บอกเวลาที่เหลือให้เตรียมใจ (เจ้าของเคาะ) · left = ปีก่อนถึงนัด 0 = ปีนี้
       if (card.illness) body.append(el('p', 'sub', card.illness.left ? `หมอว่าเหลือเวลาราว ${card.illness.left} ปี` : 'หมอว่านี่อาจเป็นปีสุดท้าย'));
-      choices.append(enter(button(BTN.next, null, next)));
+      // ปุ่มปฏิกิริยาทุกปุ่มคือ "ถัดไป" — ไม่ส่งอะไรเข้าแกน ชีวิตเดินเหมือนการ์ดผลปุ่มเดียว
+      const reacts = card.kind === 'result' && CONTENT.resultReacts?.[card.tag];
+      if (reacts) choices.append(...reacts.map((w, i) => numbered(button(w, null, next), i + 1)));
+      else choices.append(enter(button(BTN.next, null, next)));
     } else if (card.entry) {
       entryOffer(card, body, choices);
     } else {
@@ -13690,6 +15224,7 @@ function render(card) {
         body.append(ul);
       }
       if (card.disclaimer) body.append(el('p', 'note', card.disclaimer));
+      const spendAt = card.spend ? spendRowEl(card.spend, body) : null;
       let n = 0;
       card.choices.forEach((c, i) => {
         // ตัวเลือกประตูเข้าสายที่ยังไม่เปิด (โฟกัสใบ 04) ไม่บอกว่ามีอยู่ — ต่างจากตัวที่ล็อกด้วยเงิน/ค่าสถานะ
@@ -13699,7 +15234,7 @@ function render(card) {
         const fx = why ?? card.fx?.[i];
         const b = numbered(button(c, fx, () => {
           veil(card, i);
-          play(lifePick(i));
+          play(spendAt ? spendPick(spendAt(), i) : lifePick(i));
           if (card.kind === 'upgrade') upgradeFx(card, i);
         }, card.hints?.[i]), ++n);
         if (card.kind === 'upgrade' && card.desc?.[i]) b.firstChild.append(el('small', 'idesc', card.desc[i]));
@@ -13715,8 +15250,10 @@ function render(card) {
   }
   box.append(body, choices, ...after);
   root.append(panels(box, false), lifeMenu(card, box));
+  fitPic(box);
   shelfDot();
   fxCard(box, card);
+  askArt();
 }
 
 // กล่องกระซิบ (B117): สอนระบบที่เพิ่งโผล่ครั้งแรกตามวัย ในเสียงยาย · บอกแค่ทิศ ไม่บอกตัวเลข/สูตร/บัญชีบุญบาป (กติกาเดียวกับ B31)
@@ -13885,12 +15422,14 @@ function helpRow(h) {
 
 // แผงครอบครัว (B36c): คนรอบตัวตอนนี้ แยกจากผังตระกูลที่เล่ารุ่นก่อน · อ่านอย่างเดียว ไม่มี token ในเซฟ
 // ใช้เฉพาะช่องที่ไล่ชื่อไว้ข้างล่าง — แกนเติมช่องใหม่ในสมาชิกก็ไม่หลุดขึ้นจอ · bond บอกเป็นป้ายคำ ไม่ใช่ตัวเลข
-const FAMILY_ORDER = ['parent', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
+const FAMILY_ORDER = ['parent', 'partner', 'spouse', 'child', 'grandchild', 'pet', 'herd', 'peer'];
 const ANIMAL_ROLES = ['pet', 'herd'];
 const kinWord = (m) => {
   const male = m.sex === 'ชาย';
   if (m.role === 'parent') return male ? 'พ่อ' : 'แม่';
-  if (m.role === 'spouse') return m.left ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
+  if (m.role === 'partner') return m.left ? 'แฟนเก่า' : 'แฟน';
+  // แยกทาง (apart) ยังเป็นคู่ตามกฎหมาย — ป้ายสามี/ภรรยาเดิม ไม่ใช่อดีตคู่
+  if (m.role === 'spouse') return m.left && m.status !== 'apart' ? 'อดีตคู่' : male ? 'สามี' : 'ภรรยา';
   if (m.role === 'child') return male ? 'ลูกชาย' : 'ลูกสาว';
   if (m.role === 'grandchild') return male ? 'หลานชาย' : 'หลานสาว';
   if (m.role === 'pet') return m.kind ?? 'สัตว์เลี้ยง';
@@ -13933,13 +15472,22 @@ function kinParts(members, animals = false) {
     const here = members.filter((m) => m.alive && !m.left).length;
     return [el('h3', null, here ? `สัตว์เลี้ยง · ยังอยู่ ${here}` : 'สัตว์เลี้ยง'), kinList(members)];
   }
-  const alive = members.filter((m) => m.alive).length;
-  return [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === members.length ? 'คน' : `จาก ${members.length} คน`}`), kinList(members)];
+  // คู่ที่จากไป/แยกทางย้ายไปหัวของมันเอง (ui-redo ใบ 30) ไม่ซ้ำในรายการหลัก · คู่ที่ยังอยู่คนเดียวไม่มีหัวนี้
+  // แยกกันอยู่ยังไม่จบความเป็นคู่ จึงอยู่คนในบ้าน · หย่า/ตาย/ออกจากบ้านแบบเซฟเก่า (ไม่มี status) = ผ่านมาแล้ว
+  const past = members.filter((m) => m.role === 'spouse' && (!m.alive || (m.left && m.status !== 'apart')));
+  const home = members.filter((m) => !past.includes(m));
+  const alive = home.filter((m) => m.alive).length;
+  // คู่คนเดียว = ลูกทุกคนเป็นของคู่นั้นอยู่แล้ว บอกซ้ำทุกแถวแค่รก (ui-redo ใบ 331)
+  const mates = members.filter((m) => m.role === 'spouse');
+  const mateName = mates.length >= 2 ? new Map(mates.map((m) => [m.id, m.name])) : null;
+  const out = home.length ? [el('h3', null, `คนในบ้าน · ยังอยู่ ${alive} ${alive === home.length ? 'คน' : `จาก ${home.length} คน`}`), kinList(home, mateName)] : [];
+  if (past.length) out.push(el('h3', null, 'คู่ชีวิตที่ผ่านมา'), kinList(past, mateName));
+  return out;
 }
 // ผังตระกูลมีเมื่อเป็นรุ่นที่ 2 ขึ้นไป
 function clanParts() {
   const out = [];
-  if (st.lineage.length) out.push(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls));
+  if (st.lineage.length) out.push(el('h3', null, `ผังตระกูล · ${st.lineage.length} รุ่นก่อน`), lineageView(st.lineage, st.cls, undefined, undefined, st));
   out.push(
     el('h3', null, st.lineage.length ? `กราฟฐานะตระกูล · ${st.lineage.length + 1} รุ่น` : 'กราฟฐานะตระกูล'),
     standingChart(standingGens(st.lineage, standingNow(!!st.dead)), null, false) ?? el('p', 'sub', 'ยังมีจุดเดียว — กราฟขึ้นเมื่อถึงช่วงวัยถัดไป'),
@@ -14034,6 +15582,13 @@ function morePanel() {
     unblockSheet();
     dayNew();
   };
+  // ท้ายหน้าซ่อนเมื่อมีราวเมนู — เครื่องใหม่ที่ยังไม่มีเซฟเข้าชีวิตแรกพร้อมราวทันที ทางเปิดไฟล์เซฟจึงต้องอยู่ในแผงนี้ด้วย
+  const backup = el('button', null, 'สำรองเซฟ');
+  backup.type = 'button';
+  backup.onclick = () => {
+    unblockSheet();
+    backupOpen();
+  };
   const link = (text, href) => Object.assign(el('a', null, text), { href });
   // อัปเดตล่าสุด: เปลี่ยนเนื้อแผงเดิมเป็นรายการรุ่นนี้ ปุ่มกลับไปการ์ดยังใช้ปิดได้เหมือนเดิม
   const news = el('button', null, NOTES_TITLE);
@@ -14047,7 +15602,7 @@ function morePanel() {
     notesMark();
     sheet?.querySelector('.sheet-x')?.focus();
   };
-  for (const x of [day, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'about.html'), link('หน้าแรก', 'index.html')]) {
+  for (const x of [day, backup, news, link('คู่มือ', 'guide.html'), link('กลไกในเกม', 'guide.html#core'), link('หน้าแรก', 'index.html')]) {
     const li = el('li');
     li.append(x);
     ul.append(li);
@@ -14111,8 +15666,11 @@ function notesBoot() {
     shut();
   };
 }
-function kinList(members) {
+// เซฟเก่าไม่มี since → engine ไม่ส่ง together · ไม่โชว์ 0 ปี
+const togetherText = (m) => (m.together ? ` · อยู่ด้วยกัน ${m.together} ปี` : '');
+function kinList(members, mateName = null) {
   const rank = (m) => FAMILY_ORDER.indexOf(m.role) * 2 + (m.alive ? 0 : 1);
+  const withMate = (m) => (m.role === 'child' && mateName?.get(m.by) ? `ลูกกับ${mateName.get(m.by)}` : null);
   const ul = el('ul', 'picks');
   members
     .map((m, i) => ({ m, i }))
@@ -14127,10 +15685,11 @@ function kinList(members) {
       // ตาย (ui-redo ใบ 28): ขีดเฉพาะชื่อ แถวไม่จาง อายุที่จากไปอ่านง่าย
       if (!m.alive) {
         const li = el('li', 'dead');
-        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}`);
+        li.append(el('s', null, who), ` · ${m.diedAge != null ? `จากไปตอนอายุ ${m.diedAge}` : 'จากไปแล้ว'}${togetherText(m)}${withMate(m) ? ` · ${withMate(m)}` : ''}`);
         return ul.append(li);
       }
-      row([who, m.age != null && `อายุ ${m.age}`, m.left ? 'แยกทางแล้ว' : m.bondLevel].filter(Boolean).join(' · '), false);
+      const leftWord = m.status === 'apart' ? 'แยกกันอยู่' : m.status === 'divorced' ? 'หย่าแล้ว' : 'แยกทางแล้ว';
+      row([who, m.age != null && `อายุ ${m.age}`, withMate(m), m.left ? `${leftWord}${togetherText(m)}` : m.bondLevel].filter(Boolean).join(' · '), false);
     });
   return ul;
 }
@@ -14245,7 +15804,7 @@ function loopBar(l) {
 function renderAfter(card) {
   if (card.kind === 'isekai') return renderIsekai(card);
   root.replaceChildren();
-  const box = el('article', 'card b af');
+  const box = el('article', 'card a b af');
   const top = el('div', 'top');
   // หัวแถบเป็นชื่อเกมเหมือนหน้าเปิด (ui-redo 66 · เจ้าของ) · ฉากที่อยู่บอกด้วยป้ายบนการ์ดแทน
   top.append(el('b', null, GAME_NAME), el('small', null, card.loop ? `${genLabel()}${st.name} · ภูมิ${af.verdict.realm.name} · ปีที่ ${card.loop.year}/${card.loop.years}` : `${genLabel()}${st.name} · ${lifeEndWord(isGone(st))} ${st.age}`));
@@ -14269,21 +15828,24 @@ function renderAfter(card) {
   if (card.earn) body.append(earnBox(card.earn, `${save.seed}:${st.gen}:v`));
   if (card.lineage) {
     body.append(el('div', 'kicker', 'ผังตระกูล'));
-    body.append(af.heir ? lineageView(af.heir.lineage, af.heir.cls, af.heir.lineage.length, 'รุ่นถัดไป') : list(card.lineage, 'picks'));
+    body.append(af.heir ? lineageView(af.heir.lineage, af.heir.cls, af.heir.lineage.length, 'รุ่นถัดไป', af.heir) : list(card.lineage, 'picks'));
     // การ์ดส่งต่อ (B95): ผังตระกูลรวมชีวิตที่เพิ่งจบแล้ว + จุดฐานะบ้านที่รุ่นถัดไปจะเกิด
     const chart = af.heir && standingChart(standingGens(af.heir.lineage), CLASSES.indexOf(af.heir.cls));
     if (chart) body.append(chart);
   }
   if (card.note) body.append(el('p', 'note', card.note));
+  if (card.done && overlapOf(af.heir ?? af.st) > 0) body.append(el('p', 'note', OVERLAP_RESET_WARN));
   if (card.done) {
     choices.append(enter(button(BTN.rebirth, null, rebirth)));
     choices.append(button(BTN.newFamily, null, start));
   } else if (card.choices.length) {
-    const offer = () => choices.replaceChildren(...card.choices.map((c, i) => {
+    // ปุ่มที่ซ่อนตอนล็อก DLC (card.hidden) ไม่วาด แต่ i ยังเป็นลำดับเดิมในแถว — เลขที่ afterPick เขียนลงเซฟไม่เลื่อน
+    const offer = () => choices.replaceChildren(...card.choices.flatMap((c, i) => {
+      if (card.hidden?.[i]) return [];
       const why = lockText(card, i);
       const b = button(c, why ?? card.fx?.[i], () => (card.manual?.[i] ? heirPick(card, i, choices, offer) : play(afterPick(i))), card.hints?.[i]);
       if (why) b.disabled = true;
-      return b;
+      return [b];
     }));
     offer();
   } else choices.append(enter(button(BTN.next, null, next)));
@@ -14480,7 +16042,7 @@ function isekaiFocusPanel(card) {
 const focusUp = (fx) => (fx?.endsWith(' ขึ้น') ? fx.slice(0, -' ขึ้น'.length).split(' · ').map((k) => `${k} ↑`).join(' · ') : fx);
 function renderIsekai(card) {
   root.replaceChildren();
-  const box = el('article', 'card i');
+  const box = el('article', 'card a i');
   const s = card.status;
   const pick = card.trip ? lifePick : afterPick;
   const where = card.trip ? `ข้ามมาตอนอายุ ${card.life}` : `ชาติต่างโลกที่ ${card.run + 1}`;
@@ -14570,7 +16132,10 @@ const LOAN_TOK = /^~([0-9])([0-9a-z])$/;
 // เล่นต่อเป็นผู้สืบสายเลือด (B76) = "@<ทาง A-Z><ลำดับในรายชื่อ>" · รายชื่ออ่านจากสถานะที่เล่นซ้ำมาถึงจุดเดียวกัน ลำดับจึงตรงกันทุกครั้ง
 const bloodPick = (i, k) => `@${afterPick(i)}${k.toString(36)}`;
 const BLOOD_TOK = /^@([A-Z])([0-9a-z])$/;
-const tokens = (log) => log.match(/[~@]..|[^]/g) ?? [];
+// ทบทวนเงินพร้อมระดับใช้จ่าย (B29) = "$<ลำดับระดับ><ตัวเลือก>" · ระดับลงพร้อมตัวเลือกในก้าวเดียว เล่นซ้ำจึงได้ผลเท่ากดจริง
+const spendPick = (k, i) => `$${k.toString(36)}${i.toString(36)}`;
+const SPEND_TOK = /^\$([0-9a-z])([0-9a-z])$/;
+const tokens = (log) => log.match(/[~@$]..|[^]/g) ?? [];
 let save = null;
 
 // อายุของการ์ดชีวิตใบก่อน/ใบนี้ — จำใน apply ไม่ใช่ตอนวาด เพราะเล่นซ้ำจากเซฟไม่ได้วาดทุกใบ
@@ -14673,6 +16238,7 @@ function step(tok) {
     af = null;
     curAge = null;
     bookReset();
+    tvReset();
     return nextCard(st);
   }
   if (/^[A-Z]$/.test(tok)) {
@@ -14691,6 +16257,14 @@ function step(tok) {
     const kind = LOAN_KINDS[+loan[1]];
     if (!kind) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
     choose(st, parseInt(loan[2], 36), kind);
+    return nextCard(st);
+  }
+  const spend = SPEND_TOK.exec(tok);
+  if (spend) {
+    const id = Object.keys(st.content.spending?.levels ?? {})[parseInt(spend[1], 36)];
+    if (!id) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
+    chooseSpend(st, id);
+    choose(st, parseInt(spend[2], 36));
     return nextCard(st);
   }
   if (!/^[0-9a-z]$/.test(tok)) throw new Error(`ปุ่มในเซฟไม่รู้จัก: ${tok}`);
@@ -14718,11 +16292,22 @@ function saveWrite(card) {
     localStorage.setItem(SNAP_KEY, snapHide(JSON.stringify({ v: APP_VERSION, snap: snapshot({ st, af, card, ui: uiState() }, CONTENT) })));
     localStorage.removeItem(SAVE_KEY);
     savedMark(true);
+    askPersist();
   } catch {
     // เขียนไม่ลงแต่เซฟเก่ายังอยู่ = รีเฟรชแล้วย้อนไปจุดเก่าโดยไม่รู้ตัว — ลบทิ้งดีกว่า
     saveClear();
     savedMark(false);
   }
+}
+// Safari ลบ localStorage ของเว็บที่ไม่ได้เปิดราว 7 วัน — ขอสิทธิ์เก็บถาวรหลังเซฟลงจริงครั้งแรกของการเปิดหน้า (มีของให้เสียแล้ว)
+// เบราว์เซอร์ตัดสินเอง ได้หรือไม่ได้เกมเล่นต่อเหมือนเดิม · ทางกู้ที่แน่นอนคือไฟล์สำรองเซฟท้ายหน้า
+let persistAsked = false;
+function askPersist() {
+  if (persistAsked) return;
+  persistAsked = true;
+  const s = navigator.storage;
+  if (!s?.persist || !s.persisted) return;
+  s.persisted().then((ok) => ok || s.persist()).catch(() => {});
 }
 function savedMark(ok) {
   const m = document.getElementById('saved');
@@ -14753,6 +16338,7 @@ function snapRead() {
     if (!raw) return null;
     const root = restore(JSON.parse(snapShow(raw)).snap, CONTENT);
     ({ st, af } = root);
+    tvReset();
     ({ save, prevAge, curAge, eraSeen, bookIntro } = root.ui);
     // ภาพถ่ายก่อนมีสมุดภาพ (B130) ไม่มีช่องนี้ — ภาพของการ์ดก่อนอัปเดตจึงไม่ถูกนับ
     picSeen = root.ui.picSeen ?? [];
@@ -14774,7 +16360,10 @@ function saveClear() {
   }
 }
 
-const show = (card) => (af ? renderAfter(card) : render(card));
+const show = (card) => {
+  dlcSync();
+  return af ? renderAfter(card) : render(card);
+};
 
 function play(tok, times = 1) {
   let card;
@@ -14798,12 +16387,70 @@ function digestRest(card) {
   return rest;
 }
 
-function begin(seed) {
+// ภาคเสริม (DLC) ระดับเครื่องแบบสมุดฉายา: ปลดแล้วอยู่ทุกตระกูลในเครื่องนี้ · ค่าเริ่ม = ล็อกหมด · เงื่อนไขปลดจริงเป็นใบ 03
+// สวิตช์ทดสอบ ?dlc=all = เปิดหมดเฉพาะหน้านี้ ไม่เขียนลงเครื่อง · มีผลเฉพาะโฮสต์ dev (localhost/127.0.0.1/::1 · เปิดจากไฟล์) ผู้เล่นจริงพิมพ์แล้วไม่มีผล
+// อ่านพังได้ (โหมดส่วนตัว) = ล็อกหมด
+const DLC_KEY = 'next-life-dlc-v1';
+const devHost = () => ['', 'localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+// ผู้เล่นเดิม (ก่อนมีสวิตช์ DLC · เครื่องไม่มี DLC_KEY): ปลดตามร่องรอยที่เล่นมาแล้ว — migration-options.md ข
+// memorial มีแถว = เคยตายจนจบ ≥ 1 ชีวิต → ปรโลก · สมุดสกิลมีรหัส :i/:t = เคยจบชาติต่างโลก/ทริปต่างโลก → ต่างโลก+ซ้อนทับ (ครบเงื่อนไข 26ข) · ดันเจียนไม่ปลด
+// ก้อนหลังต้องมีก้อนก่อนเสมอ (เงื่อนไขปลดต่อเนื่อง) · ทำครั้งเดียวต่อเครื่อง: เครื่องใหม่ก็เขียนค่าล็อกหมดไว้ ไม่งั้นการ์ดศาลครั้งแรกจะถูกนับเป็นผู้เล่นเดิมแล้วไม่มีป้ายแจ้งปลด
+function dlcMigrate() {
+  const trip = skillsRead().e.some((x) => /:[it]\d*$/.test(String(x)));
+  const b = { afterlife: trip || memoRead().l.length > 0, isekai: trip, overlap: trip, dungeon: false };
+  dlcWrite(b);
+  return b;
+}
+function dlcDevice() {
+  try {
+    if (devHost() && new URLSearchParams(location.search).get('dlc') === 'all') return { ...DLC_OPEN };
+    const raw = localStorage.getItem(DLC_KEY);
+    if (raw === null) return dlcMigrate();
+    const b = JSON.parse(raw);
+    return Object.fromEntries(DLC_KEYS.map((k) => [k, b?.[k] === true]));
+  } catch {
+    return { ...DLC_LOCKED };
+  }
+}
+
+function dlcWrite(b) {
+  try {
+    localStorage.setItem(DLC_KEY, JSON.stringify(b));
+  } catch {
+    // ไม่มีที่เก็บ — ปลดได้แค่ในตระกูลนี้ (ทายาทรับต่อจาก st) ปิดหน้าแล้วหาย
+  }
+}
+const DLC_NAME = { afterlife: 'ปรโลก', isekai: 'ต่างโลก', overlap: 'โลกซ้อนทับ', dungeon: 'ดันเจียน' };
+// แจ้งปลดทันที แต่ชีวิตและปรโลกรอบที่เล่นอยู่ไม่เปลี่ยน — เริ่มมีผลชาติหน้า (ข้อ 13ค)
+function dlcNotice(keys) {
+  document.querySelector('.dlc-notice')?.remove();
+  const p = el('p', 'note dlc-notice', `ปลดภาคเสริม ${keys.map((k) => DLC_NAME[k]).join(' · ')} แล้ว · เริ่มมีผลตั้งแต่ชาติหน้า`);
+  p.setAttribute('role', 'status');
+  p.addEventListener('click', () => p.remove());
+  root.before(p);
+  setTimeout(() => p.remove(), 12000);
+}
+// สิ่งที่ชีวิตนี้ได้ปลดใหม่ลงค่าเครื่องทันที (ทุกตระกูลในเครื่องได้ด้วย) · ค่าเครื่องที่เปลี่ยนมีผลกับทายาทผ่านค่าเริ่มของแกน
+function dlcSync() {
+  const got = (af?.st ?? st).dlcEarned ?? [];
+  const dev = dlcDevice();
+  const fresh = got.filter((k) => !dev[k]);
+  if (!fresh.length) return;
+  const next = { ...dev, ...Object.fromEntries(fresh.map((k) => [k, true])) };
+  dlcWrite(next);
+  setDlcDefault(next);
+  dlcNotice(fresh);
+}
+
+function begin(seed, dlc = dlcDevice()) {
+  // ค่าเริ่มของแกนใช้เฉพาะชีวิตแรกของตระกูล · ทายาทรับ st.dlc ต่อจากรุ่นก่อน
+  setDlcDefault(dlc);
   st = newLife(seed, CONTENT);
   af = null;
   save = { seed, log: '' };
   curAge = null;
   bookReset();
+  tvReset();
   return track(nextCard(st));
 }
 
@@ -14867,7 +16514,8 @@ function reroll() {
 // เล่นซ้ำทั้งตระกูลจากเซฟ · ไม่ตรงการ์ดเดิม = null
 function resume(s) {
   try {
-    let card = begin(s.seed);
+    // เซฟ v1 เกิดก่อนมีสวิตช์ = ปลดครบ · เล่นซ้ำบนค่าเครื่องที่ล็อกจะได้การ์ดคนละชุดจนลำดับปุ่มเพี้ยน
+    let card = begin(s.seed, { ...DLC_OPEN });
     if (s.rr) save.rr = 1;
     for (const tok of tokens(s.log)) card = apply(tok);
     save.log = s.log;
@@ -14877,8 +16525,11 @@ function resume(s) {
   }
 }
 
-function homeCard(title, lines) {
-  root.replaceChildren();
+function homeCard(title, lines, keep = false) {
+  // keep: ราวเมนูกับแผงค้างอยู่ใน root ด้วย ลบเฉพาะการ์ดเดิม
+  if (keep) {
+    for (const n of [...root.children]) if (!n.matches('.mnav, .sheet')) n.remove();
+  } else root.replaceChildren();
   const box = el('article', 'card a');
   const top = el('div', 'top');
   top.append(el('b', null, GAME_NAME), el('small', null, title));
@@ -14886,19 +16537,25 @@ function homeCard(title, lines) {
   lines.forEach((t, i) => body.append(el(i ? 'p' : 'h3', i ? 'sub' : 'lead', t)));
   const choices = el('div', 'choices');
   box.append(top, body, choices);
-  root.append(box);
+  const nav = keep && root.querySelector(':scope > .mnav');
+  if (nav) nav.before(box);
+  else root.append(box);
   return choices;
 }
 
+// ตระกูลค่าซ้อนทับ > 0 ล้างแล้วโลกที่บางลงหายด้วย · ค่า 0 ไม่เพิ่มบรรทัดใด หน้าต้องเหมือนฐานทุกตัวอักษร
+const OVERLAP_RESET_WARN = 'โลกที่บางลงจะหายไปด้วย';
+const overlapWarnLines = () => (overlapOf(af?.heir ?? st) > 0 ? [OVERLAP_RESET_WARN] : []);
+
 // ล้างเซฟ = ลบทั้งตระกูล จึงถามซ้ำก่อน · สมุดทุกเล่มในชั้นสมุดแยก key ไม่โดนล้าง
 function confirmNew(back, go = () => start(), title = 'เริ่มตระกูลใหม่', yes = 'ลบแล้วเริ่มตระกูลใหม่') {
-  const choices = homeCard(title, ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ']);
+  const choices = homeCard(title, ['ลบชีวิตที่ค้างไว้ทั้งตระกูล?', 'ผังตระกูลและสิ่งที่สืบทอดจะหายทั้งหมด กู้คืนไม่ได้ · สมุดในชั้นสมุดยังอยู่ครบ', ...overlapWarnLines()]);
   choices.append(button(yes, null, go), button('ยกเลิก', null, back));
 }
 
 // เปิดลิงก์เพื่อนตอนมีตระกูลค้าง: ถามก่อนทับ · Enter = เล่นต่อของเดิม กดพลาดจะได้ไม่เสียตระกูล
 function linkAsk(card, seed) {
-  const choices = homeCard('ลิงก์จากเพื่อน', ['เพื่อนชวนเกิดชีวิตเดียวกัน', `มีชีวิตที่เล่นค้างไว้ (${genLabel()}${st.name}) · เกิดตามลิงก์ = ลบตระกูลนี้ทั้งหมด สมุดในชั้นสมุดยังอยู่ครบ`]);
+  const choices = homeCard('ลิงก์จากเพื่อน', ['เพื่อนชวนเกิดชีวิตเดียวกัน', `มีชีวิตที่เล่นค้างไว้ (${genLabel()}${st.name}) · เกิดตามลิงก์ = ลบตระกูลนี้ทั้งหมด สมุดในชั้นสมุดยังอยู่ครบ`, ...overlapWarnLines()]);
   choices.append(enter(button(BTN.resume, null, () => home(card))), button('ลบแล้วเกิดตามลิงก์', null, () => startLink(seed)));
 }
 
@@ -14931,6 +16588,109 @@ document.getElementById('dayLink')?.addEventListener('click', (e) => {
   e.preventDefault();
   dayNew();
 });
+
+// สำรองเซฟ: ทุก key ของเกมรวมในไฟล์เดียว — localStorage หายได้ (Safari ล้างเว็บที่ไม่ได้เปิด · ล้างข้อมูลเบราว์เซอร์ · ย้ายเครื่อง)
+// จับทุก key ที่ขึ้นต้นด้วย prefix แทนรายชื่อ key — key ใหม่ในอนาคตติดไฟล์ไปเองไม่ต้องจำมาเติม
+const BACKUP_PREFIX = 'next-life-';
+const BACKUP_KIND = 'next-life-backup';
+function backupKeys() {
+  const keys = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k?.startsWith(BACKUP_PREFIX)) keys[k] = localStorage.getItem(k);
+  }
+  return keys;
+}
+// ไฟล์มาจากนอกเครื่อง: รับเฉพาะรูปที่เกมเขียนเอง — key ของเกม ค่าเป็นสตริง · ผิดรูปแม้ช่องเดียว = ไม่รับทั้งไฟล์
+function backupParse(text) {
+  try {
+    const d = JSON.parse(text);
+    if (d?.kind !== BACKUP_KIND || !d.keys || typeof d.keys !== 'object' || Array.isArray(d.keys)) return null;
+    const ks = Object.entries(d.keys);
+    if (!ks.length || ks.some(([k, v]) => !k.startsWith(BACKUP_PREFIX) || typeof v !== 'string')) return null;
+    return { at: typeof d.at === 'string' ? d.at : null, keys: d.keys };
+  } catch {
+    return null;
+  }
+}
+// เขียนไม่ครบ (ที่เก็บเต็มกลางทาง) = คืนของเดิมทั้งชุด ไม่ทิ้งเซฟครึ่งไฟล์ครึ่งเครื่อง
+function backupApply(keys) {
+  const old = backupKeys();
+  const wipe = () => Object.keys(backupKeys()).forEach((k) => localStorage.removeItem(k));
+  try {
+    wipe();
+    for (const [k, v] of Object.entries(keys)) localStorage.setItem(k, v);
+    return true;
+  } catch {
+    try {
+      wipe();
+      for (const [k, v] of Object.entries(old)) localStorage.setItem(k, v);
+    } catch {
+      // คืนไม่ได้เพราะที่เก็บใช้ไม่ได้ทั้งเครื่อง — ไม่มีอะไรให้คืน
+    }
+    return false;
+  }
+}
+// ทุกการ์ดในทางสำรองเซฟติดป้ายไว้ กดลิงก์ท้ายหน้าซ้ำระหว่างทางจะไม่จำการ์ดสำรองเป็นจอที่ต้องกลับไป
+function backupCard(title, lines) {
+  const choices = homeCard(title, lines);
+  choices.parentElement.classList.add('backup-view');
+  return choices;
+}
+function backupDownload() {
+  const d = new Date();
+  const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const body = JSON.stringify({ kind: BACKUP_KIND, v: APP_VERSION, at: d.toISOString(), keys: backupKeys() });
+  downloadBlob(new Blob([body], { type: 'application/json' }), `next-life-save-${day}.json`);
+}
+function backupPick(back) {
+  const input = el('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = async () => {
+    const f = input.files?.[0];
+    if (!f) return;
+    const data = backupParse(await f.text().catch(() => ''));
+    if (!data) {
+      const choices = backupCard('สำรองเซฟ', ['เปิดไฟล์นี้ไม่ได้', 'ไฟล์นี้ไม่ใช่ไฟล์เซฟของเกม หรือไฟล์เสีย · เซฟในเครื่องนี้ยังอยู่ครบ']);
+      choices.append(button('กลับ', null, back));
+      return;
+    }
+    const when = data.at && !Number.isNaN(Date.parse(data.at)) ? ` (บันทึกเมื่อ ${new Date(data.at).toLocaleDateString('th-TH', { dateStyle: 'long' })})` : '';
+    const choices = backupCard('เปิดไฟล์เซฟ', [`แทนที่เซฟด้วยไฟล์นี้${when}?`, 'ตระกูลที่ค้างและสมุดทุกเล่มในเครื่องนี้จะถูกแทนที่ด้วยของในไฟล์ทั้งหมด กู้คืนไม่ได้ · สำรองของเดิมก่อนถ้ายังอยากเก็บ']);
+    choices.append(
+      button('แทนที่ด้วยไฟล์นี้', null, () => {
+        if (backupApply(data.keys)) return location.reload();
+        const c = backupCard('สำรองเซฟ', ['เขียนเซฟไม่ลง', 'เครื่องนี้ไม่ให้เก็บข้อมูล (โหมดส่วนตัวหรือที่เก็บเต็ม) · เซฟเดิมยังอยู่']);
+        c.append(button('กลับ', null, back));
+      }),
+      button('ยกเลิก', null, back),
+    );
+  };
+  input.click();
+}
+function backupOpen() {
+  const prev = [...root.childNodes];
+  const back = () => root.replaceChildren(...prev);
+  let has = false;
+  let ok = true;
+  try {
+    has = Object.keys(backupKeys()).length > 0;
+  } catch {
+    ok = false;
+  }
+  const lines = !ok
+    ? ['สำรองเซฟไม่ได้', 'เครื่องนี้ไม่ให้เก็บข้อมูล (โหมดส่วนตัวหรือที่เก็บเต็ม)']
+    : ['เก็บเซฟไว้นอกเบราว์เซอร์', has ? 'ตระกูลที่เล่นค้างและสมุดทุกเล่มในชั้นสมุดอยู่ในไฟล์เดียว · ใช้ย้ายเครื่อง หรือกู้คืนเมื่อเบราว์เซอร์ล้างข้อมูล' : 'ยังไม่มีเซฟในเครื่องนี้ · เปิดไฟล์เซฟที่สำรองไว้จากเครื่องอื่นได้'];
+  const choices = backupCard('สำรองเซฟ', lines);
+  if (ok && has) choices.append(button('บันทึกไฟล์เซฟ', null, backupDownload));
+  if (ok) choices.append(button('เปิดไฟล์เซฟ', null, () => backupPick(back)));
+  choices.append(button('กลับ', null, back));
+}
+document.getElementById('backupLink')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (!root.querySelector('.backup-view')) backupOpen();
+});
 shelfDot();
 // เพดานความสูงการ์ด (B116) หักหัวเว็บ — ชื่อเกมตัดสองบรรทัดบนจอแคบ หัวจึงสูงไม่ตายตัว วัดจริงแทนเดาค่าเดียว · 20 = ระยะบนของ #app
 const chromeH = () => document.documentElement.style.setProperty('--chrome', `${(document.querySelector('.logo')?.offsetHeight ?? 116) + 20}px`);
@@ -14949,6 +16709,8 @@ if (logoEl && window.ResizeObserver) new ResizeObserver(headEdge).observe(logoEl
 function boot() {
   // ล้างโครงหน้าเปิดที่มากับ HTML (template.html) — ทุกทางข้างล่างวาดจอใหม่ลง root
   root.replaceChildren();
+  // ทายาทของตระกูลที่โหลดจากเซฟรับค่าเครื่องผ่านค่าเริ่มของแกน — ไม่ตั้งไว้ = ปลดหมดตามค่าเริ่มของแกน
+  setDlcDefault(dlcDevice());
   const seed = linkSeed();
   dropLinkSeed();
   let card = snapRead();
@@ -14963,6 +16725,26 @@ function boot() {
   if (seed === null) home(card);
   else linkAsk(card, seed);
 }
+
+// สถานะจอเป็น JSON ให้สคริปต์เทส/AI อ่านแทนดูภาพ (ui-redo 137) — อ่านจาก DOM ที่วาดอยู่เท่านั้น ไม่แตะ st/แกน
+// ⇒ ไม่มีของที่จอไม่โชว์ (บุญบาป · ธงลับ · seed · น้ำหนัก) · ตัวเลือกเอาเฉพาะข้อความปุ่ม ไม่เอาป้ายผลข้างปุ่ม
+const screenTxt = (n) => (n?.innerText ?? n?.textContent ?? '').replace(/\s+/g, ' ').trim();
+const screenSeen = (n) => n.getClientRects().length > 0;
+window.render_game_to_text = () => {
+  const card = root.querySelector(':scope > .card');
+  const age = root.querySelector('.sb-age b');
+  const mode = !card ? 'other' : card.querySelector('.d-head') ? 'death' : card.querySelector('.kicker')?.textContent === 'เปิดชีวิต' ? 'start' : 'life';
+  return JSON.stringify({
+    mode,
+    kicker: screenTxt(card?.querySelector('.kicker')),
+    name: screenTxt(root.querySelector('.sb-who b')),
+    age: age ? screenTxt(age) : null,
+    stats: [...root.querySelectorAll('.sb-m > li')].map((li) => ({ label: screenTxt(li.querySelector('.mk')), value: screenTxt(li.querySelector('.num')) })),
+    text: [...(card?.querySelectorAll('.body h3, .body p, .body dd, .body dt') ?? [])].filter(screenSeen).map(screenTxt).filter(Boolean),
+    choices: [...(card?.querySelectorAll('.choices button.choice') ?? [])].map((b) => ({ label: screenTxt(b.querySelector(':scope > span:not(.fx)')?.firstChild), enabled: !b.disabled })),
+    sheetOpen: !!root.querySelector('.sheet'),
+  });
+};
 
 boot();
 notesBoot();

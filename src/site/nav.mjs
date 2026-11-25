@@ -10,16 +10,15 @@ export const NAV_MENU = [
   // หน้าโฟกัสไม่มีป้ายของตัวเอง (เจ้าของเคาะ) เข้าจากลิงก์ในหน้าวิธีเล่น
   ['guide.html', 'วิธีเล่น', null, ['focus.html']],
   ['whatsnew.html', 'แพตช์โน้ต'],
-  ['about.html', 'กลไกในเกม'],
-  // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" · หน้าต่างโลกยังอยู่ (ลิงก์จากหน้าโลก) และนับเป็นหัวนี้ตอนเปิดอยู่
-  ['worlds.html', 'โลก', null, ['otherworld.html']],
+  // เจ้าของรวมสองหน้าเป็นหัวเดียว "โลก" (ui-redo 42) · otherworld.html เป็นหน้าส่งต่อ ไม่มีแถบ
+  ['worlds.html', 'โลก'],
   ['catalog.html', 'การ์ดทั้งหมด'],
   ['dev/index.html', 'ห้องผู้พัฒนา'],
 ];
 
 // เส้นใต้เหลือไว้ให้ hover/focus — หน้าปัจจุบันแยกด้วยสีกับน้ำหนัก
 // 390: ลิงก์กลางล้นแถบ ⇒ เงาจางขอบขวาบอกว่าเลื่อนได้ · nav.top a รีเซ็ตกล่องเอง เพราะบางหน้ามีกฎ a.<ชื่อ> ของตัวเอง (otherworld: a.play)
-// T2 (ui-redo 105 · ข้อ 218): แถบกับหัวหน้า (header ชื่อหน้า + คำโปรย) เป็นก้อนครามเดียว เตี้ย ไม่มีลาย — header แบบเดียวทุกหน้า หน้าแรกใช้ header.home ของตัวเอง
+// T2 (ui-redo 105 · ข้อ 218): แถบกับหัวหน้า (header ชื่อหน้า + คำโปรย) เป็นก้อนครามเดียว เตี้ย ไม่มีลาย — หน้าแรกใช้ header.home ของตัวเอง · CSS ของ header อยู่ที่ docs-layout.mjs (HEAD_CSS)
 // ลิงก์ในเนื้อขีดเส้นใต้เสมอ (คราม = ตัวหนังสือ แยกด้วยสีไม่ได้) · ลิงก์ที่มี class เป็นปุ่ม/เมนูของหน้า ดูแลกรอบเอง
 // ตัวแถบแยกจากกฎของหน้า ⇒ ห้องผู้พัฒนาหยิบแถบไปใช้ได้โดย header กับลิงก์ในเนื้อของหน้านั้นคงเดิม
 const NAV_BAR_CSS = `  nav.top { display: flex; align-items: center; gap: 4px; background: var(--head); border-bottom: 0; padding: 0 12px; font-family: var(--fb); line-height: normal; }
@@ -36,11 +35,7 @@ const NAV_BAR_MASK = `  @media (max-width: 760px) { nav.top .links { -webkit-mas
 `;
 export const NAV_CSS = `
   ${SITE_ROOT}
-${NAV_BAR_CSS}  body > header:not(.home) { background: var(--head); color: var(--title); padding: 16px 16px 18px; }
-  body > header:not(.home) h1 { font-family: var(--fh); font-weight: 600; color: var(--title); }
-  body > header:not(.home) p { color: var(--on-head2); }
-  body > header:not(.home) a { color: var(--headink); text-decoration: underline; text-underline-offset: 3px; }
-  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
+${NAV_BAR_CSS}  main :is(p, li, td, dd, figcaption, blockquote) a:not([class]) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--accent2); }
 ${NAV_BAR_MASK}`;
 
 // 390: ลิงก์หน้าปัจจุบันอาจอยู่นอกส่วนที่เห็นของแถบที่ล้น ⇒ ตั้ง scrollLeft ของแถบเอง (scrollIntoView เลื่อนทั้งหน้าแนวตั้งด้วย) · ไม่มี JS แถบยังใช้ได้เหมือนเดิม
@@ -78,11 +73,10 @@ export function navBlocks(html) {
   return { css: pick(NAV_CSS_START, NAV_CSS_END), nav: pick(NAV_START, NAV_END), count: html.split(NAV_START).length - 1 };
 }
 
-// แถบห้องผู้พัฒนา = แถบเว็บ nav.top + แท็บ 7 ป้าย (ข้อ 292 293): หน้าที่ build สร้างใต้ dev/ เรียก devNavHtml · หน้าเขียนมือ (DEV_NAV_PAGES) build เขียนทับระหว่าง marker
+// แถบห้องผู้พัฒนา = แถบเว็บ nav.top + แท็บ DEV_TABS (ข้อ 292 293): หน้าที่ build สร้างใต้ dev/ เรียก devNavHtml · หน้าเขียนมือ (DEV_NAV_PAGES) build เขียนทับระหว่าง marker
 export const DEV_TABS = [
   ['dev/index.html', 'สารบัญ'],
   ['dev/spec.html', 'ภาคผนวกสเปก'],
-  ['dev/plan.html', 'สเปก/แผน'],
   ['dev/design.html', 'คำตัดสินเกม'],
   ['dev/ui.html', 'การออกแบบ'],
   ['dev/maps/continent.html', 'แผนที่'],
@@ -100,7 +94,7 @@ export const DEV_MAPS = [
   ['politics', 'การเมือง', 'ผังบันไดการเมือง'],
 ];
 export const mapsMoved = ([id, , title]) => movedHtml(`dev/maps/${id}.html`, `${DEV_MAPS_PAGE}#${id}`, title);
-export const DEV_NAV_PAGES = ['dev/index.html', 'dev/plan.html', 'dev/spec.html', DEV_MAPS_PAGE];
+export const DEV_NAV_PAGES = ['dev/index.html', 'dev/spec.html', DEV_MAPS_PAGE];
 export const DEV_NAV_START = '<!--nav-->';
 export const DEV_NAV_END = '<!--/nav-->';
 // แผนที่ไม่ได้ใช้ชุดสีกลาง และแต่ละหน้ามีตัวแปรชื่อซ้ำของตัวเอง ⇒ ตั้งสีเฉพาะที่แถบ
@@ -137,8 +131,10 @@ export function injectDevNav(html, file) {
 // หน้าส่งต่อของ URL ที่ย้ายไป (GitHub Pages ไม่มี redirect ฝั่งเซิร์ฟเวอร์) — noindex ไม่ใช้ canonical (คำตัดสินเจ้าของ) · พก #ส่วนในหน้าไปด้วย เว้นปลายทางระบุหัวไว้แล้ว (หน้าที่ย้ายมาเป็นหัวในหน้าอื่น)
 // from/to = path ใต้ docs/ · build เขียนทุกรอบ จึงไม่หายเมื่อ build ซ้ำ · MOVED_MARK ให้ build/ด่านแยกหน้าส่งต่อออกจากหน้าค้าง
 export const MOVED_MARK = '<meta name="next-life-moved"';
-export function movedHtml(from, to, title) {
-  const href = '../'.repeat(from.split('/').length - 1) + to;
+// carry: to มี # = ค่าเริ่มเมื่อลิงก์เก่าไม่มี # · ลิงก์เก่าที่พก # ไปที่ id เดียวกันในหน้าใหม่ (otherworld.html#entry → worlds.html#entry)
+export function movedHtml(from, to, title, carry = false) {
+  const up = '../'.repeat(from.split('/').length - 1);
+  const href = up + to;
   title = title.replace(/&/g, '&amp;').replace(/</g, '&lt;');
   return `<!doctype html>
 <html lang="th">
@@ -149,7 +145,7 @@ export function movedHtml(from, to, title) {
 ${MOVED_MARK} content="${to}">
 <meta http-equiv="refresh" content="0; url=${href}">
 <title>ย้ายแล้ว · ${title}</title>
-<script>location.replace(${JSON.stringify(href)}${to.includes('#') ? '' : ' + location.hash'})</script>
+<script>location.replace(${carry ? `${JSON.stringify(up + to.split('#')[0])} + (location.hash || ${JSON.stringify('#' + to.split('#')[1])})` : `${JSON.stringify(href)}${to.includes('#') ? '' : ' + location.hash'}`})</script>
 </head>
 <body style="font-family:Sarabun,sans-serif;padding:24px">
 <p>หน้านี้ย้ายไปแล้ว — <a href="${href}">${title}</a></p>

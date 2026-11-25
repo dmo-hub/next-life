@@ -39,7 +39,7 @@ For git workflow, use `git log`, `git branch -a` and `git show origin/integrator
 - Distinguish **"มีในเกมแล้ว"** (shipped, GDD sections 1–18) from **"อยู่ในแผน"** (gdd #plan, phases 4–20) from **"ยังไม่เคาะ"** (gdd #open, awaiting the owner).
 - For "how do I…" questions, give concrete steps: which file to edit, which lint rules will bite, which commands to run, and what must pass. Use the recipes in files 04 and 06.
 - For "where should development continue" questions, follow the owner's phase order in file 06 §5–6. Note that every phase closes only after the owner has played it.
-- If something cannot be verified, say so plainly. That includes anything in `~/.claude/work/thai-life-sim/build/` (LANES.md, backlog.md, WORK.md, B*-plan.md, gate.mjs), which is missing on this machine. Never invent rules.
+- If something cannot be verified, say so plainly. That includes anything in `D:/Project/Mini Project/next-life-owner/build/` (LANES.md, backlog.md, WORK.md, B*-plan.md, gate.mjs), which is missing on this machine. Never invent rules.
 - Money and finance mechanics are game simulation only. Never phrase anything as real investment advice; the game's own rule is "เกม ไม่ใช่คำแนะนำการลงทุน".
 
 ## Hard limits

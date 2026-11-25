@@ -4,13 +4,15 @@
 events:
   # ← debt_student_loan_01 "กู้มา แบ่งไปซื้อมือถือใหม่"
   - id: echo_debt_payroll_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว สลิปเงินเดือนและแผนกของลูกจ้าง"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
     years: [2539, 2650]
     systems: [student_loan]
     lore_ref: lore-finance-series.html#6
-    when: {occupation: [clerk, professional, manager, factory, technician, service, officer, senior_officer]}
+    when: {occupation: [clerk, professional, manager, factory, technician, service, officer, senior_officer], flags: {not: [own_business]}}
     title: "บรรทัดใหม่ในสลิป"
     text: "สลิปเงินเดือนเดือนนี้มีบรรทัดใหม่ หักชำระกยศ. ผ่านนายจ้าง ฝ่ายบุคคลส่งรายชื่อเข้ากลุ่มแผนกผิดห้อง ทั้งแผนกรู้กันก่อนเที่ยงว่าใครยังค้างหนี้สมัยเรียน ทั้งที่มือถือเครื่องนั้นพังไปนานแล้ว"
     choices:
@@ -37,6 +39,7 @@ events:
 
   # ← debt_student_loan_01 "ทำงานพิเศษส่งตัวเอง"
   - id: echo_debt_old_boss_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -46,7 +49,7 @@ events:
     choices:
       - id: join_share
         text: "ลงขันด้วย"
-        gate: business
+        gate: mo5
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, multipliers: {stats: {network: 1.4}}, text: "สาขาสองคืนทุนในสองปี ได้ปันผลทุกสิ้นปี", effects: {money: {unit: income_x, amount: -1}, income_mult: 1.3, happiness: 1}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -61,7 +64,7 @@ events:
         merit: [{cat: neutral}]
       - id: quit_and_run
         text: "ลาออกจากงานประจำมาคุมร้านเต็มตัว"
-        gate: business
+        gate: mo5
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, multipliers: {stats: {knowledge: 1.3}}, text: "คุมร้านเองจนยอดขึ้นสองเท่า เจ้าของเดิมยกส่วนแบ่งก้อนใหญ่ให้", effects: {income_mult: 1.5, happiness: 2}, sets_flags: [own_business], merit: [{cat: neutral}]}
@@ -69,6 +72,7 @@ events:
 
   # ← debt_guarantor_ask_01 "ปฏิเสธแบบนุ่ม ๆ"
   - id: echo_debt_unsigned_friend_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -99,6 +103,7 @@ events:
 
   # ← debt_car_buy_01 "ออกรถให้พ่อแม่ใช้ที่บ้าน"
   - id: echo_debt_old_car_01
+    away_block: [abroad]
     type: A
     category: family
     stage: กลางคน
@@ -133,6 +138,7 @@ events:
 
   # ← debt_cash_short_01 "ลงวงไพ่ หวังพลิกคืนเดียว"
   - id: echo_debt_card_table_01
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -165,6 +171,8 @@ events:
 
   # ← debt_refinance_01 "แต่งสลิปเงินเดือนกู้เพิ่ม" (ผ่านฉลุย)
   - id: echo_debt_slip_audit_01
+    when: {occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -197,6 +205,7 @@ events:
 
   # ← debt_friend_reunion_01 "ยกหนี้ให้ จบกันแค่นี้"
   - id: echo_debt_forgiven_back_01
+    office_ok: "บริษัทของเพื่อนที่เคยยกหนี้ให้ ผู้เล่นไปทำงานด้วย ไม่ใช่ที่ทำงานเดิม"
     type: A
     category: society
     stage: ทำงาน

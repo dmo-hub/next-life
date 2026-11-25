@@ -8,6 +8,11 @@ import { loadContent } from '../src/node/load.mjs';
 import { BOTS, isekaiBot } from './bots.mjs';
 import { contDeckWrong } from './continent.mjs';
 
+// ล็อก DLC (NL_DLC=locked): ด่านนี้พาผู้เล่นเข้าต่างโลก/ซ้อนทับโดยตั้งใจ ล็อกแล้วทำไม่ได้ — รายงานแทนด้วยด่าน dlc (ชีวิตเข้าต่างโลก = 0 · ค่าซ้อนทับ = 0)
+if (process.env.NL_DLC === 'locked') {
+  process.argv.splice(2);
+  await import('./dlc.mjs');
+}
 const args = process.argv.slice(2);
 const opt = (name, def) => {
   const i = args.indexOf(`--${name}`);

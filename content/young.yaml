@@ -2,6 +2,8 @@
 # ใช้ธงวัยต้น: good_student (ทุน/ไปนอก) · likes_clips (อินฟลูฯ) · bullied (หัวหน้าเอาเปรียบ/ปาร์ตี้) · sporty (ไปนอก) · school_record (ทุนยากขึ้น)
 events:
   - id: young_scholarship_01
+    office_ok: "บริษัทที่รุ่นพี่ชวนไปทำ ไม่ใช่ที่ทำงานของผู้เล่น"
+    away_block: [abroad]
     type: A
     category: study
     stage: หนุ่มสาว
@@ -38,13 +40,14 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_first_boss_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 2
     multipliers: {flags: {bullied: 2}, occupation: {clerk: 1.5}}
-    when: {age: [21, 28], occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
+    when: {age: [21, 28], occupation: [clerk, technician, professional, manager], ladder: [none, private], flags: {not: [own_business]}}
     title: "หัวหน้าขโมยผลงาน"
     text: "งานแรกปีแรก หัวหน้าโยนงานให้จนดึกทุกคืน แล้วเช้าวันประชุมก็เอาผลงานของคุณขึ้นพรีเซนต์ต่อหน้าผู้บริหารเป็นของตัวเองหน้าตาเฉย"
     choices:
@@ -72,6 +75,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_wedding_01
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -118,6 +122,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_baby_01
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -158,6 +163,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_loan_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -198,6 +204,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_shop_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -210,21 +217,21 @@ events:
     choices:
       - id: cafe
         text: "กู้มาเปิดร้านกาแฟตามฝัน"
-        gate: business
+        gate: mo5
         outcomes:
           - {weight: 2, ok: true, text: "คนต่อคิวยาวถึงหน้าร้าน กลายเป็นร้านดังของย่าน", multipliers: {stats: {network: 1.4}}, effects: {happiness: 2, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], next: young_shop_rush_01, merit: [{cat: neutral}]}
           - {weight: 2, text: "ขายได้วันละสิบแก้ว ค่าเช่ากินเงินเก็บหมด ต้องปิดร้านกลับไปทำงานเดิม", effects: {happiness: -2, debt: {kind: bank_loan, amount: {unit: income_x, amount: 2}}, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: chicken_rice
         text: "เปิดร้านข้าวมันไก่สูตรแม่"
-        gate: business
+        gate: mo5
         outcomes:
           - {weight: 3, ok: true, multipliers: {stats: {health: 1.3}}, text: "อร่อยจนคนบอกกันปากต่อปาก", effects: {relations: 1, job: service, money: {unit: income_x, amount: 1}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "ขายดีแต่ยืนหน้าเตาจนหลังพัง ต้องเซ้งร้านกลับไปทำงานเดิม", effects: {health: -2, money: {unit: income_x, amount: 0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: partner
         text: "ชวนเพื่อนลงขันกันคนละครึ่ง"
-        gate: business
+        gate: mo5
         outcomes:
           - {weight: 1, ok: true, text: "ช่วยกันจนรุ่ง เปิดสาขาสองในปีเดียว", multipliers: {stats: {relations: 2}}, effects: {relations: 1, job: service, money: {unit: income_x, amount: 1.5}}, sets_flags: [own_business], merit: [{cat: neutral}]}
           - {weight: 1, text: "เช้าวันหนึ่งเพื่อนหอบเงินในลิ้นชักหายไปทั้งหมด", effects: {relations: -2, money: {unit: income_x, amount: -2}}, merit: [{cat: neutral}]}
@@ -245,7 +252,7 @@ events:
         merit: [{cat: neutral}]
       - id: chicken_rice_rite
         text: "เปิดร้านข้าวมันไก่ตามฤกษ์"
-        gate: business
+        gate: mo5
         cost: {unit: fixed_baht, amount: 2000, ref_year: 2566}
         effects: {happiness: 1, relations: 1}
         outcomes:
@@ -254,6 +261,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_party_01
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -293,6 +301,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_influencer_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -331,6 +340,8 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_abroad_01
+    office_ok: "เงินเดือนของงานต่างประเทศที่นายหน้าเสนอ ไม่ใช่ที่ทำงานเดิม"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -373,11 +384,12 @@ events:
         merit: [{cat: neutral}]
 
   - id: young_boss_room_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private, trade]}
+    when: {occupation: [clerk, technician, professional, manager], ladder: [none, private], flags: {not: [own_business]}}
     title: "แฟ้มลับในห้องผู้บริหาร"
     text: "ผู้บริหารปิดประตูแล้ววางแฟ้มลงตรงหน้า ข้างในคือใบเบิกปลอมที่หัวหน้าเซ็นมาสองปีเต็ม เขาถามเรียบ ๆ ว่าเรื่องนี้คุณอยากให้จบแบบไหน"
     choices:
@@ -408,6 +420,7 @@ events:
 
   # เรื่องต่อของ young_shop_01 (ร้านกาแฟดัง) — ออกทาง next เท่านั้น
   - id: young_shop_rush_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -441,6 +454,8 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ young_wedding_01 (กู้จ่ายสินสอด) — ออกทาง next เท่านั้น
   - id: young_dowry_debt_01
+    office_ok: "เงินเดือนเป็นตัวเทียบเวลาที่ใบแจ้งหนี้ค่าสินสอดมาถึง"
+    away_block: [abroad, monk]
     type: A
     category: family
     stage: หนุ่มสาว
@@ -470,6 +485,7 @@ events:
         merit: [{cat: neutral}]
   # เรื่องต่อ young_influencer_01 (ลาออกทำคอนเทนต์ กระแสหมด) — ออกทาง next เท่านั้น
   - id: young_influencer_fade_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว

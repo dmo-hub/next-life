@@ -125,6 +125,36 @@ export function causeHazards(st, py, age, k) {
   return era.causes.keys.map((key, j) => base * k * s[j] * (riskOf(st, key) / normOf(era, st.sex, key, b)));
 }
 
+// ใบ 190 (decisions 319 324 328 337): ตารางชีพไม่ฆ่าตรงแล้ว — ตายเมื่อหลอดสุขภาพหมดเท่านั้น
+// เหตุเฉียบพลัน/อุบัติเหตุ = เกิดเหตุแล้วกดหลอด hit = เส้นธรรมชาติ × สุ่ม lo–hi · hit ≥ หลอดที่เหลือ = ตาย ไม่ถึง = รอดเป็นแผล
+// โอกาสเกิดเหตุ = ส่วนของ qx ÷ โอกาสที่เหตุหนึ่งครั้งฆ่าคนบนเส้นธรรมชาติ ⇒ คนบนเส้นตายเท่าตารางเดิม · หลอดสูงกว่าเส้นรอดง่ายกว่าเอง
+// แทนตัวคูณสุขภาพเดิม (1−d/50) ที่ทำให้คนรอดเหตุเสี่ยงสูงตลอดชีวิต — แผลฟื้นคืนทีละปี (heal = สัดส่วนของแผลที่คืนต่อปี)
+// ส่วนเกินเส้นจางเอง excessFade ต่อปี · ส่วนขาดจากเหตุอื่น (การ์ด) ฟื้นเอง mend ต่อปี (decisions 398)
+// สองค่าต้องเท่ากัน — จางแต่ไม่ฟื้น หลอดของคนไม่ดูแลตัวไหลต่ำกว่าเส้นทั้งชีวิต อายุตายเฉลี่ยต่ำกว่าตารางหลายปี · ขนาดกดสุ่มจาก stream แยก (salt) ไม่ดึง st.rng/causeRng
+export const HIT = { lo: 0.1, hi: 1.5, heal: 0.5, excessFade: 0.05, mend: 0.05, salt: 0x2545f491 };
+export const HIT_KILL = (HIT.hi - 1) / (HIT.hi - HIT.lo);
+// สาเหตุที่มาแบบเหตุครั้งเดียว · other (แก่) ไม่ทอยแล้ว เป็นหลอดลดเงียบแทน (frailOf) · โรคเรื้อรังนัดล่วงหน้าตามเดิม
+export const isAcute = (key) => key !== 'other' && !CHRONIC.includes(key);
+// ส่วนของเส้นธรรมชาติที่หลอดหายไปกับความแก่ — ขนาดที่ทำให้เหตุเฉียบพลันฆ่าเพิ่มเท่าส่วน other ของตารางพอดี
+// เหตุที่ฆ่าเพราะส่วนนี้ (ถ้าไม่แก่จะรอด) นับสาเหตุเป็น other ⇒ ทั้งอัตราตายและสัดส่วนสาเหตุยังตรงข้อมูล
+// คิดจากสัดส่วนของประชากร ไม่ผ่านปัจจัยเสี่ยงรายคน — หลอดส่วนแก่ไม่ฟื้น ถ้าใช้ค่ารายคน ปีที่เสี่ยงเฉียบพลันลดลงชั่วคราว
+// (เลิกงานเสี่ยง ฯลฯ) other/acute พุ่งแล้วค้างทั้งชีวิต ⇒ หลอดต่ำเกินเส้นตั้งแต่วัยกลางคน
+// สัดส่วนรายปีปฏิทินแกว่งแรง (ปีเดียวกระโดด 3–5 เท่า) — ค่าไม่ลดจึงต้องเฉลี่ยหน้าต่างย้อนหลังก่อน ไม่งั้นเก็บยอดแหลมไว้
+export const FRAIL_WINDOW = 5;
+export function frailOf(st, year, age) {
+  const era = st.content.era;
+  const keys = era.causes.keys;
+  const oj = keys.indexOf('other');
+  let acute = 0;
+  let other = 0;
+  for (let k = 0; k < FRAIL_WINDOW && age - k >= 0; k++) {
+    const s = causeShares(era, st.sex, protoYear(era, st.seed, year - k), age - k);
+    acute += s.reduce((sum, x, j) => sum + (isAcute(keys[j]) ? x : 0), 0);
+    other += s[oj] ?? 0;
+  }
+  return acute > 0 ? Math.min(1, ((HIT.hi - 1) * other) / acute) : 0;
+}
+
 // สุ่มสาเหตุตามน้ำหนัก · เฉพาะดัชนีที่ allow ยอม (ไม่ใส่ = ทุกตัว)
 export function pickCause(rng, keys, w, allow = null) {
   let sum = 0;

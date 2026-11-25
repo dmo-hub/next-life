@@ -1,8 +1,10 @@
 # โลกซ้อนทับขั้นเบา (ขั้น 1): ข่าวลือ ลางแปลก ที่มีแต่ตัวเราเห็น — โลกยังปกติในสายตาคนอื่น
 # ออกเฉพาะตระกูลที่ค่าซ้อนทับถึงขั้น 1–2 · ขั้น 3 เปิดเผยทั้งสังคมแล้วข่าวลือไม่ใช่ข่าวลืออีก · ไม่ติดบุญบาป ไม่ใส่ธง
+# ผีทั่วไปออกขั้น 1 ขึ้นไป (ม่านบางแล้วเห็นต่อ) · ไม่มีชื่อ ไม่มีเรื่องค้างให้ทวง ต่างจากผีญาติ · ทำบุญอุทิศเป็นทานจริง ทางอื่นไม่ผูกบุญบาป
 # id ขึ้นต้น overlap_ ไม่ใส่ weight — แกนนัดตามโควตาของขั้น (overlapPlan) ใส่ weight = ออกซ้ำทางกองสุ่มเกินโควตา
 events:
   - id: overlap_rumor_01
+    away_block: [abroad]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -31,6 +33,8 @@ events:
   # ขั้น 3 เกตเปิดทั้งสังคม: ประกาศรับสมัครนักล่า ทางเดียวที่เข้าสาย hunter (สายนี้ไม่มี occs คนทำงานบริการจึงไม่ถูกจับเข้าเอง)
   # กั้น ladder ไว้ที่คนนอกสายบำนาญ — ข้าราชการ/ทหาร/ตำรวจได้การ์ดดันเจียนตามอาชีพแทน ไม่ลาออกมาสมัคร
   - id: overlap_hunter_recruit_01
+    office_ok: "เงินเดือนประจำของทีมล่าที่รับสมัคร ไม่ใช่ที่ทำงานเดิม"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -57,3 +61,117 @@ events:
         text: "ทำงานเดิมต่อ ปล่อยให้คนอื่นล่า"
         merit: [{cat: neutral}]
         effects: {}
+
+  # ผีทั่วไป (ใบ 25) ออกทางตารางนัดตามโควตาขั้นเหมือนการ์ด overlap_ ใบอื่น — ขั้น 1 แชร์ 1 ใบกับข่าวลือ
+  # จบที่ขั้น 2: ผีอยู่ใน pool ขั้น 3 แล้วแย่งช่องนัดกับใบเข้าดันเจียน ทำให้นักล่าได้เข้าเกตน้อยลง (เจ้าของเคาะ ไม่ให้ผีออกขั้น 3–4)
+  - id: overlap_ghost_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {overlap_stage: [1, 2]}
+    title: "เงาใต้ต้นไม้ริมทาง"
+    text: "ดึกคืนหนึ่งระหว่างเดินกลับบ้าน คุณเห็นคนยืนนิ่งใต้ต้นไม้ริมทาง หน้าซีด ไม่เอ่ยชื่อ ไม่ขออะไร แค่มองมาเงียบ ๆ คนที่เดินสวนมากลับเดินทะลุผ่านไปเหมือนตรงนั้นไม่มีใคร"
+    choices:
+      - id: make_merit
+        text: "ทำบุญอุทิศให้"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: flee
+        text: "รีบหนีกลับบ้าน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: stand_still
+        text: "ยืนนิ่งจนมันหายไป"
+        effects: {health: -1}
+        merit: [{cat: neutral}]
+      - id: tell_others
+        text: "เล่าให้คนอื่นฟัง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+
+  # ผีญาติ (ใบ 26): คนตายที่ตระกูลจำ (deadKin) ไม่ใช่ผีทั่วไปแบบ overlap_ghost_ — มีชื่อ มีเรื่องค้าง
+  # ไม่ขึ้นต้น overlap_ ⇒ ไม่เข้าตารางนัดของขั้น (overlapPlan) ไม่แย่งช่องข่าวลือ/ผีทั่วไป · ออกทางกองสุ่มเมื่อมีรายชื่อญาติตายเท่านั้น (when.kin_ghost)
+  # สีหน้าตามสาเหตุตายกับ bond ของคนที่ถูกเลือก (family.mjs pickKinGhost): ตายผิดธรรมชาติหรือ bond ต่ำ = ทวง · ตายธรรมดาและ bond สูง = เตือน/ช่วย · ไม่เอ่ยสาเหตุตายบนการ์ด
+  # ขั้น 1–2 เหมือนผีทั่วไป (เจ้าของเคาะ ไม่ให้ผีออกขั้น 3–4) · ไม่ใส่ธง ไม่ผูกบุญบาปนอกจากทานที่ทำจริง
+  - id: kinghost_haunt_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {overlap_stage: [1, 2], kin_ghost: [haunt], age: [18, 70]}
+    title: "{ผีญาติบทบาท}มายืนหน้าห้อง"
+    text: "ดึกคืนหนึ่งมีคนยืนนิ่งอยู่หน้าประตูห้อง คุณจำได้ทันทีว่าเป็น{ผีญาติบทบาท}{ผีญาติ} ที่จากไปนานแล้ว ท่าทางไม่ได้มาเยี่ยม แต่เหมือนมาทวงอะไรที่ยังค้างกันอยู่ ไม่เอ่ยปาก แค่ยืนมองจนไก่ขัน"
+    choices:
+      - id: make_merit
+        text: "ตั้งใจทำบุญอุทิศให้"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_what
+        text: "ถามว่ายังค้างอะไรอยู่"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: apologize
+        text: "กราบขอขมาที่ยังไม่ได้ทำให้"
+        effects: {relations: 1}
+        merit: [{cat: bhavana, level: 1}]
+      - id: flee
+        text: "เปิดไฟทุกดวงแล้วคลุมโปง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: kinghost_warn_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    when: {overlap_stage: [1, 2], kin_ghost: [warn], age: [18, 70]}
+    title: "ฝันถึง{ผีญาติบทบาท}"
+    text: "คืนนี้คุณฝันเห็น{ผีญาติบทบาท}{ผีญาติ} ยืนอยู่ปลายเตียงเหมือนตอนยังอยู่ ไม่พูดอะไร ชี้ไปที่ประตูบ้านทีเดียว แล้วจางไป พอตื่นมาในห้องมีกลิ่นธูปอ่อน ๆ ทั้งที่ไม่มีใครจุด"
+    choices:
+      - id: check_house
+        text: "เดินตรวจบ้านทุกมุม"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: tell_family
+        text: "เล่าให้คนในบ้านฟัง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: make_merit
+        text: "ใส่บาตรอุทิศให้เช้านี้"
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: shrug
+        text: "คิดว่าฝันไปเอง"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ขั้น 2 (ผีคนจริงชาติก่อน ยังเป็นความลับ): ผีคือแถวชาติไทยล่าสุดในผังตระกูล = ชาติก่อนของตัวเราเอง
+  # เล่าเรื่อง/เตือนเท่านั้น ป้าย neutral ล้วน (lint merit-ancestor) · ทวง/ขอส่วนบุญเป็นของผีญาติตาย ไม่ใช่ใบนี้
+  - id: overlap_ancestor_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {overlap_stage: [2, 2], ancestor: true}
+    title: "คนในผังตระกูล"
+    text: "คืนหนึ่งมี{บรรพบุรุษ}ยืนนิ่งอยู่ปลายเตียง บอกว่าชื่อ{ชื่อบรรพบุรุษ} เคยอยู่{จังหวัดบรรพบุรุษ} จากไปตอนอายุ {อายุตายบรรพบุรุษ} ไม่ได้มาขออะไร มาเตือนแค่ว่าม่านระหว่างโลกขาดแล้ว อย่าข้ามไปมาบ่อยนัก แปลกที่เสียงนั้นคุ้นหูเหมือนเสียงตัวเอง"
+    choices:
+      - id: ask_name
+        text: "ถามชื่อซ้ำให้แน่ใจ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: heed
+        text: "รับคำเตือนไว้ในใจ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: look_away
+        text: "หลับตา ทำเป็นไม่เห็น"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: tell_home
+        text: "เล่าให้คนในบ้านฟัง"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]

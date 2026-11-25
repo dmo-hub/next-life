@@ -2,7 +2,7 @@
 // ทุกตัวเลือกจากตัวเลือกที่กดได้ (openChoices) · ตัดสินจากป้ายบนการ์ด (card.fx) ที่ผู้เล่นเห็นเท่านั้น
 // ข้อยกเว้นเดียว: สายบุญ/บาปอ่านป้ายบุญบาปของตัวเลือก (holder.pending · ต่างโลกอ่าน ISEKAI_MERIT ของการ์ด) แทนการอ่านความหมายของข้อความแบบที่คนทำ — ไม่อ่านบัญชี
 // เสมอกันสุ่มจาก stream ของบอท · holder = st (การ์ดชีวิต) หรือ af (การ์ดระหว่างชาติ)
-import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, STAT_KEYS, makeRng, mixSeed, stageOf, lifeFocusOffers, lifeFocusDefs, setLifeFocus, lifeTreeDefs, treeOffersNow, treeInvestNode, FOCUS_FLOW, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
+import { openChoices, meritId, MERIT_WEIGHTS, MERIT_LEVELS, SIN_CATS, FLAG_CATS, STAT_LABELS, makeRng, mixSeed, lifeTreeDefs, lifeTreeStart, treeOffersNow, treeInvestNode, ISEKAI_FX, ISEKAI_LINK, ISEKAI_MERIT } from '../src/engine/index.mjs';
 
 export const random = (card, rng) => {
   const open = openChoices(card);
@@ -103,43 +103,8 @@ const stillness = (card) => (i) => {
 export const passive = (card, rng, h) => (h.pending?.alloc || !card.fx ? random(card, rng) : best(card, rng, stillness(card)));
 
 
-// นโยบายโฟกัสของบอท (โฟกัสใบ 04): ราว 1/3 ใช้ชีวิตตามน้ำทั้งชีวิต · ที่เหลือเลือกโฟกัสที่ดันค่าเด่นของตัวเองขึ้น ทบทวนเมื่อขึ้นช่วงวัยใหม่หรือโฟกัสเดิมปิด
-// ไม่มีนโยบายนี้ บอทไม่เคยโฟกัส ⇒ ประตูเข้าสายปิดตลอด ด่านที่วัดสายการเมือง/ธุรกิจ/บวชจะเหลือแค่ชีวิตที่ถูกชวน
-// สุ่มจาก stream ของ seed ชีวิต (แยกจากบอทเลือกตัวเลือกและ rng ของโลก) — WeakMap ต่อชีวิต จึงไม่เขียนอะไรลง state
-export const FOCUS_FLOW_SHARE = 1 / 3;
-const FOCUS_SALT = 0x3c6ef372;
-const focusMemo = new WeakMap();
-// ทางดูแลสุขภาพ (decisions 335): บอทสุ่มที่ด่าน 3b ใช้ไม่แตะ ⇒ อายุตายของคนทั่วไปยังเทียบตารางชีพได้ · บอทสายสุขภาพถือตลอด วัดว่ายืดได้แค่ไหน
-// ทางสุขภาพนอกโฟกัส (ของในตลาด · ปุ่มหาหมอ) อ่าน bot.health ('avoid' | 'seek') ตัดสินแทนบอทชุดเดียวกัน
-// NL_BOT_HEALTH=keep = ตัวควบคุม: บอทสุ่มกลับมาเลือกโฟกัสสุขภาพได้แบบเดิม (อายุเฉลี่ยด่าน 3b ต้องขยับ)
-export const HEALTH_FOCUS = ['health_care', 'rest_travel'];
-const keepHealth = process.env.NL_BOT_HEALTH === 'keep';
-// key = ค่าเด่นที่บอทตัวนั้นดัน (ไม่ส่ง = ค่าสถานะที่สูงสุดตอนนั้น) · บอทสายเงินดันเงิน — ไม่งั้นโฟกัสที่ผลมีแต่เงิน (ทำธุรกิจ · ทางลัด) ไม่มีบอทไหนเลือก
-// ประตูธุรกิจ/ทางลัดจึงไม่เคยเปิด ตัวเลือกหลังประตูกับการ์ดตามมาไม่มีใครถึงเลยในด่าน full
-export function botFocus(st, key, health) {
-  let m = focusMemo.get(st);
-  if (!m) {
-    const rng = makeRng(mixSeed(st.seed ^ FOCUS_SALT, st.gen ?? 1));
-    // สายสุขภาพไม่ตามน้ำ — ดึงเลขเดิมไว้ให้ stream ตรงกับบอทอื่น
-    m = { rng, flow: rng.next() < FOCUS_FLOW_SHARE && health !== 'seek', stage: null };
-    focusMemo.set(st, m);
-  }
-  if (m.flow) return;
-  const all = lifeFocusOffers(st).filter((id) => id !== FOCUS_FLOW);
-  const offers = health === 'avoid' && !keepHealth ? all.filter((id) => !HEALTH_FOCUS.includes(id)) : all;
-  const s = stageOf(st.age);
-  if (s === m.stage && (!st.focus || offers.includes(st.focus))) return;
-  m.stage = s;
-  if (!offers.length) return;
-  const defs = lifeFocusDefs(st);
-  const top = key ?? STAT_KEYS.reduce((a, k) => (st[k] > st[a] ? k : a));
-  const care = health === 'seek' ? HEALTH_FOCUS.filter((id) => offers.includes(id)) : [];
-  const fit = care.length ? care.slice(0, 1) : offers.filter((id) => defs[id].fx?.[top] > 0);
-  const from = fit.length ? fit : offers;
-  setLifeFocus(st, from[Math.floor(m.rng.next() * from.length)]);
-}
-export const botFlows = (st) => !!focusMemo.get(st)?.flow;
-const withFocus = (bot, key, health) => Object.assign((...a) => bot(...a), bot, { focus: (st) => botFocus(st, key, health), ...(health && { health }) });
+// ทางดูแลสุขภาพนอกต้นไม้ (ของในตลาด · ปุ่มหาหมอ) อ่าน bot.health ('avoid' | 'seek') ตัดสินแทนบอทชุดเดียวกัน
+const withHealth = (bot, health) => Object.assign((...a) => bot(...a), bot, health && { health });
 
 const RAW_BOTS = {
   สุ่ม: random,
@@ -150,9 +115,13 @@ const RAW_BOTS = {
   สายครอบครัว: labelBot({ relations: 3, happiness: 1 }),
   สายสุขภาพ: labelBot({ health: 3, happiness: 1 }),
 };
-const FOCUS_KEY = { สายเงิน: 'money', สายสุขภาพ: 'health' };
 const HEALTH_WAY = { สุ่ม: 'avoid', สายสุขภาพ: 'seek' };
-export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withFocus(b, FOCUS_KEY[k], HEALTH_WAY[k])]));
+export const BOTS = Object.fromEntries(Object.entries(RAW_BOTS).map(([k, b]) => [k, withHealth(b, HEALTH_WAY[k])]));
+
+// นโยบายระดับใช้จ่าย (B29 · ใบ 52): สายเงินเก็บเงิน · สายสุขภาพเลือกความสุข — ไม่ผูกเข้า BOTS
+// ด่านที่วนบอททั้งชุดจึงได้ชีวิตเดิมทุกบิต · ด่านที่วัดระดับใช้จ่ายห่อบอทเองด้วย withSpend
+export const SPEND_WAY = { สายเงิน: 'frugal', สายสุขภาพ: 'luxury' };
+export const withSpend = (bot, level) => Object.assign((...a) => bot(...a), bot, { spend: () => level });
 
 // นโยบายต้นไม้ของบอท (ใบ 03 · ข้อ 85): ทุ่มโหนดเดียวทุกปีตลอดชีวิต ไม่มีตามน้ำ · เลือกโหนดตามโปรไฟล์แขนงเป้า ไม่ข้ามแขนงสุ่ม
 // โปรไฟล์ = ไล่ปลดให้ครบแขนงเป้า: เลือกโหนดที่เปิดอยู่ซึ่งมีโหนดลูกหลานในแขนงเยอะสุด (เสมอกันสุ่ม) · โหนดซ่อนบอทไม่แตะ
@@ -165,16 +134,38 @@ const descendants = (defs, id) => {
   walk(id);
   return seen.size;
 };
+// target = แขนงเดียว | รายการแขนง (โปรไฟล์คู่ ลงแขนงคู่เพื่อให้ถึงโหนดกลาง ข้อ 86) | 'start' (แขนงตามจุดเกิดของชีวิตนั้น ข้อ 97)
+// โหนดกลางเลือกได้เมื่อแม่ทุกตัวอยู่ในแขนงเป้า (ถึงโหนดกลางได้ต้องปลดแม่ครบอยู่แล้ว)
+const profile = (st, target) => (target === 'start' ? [lifeTreeStart(st)?.branch] : [].concat(target));
 export function botTree(st, target) {
   let rng = treeMemo.get(st);
   if (!rng) treeMemo.set(st, (rng = makeRng(mixSeed(st.seed ^ TREE_SALT, st.gen ?? 1))));
   const defs = lifeTreeDefs(st);
-  const offers = treeOffersNow(st).filter((id) => defs[id].branch === target && !defs[id].hidden);
+  const want = profile(st, target);
+  const offers = treeOffersNow(st).filter((id) => !defs[id].hidden && (want.includes(defs[id].branch) || (defs[id].and && defs[id].pre.every((p) => want.includes(defs[p].branch)))));
   if (st.tree?.cur && offers.includes(st.tree.cur)) return;
   if (!offers.length) return;
   const score = offers.map((id) => descendants(defs, id));
   const top = Math.max(...score);
   const from = offers.filter((_, i) => score[i] === top);
-  treeInvestNode(st, from[rng.int(0, from.length - 1)]);
+  const pick = from[rng.int(0, from.length - 1)];
+  treeInvestNode(st, pick, !!defs[pick].keystone);
 }
+// เลือกผลบนการ์ดด่าน (ใบ 05): สุ่มจาก stream ของ seed ชีวิตแยกจากบอทเลือกตัวเลือกและ rng ของโลก — การ์ดด่านออกเฉพาะชีวิตที่ทุ่มโหนดใหญ่ ชีวิตของบอทอื่นไม่ถูกแตะ
+const GATE_SALT = 0x2c1b3c6d;
+const gateMemo = new WeakMap();
+export function botGate(card, st) {
+  let rng = gateMemo.get(st);
+  if (!rng) gateMemo.set(st, (rng = makeRng(mixSeed(st.seed ^ GATE_SALT, st.gen ?? 1))));
+  const open = openChoices(card);
+  return open[rng.int(0, open.length - 1)];
+}
+export const withGate = (bot) => (card, rng, st) => (card.id?.startsWith('tree_gate_') ? botGate(card, st) : bot(card, rng, st));
 export const withTree = (bot, target) => Object.assign((...a) => bot(...a), bot, { tree: (st) => botTree(st, target) });
+
+// ทางฟื้นสุขภาพบนต้นไม้ (ใบ ft11 · ข้อ 36/96): บอทสายสุขภาพทุ่มโหนดแขนงทักษะ (s1–s7 ผลสุขภาพ) แทนโฟกัสสุขภาพที่ถอดแล้ว
+// ต้องผูกหลัง withTree/withGate ประกาศ · NL_BOT_HEALTH_TREE=off = ตัวควบคุม: บอทไม่ทุ่มต้นไม้ (อายุเฉลี่ยบอทสายสุขภาพต้องตกกลับใกล้บอทสุ่ม)
+if (process.env.NL_BOT_HEALTH_TREE !== 'off') {
+  const care = BOTS.สายสุขภาพ;
+  BOTS.สายสุขภาพ = Object.assign(withGate(care), care, { tree: (st) => botTree(st, 'skill') });
+}

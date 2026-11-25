@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { parse } from 'yaml';
 import { brassLx, e0FromLx, stdFor, MAX_AGE } from '../engine/era.mjs';
 import { normCdf } from '../engine/birth.mjs';
-import { CLASSES } from '../engine/life.mjs';
+import { CLASSES, RESULT_TAGS } from '../engine/life.mjs';
 import { lintDocs, formatProblem } from './lint/index.mjs';
 import { MERIT_CATS } from './lint/vocab.mjs';
 import { checkMeritTable } from '../engine/merit.mjs';
@@ -11,11 +11,17 @@ import { DEBTS } from '../engine/finance.mjs';
 import { PLACEHOLDERS, MAX_LEN, ID_RE } from './lint/vocab.mjs';
 import { isObj, isMoney } from './lint/util.mjs';
 import { NEAR_HINT_LEVELS } from '../engine/court.mjs';
-import { checkFocus } from './lint/focus.mjs';
-import { checkTree } from './lint/tree.mjs';
+import { checkNature } from './lint/nature.mjs';
+import { checkTree, checkTreePace } from './lint/tree.mjs';
 import { lintIsekai, formatIsekaiProblem } from './lint/isekai.mjs';
 import { useIsekaiCards, ISEKAI_SKILLS } from '../engine/isekai.mjs';
 import { TITLES, FAMILY_GOALS } from '../engine/titles.mjs';
+import { setDlcDefault, setDlcFrozen, DLC_LOCKED } from '../engine/dlc.mjs';
+
+// ตัวเลือกเดียวของด่านทุกตัว: ค่าเริ่ม = ปลด DLC หมด (ผลเดิมไม่ขยับ) · NL_DLC=locked = ล็อกหมดและไม่ปลดเอง · NL_DLC=progress = เริ่มล็อกหมดแล้วปลดตามเงื่อนไขจริงแบบผู้เล่น
+// อยู่ที่ตัวโหลดเพราะ harness ทุกตัวโหลดเนื้อหาผ่านที่นี่ · เบราว์เซอร์ตั้งจากสมุดระดับเครื่องแทน (app.mjs)
+if (process.env.NL_DLC === 'locked' || process.env.NL_DLC === 'progress') setDlcDefault(DLC_LOCKED);
+if (process.env.NL_DLC === 'locked') setDlcFrozen(true);
 
 const root = new URL('../../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -401,6 +407,21 @@ const loadHeir = () => parse(read('content/rules/flags.yaml')).heir ?? {};
 // หมวด home: ของทะเบียนธง = ธงบ้านเกิด (ใบ 105) — แกนอ่านตอนสุ่มเกิด/เล่าที่การ์ดเกิด
 const loadHome = () => parse(read('content/rules/flags.yaml')).home ?? {};
 
+// ปุ่มปฏิกิริยาการ์ดผล ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
+export const REACT_COUNT = 4;
+const REACT_MAX = 32;
+export function loadResultReacts(p = 'content/rules/result-reacts.yaml') {
+  const doc = parse(read(p)) ?? {};
+  const bad = [];
+  for (const [tag, words] of Object.entries(doc)) {
+    if (!RESULT_TAGS.includes(tag)) bad.push(`หมวด ${tag} ไม่มีในแกน`);
+    if (!Array.isArray(words) || words.length !== REACT_COUNT || new Set(words).size !== REACT_COUNT) bad.push(`${tag} ต้องมี ${REACT_COUNT} คำไม่ซ้ำ`);
+    else for (const w of words) if (typeof w !== 'string' || !w.trim() || w.length > REACT_MAX) bad.push(`${tag} คำว่างหรือยาวเกิน ${REACT_MAX}: ${w}`);
+  }
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return doc;
+}
+
 // คำใบ้ที่ศาลตอนเฉียดตาย (B153) ระดับละหลายข้อความ — ไม่ใช่การ์ด จึงตรวจตอนโหลดแทนด่านเนื้อหา
 // ห้ามเลขคู่คำบุญ/บาป (กติกาเดียวกับด่านการ์ดไม่เผยบัญชีของ harness)
 export function loadNearHints(p = 'content/rules/near-hints.yaml') {
@@ -420,35 +441,37 @@ export function loadNearHints(p = 'content/rules/near-hints.yaml') {
   return doc;
 }
 
-// โฟกัสชีวิตโลกหลัก (B163): ทะเบียนผิดรูป = หยุด build ไม่ปล่อยให้แกนอ่านค่าครึ่ง ๆ
-function loadFocus() {
-  const doc = parse(read('content/rules/focus.yaml'));
-  const causes = Object.keys(JSON.parse(read('data/death-causes.json')).groups);
+// นิสัยจากวัยเด็ก (B41 · ใบ ft07): ทะเบียนผิดรูป = หยุด build · แยกจาก focus.yaml (ใบ ft15a) เพื่อให้ลบโฟกัสเดิมได้โดยไม่ลากนิสัยไปด้วย
+function loadNature() {
+  const doc = parse(read('content/rules/nature.yaml'));
   const jobs = JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id);
-  const bad = checkFocus(doc, { causes, jobs, flags: Object.keys(parse(read('content/rules/flags.yaml')).flags) });
-  if (bad.length) throw new Error(`content/rules/focus.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, card_mul: doc.card_mul, spend_scale: doc.spend_scale, chain_years: doc.chain_years, focuses: doc.focuses, ...(doc.natures && { natures: doc.natures, nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul }) };
+  const treeNodes = Object.keys(parse(read('content/rules/tree.yaml')).nodes);
+  const bad = checkNature(doc, { jobs, treeNodes });
+  if (bad.length) throw new Error(`content/rules/nature.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { nature_age: doc.nature_age, heir_nature: doc.heir_nature, nature_mul: doc.nature_mul, node_pts: doc.node_pts, natures: doc.natures };
 }
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูป = หยุด build
 function loadTree() {
   const doc = parse(read('content/rules/tree.yaml'));
-  const bad = checkTree(doc);
+  const bad = checkTree(doc, JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id));
   if (bad.length) throw new Error(`content/rules/tree.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
-  return { year_scale: doc.year_scale, light_unit: doc.light_unit, nodes: doc.nodes };
+  const pace = parse(read('content/rules/tree-pace.yaml'));
+  const badPace = checkTreePace(pace);
+  if (badPace.length) throw new Error(`content/rules/tree-pace.yaml ไม่ผ่าน ${badPace.length} ข้อ\n${badPace.join('\n')}`);
+  return { year_scale: doc.year_scale, goal_joy: doc.goal_joy, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }), ...(doc.budget_ref && { budget_ref: doc.budget_ref }), ...(doc.gates && { gates: doc.gates }) };
 }
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
-// lifeGoal ยังไม่มีระบบให้เทียบ id — ตรวจแค่สกิล
-export function loadSkillMap(p = 'content/rules/skill-map.yaml', focus = loadFocus()) {
+// lifeGoal = id แขนงของต้นไม้ (เป้าชีวิต ft15 · st.goalsDone จดตัวนี้ · เซฟก่อน ft15 จด id ต้นสายโฟกัสเดิม ไม่ได้สกิลจากตาราง)
+export function loadSkillMap(p = 'content/rules/skill-map.yaml') {
   const doc = parse(read(p)) ?? {};
   const known = {
     job: json('data/finance.json').occupations.list.map((o) => o.id),
     title: TITLES.map((t) => t.id),
     cause: Object.keys(json('data/death-causes.json').groups),
     goal: FAMILY_GOALS.map((g) => g.id),
-    focus: Object.keys(focus.focuses),
-    lifeGoal: null,
+    lifeGoal: [...new Set(Object.values(parse(read('content/rules/tree.yaml')).nodes).map((n) => n.branch).filter((b) => b !== 'mid'))],
   };
   const bad = Object.keys(doc).filter((k) => !(k in known)).map((k) => `คีย์ ${k} ไม่มีในแกน (${Object.keys(known).join(' ')})`);
   const map = {};
@@ -498,7 +521,35 @@ export function loadItems(p = 'content/rules/items.yaml') {
 // เส้นเตรียมทหาร: เนื้อหาสนามสอบ + ตัวเลขที่เจ้าของเคาะ (engine: src/engine/cadet.mjs)
 export const loadCadet = (p = 'content/rules/cadet.yaml') => parse(read(p));
 
+// ระดับการใช้จ่าย (B29 · ใบ 52): ตัวคูณเงินเก็บรายปี + ผลความสุขต่อระดับ — ค่าเริ่มต้องครบ 3 ระดับ
+// normal = ×1 = ค่าเดิมของ main · engine อ่านจาก st.content.spending
+export function loadSpending(p = 'content/rules/spending.yaml') {
+  const doc = parse(read(p));
+  const bad = [];
+  for (const id of ['frugal', 'normal', 'luxury']) {
+    const l = doc?.levels?.[id];
+    if (!l) { bad.push(`levels.${id} หาย`); continue; }
+    if (typeof l.name !== 'string' || !l.name.trim()) bad.push(`levels.${id}.name ต้องเป็นข้อความไม่ว่าง`);
+    if (typeof l.save_mult !== 'number' || l.save_mult <= 0) bad.push(`levels.${id}.save_mult ต้องเป็นเลข > 0`);
+    if (typeof l.happy !== 'number') bad.push(`levels.${id}.happy ต้องเป็นเลข`);
+  }
+  const normal = doc?.levels?.normal;
+  if (normal && normal.save_mult !== 1) bad.push('levels.normal.save_mult ต้องเป็น 1 (ค่าเดิมของ main)');
+  if (normal && normal.happy !== 0) bad.push('levels.normal.happy ต้องเป็น 0 (ค่าเดิมของ main)');
+  if (typeof doc?.luxury_decay !== 'number' || doc.luxury_decay < 0 || doc.luxury_decay > 1) bad.push('luxury_decay ต้องเป็นเลข 0–1');
+  if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
+  return { levels: doc.levels, luxury_decay: doc.luxury_decay };
+}
+
 // ทะเบียนสายเรื่องรายคน (krung-1): ทุกคีย์ arc บนการ์ดต้องมีชื่อ — หน้าจบใช้บอกสถานะสาย · harness ส่งทะเบียนของ fixture เองได้
+// ทะเบียนชนิดสถานะอยู่นอกบ้าน (ใบ 237) — การ์ดอ้างชื่อชนิด lint ตรวจชื่อกับทะเบียน · ค่าที่ engine อ่านต้องครบ ไม่งั้นพังตอนการ์ดโทรมาบอกออก
+export function loadAway(p = 'content/rules/away.yaml') {
+  const kinds = parse(read(p))?.kinds ?? {};
+  const bad = Object.entries(kinds).filter(([, k]) => typeof k?.name !== 'string' || typeof k?.return_text !== 'string' || !(k?.return_cost > 0)).map(([id]) => `ชนิด ${id} ต้องมี name return_text return_cost > 0`);
+  if (bad.length) throw new Error(bad.join('\n'));
+  return { kinds };
+}
+
 export function loadArcs(events, p = 'content/rules/arcs.yaml') {
   const arcs = parse(read(p))?.arcs ?? {};
   const bad = Object.entries(arcs).filter(([, a]) => typeof a?.name !== 'string' || !a.name.trim()).map(([k]) => `สาย ${k} ไม่มี name`);
@@ -541,9 +592,8 @@ export function checkCadetHeirText(cadet) {
 
 export function loadContent() {
   const events = loadEvents();
-  const focus = loadFocus();
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), focus, tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(undefined, focus), arcs: loadArcs(events), cadet };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
 }

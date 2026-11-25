@@ -7,7 +7,7 @@ import { MOVED_MARK } from './nav.mjs';
 const OUT = (f, html) => f === 'play.html' || html.includes(MOVED_MARK);
 
 // กลุ่มในตัวเลือกหน้า + ชนิดความกว้าง: อ่าน = หน้าข้อความยาว · กว้าง = ตาราง/การ์ด · แผนที่ = dev/maps (พื้นมืดตามโลก ข้อ 28)
-const READ = ['index.html', 'guide.html', 'whatsnew.html', 'about.html', 'worlds.html', 'otherworld.html', 'spec/lore-finance-series.html'];
+const READ = ['index.html', 'guide.html', 'whatsnew.html', 'worlds.html', 'spec/lore-finance-series.html'];
 export function pageKind(f) {
   if (f.startsWith('dev/maps/')) return 'map';
   return READ.includes(f) ? 'read' : 'wide';
@@ -57,6 +57,7 @@ export function docsLayoutCss(kind, tokens = true) {
   if (!tokens) return frame;
   return [
     frame,
+    HEAD_CSS,
     `main h2${X}:not(:first-child){margin-top:28px}main :is(section,.box)${X}{margin-bottom:17px}`,
     // ตารางกว้างเลื่อนในตัวเองแทนดันทั้งหน้า · ป้าย .st ไม่ตัดบรรทัดเลยดันหน้าล้นเมื่อคอลัมน์เปลี่ยน
     `main${X}{overflow-wrap:anywhere}main .st${X}{white-space:normal;max-width:100%}@media (max-width:640px){main table${X}{display:block;max-width:100%;overflow-x:auto}}`,
@@ -66,6 +67,17 @@ export function docsLayoutCss(kind, tokens = true) {
     `.tag${X}{border-radius:0}`,
   ].join('\n');
 }
+// header เว็บแบบเดียวทุกหน้า (ui-redo 78 · ตามข้อ 218 คราม เตี้ย): CSS อยู่ที่นี่ที่เดียว หน้าไม่เขียน header{} เอง
+// ผูกที่ body > header เท่านั้น ⇒ header.sb (แถบสถานะเกมในจอจำลอง) กับ header.home (หัวหน้าแรก) ไม่โดน
+export const HEAD_SEL = 'body > header:not(.home)';
+export const HEAD_CSS = [
+  `${HEAD_SEL}{background:var(--head);color:var(--title);padding:16px 16px 18px}`,
+  `${HEAD_SEL}>.w{margin-left:auto;margin-right:auto}`,
+  `${HEAD_SEL} h1{font-family:var(--fh);font-weight:600;font-size:clamp(26px,5vw,36px);line-height:1.3;margin:0 0 8px;color:var(--title)}`,
+  `${HEAD_SEL} p{margin:0 0 6px;max-width:680px;color:var(--on-head2)}`,
+  `${HEAD_SEL} :is(p,h1):last-child{margin-bottom:0}`,
+  `${HEAD_SEL} a{color:var(--headink);text-decoration:underline;text-underline-offset:3px}`,
+].join('\n');
 const hasTokens = (html) => /--surface\s*:/.test(html);
 const docsLayoutBlock = (kind, tokens) => `${DOCS_LAYOUT_START}<style>\n${docsLayoutCss(kind, tokens)}\n</style>${DOCS_LAYOUT_END}`;
 export function injectDocsLayout(html, kind, where) {

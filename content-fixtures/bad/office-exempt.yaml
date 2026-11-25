@@ -1,0 +1,15 @@
+# ผิดกติกาเดียว: ป้ายยกเว้นคำออฟฟิศไม่มีเหตุผล (สั้นเกินไป)
+events:
+  - id: bad_case_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    office_ok: "สั้น"
+    weight: 1
+    text: "กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว"
+    choices:
+      - {text: "ลุกออกไปล้างหน้า", merit: [{cat: neutral}]}
+      - {text: "ฝืนนั่งฟังต่อ", merit: [{cat: neutral}]}
+      - {text: "ขอลาครึ่งวัน", merit: [{cat: neutral}]}
+      - {text: "ส่งข้อความหาเพื่อน", merit: [{cat: neutral}]}

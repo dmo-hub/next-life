@@ -46,7 +46,14 @@ const BOTS = {
 };
 
 // ค่าบัญชีห้ามออกไปกับการ์ดหรือค่าที่หน้าจอวาด — ตรวจทุก key ทุกชั้น
-const LEAK = /ledger|merit|sin|karma|byCat|broken|omenTone|omenAge/i;
+// "sin" เป็นคำเต็มเท่านั้น (sin · sins · totalSin · total_sin) — substring จะจับ `since` ของสมาชิกครอบครัวผิด
+const LEAK_SUBSTR = /ledger|merit|karma|byCat|broken|omenTone|omenAge/i;
+const LEAK_SIN = /(?<![A-Za-z])sins?(?![a-z])|(?<![A-Z])Sins?(?![a-z])|(?<![A-Za-z])SINS?(?![A-Za-z])/;
+const LEAK = { test: (k) => LEAK_SUBSTR.test(k) || LEAK_SIN.test(k) };
+// ตัวควบคุมของ regex เอง: คีย์ปลอมต้องจับ · since ต้องไม่จับ
+for (const [k, want] of [['sin', true], ['sins', true], ['sinTotal', true], ['totalSin', true], ['total_sin', true], ['SIN', true], ['merit', true], ['since', false], ['sinceYear', false], ['Since', false]]) {
+  if (LEAK.test(k) !== want) { console.error(`LEAK regex ผิด: ${k} ควรได้ ${want}`); process.exit(1); }
+}
 const STAT_SHOWN = ['health', 'happiness', 'knowledge', 'relations', 'network', 'money'];
 // ข้อยกเว้นช่องเดียว: เฉลยบัญชีบนการ์ดปรโลกในระหว่างชาติ (ใบ 09) · โผล่บนการ์ดอื่นรวมการ์ดตาย = รั่ว
 const REVEAL = 'reckoning';

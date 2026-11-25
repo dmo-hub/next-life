@@ -45,7 +45,7 @@ npm run build        # สร้าง docs/play.html และหน้าเ�
 | กติกาเกม (อายุ เงิน กรรม ปรโลก ต่างโลก) | `src/engine/` |
 | เนื้อหาการ์ด | `content/*.yaml` |
 | ข้อมูลยุคจริง (เกิด เงินเฟ้อ อายุขัย เหตุการณ์) | `data/*.json` — ทุกค่าต้องมี `source` หรือ `assumption: true` + `note` |
-| หน้าเว็บเขียนมือ | `docs/index.html` · `about.html` · `worlds.html` · `otherworld.html` · `whatsnew.html` — ตัวเลขใน `data-fact` build ฉีดให้ |
+| หน้าเว็บเขียนมือ | `docs/index.html` · `about.html` · `worlds.html` (หน้า "โลก" รวมต่างโลก · `otherworld.html` เป็นหน้าส่งต่อ) · `whatsnew.html` — ตัวเลขใน `data-fact` build ฉีดให้ |
 | หน้าเว็บที่ build สร้าง | `catalog.html` · `guide.html` — แก้แม่แบบใน `src/site/` |
 | ตัวทดสอบและบอทจำลอง | `harness/` (อ่านหัวไฟล์แต่ละตัว) · `content-fixtures/` ตัวอย่างผิด/ถูก ไม่เข้าเกม |
 | ห้องผู้พัฒนา | `docs/dev/` |

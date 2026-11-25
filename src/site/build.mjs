@@ -2,6 +2,7 @@
 import { readFileSync, writeFileSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { siteFacts, injectFacts } from './facts.mjs';
 import { catalogHtml } from './spoilers.mjs';
+import { cardGroupRows } from './catalog.mjs';
 import { injectSpec, SPEC_PAGE } from './spec.mjs';
 import { guideHtml } from './guide.mjs';
 import { demoHtml } from './demo.mjs';
@@ -9,14 +10,14 @@ import { focusHtml } from './focus.mjs';
 import { designPages, designHtml, DESIGN_AT } from './design.mjs';
 import { injectNav, injectDevNav, DEV_NAV_PAGES, movedHtml, DEV_MAPS, mapsMoved } from './nav.mjs';
 import { uiPage, designMoved, UI_PAGE } from './ui.mjs';
-import { soonCats, soonIds, injectRoadmap } from './roadmap.mjs';
+import { soonCats, soonIds, injectRoadmap, PLAN_FROM, PLAN_ID } from './roadmap.mjs';
 import { gatedFiles, injectGate, readGateHash } from './gate.mjs';
 import { injectSeo, sitemapXml, faviconSvg, SITEMAP, FAVICON_SVG } from './seo.mjs';
 import { ART_INK } from '../ui/art.mjs';
 import { docsScope, injectDocsLayout } from './docs-layout.mjs';
 
 // หน้าที่เขียนมือแต่มีตัวเลขจาก data — play.html (build สร้าง) · whatsnew.html (ผู้รวมงานเขียน) ไม่อยู่ในนี้
-export const FACT_PAGES = ['index', 'about', 'otherworld', 'worlds'];
+export const FACT_PAGES = ['index', 'worlds'];
 // หน้าเขียนมือที่ไม่มีตัวเลขจาก data แต่ต้องมีแถบบนชุดเดียวกัน — ไฟล์อยู่ใต้ docs/
 export const NAV_PAGES = ['whatsnew.html', 'spec/lore-finance-series.html'];
 // หน้าที่ build สร้างทั้งหน้าจากแม่แบบ src/site/<ชื่อ>.html
@@ -25,7 +26,7 @@ export const GEN_PAGES = [
   ['catalog', '<!--__CATALOG__-->', (content) => catalogHtml(content, demoHtml(content))],
   // คู่มือสั้น (B121) ป้ายปุ่มดึงจาก src/ui/labels.mjs ที่เกมใช้
   ['guide', '<!--__GUIDE__-->', guideHtml],
-  // โฟกัสชีวิต: รายการ/เงื่อนไข/ป้ายดึงจาก content.focus กับโมดูลต่างโลก ระดับคู่มือ ไม่เฉลยตัวเลข
+  // โฟกัสชีวิต: รายการ/เงื่อนไข/ป้ายดึงจาก content.tree กับโมดูลต่างโลก ระดับคู่มือ ไม่เฉลยตัวเลข
   ['focus', '<!--__FOCUS__-->', focusHtml],
 ];
 
@@ -57,12 +58,16 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   put(specFile, specNext, specOld);
   out.push('dev/spec');
   for (const [name, slot, html] of GEN_PAGES) {
-    const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content));
+    const page = injectFacts(readFileSync(at(`src/site/${name}.html`), 'utf8'), facts, `src/site/${name}.html`).replace(slot, () => html(content)).replace('<!--__CARD_GROUPS__-->', () => cardGroupRows());
     put(at(`docs/${name}.html`), injectNav(page, `${name}.html`));
     out.push(name);
   }
   // เฉลยรวมเข้าหน้าการ์ดแล้ว (ข้อ 187) ที่อยู่เดิมส่งต่อพก #ใบ ไปด้วย
   put(at('docs/spoilers.html'), movedHtml('spoilers.html', 'catalog.html', 'การ์ดทั้งหมด'));
+  // กลไกในเกมรวมเข้าวิธีเล่นแล้ว (ui-redo 98 · ข้อ 190) ที่อยู่เดิมส่งต่อพก #ส่วน ไปด้วย
+  put(at('docs/about.html'), movedHtml('about.html', 'guide.html', 'วิธีเล่น'));
+  // หน้าต่างโลกรวมเข้าหน้า "โลก" แล้ว (ui-redo 42 · ข้อ 41) ที่อยู่เดิมส่งต่อไปส่วนต่างโลก · id ลิงก์เก่า (#entry #isekai #rules) อยู่ครบในหน้าโลก
+  put(at('docs/otherworld.html'), movedHtml('otherworld.html', 'worlds.html#otherworld', 'โลก', true));
   // หน้าคำตัดสินเกมหลายหน้าจากแม่แบบเดียว — จำนวนหน้าตามโฟลเดอร์ใน design/ · ที่อยู่เดิมใต้ docs/ เขียนเป็นหน้าส่งต่อทุกรอบ (ลิงก์ภายนอกยังเปิดได้)
   const designTpl = injectFacts(readFileSync(at('src/site/design.html'), 'utf8'), facts, 'src/site/design.html');
   const designOut = designPages(new URL('design/', root));
@@ -75,6 +80,8 @@ export function buildSite(content, root = new URL('../../', import.meta.url), fa
   put(at(`docs/${UI_PAGE}`), designHtml(designTpl, uiPage(content, at('docs/')), UI_PAGE.slice(DESIGN_AT.length)));
   out.push(UI_PAGE.replace(/\.html$/, ''));
   for (const m of DEV_MAPS) put(at(`docs/dev/maps/${m[0]}.html`), mapsMoved(m));
+  // แผนข้างหน้าย้ายมาอยู่ในแพตช์โน้ต (ui-redo 100) — ที่เดิมเป็นหน้าส่งต่อที่ build เขียนทุกรอบ
+  put(at(`docs/${PLAN_FROM}`), movedHtml(PLAN_FROM, `whatsnew.html#${PLAN_ID}`, 'แผนข้างหน้า'));
   // เรื่องที่ถูกรวม/ลบออกจาก design/ ทิ้งหน้าเก่าไว้ = ลิงก์ค้างที่ไม่ตรงต้นฉบับ · ที่เดิมที่เป็นหน้าเนื้อ (ไม่ใช่หน้าส่งต่อ) ก็ลบ
   const made = new Set(designOut.map(([f]) => f));
   for (const dir of ['docs/', `docs/${DESIGN_AT}`]) for (const f of readdirSync(at(dir)).filter((n) => /^design-.+\.html$/.test(n) && !made.has(n))) unlinkSync(at(`${dir}${f}`));

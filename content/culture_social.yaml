@@ -238,7 +238,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 0.25
-    when: {age: [19, 30], occupation: [clerk, manager, professional]}
+    when: {age: [19, 30], occupation: [clerk, manager, professional], flags: {not: [own_business]}}
     title: "นิ่งให้เหมือนหุ่น"
     text: "ฝ่ายการตลาดอยากได้คลิปยืนนิ่งเหมือนหุ่น ทุกคนต้องหยุดค้างในท่าทำงาน กล้องเดินผ่านทีละโต๊ะ คุณได้บทถือแก้วกาแฟค้างข้างปาก ถ่ายรอบที่เก้าแล้ว และคุณเริ่มอยากจาม"
     choices:
@@ -270,7 +270,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.25
-    when: {age: [31, 45], occupation: [clerk, manager, professional]}
+    when: {age: [31, 45], occupation: [clerk, manager, professional], flags: {not: [own_business]}}
     title: "คนนั่งใกล้ปลั๊ก"
     text: "โปรแกรมแชตที่บริษัทใช้คุยงานจะปิดบริการเดือนหน้า ลูกค้าเจ้าใหญ่ยังส่งงานผ่านมันทุกวัน ประวัติคุยงานหกปีอยู่ในนั้น หัวหน้าถามว่าใครรู้วิธีย้าย ทุกคนมองคุณเพราะคุณนั่งใกล้ปลั๊ก"
     choices:

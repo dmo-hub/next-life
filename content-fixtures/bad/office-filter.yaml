@@ -1,0 +1,14 @@
+# ผิดกติกาเดียว: การ์ดวัยทำงานมีคำออฟฟิศ ไม่กรองอาชีพ ไม่ใช้คำแทน ไม่มีป้ายยกเว้น
+events:
+  - id: bad_case_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 1
+    text: "กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว"
+    choices:
+      - {text: "ลุกออกไปล้างหน้า", merit: [{cat: neutral}]}
+      - {text: "ฝืนนั่งฟังต่อ", merit: [{cat: neutral}]}
+      - {text: "ขอลาครึ่งวัน", merit: [{cat: neutral}]}
+      - {text: "ส่งข้อความหาเพื่อน", merit: [{cat: neutral}]}

@@ -58,7 +58,7 @@ export const rules = [
   },
   {
     id: 'court-shape',
-    desc: `ทริปศาลขณะยังมีชีวิต (scene ${COURT_SCENES.join('|')}): ไม่มี when/weight/realm · ตัวเลือกไม่มี effects (ค่าสถานะเข้าสูตรชีวิต อายุตายจะเลื่อน) · near/visit ป้ายบุญบาปเป็น neutral ล้วน · near: ${NEAR_DEATH.causes.join('|')} มีเฉพาะ scene near และไม่มีตัวเลือก`,
+    desc: `ทริปศาลขณะยังมีชีวิต (scene ${COURT_SCENES.join('|')}): ไม่มี when/weight/realm · ตัวเลือกไม่มี effects (ค่าสถานะเข้าสูตรชีวิต อายุตายจะเลื่อน) · near/visit ป้ายบุญบาปเป็น neutral ล้วน · near: ${NEAR_DEATH.causes.join('|')} มีเฉพาะ scene near`,
     event(e, ctx, r) {
       const court = e.stage === AFTERLIFE_STAGE && COURT_SCENES.includes(e.scene);
       if (e.near !== undefined && !(court && e.scene === 'near')) r('.near', 'near ใช้ได้เฉพาะ scene near');
@@ -66,7 +66,6 @@ export const rules = [
       for (const k of ['when', 'weight', 'realm', 'multipliers']) if (e[k] !== undefined) r(`.${k}`, `ฉากศาลไม่มี ${k} — แกนเลือกใบเอง`);
       if (e.scene === 'near') {
         if (!NEAR_DEATH.causes.includes(e.near)) r('.near', `scene near ต้องมี near: ${NEAR_DEATH.causes.join('|')}`);
-        if (Array.isArray(e.choices) && e.choices.length) r('.choices', 'ใบเกือบตายเป็นการ์ดเล่าเรื่อง choices: []');
       }
       for (const { c, path } of choicesOf(e)) {
         if (c.effects !== undefined) r(`${path}.effects`, 'ฉากศาลไม่มีผลต่อค่าสถานะ');

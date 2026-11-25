@@ -1,0 +1,13 @@
+# ผิดกติกาเดียว: การ์ดผีบรรพบุรุษ (when.ancestor) ขอส่วนบุญ — แถวผังคือชาติก่อนของตัวเรา ป้ายต้อง neutral ล้วน
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {overlap_stage: [2, 2], ancestor: true}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทำบุญไปให้", merit: [{cat: dana, level: 1}]}
+      - {text: ทางเลือกอื่น 2, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 3, merit: [{cat: neutral}]}
+      - {text: ทางเลือกอื่น 4, merit: [{cat: neutral}]}

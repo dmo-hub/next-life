@@ -6,6 +6,8 @@ import { STAGES, STAT_LABELS, MERIT_LEVELS, MERIT_WEIGHTS, SIN_CATS, FLAG_CATS, 
 import { AFTER, esc, text, choiceText, catalogCard } from './catalog.mjs';
 import { isekaiCatalogHtml, isekaiNav, isekaiBoxes } from './otherworld.mjs';
 import { careerHtml, careerSim } from './career.mjs';
+import { cadetHtml, cadetNav, readCadet } from './cadet-cards.mjs';
+import { filterUi } from './catalog-ui.mjs';
 
 const YEAR_ALL = [2400, 2700];
 const sgn = (n) => (n > 0 ? `+${n}` : String(n).replace('-', '−'));
@@ -66,8 +68,8 @@ function labels(content, flags, systems) {
   // none = ไม่ได้อยู่สายเลื่อนขั้นใด (แกนเทียบ st.ladder?.id ?? 'none')
   const ladders = content.era.careers?.ladders ?? {};
   const ladder = (id) => (id === 'none' ? 'ไม่อยู่สายเลื่อนขั้น' : ((n) => (n.startsWith('สาย') ? n : `สาย${n}`))(ladders[id]?.name ?? id));
-  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.focus.natures
-  const nature = (id) => content.focus?.natures?.[id]?.name ?? id;
+  // นิสัยจากวัยเด็ก (B41) อยู่ในกติกาทุ่มเท content.nature.natures
+  const nature = (id) => content.nature?.natures?.[id]?.name ?? id;
   return { occ: (id) => occ[id] ?? id, era: (id) => era[id] ?? id, sys, flag, ladder, nature };
 }
 
@@ -86,6 +88,8 @@ function family(f, L) {
   if (f.bond) return `ความผูกพันกับ${who} ${sgn(f.d)}`;
   if (f.die) return `${who}ตาย`;
   if (f.leave) return `${who}จากไป`;
+  if (f.far) return 'ลูกย้ายไปอยู่ไกล';
+  if (f.back) return 'ลูกกลับมาอยู่ใกล้';
   return esc(JSON.stringify(f));
 }
 
@@ -179,7 +183,10 @@ function conditions(e, L) {
   if (w.region) out.push(`ภาค${any(w.region.map(esc))}`);
   if (w.province) out.push(`จังหวัด${any(w.province.map(esc))}`);
   if (w.sex) out.push(`เพศ${any(w.sex.map(esc))}`);
+  if (w.identity) out.push(`อัตลักษณ์${any(w.identity.map(esc))}`);
   if (w.overlap_stage) out.push(`ค่าซ้อนทับขั้น ${range(w.overlap_stage)}`);
+  if (w.kin_ghost) out.push(`ผีญาติ${any(w.kin_ghost.map((m) => (m === 'haunt' ? 'มาทวง' : 'มาเตือน')))}`);
+  if (w.ancestor) out.push('มีชาติก่อนในผังตระกูล');
   if (w.class) out.push(`ฐานะ${any(w.class.map(esc))}`);
   if (w.occupation) out.push(`ทำงาน${any(w.occupation.map((o) => esc(L.occ(o))))}`);
   if (w.ladder) out.push(any(w.ladder.map((l) => esc(L.ladder(l)))));
@@ -191,6 +198,17 @@ function conditions(e, L) {
   if (w.kin_illness) {
     const k = w.kin_illness;
     out.push(`${any((k.roles ?? ['parent', 'spouse', 'child', 'grandchild']).map((r) => FAMILY_ROLE_NAMES[r] ?? r))}รู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
+  }
+  if (w.child_far) out.push(`มีลูก${w.child_far.far ? 'อยู่ไกล' : 'อยู่ใกล้'}${w.child_far.age ? ` อายุ ${range(w.child_far.age, ' ปี')}` : ''}${w.child_far.grandkids ? ' มีหลานแล้ว' : ''}`);
+  if (w.illness) {
+    const k = w.illness;
+    out.push(`ตัวเองรู้แล้วว่าป่วยโรคเรื้อรัง${k.causes ? ` (${any(k.causes.map(esc))})` : ''}${k.left ? ` เหลือ ${range(k.left, ' ปี')}` : ''}`);
+  }
+  if (w.child_not_mine) out.push(`มีลูกที่ไม่ใช่ลูกทางสายเลือดของเรา${w.child_not_mine.age ? ` อายุ ${range(w.child_not_mine.age, ' ปี')}` : ''}`);
+  if (w.ex_spouse) out.push(`ยังโสดหลังหย่า มีคู่เก่าที่ยังอยู่ หย่ามาแล้ว ${range(w.ex_spouse.within, ' ปี')} (คืนดีได้ครั้งเดียว)`);
+  if (w.spouse) {
+    const s = w.spouse;
+    out.push(`มีคู่${s.status === 'apart' ? 'ที่แยกทางกันอยู่' : s.status === 'together' ? 'ที่อยู่ด้วยกัน' : ''}${s.bond ? ` ผูกพัน ${range(s.bond, '')}` : ''}${s.together ? ` อยู่ด้วยกัน ${range(s.together, ' ปี')}` : ''}${s.apart ? ` แยกทางมา ${range(s.apart, ' ปี')}` : ''}${s.wed ? ` แต่งปี ${range(s.wed, '')}` : ''}`);
   }
   if (w.filial) {
     const n = w.filial.n ?? [1, 99];
@@ -217,6 +235,7 @@ function locks(q, L) {
   if (q.edu) out.push(`จบ${esc(Array.isArray(q.edu) ? q.edu.join(' หรือ ') : q.edu)}`);
   for (const f of q.family ?? []) out.push(famCond(f));
   if (q.nature) out.push(`เป็นคน${esc(L.nature(q.nature))}`);
+  if (q.isekai_lineage) out.push('ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยข้ามไปแล้วกลับบ้าน');
   out.push(...flagCond(q.flags, L));
   const own = Object.entries(q.reasons ?? {}).map(([k, t]) => `ไม่ผ่าน${esc(k)}จอบอก "${esc(t)}"`).join(' · ');
   return [`เลือกได้เมื่อ ${out.join(' · ')}${q.reason ? ` · ไม่ผ่านจอบอก "${esc(q.reason)}"` : ''}${own ? ` · ${own}` : ''}`];
@@ -294,16 +313,16 @@ export function spoilerBacks(content, ids, flags = flagNames(), systems = system
 }
 
 // demo = เดโมการ์ดเล่นได้ (demo.mjs) วางหลังสารบัญ
-export function catalogHtml(content, demo = '', flags = flagNames(), systems = systemNames(), sim = careerSim()) {
+export function catalogHtml(content, demo = '', flags = flagNames(), systems = systemNames(), sim = careerSim(), cadet = readCadet()) {
   const L = labels(content, flags, systems);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const groups = [...STAGES.map((s) => s.name), AFTER].map((stage) => ({ stage, events: content.events.filter((e) => e.stage === stage) })).filter((g) => g.events.length);
   const nav = groups.map((g, i) => `<a href="#s${i}">${esc(g.stage)} <small>${g.events.length}</small></a>`).join('');
   const body = groups
-    .map((g, i) => `<details id="s${i}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => catalogCard(e, back(e, L, byId))).join('')}</div></details>`)
+    .map((g, i) => `<details id="s${i}" data-st="${esc(g.stage === AFTER ? 'ปรโลก' : g.stage)}"${i === 0 ? ' open' : ''}><summary>${esc(g.stage === AFTER ? 'ปรโลก (ระหว่างชาติ)' : `ช่วง${g.stage}`)} <small>${g.events.length} ใบ</small></summary><div class="grid">${g.events.map((e) => catalogCard(e, back(e, L, byId))).join('')}</div></details>`)
     .join('\n');
   // เฉลยที่ไม่ผูกการ์ดใบใด (ข้อ 187 207) ท้ายหน้า เปิดทีละกล่อง — ไม่มี <article> ด่านนับการ์ดจึงนับเท่าเดิม
   const career = careerHtml(content, L, sim);
   const more = `<section class="more" id="more">${career}<h2 id="isk-more">ต่างโลก</h2><div class="jobs">${isekaiBoxes(merit)}</div></section>`;
-  return `<nav class="toc">${nav}${isekaiNav(groups.length)}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}<a href="#isk-more">เฉลยต่างโลก</a></nav>\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length, merit)}\n${more}`;
+  return `<nav class="toc">${nav}${isekaiNav(groups.length)}${cadetNav(cadet)}${career ? '<a href="#career">เส้นทางงาน</a>' : ''}<a href="#isk-more">เฉลยต่างโลก</a></nav>\n${filterUi()}\n${demo ? `${demo}\n` : ''}${body}\n${isekaiCatalogHtml(groups.length, merit)}\n${cadetHtml(cadet)}\n${more}`;
 }

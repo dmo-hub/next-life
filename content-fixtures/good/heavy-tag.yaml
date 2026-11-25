@@ -1,0 +1,15 @@
+# ป้ายเรื่องหนักครบ 2 ค่าในใบเดียว + ตัวเลือกปั่นแบบถูกต้อง
+events:
+  - id: heavy_tag_fixture_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    heavy: [turning, sad]
+    weight: 1
+    text: "ญาติมาถามว่าปีนี้จะกลับบ้านไหม"
+    choices:
+      - {text: "กลับไปเยี่ยม", merit: [{cat: neutral}]}
+      - {text: "โทรไปคุยแทน", merit: [{cat: neutral}]}
+      - {text: "ส่งเงินกลับไป", merit: [{cat: neutral}]}
+      - {text: "ส่งรูปแมวแทนตัวเอง", silly: true, merit: [{cat: neutral}]}

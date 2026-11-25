@@ -8,7 +8,7 @@ import { MERIT_CATS } from './vocab.mjs';
 import { isObj, isInt, isRange } from './util.mjs';
 
 export const ISEKAI_RULES = [
-  { id: 'isekai-shape', desc: 'ไฟล์เป็น {cards: [...]} · ช่องของการ์ด/ตัวเลือก/ผลอยู่ในรายการ · ch เป็นชั้นของช่วงวัย · ตัวเลือก 2–3 ข้อ' },
+  { id: 'isekai-shape', desc: 'ไฟล์เป็น {cards: [...]} · ช่องของการ์ด/ตัวเลือก/ผลอยู่ในรายการ · ch เป็นชั้นของช่วงวัย · ตัวเลือก 2–4 ข้อ' },
   { id: 'isekai-id', desc: 'id ตัวพิมพ์เล็ก/ตัวเลข/_ · ไม่ซ้ำกันและไม่ชนการ์ดใน isekai.mjs' },
   { id: 'isekai-deck', desc: 'ผูกกองได้ช่องเดียว: regions (แคว้นที่มีจริง) · dispute (ข้อพิพาทที่มีจริง) · power (major/falling/rising)' },
   { id: 'isekai-roll', desc: 'ตัวเลือกทอย = stat + dc + win + lose · ไม่ทอย = text · tag เป็นแท็กของโฟกัส · ผลแตะได้แค่ค่าต่างโลก · upgrade = true อยู่ที่ผล (ทอยแล้วอยู่ใน win/lose)' },
@@ -54,7 +54,7 @@ export function lintIsekai(docs) {
       if (e.minFame !== undefined && !(isInt(e.minFame) && e.minFame > 0)) bad(id, 'isekai-shape', 'minFame ต้องเป็นจำนวนเต็มบวก');
       if (e.overlap_stage !== undefined && !isRange(e.overlap_stage, 0, OVERLAP_STAGE_MIN.length - 1)) bad(id, 'isekai-overlap', `overlap_stage ต้องเป็น [จาก, ถึง] ขั้น 0–${OVERLAP_STAGE_MIN.length - 1} จำนวนเต็ม ได้ ${JSON.stringify(e.overlap_stage)}`);
       for (const k of ['adult', 'follow']) if (e[k] !== undefined && e[k] !== true) bad(id, 'isekai-shape', `${k} ใส่ได้แค่ true`);
-      if (!Array.isArray(e.choices) || e.choices.length < 2 || e.choices.length > 3) bad(id, 'isekai-shape', 'ตัวเลือก 2–3 ข้อ');
+      if (!Array.isArray(e.choices) || e.choices.length < 2 || e.choices.length > 4) bad(id, 'isekai-shape', 'ตัวเลือก 2–4 ข้อ');
 
       const decks = Object.keys(CONT_DECK).filter((k) => e[k] !== undefined);
       if (decks.length !== 1) bad(id, 'isekai-deck', `ต้องผูกกองช่องเดียว ได้ ${decks.length} (${Object.keys(CONT_DECK).join(' / ')})`);

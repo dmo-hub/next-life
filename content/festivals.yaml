@@ -3,6 +3,7 @@
 # ผลเบาทุกใบ (±1–2) — การ์ดบรรยากาศ ไม่ใช่ทางลัดเปลี่ยนชีวิต · ผู้ใหญ่ในบ้านเรียกรวม ๆ เพราะใบเด็กไม่ผูกว่าพ่อหรือแม่ยังอยู่
 events:
   - id: fest_songkran_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -36,6 +37,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_songkran_adult_01
+    away_block: [abroad]
     type: A
     category: family
     stage: ทำงาน
@@ -58,7 +60,7 @@ events:
       - id: party
         text: "เล่นน้ำกับเพื่อน ตั้งวงจนเช้า"
         outcomes:
-          - {weight: 2, ok: true, text: "สนุกจนเสียงแหบ เพื่อนในแผนกสนิทกันขึ้นอีกหลายคน", effects: {happiness: 2, network: 1}, merit: [{cat: intoxicants, level: 1}]}
+          - {next: after_fest_work_01, weight: 2, ok: true, text: "สนุกจนเสียงแหบ เพื่อนร่วมงานสนิทกันขึ้นอีกหลายคน", effects: {happiness: 2, network: 1}, merit: [{cat: intoxicants, level: 1}]}
           - {weight: 1, text: "ขากลับรถเพื่อนเฉี่ยวมอเตอร์ไซค์ ไม่มีใครเจ็บหนักแต่ค่าซ่อมหารกันหลายคน", effects: {happiness: -1, health: -1, money: {unit: income_x, amount: -0.15}}, merit: [{cat: intoxicants, level: 1}]}
         merit: [{cat: intoxicants, level: 1}]
       - id: shift
@@ -100,6 +102,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_lent_adult_01
+    away_block: [abroad]
     type: A
     category: society
     stage: กลางคน
@@ -130,6 +133,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_loykrathong_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -163,6 +167,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_loykrathong_adult_01
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: หนุ่มสาว
@@ -193,6 +198,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: fest_newyear_kid_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -226,6 +232,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: fest_newyear_adult_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน

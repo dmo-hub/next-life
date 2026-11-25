@@ -4,6 +4,7 @@
 events:
   # ดูดวง — ผลคำทำนาย 3 โทนสุ่มเท่ากัน ไม่อ่านบัญชี ไม่สอดคล้องกับเหตุการณ์จริง · โทนเตือนเสนอพิธีได้ครั้งเดียว
   - id: bel_fortune_market
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -34,12 +35,13 @@ events:
         merit: [{cat: neutral}]
       - id: apprentice_palm
         text: "ขอฝากตัวเรียนดูลายมือกับหมอดู"
-        gate: occult
+        gate: m4
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "หมอดูให้นั่งโต๊ะแทนตอนลุกไปพัก ลูกค้าบางคนเดินกลับมาหาคุณเอง", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "เรียนได้สามเดือน หมอดูเรียกค่าครูก้อนโตแล้วยังไม่ยอมสอนเคล็ดจริง", effects: {money: {unit: income_x, amount: -0.3}, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_market_rite
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -67,6 +69,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: bel_fortune_cards
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: กลางคน
@@ -97,12 +100,13 @@ events:
         merit: [{cat: neutral}]
       - id: open_table
         text: "ตั้งโต๊ะดูไพ่เองวันหยุด"
-        gate: occult
+        gate: m4
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 2, ok: true, text: "ลูกค้าวันหยุดต่อคิวยาวขึ้นทุกเดือน บางคนพาเพื่อนมาด้วย", effects: {relations: 1, happiness: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ทายว่าลูกค้าจะได้เลื่อนขั้น เดือนถัดมาเขาถูกเลิกจ้าง กลับมาต่อว่าถึงหน้าโต๊ะ", effects: {relations: -1, happiness: -1}, merit: [{cat: neutral}]}
   - id: bel_fortune_cards_rite
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: กลางคน
@@ -131,6 +135,7 @@ events:
 
   # ฤกษ์ยาม — ถือฤกษ์ให้ผู้ใหญ่สบายใจ ไม่มีผลต่อความสำเร็จของงานนั้น
   - id: bel_auspicious_house
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -163,6 +168,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: bel_auspicious_shop
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -195,6 +201,7 @@ events:
 
   # เครื่องราง/สักยันต์ — ความอุ่นใจเท่านั้น ไม่ลดความเสี่ยงใด ๆ · ข้อห้ามของสำนักเป็นเนื้อเรื่อง ไม่มีกลไกลงโทษ
   - id: bel_amulet_center
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -223,7 +230,7 @@ events:
         merit: [{cat: neutral}]
       - id: rent_stall
         text: "เช่าแผงส่องพระของตัวเอง"
-        gate: occult
+        gate: m4
         effects: {money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
         outcomes:
@@ -231,6 +238,7 @@ events:
           - {weight: 1, text: "รับพระเก๊มาเข้าแผงทั้งชุด กว่าจะรู้ก็ปล่อยไปหลายองค์ ต้องตามขอโทษลูกค้า", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
 
   - id: bel_amulet_yantra
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -262,12 +270,13 @@ events:
         merit: [{cat: neutral}]
       - id: stay_samnak
         text: "ขออยู่ช่วยงานสำนักเป็นศิษย์"
-        gate: occult
+        gate: m4
         effects: {happiness: 1, relations: -1}
         merit: [{cat: neutral}]
 
   # ทำบุญเสริมดวง — คู่เจตนา ต้นทุนเท่ากัน ป้ายเหมือนกัน · ทำหวังผลบุญน้อยกว่า 1 ระดับ และมีการ์ดตามมาถ้าเงินไม่ดีขึ้น
   - id: bel_merit_wish_robe
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -281,7 +290,10 @@ events:
       - {id: sincere, pair_id: mw_robe, intent: sincere, text: "ร่วมทำบุญด้วยใจ", cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1}, merit: [{cat: dana, level: 2}]}
       - {id: wish, pair_id: mw_robe, intent: wish_for_gain, text: "ทำบุญแล้วขอให้มีโชคลาภ", cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1}, merit: [{cat: dana, level: 1}], sets_flags: [hope_set:mw_robe], schedules: [{event: bel_hope_robe, after_years: [3, 5]}]}
       - {id: help, text: "ไปช่วยยกของในงานแทน", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: build_hall, text: "ร่วมสร้างศาลาให้วัด", cost: {unit: income_x, amount: 0.06}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}], sets_flags: [built_hall], schedules: [{event: bel_built_hall_later, after_years: [12, 25]}]}
+      - {id: build_pond, text: "ร่วมขุดบ่อน้ำให้หมู่บ้าน", cost: {unit: income_x, amount: 0.06}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}], sets_flags: [built_pond], schedules: [{event: bel_built_pond_later, after_years: [12, 25]}]}
       - {id: skip, text: "ไม่ไปงานนี้", merit: [{cat: neutral}]}
+      - {id: usual, text: "ใส่ซองประจำ ชวนเพื่อนบ้านช่วยงาน", show_if: {tree: [o3]}, cost: {unit: income_x, amount: 0.02}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 2}]}
   - id: bel_hope_robe
     type: A
     category: belief
@@ -291,9 +303,14 @@ events:
     lore_ref: lore-finance-belief.md#B
     when: {flags: {has: [hope_set:mw_robe]}}
     belief: {kind: merit_wish, tradition: พุทธ}
-    choices: []
+    choices:
+      - {id: ledger, text: "ลุกมาจดรายจ่ายใหม่ทีละบรรทัด", merit: [{cat: neutral}]}
+      - {id: talk, text: "เล่าให้คนใกล้ตัวฟัง", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: temple, text: "แวะวัดอีกครั้ง คราวนี้ไม่ขออะไร", merit: [{cat: bhavana, level: 1}]}
+      - {id: letgo, text: "เลิกนับว่าบุญคืนมาเท่าไร", merit: [{cat: neutral}]}
 
   - id: bel_merit_wish_birthday
+    away_block: [abroad]
     type: B
     category: belief
     stage: กลางคน
@@ -307,7 +324,9 @@ events:
       - {id: sincere, pair_id: mw_birthday, intent: sincere, text: "ถวายด้วยใจ ไม่ขออะไร", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 2}]}
       - {id: wish, pair_id: mw_birthday, intent: wish_for_gain, text: "ถวายแล้วขอให้ปีนี้รวย", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 1}], sets_flags: [hope_set:mw_birthday], schedules: [{event: bel_hope_birthday, after_years: [3, 5]}]}
       - {id: chant, text: "นั่งสวดมนต์ที่ศาลาสักพัก", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
+      - {id: build_tree, text: "ร่วมปลูกต้นไม้ในลานวัด", cost: {unit: income_x, amount: 0.03}, effects: {happiness: 1}, merit: [{cat: dana, level: 2}], sets_flags: [built_tree], schedules: [{event: bel_built_tree_later, after_years: [10, 20]}]}
       - {id: work, text: "งานเยอะ ไว้ปีหน้า", merit: [{cat: neutral}]}
+      - {id: precepts, text: "ขอถือศีลฟังธรรมที่วัดทั้งวัน", show_if: {tree: [o4]}, effects: {happiness: 1}, merit: [{cat: sila, level: 1}]}
   - id: bel_hope_birthday
     type: A
     category: belief
@@ -317,11 +336,60 @@ events:
     lore_ref: lore-finance-belief.md#B
     when: {flags: {has: [hope_set:mw_birthday]}}
     belief: {kind: merit_wish, tradition: พุทธ}
-    choices: []
+    choices:
+      - {id: cut, text: "ขีดรายจ่ายที่ตัดได้ออก", merit: [{cat: neutral}]}
+      - {id: ask, text: "ถามคนรู้จักว่าเก็บเงินกันยังไง", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: chant, text: "นั่งสวดมนต์ให้ใจนิ่งก่อน", merit: [{cat: bhavana, level: 1}]}
+      - {id: close, text: "ปิดสมุดบัญชี ไม่เปิดอีกสักพัก", merit: [{cat: neutral}]}
+
+  # ของถาวรที่ร่วมสร้างไว้ (asam-3 · ใบ 106) — การ์ดนัดจากตัวเลือก "ร่วมสร้าง" ไม่อยู่กองสุ่ม · ไม่อ่านยอดบุญ · ไม่ขยับระดับชุมชน
+  - id: bel_built_hall_later
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ศาลาหลังเดิม"
+    text: "ศาลาวัดที่เคยลงเงินร่วมสร้างยังตั้งอยู่ ไม้เสาเป็นมันจากคนนั่งพิงมาหลายปี ป้ายชื่อผู้ร่วมสร้างซีดจนอ่านยากแล้ว คนรุ่นใหม่ในหมู่บ้านไม่รู้ว่าใครเป็นคนลงเงินหลังนี้"
+    when: {flags: {has: [built_hall]}}
+    choices:
+      - {id: sit, text: "นั่งพักที่ศาลาสักครู่", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: grandchild, text: "พาหลานมานั่งเล่นที่ศาลาหลังนี้", show_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - {id: paint, text: "ช่วยทาสีป้ายชื่อให้ชัดขึ้น", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: pass, text: "ผ่านไปเฉย ๆ ไม่บอกใคร", merit: [{cat: neutral}]}
+      - {id: alone, text: "มองป้ายชื่อเก่านั้นอยู่นาน", hide_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1}, merit: [{cat: neutral}]}
+  - id: bel_built_pond_later
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "บ่อน้ำหน้าหมู่บ้าน"
+    text: "ฤดูแล้งปีนี้บ่อน้ำที่เคยร่วมกันขุดยังมีน้ำให้ตัก คนเดินผ่านมาตักไปใช้ทั้งวัน บางคนถามว่าบ่อนี้ใครขุด ไม่มีใครตอบได้ชัดเจน"
+    when: {flags: {has: [built_pond]}}
+    choices:
+      - {id: draw, text: "ตักน้ำไปใช้ที่บ้านเหมือนทุกครั้ง", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: grandchild, text: "พาหลานมาดูบ่อที่เคยช่วยขุด", show_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - {id: clear, text: "ช่วยกันกวาดใบไม้ออกจากปากบ่อ", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: say, text: "บอกคนที่ถามว่าเคยช่วยกันขุดมา", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: look, text: "ยืนมองผิวน้ำในบ่อเงียบ ๆ", hide_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1}, merit: [{cat: neutral}]}
+  - id: bel_built_tree_later
+    type: A
+    category: society
+    stage: กลางคน
+    years: [2500, 2650]
+    title: "ต้นไม้ที่ปลูกไว้"
+    text: "ต้นไม้ที่ปลูกไว้ในลานวัดวันนั้นสูงเลยหลังคากุฏิไปแล้ว ใต้ร่มมีคนนั่งพักกินข้าวห่อ ไม่มีใครรู้ว่าต้นนี้เคยเป็นกล้าเล็ก ๆ ที่ใครปลูก"
+    when: {flags: {has: [built_tree]}}
+    choices:
+      - {id: rest, text: "นั่งพักใต้ต้นไม้สักครู่", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: grandchild, text: "พาหลานมาเก็บใบไม้ใต้ต้นนี้", show_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+      - {id: water, text: "ตักน้ำรดโคนต้นให้", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
+      - {id: pass, text: "เดินผ่านไป", merit: [{cat: neutral}]}
+      - {id: shade, text: "เงยมองยอดต้นไม้อยู่ครู่หนึ่ง", hide_if: {family: [{role: grandchild, alive: true}]}, effects: {happiness: 1}, merit: [{cat: neutral}]}
 
   # บนบาน/แก้บน — ผลของเรื่องที่บนเป็นอิสระจากการบน · แก้ตามกำลังมีทุกใบ ≤0.05 เท่าเงินเก็บต่อปี · เลื่อนได้ครั้งเดียว
   # ศาลเจ้าก่อนสอบไม่อยู่ในกองสุ่ม (B63): แกนวางไว้หน้าด่านสอบเข้ามหาวิทยาลัยปีจบ ม.ปลาย/ปวช. · แก้บนทวงเฉพาะคนที่สอบติด (exam_pass:uni)
   - id: bel_vow_exam
+    away_block: [monk]
     type: B
     category: belief
     stage: วัยรุ่น
@@ -345,7 +413,9 @@ events:
       - {id: pray, text: "ไหว้ขอพรเฉย ๆ", merit: [{cat: neutral}]}
       - {id: donate, text: "ไหว้แล้วหยอดตู้บริจาค", cost: {unit: fixed_baht, amount: 20, ref_year: 2560}, merit: [{cat: dana, level: 1}]}
       - {id: wait, text: "รออยู่ข้างนอก ไม่เข้าไปไหว้", merit: [{cat: neutral}]}
+      - {id: sit, text: "นั่งสมาธิหน้าศาล ใจนิ่งก่อนสอบ", show_if: {tree: [o2]}, effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
   - id: bel_vow_exam_due
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -361,6 +431,7 @@ events:
       - {id: defer, text: "ขอเลื่อนไปก่อน", redeem: defer, schedules: [{event: bel_vow_exam_due2, after_years: [1, 2]}], merit: [{cat: neutral}]}
       - {id: plus, text: "แก้บนพร้อมถวายสังฆทาน", redeem: full, cost: {unit: fixed_baht, amount: 2000, ref_year: 2560}, clears_flags: [vow_open:exam], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
   - id: bel_vow_exam_due2
+    away_block: [abroad]
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -377,6 +448,7 @@ events:
       - {id: plus, text: "แก้บนพร้อมถวายสังฆทาน", redeem: full, cost: {unit: fixed_baht, amount: 2000, ref_year: 2560}, clears_flags: [vow_open:exam], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
 
   - id: bel_vow_parent
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -402,6 +474,7 @@ events:
       - {id: chant, text: "นั่งสวดมนต์เงียบ ๆ หน้าห้อง", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
       - {id: call, text: "โทรบอกญาติให้รู้ไว้", effects: {relations: 1}, merit: [{cat: neutral}]}
   - id: bel_vow_parent_due
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -417,6 +490,7 @@ events:
       - {id: defer, text: "ขอเลื่อนไปก่อน", redeem: defer, schedules: [{event: bel_vow_parent_due2, after_years: [1, 2]}], merit: [{cat: neutral}]}
       - {id: plus, text: "แก้บนพร้อมทำบุญเพิ่ม", redeem: full, cost: {unit: fixed_baht, amount: 2500, ref_year: 2560}, clears_flags: [vow_open:parent], effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
   - id: bel_vow_parent_due2
+    away_block: [abroad]
     type: B
     category: belief
     stage: ทำงาน
@@ -435,6 +509,7 @@ events:
   # หวยสายลี้ลับ — เกิดเฉพาะตอนเงินตึง รวมทุกใบไม่เกิน 5 ครั้งต่อชีวิต · แกนจับรางวัลจากตาราง finance.lottery
   # ข้อความไม่บอกมูลค่ารางวัล ไม่บอกว่าเลขแม่น ไม่ชวนซื้อเพิ่ม · มีทางเลือกจัดการเงินวางคู่เสมอ
   - id: bel_lottery_dream
+    office_ok: "เงินเดือนเป็นเงินประจำเดือนของคนซื้อหวย ไม่ผูกกับออฟฟิศ"
     type: B
     category: belief
     stage: หนุ่มสาว
@@ -460,6 +535,7 @@ events:
       - {id: tell, text: "เล่าความฝันให้คนที่บ้านฟัง", effects: {relations: 1}, merit: [{cat: neutral}]}
 
   - id: bel_lottery_tree
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: ทำงาน
@@ -477,6 +553,7 @@ events:
       - {id: offer, text: "ไหว้ขอให้ผ่านเดือนนี้ไปได้", effects: {happiness: 1}, merit: [{cat: neutral}]}
 
   - id: bel_lottery_plate
+    away_block: [abroad, monk]
     type: B
     category: belief
     stage: กลางคน
@@ -509,3 +586,102 @@ events:
       - {id: chant, text: "นั่งฟังพระสวดจนจบ", effects: {happiness: 1}, merit: [{cat: bhavana, level: 1}]}
       - {id: host, text: "ช่วยเจ้าภาพล้างจาน", effects: {relations: 1}, merit: [{cat: help_others, level: 1}]}
       - {id: ask, text: "ปรึกษาคนในบ้านเรื่องรายจ่าย", effects: {relations: 1}, merit: [{cat: neutral}]}
+
+  # ช่วงเด็ก (ข้อ 89) — ให้แขนงลึกลับของต้นไม้โฟกัสปลดได้ตั้งแต่เด็ก · เล่าแบบเคารพ ไม่บอกว่าพิธีได้ผล
+  - id: bel_kid_temple_grandma
+    type: B
+    category: belief
+    stage: เด็ก
+    years: [2500, 2650]
+    weight: 2
+    title: "ไปวัดกับยาย"
+    text: "เช้าวันพระ ยายถือถุงข้าวสารกับดอกไม้ธูปเทียนยืนรออยู่หน้าบ้าน ถามว่าอยากไปวัดด้วยกันไหม"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {id: go_temple, text: "ไปวัดกับยาย ช่วยถือถุงของ", cost: {unit: fixed_baht, amount: 20, ref_year: 2560}, effects: {happiness: 1, relations: 1}, merit: [{cat: dana, level: 1}]}
+      - {id: sit_listen, text: "นั่งฟังพระเทศน์ข้างยาย", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: ask_story, text: "ถามยายว่าทำไมต้องไปวัด", effects: {relations: 1}, merit: [{cat: neutral}]}
+      - {id: play_home, text: "อยู่บ้านเล่นกับเพื่อนบ้านแทน", merit: [{cat: neutral}]}
+
+  # ช่วงวัยรุ่น (ใบ 16 · ข้อ 91) — เพิ่มการ์ดหมวด belief วัย 13–18 ให้โหนด o2 ปลดได้ · เล่าแบบเคารพ ไม่บอกว่าพิธีได้ผล
+  - id: bel_teen_camp_invite
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    title: "ชวนไปค่ายธรรมะปิดเทอม"
+    text: "โรงเรียนแปะประกาศค่ายธรรมะปิดเทอม เพื่อนสนิทสองคนจะไป ครูประจำชั้นถามว่าสนใจไหม"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {id: full_camp, text: "ไปค่ายเต็มช่วงปิดเทอม", effects: {happiness: 1}, merit: [{cat: dana, level: 1}]}
+      - {id: last_day, text: "ไปแค่วันสุดท้าย", merit: [{cat: neutral}]}
+      - {id: stay_home, text: "ไม่ไป อยู่บ้านพักผ่อน", merit: [{cat: neutral}]}
+      - {id: go_with_friend, text: "ขอไปกับเพื่อนแต่ไม่เอาของไปเอง", merit: [{cat: neutral}]}
+
+  - id: bel_teen_friend_fortune
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    title: "เพื่อนดูดวงให้"
+    text: "เพื่อนในห้องเอาไพ่มาเปิดดูดวงให้ทุกคนช่วงพักเที่ยง ไพ่ใบของเรามีคำเตือนเรื่องสอบ"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: fortune, tradition: ผสม}
+    choices:
+      - {id: see_through, text: "ขอดูของตัวเองจนจบ", effects: {happiness: 1}, merit: [{cat: neutral}]}
+      - {id: laugh_off, text: "ขำแล้วเปลี่ยนเรื่อง", merit: [{cat: neutral}]}
+      - {id: ask_fix, text: "ถามว่าจะแก้ยังไง", merit: [{cat: neutral}]}
+      - {id: note_down, text: "ขอจดคำทำนายไว้ในสมุด", merit: [{cat: neutral}]}
+
+  - id: bel_teen_grandma_merit
+    type: B
+    category: belief
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    weight: 3
+    title: "ใส่บาตรตอนเช้า"
+    text: "ยายปลุกตั้งแต่ตีห้า บอกให้ช่วยถือถุงอาหารไปใส่บาตรหน้าปากซอย"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: merit_wish, tradition: พุทธ}
+    choices:
+      - {id: help_give, text: "ไปช่วยใส่บาตร", merit: [{cat: dana, level: 1}]}
+      - {id: stand_wait, text: "ไปแต่ยืนรอ", merit: [{cat: neutral}]}
+      - {id: sleep_on, text: "ขอนอนต่อ", merit: [{cat: neutral}]}
+      - {id: buy_own, text: "ไปแต่ขอซื้อของใส่บาตรเอง", cost: {unit: fixed_baht, amount: 20, ref_year: 2560}, merit: [{cat: dana, level: 1}]}
+
+  # โกงความตาย (ใบ 206 · B153) — พิธียืมชื่อคนอื่นมาต่อชะตาตัวเอง ตั้งธง cheat_death ⇒ ถึงคราวตายถูกเรียกตัวไปศาล (court_summons_*) แล้วตายปีเดิมสาเหตุเดิม
+  # บาปฝืนธรรมชาติลงที่ตัวเลือกนี้ที่เดียว — ใบศาล summons ไม่ลงบาปซ้ำ · สืบชะตาที่วัดเป็นพิธีปกติ ไม่ตั้งธง
+  - id: bel_borrow_name_01
+    type: B
+    category: belief
+    stage: ชรา
+    years: [2500, 2650]
+    weight: 1
+    when: {illness: {}}
+    title: "ยืมชื่อต่อชะตา"
+    text: "หลังหมอบอกผลตรวจ เพื่อนรุ่นเดียวกันพาไปหาอาจารย์ในซอยลึก อาจารย์ดูวันเกิดแล้วบอกว่าชะตาขาด ถ้าอยากอยู่ต่อ ให้เขียนชื่อคนที่ยังไม่ถึงคราวลงผ้ายันต์ แล้วเผาพร้อมชื่อตัวเอง ใครมารับจะได้จดผิดคน ส่วนเจ้าของชื่อจะเป็นอย่างไร อาจารย์ไม่ได้พูดถึง"
+    lore_ref: lore-finance-belief.md#B
+    belief: {kind: amulet, tradition: ผสม}
+    choices:
+      - id: borrow_name
+        text: "ยอมทำพิธียืมชื่อ"
+        cost: {unit: fixed_baht, amount: 5000, ref_year: 2560}
+        sets_flags: [cheat_death]
+        effects: {happiness: 1}
+        merit: [{cat: against_nature, level: 2}]
+      - id: temple_rite
+        text: "ไปทำบุญสืบชะตาที่วัดแทน"
+        cost: {unit: fixed_baht, amount: 500, ref_year: 2560}
+        effects: {happiness: 1}
+        merit: [{cat: dana, level: 1}]
+      - id: ask_family
+        text: "กลับไปเล่าให้ลูกหลานฟังก่อน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: decline
+        text: "ขอบคุณแล้วขอตัวกลับ"
+        merit: [{cat: neutral}]

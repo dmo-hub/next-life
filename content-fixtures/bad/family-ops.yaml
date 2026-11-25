@@ -20,6 +20,17 @@ events:
       - {text: "ทางที่สอง", family: [{leave: spouse}], merit: [{cat: neutral}]}
       - {text: "ทางที่สาม", family: [{die: parent}], merit: [{cat: neutral}]}
       - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  # ใบ 90 บทแฟน: add partner · breakup (by us|them) · marry ผ่าน
+  - id: ok_case_partner
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", family: [{add: partner}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", family: [{marry: partner}], merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
   # B36a2: สัตว์ไม่มีอายุขัย · bond ไม่มีค่า d · d ลอยไม่มี bond · ชนิดสัตว์ติดบทบาทคน — รับสัตว์ครบรูป/เพื่อนรุ่น/bond ขึ้นลงยังผ่าน
   - id: bad_case_02
     type: A

@@ -1,0 +1,24 @@
+# ลูกอยู่ไกลผิดรูป: ไม่บอก far · grandkids ไม่ใช่ true
+events:
+  - id: bad_case_01
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {child_far: {age: [24, 42]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {child_far: {far: true, grandkids: false}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

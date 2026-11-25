@@ -32,12 +32,13 @@ events:
         merit: [{cat: neutral}]
 
   - id: food_somtam_contest_01
+    office_ok: "ใบกรองอาชีพลูกจ้างแล้ว ตัวแทนแผนกของโรงงานหรือออฟฟิศ"
     type: A
     category: society
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [factory, clerk, technician, professional, manager]}
+    when: {age: [31, 45], occupation: [factory, clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ตัวแทนแผนกลงแข่งตำส้ม"
     text: "งานประจำจังหวัดปีนี้มีแข่งตำส้ม ครกไม้เรียงบนเวที กรรมการถือช้อนรอชิมทีละจาน หัวหน้าส่งชื่อคุณเป็นตัวแทนแผนก เพราะเคยคุยในวงข้าวว่ามือหนัก ทั้งที่ปีนี้ทั้งปีคุณตำแต่น้ำพริกถ้วยเล็ก"
     choices:
@@ -68,7 +69,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [31, 45], occupation: [clerk, technician, professional, manager]}
+    when: {age: [31, 45], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "พักเที่ยงเหลือสิบห้านาที"
     text: "ประชุมลากยาวจนเหลือพักสิบห้านาที หน้าร้านข้าวแกงคนต่อแถวถึงตู้น้ำ ถาดแกงเหลือครึ่ง ป้าถือทัพพีรอคำตอบจากคนข้างหน้าที่ยังชี้ไปชี้มาเหมือนกำลังซื้อบ้าน"
     choices:
@@ -316,7 +317,7 @@ events:
         text: "เอาครบทุกอย่างเหมือนสมัยก่อน"
         outcomes:
           - {weight: 1, ok: true, text: "รสยังเหมือนเดิมทุกคำ นั่งยิ้มกับถ้วยเปล่าอยู่จนรถเข็นไปพ้นซอย", effects: {happiness: 2}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "อร่อยได้สามคำ ฟันเสียวจนต้องอมน้ำอุ่นทั้งบ่าย", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
+          - {next: after_care_old_01, weight: 1, text: "อร่อยได้สามคำ ฟันเสียวจนต้องอมน้ำอุ่นทั้งบ่าย", effects: {happiness: 1, health: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: one_scoop
         text: "ขอลูกเดียวใส่ขนมปังพอ"
@@ -370,7 +371,7 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [19, 26], year: [2554, 2650], family: [{role: spouse, count: [0, 0]}]}
+    when: {age: [19, 26], year: [2554, 2650], family: [{role: spouse, count: [0, 0]}, {role: partner, count: [0, 0]}]}
     title: "เงินเหลือสองซุ้มสุดท้าย"
     text: "คืนวันเสาร์คุณนัดคนที่แอบชอบมาตลาดนัดกลางคืน หลอดไฟเหลืองห้อยเต็มทาง วงดนตรีเล่นอยู่หน้ารถเก่า หมึกย่างหมดไปแล้ว ขนมโตเกียวหมดไปแล้ว เงินในกระเป๋าเหลือพอแค่สองซุ้ม เขาชี้ไปที่ร้านเสื้อมือสองแล้วหันมายิ้ม"
     choices:
@@ -430,7 +431,7 @@ events:
     stage: กลางคน
     years: [2500, 2650]
     weight: 0.0625
-    when: {age: [46, 59], occupation: [clerk, technician, professional, manager]}
+    when: {age: [46, 59], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ขายแค่วันละสามชั่วโมง"
     text: "ร้านขนมครกโบราณที่คุณกินมาตั้งแต่เด็กยังโม่แป้งเอง เปิดวันละแค่สามชั่วโมง ตรงเวลางานพอดี แถวยาวตั้งแต่เตายังไม่ร้อน อาทิตย์นี้เพื่อนเก่าจากต่างจังหวัดจะมาเยี่ยม และเขาพูดถึงขนมครกถาดนี้มาสามปีแล้ว"
     choices:

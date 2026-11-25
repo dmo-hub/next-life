@@ -3,6 +3,7 @@
 events:
   # smoker
   - id: kid_smoke_house_01
+    away_block: [monk]
     type: A
     category: health
     stage: เด็ก
@@ -36,6 +37,7 @@ events:
 
   # heavy_drinker
   - id: kid_fetch_from_circle_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -69,6 +71,7 @@ events:
 
   # heavy_drinker — ทางสาบานตั้ง no_drink_vow ให้ young_party_01 ออกครึ่งเดียว
   - id: teen_no_drink_vow_01
+    away_block: [monk]
     type: A
     category: health
     stage: วัยรุ่น
@@ -102,6 +105,7 @@ events:
 
   # lottery_habit
   - id: kid_lottery_errand_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: เด็ก
@@ -134,6 +138,7 @@ events:
 
   # own_business
   - id: teen_family_shop_01
+    away_block: [monk]
     type: A
     category: work_money
     stage: วัยรุ่น
@@ -166,6 +171,7 @@ events:
 
   # home_owner
   - id: teen_home_paid_01
+    away_block: [monk]
     type: A
     category: family
     stage: วัยรุ่น
@@ -195,6 +201,7 @@ events:
 
   # caught_fraud
   - id: teen_parent_news_01
+    away_block: [monk]
     type: A
     category: society
     stage: วัยรุ่น
@@ -227,6 +234,7 @@ events:
 
   # loan_shark — รุ่นก่อนติดราวอายุ 33 ทายาทยังเด็กอยู่ จึงเล่าตอน 9–12 ได้
   - id: kid_collector_door_01
+    away_block: [monk]
     type: A
     category: family
     stage: เด็ก
@@ -259,6 +267,7 @@ events:
 
   # guarantor
   - id: teen_court_letter_01
+    away_block: [monk]
     type: A
     category: family
     stage: วัยรุ่น

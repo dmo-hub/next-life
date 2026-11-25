@@ -1,0 +1,86 @@
+# when.spouse ผิดรูป (ใบ 92): status นอกรายการ · bond ต่ำกว่าพื้นเกม 38 · ช่วงกลับด้าน · apart คู่กับ together · together คู่กับ apart · คีย์แปลก · ไม่ใช่ object — when.spouse ถูกรูปยังผ่าน
+events:
+  - id: bad_case_01
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {status: divorced}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_02
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {bond: [0, 30]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_03
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {bond: [50, 40]}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_04
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {apart: [1, 3], status: together}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_05
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {together: [1, 3], status: apart}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_06
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: {mood: happy}}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}
+  - id: bad_case_07
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {spouse: [together]}
+    text: "ข้อความการ์ด"
+    choices:
+      - {text: "ทางที่หนึ่ง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สอง", merit: [{cat: neutral}]}
+      - {text: "ทางที่สาม", merit: [{cat: neutral}]}
+      - {text: "ทางที่สี่", merit: [{cat: neutral}]}

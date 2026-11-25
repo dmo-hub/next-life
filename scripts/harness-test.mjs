@@ -1,9 +1,11 @@
 // ทดสอบตัว harness เอง (ไม่ใช่เนื้อหา): ด่านต้องตกเมื่อควรตก · ตัวชี้ต้นเหตุคิดถูกบนตัวอย่างมือ · ตัวเทียบฐานจับของที่แย่ลง
 // · บอทอ่านป้ายถูก กดเฉพาะตัวที่เปิด และเล่นซ้ำได้ผลเดิม — ใครแก้ harness/gates.mjs หรือ bots.mjs จนด่านผ่านง่ายเกิน ไฟล์นี้ตก
-import { playLife, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, dieMidYear, causeWords, nextCard } from '../src/engine/index.mjs';
-import { loadContent, loadEvents } from '../src/node/load.mjs';
+import { readFileSync } from "node:fs";
+import { pickFocus, treePace, treePaceCtl, treeInvest, treeYearEnd, applyFamily, ageKin, spouseOf, spouseStatus, funeralWho, letterTo, lossOk, exPartnerOf, familyOf, lossText, becomePartner, parentSpouseOf, spouseOk, KIN_CUSTODY, DIVORCE_SPLIT, BOND_FLOOR, NOT_MINE } from '../src/engine/index.mjs';
+import { playLife, levelValue, thaiEarn, goalNames, lifeTreeGoals, newLife, mixSeed, makeRng, openChoices, familyOk, lifeGateOpen, GATE_FLAG, OFFICE_GATE, moneyTight, sinPicks, DARK_GATE, nextLife, playAfterlife, whenOk, choose, monthlyIncome, snapshot, restore, repairLife, PAST_TALENT, picksAfter, CLASSES, focusYearEnd, focusOffers, dieMidYear, causeWords, nextCard, moneyValue, chooseSpend } from '../src/engine/index.mjs';
+import { loadContent, loadEvents, loadSkillMap } from '../src/node/load.mjs';
 import { gate3b, gate4, blame, compareBaseline, gate3bTol, GATE3B_Z, splitDeadChoices, MIN_EXPECTED_PICKS, MIN_LIVES, AGE_TOL, CARD_MIN, CARD_MAX } from '../harness/gates.mjs';
-import { BOTS, readFx, random, botFlows, FOCUS_FLOW_SHARE } from '../harness/bots.mjs';
+import { BOTS, readFx, random, withSpend, SPEND_WAY } from '../harness/bots.mjs';
 import { kinGaps, kinDeadRefs, familyLockShort } from '../harness/kin.mjs';
 import { cadetCard, chooseCadet } from '../src/engine/cadet.mjs';
 import { newLedger } from '../src/engine/merit.mjs';
@@ -175,6 +177,69 @@ const f2 = (v) => v.toFixed(2);
   check('B159 ถือธงตรง = การ์ดออก ป้าย [{flag, tier}] เฉพาะใบนั้น', smoker.probe.length > 0 && smoker.keyed.length === smoker.probe.length && JSON.stringify(smoker.probe[0].parentFrom) === '[{"flag":"smoker","tier":1}]');
 }
 
+// เป้าชีวิต (life-goal ใบ 02 · ย้ายมาผูกต้นไม้ ft15): ปลดโหนดใหญ่ (b) หรือ keystone (k) ตัวแรกของแขนง = ได้ความสุข goal_joy ครั้งเดียวต่อแขนง · การ์ดตายเล่ารายการ · สกิลจาก skillMap.lifeGoal (id = แขนง)
+{
+  const base = loadContent();
+  const tr = base.tree;
+  const joy = levelValue(tr.goal_joy);
+  const nodes = Object.entries(tr.nodes);
+  const pick = (branch, sizes) => nodes.filter(([, d]) => d.branch === branch && sizes.includes(d.size)).map(([id]) => id);
+  const mk = (done, content = base) => { const s = newLife(11, content); s.happiness = 40; s.tree = { cur: null, done: Object.fromEntries(done.map((id) => [id, 20])), yrs: {}, cards: {}, hist: [] }; return s; };
+  const [m1, m2] = pick('money', ['b', 'k']);
+  const [r1] = pick('rel', ['b', 'k']);
+  const [m0] = pick('money', ['s']);
+  check('lg02 ค่า goal_joy ใน tree.yaml = ระดับ 2 (+12)', tr.goal_joy === 2 && joy === 12, `${tr.goal_joy} · ${joy}`);
+  const none = mk([m0]);
+  lifeTreeGoals(none);
+  check('lg02 ปลดแต่โหนดเล็ก (s) = ไม่มีรางวัล ไม่มีรายการ', !none.goalsDone && none.happiness === 40, `${none.goalsDone}`);
+  const s = mk([m1]);
+  lifeTreeGoals(s);
+  check('lg02 ปลดโหนดใหญ่/keystone = ความสุข +12 จดแขนง+โหนด', s.happiness === 40 + joy && s.goalsDone.join() === 'money' && s.goalNode.money === m1, `${s.happiness} · ${s.goalsDone} · ${JSON.stringify(s.goalNode)}`);
+  // ตัวควบคุม: เนื้อเดียวกันแต่ goal_joy = 0 ⇒ ไม่มีรางวัล ไม่มีรายการ
+  const c0 = mk([m1], { ...base, tree: { ...tr, goal_joy: 0 } });
+  lifeTreeGoals(c0);
+  check('lg02 ตัวควบคุม goal_joy 0 = ไม่ได้รางวัล ไม่มีรายการ', c0.happiness === 40 && !c0.goalsDone, `${c0.happiness} · ${c0.goalsDone}`);
+  s.tree.done[m2] = 21;
+  lifeTreeGoals(s);
+  check('lg02 โหนดใหญ่ตัวที่สองของแขนงเดิม = ไม่ได้รางวัลซ้ำ', s.happiness === 40 + joy && s.goalsDone.length === 1, `${s.happiness} · ${s.goalsDone}`);
+  s.tree.done[r1] = 22;
+  lifeTreeGoals(s);
+  check('lg02 โหนดใหญ่ของอีกแขนง = ได้รางวัลอีกครั้ง · เล่าครบสองรายการ', s.happiness === 40 + 2 * joy && s.goalsDone.join() === 'money,rel' && goalNames(s).join() === [tr.nodes[m1].name, tr.nodes[r1].name].join(), `${s.happiness} · ${goalNames(s)}`);
+  check('lg02 ไม่สำเร็จเลย = ไม่มีรายการบนตัว', !newLife(11, base).goalsDone);
+}
+
+// สกิลจากเป้าชีวิต (life-goal ใบ 03): skillMap.lifeGoal เทียบ id แขนงของต้นไม้ · thaiEarn ให้สกิลเมื่อ st.goalsDone มี id นั้น · ชื่อเป้าชุดเดียวกับการ์ดตายกับสมุด
+{
+  const { writeFileSync, mkdtempSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { pathToFileURL } = await import('node:url');
+  const dir = mkdtempSync(join(tmpdir(), 'lg03-'));
+  const mapOf = (body) => { const f = join(dir, `m${Math.random().toString(36).slice(2)}.yaml`); writeFileSync(f, body); return pathToFileURL(f).href; };
+  const base = loadContent();
+  const ok = loadSkillMap(mapOf('lifeGoal:\n  money: [appraise]\n  rel: [regen]\n'));
+  check('lg03 skillMap.lifeGoal รับ id แขนงของต้นไม้', ok.lifeGoal.money?.[0] === 'appraise' && ok.lifeGoal.rel?.[0] === 'regen', JSON.stringify(ok.lifeGoal));
+  let threw = '';
+  try { loadSkillMap(mapOf('lifeGoal:\n  mid: [appraise]\n')); } catch (e) { threw = String(e.message); }
+  check('lg03 โหนดกลาง (mid) ไม่ใช่แขนง ใน lifeGoal ตกด่านโหลด', /lifeGoal\.mid/.test(threw), threw.slice(0, 80));
+  threw = '';
+  try { loadSkillMap(mapOf('lifeGoal:\n  nope_goal: [appraise]\n')); } catch (e) { threw = String(e.message); }
+  check('lg03 id ที่ไม่มีในทะเบียนใน lifeGoal ตกด่านโหลด', /lifeGoal\.nope_goal/.test(threw), threw.slice(0, 80));
+  const mk = (goals) => { const s = newLife(11, { ...base, skillMap: ok }); if (goals) s.goalsDone = goals; return s; };
+  const ids = (s) => thaiEarn(s).map((x) => x.id);
+  check('lg03 เป้าสำเร็จ = ได้สกิลตามตาราง', ids(mk(['money'])).includes('appraise'), ids(mk(['money'])).join());
+  const two = ids(mk(['money', 'rel']));
+  check('lg03 สำเร็จสองอัน = ได้ทั้งสองสกิล', two.includes('appraise') && two.includes('regen'), two.join());
+  check('lg03 ไม่สำเร็จเลย = ไม่ได้สกิลจากเป้า', !ids(mk()).includes('appraise') && !ids(mk()).includes('regen'), ids(mk()).join());
+  check('lg03 เป้าที่ตารางไม่ให้สกิล = ไม่ได้ ไม่ตก', ids(mk(['know'])).every((x) => x !== 'appraise' && x !== 'regen'));
+  const old = goalNames(mk(['study_hard']));
+  check('lg03 เซฟเก่า (id ต้นสายโฟกัสเดิม) ไม่ตก · ข้ามชื่อเป้าที่ไม่มีโหนดรองรับ', old.length === 0, old.join());
+  check('lg03 ไม่มีรายการ = ชื่อว่าง', goalNames(mk()).length === 0);
+  // ตารางจริง (เจ้าของเคาะ): ทุกเป้ามีสกิล ≥1 และสกิลมีจริง — ทะเบียนตกด่านโหลดอยู่แล้ว ข้อนี้กันตารางว่างกลับมา
+  const real = Object.keys(base.skillMap.lifeGoal ?? {});
+  check('lg03 ตารางจริงครบ 5 แขนง', real.length === 5, real.join());
+}
+
 // ประตูเข้าสาย (โฟกัสใบ 04): ตัวเลือกติดป้าย gate ซ่อน (hidden + locked) จนประตูเปิด — ไม่ตัดออก เลขลำดับจึงตรงเนื้อหา · ประตูเปิดจากโฟกัสครบ chain_years · ทายาท · ธงชวน
 // การ์ดชวนลงสมัครตอนยังไม่มีตำแหน่ง = ประตูการเมือง · บอทมีนโยบายโฟกัส ~1/3 ตามน้ำ
 {
@@ -182,7 +247,7 @@ const f2 = (v) => v.toFixed(2);
   const byId = new Map(base.events.map((e) => [e.id, e]));
   const gated = base.events.filter((e) => e.choices.some((c) => c.gate));
   const probe = { id: 'gate_probe', type: 'A', category: 'work_money', stage: 'ทำงาน', years: [2400, 2700], weight: 100000, text: 'probe', choices: [
-    { id: 'open', text: 'เปิดกิจการ', gate: 'business', merit: [{ cat: 'neutral' }] }, ...[1, 2, 3].map((i) => ({ id: `n${i}`, text: `อื่น ${i}`, merit: [{ cat: 'neutral' }] })),
+    { id: 'open', text: 'เปิดกิจการ', gate: 'mo5', merit: [{ cat: 'neutral' }] }, ...[1, 2, 3].map((i) => ({ id: `n${i}`, text: `อื่น ${i}`, merit: [{ cat: 'neutral' }] })),
   ] };
   const content = { ...base, events: [...base.events, probe] };
   const visible = (c) => c.choices.filter((_, i) => !c.hidden?.[i]).length;
@@ -194,14 +259,17 @@ const f2 = (v) => v.toFixed(2);
     return n;
   };
   check('ใบ 04 ประตูปิด = ตัวเลือกติดประตูไม่ขึ้น (การ์ดยังออก 3 ตัวเลือก)', seen(() => {}) === 3, `${seen(() => {})}`);
-  check('ใบ 04 โฟกัสสะสมครบ chain_years = ตัวเลือกขึ้น', seen((st) => (st.focusYears = { business: base.focus.chain_years })) === 4);
-  check('ใบ 04 โฟกัสสะสมไม่ครบ = ยังซ่อน', seen((st) => (st.focusYears = { business: base.focus.chain_years - 1 })) === 3);
-  check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['business'])) === 4);
-  check('ใบ 04 ธงชวน gate:<โฟกัส> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 4);
+  check('ft15 focusYears ครบ chain_years ไม่เปิดประตูแล้ว (สะพานตัด · เซฟเก่าแปลงตอนโหลด)', seen((st) => (st.focusYears = { business: 3 })) === 3);
+  check('ใบ 04 ทายาทรับประตูที่รุ่นก่อนเปิด = ขึ้นโดยไม่ต้องสะสมเอง', seen((st) => (st.gates = ['mo5'])) === 4);
+  check('ใบ 04 ธงชวน gate:<โหนด> = ขึ้น', seen((st) => (st.flags[GATE_FLAG + 'mo5'] = true)) === 4);
+  check('ใบ 10 ปลดโหนดประตู = ตัวเลือกขึ้น', seen((st) => { st.tree = { done: { mo5: 30 }, yrs: {}, cards: {} }; }) === 4);
+  check('ใบ 10 ปลดโหนดอื่น (ไม่ใช่โหนดประตู) = ยังซ่อน', seen((st) => { st.tree = { done: { mo3: 30 }, yrs: {}, cards: {} }; }) === 3);
+  check('ใบ 10 ล้างโหนดประตูแล้ว = ประตูปิดอีก', seen((st) => { st.tree = { done: {}, gone: { mo5: 30 }, yrs: {}, cards: {} }; }) === 3);
+  check('ft15 st.gates/ธง ชื่อโฟกัสเดิมที่ไม่ผ่านการแปลงตอนโหลด = ไม่เปิดประตู (ชื่อเดิมไม่ใช่รหัสโหนดแล้ว)', seen((st) => { st.gates = ['business']; }) === 3 && seen((st) => (st.flags[GATE_FLAG + 'business'] = true)) === 3);
 
   // ชีวิตจริงทั้งกอง: จำนวนตัวเลือกบนการ์ดที่ติดป้าย = ตามสถานะประตูตอนการ์ดออก · ชีวิตตามน้ำ/ประตูปิดไม่เคยเห็นตัวเลือกประตู
   const N = 1200;
-  let wrong = 0, flowLives = 0, flowGatedCards = 0, flowGateChoices = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0, polFocus = 0, polOffice = 0;
+  let wrong = 0, invites = 0, invitesClosed = 0, bizLives = 0, bizInvite = 0;
   for (let i = 0; i < N; i++) {
     const seed = mixSeed(404, i);
     const bot = BOTS[Object.keys(BOTS)[i % 6]];
@@ -213,22 +281,15 @@ const f2 = (v) => v.toFixed(2);
         // ตัวเลือกครบตามเนื้อหา (ลำดับไม่เลื่อน) · ซ่อน = ล็อกด้วยเสมอ · ซ่อนตรงสถานะประตู
         const shut = ev.choices.map((x) => !!x.gate && ![x.gate].flat().some((id) => lifeGateOpen(s, id)));
         if (c.choices.length !== ev.choices.length || shut.some((h, k) => h !== !!c.hidden?.[k] || (h && !c.locked?.[k]))) wrong++;
-        if (botFlows(s)) { flowGatedCards++; flowGateChoices += ev.choices.filter((x, k) => x.gate && !c.hidden?.[k]).length; }
       }
       if (/^office_/.test(c.id ?? '') && !s.office) { invites++; if (!lifeGateOpen(s, OFFICE_GATE)) invitesClosed++; }
       if (c.id === 'biz_politics_invite_01') invited = true;
     });
-    if (botFlows(st)) flowLives++;
-    if (st.flags.own_business && !(st.focusYears?.politics_base)) { bizLives++; if (invited) bizInvite++; }
-    if ((st.focusYears?.politics_base ?? 0) >= base.focus.chain_years) { polFocus++; if ((st.officeTop ?? -1) >= 0) polOffice++; }
+    if (st.flags.own_business && !(st.tree?.done?.r5 !== undefined)) { bizLives++; if (invited) bizInvite++; }
   }
   check('ใบ 04 ตัวเลือกบนการ์ดติดป้าย: ครบตามเนื้อหา · ซ่อน+ล็อกตรงสถานะประตู (ทั้งกอง)', wrong === 0, `ไม่ตรง ${wrong}`);
   check('ใบ 04 การ์ดชวนลงสมัครออกเฉพาะประตูการเมืองเปิด', invitesClosed === 0 && invites > 0, `ชวน ${invites} · ประตูปิดแต่ออก ${invitesClosed}`);
-  const share = flowLives / N;
-  check('ใบ 04 บอทตามน้ำราว 1/3', Math.abs(share - FOCUS_FLOW_SHARE) < 0.05, `${(share * 100).toFixed(1)}%`);
-  check('ใบ 04 ชีวิตตามน้ำยังเจอการ์ดทั่วไปที่มีประตู แต่ไม่เห็นตัวเลือกประตู', flowGatedCards > 0 && flowGateChoices === 0, `การ์ด ${flowGatedCards} · ตัวเลือกประตูที่เห็น ${flowGateChoices}`);
   check('ใบ 04 นักธุรกิจที่ไม่โฟกัสการเมืองถูกชวนลงการเมือง > 0', bizInvite > 0, `${bizInvite}/${bizLives}`);
-  check('ใบ 04 บอทที่โฟกัสการเมืองครบ ได้ตำแหน่ง > 0', polOffice > 0, `${polOffice}/${polFocus}`);
 }
 
 // ใบ 05a: อาชีพต่างโลกนับปีเต็มด้วยกติกากลาง — สคริปต์บังคับโฟกัสทีละตา ไม่ใช้บอท
@@ -269,7 +330,7 @@ const f2 = (v) => v.toFixed(2);
     throw new Error(`ใบ 05a ไม่มีชาติรอดครบแผน ${JSON.stringify(plan)}`);
   };
   const has = (plan, c) => run(plan).includes(c);
-  check('ใบ 05a ปีอาชีพต่างโลก = chain_years โลกหลัก', I.ISEKAI_CAREER_T.years === base.focus.chain_years, `${I.ISEKAI_CAREER_T.years} · ${base.focus.chain_years}`);
+  check('ใบ 05a ปีอาชีพต่างโลก = ค่าของโลกต่างโลกเอง (จำนวนเต็ม ≥ 1)', Number.isInteger(I.ISEKAI_CAREER_T.years) && I.ISEKAI_CAREER_T.years >= 1, `${I.ISEKAI_CAREER_T.years}`);
   check('ใบ 05a ปีที่เปลี่ยน + 2 ปีเต็ม = ยังไม่ได้อาชีพ', !has([['sword', 3]], 'swordsman'), run([['sword', 3]]).join(' · '));
   check('ใบ 05a ปีที่เปลี่ยน + 3 ปีเต็ม = นักดาบ', has([['sword', 4]], 'swordsman'));
   check('ใบ 05a สะสมไม่ติดกันครบ 3 = นักดาบ', has([['sword', 3], ['rest', 2], ['sword', 2]], 'swordsman'));
@@ -363,8 +424,7 @@ const f2 = (v) => v.toFixed(2);
 }
 
 // B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50% (ใบ: สืบทอดโอกาสเล็กน้อย ไม่ใช่ได้แน่) · นับเฉพาะทายาทที่พ่อแม่มีนิสัยและถึงอายุล็อก
-// ตัวควบคุม heir_nature 0 (เจ้าของเคาะ): seed เดียวกัน ชีวิตแรกเดินเหมือนกันทุกหลัก และแต้มไม่มีผลก่อนล็อก
-// ⇒ ทายาทรุ่นแรกต่างกันแค่แต้มทุ่มเทที่ได้จากพ่อแม่ — ทายาทที่ได้นิสัยเดียวกันต้องลดลง ไม่งั้นสายแต้มทายาทไม่ต่อ
+// ตัวควบคุม heir_nature 0 (คืนใน ft15): ทายาทรับแต้มนิสัยพ่อแม่ตอนเกิด (heir.nature × heir_nature) · seed เดียวกัน ปิดแต้ม ⇒ ทายาทนิสัยเดียวกันลดลง
 {
   const content = loadContent();
   const heirs = (n) => {
@@ -387,10 +447,10 @@ const f2 = (v) => v.toFixed(2);
   };
   const real = heirs(160);
   check('B41 ทายาทได้นิสัยเดียวกับพ่อแม่ ≤ 50%', real.all >= 50 && real.pct <= 50, `${real.same}/${real.all} = ${f2(real.pct)}%`);
-  const keep = content.focus.heir_nature;
-  content.focus.heir_nature = 0;
+  const keep = content.nature.heir_nature;
+  content.nature.heir_nature = 0;
   const zero = heirs(160);
-  content.focus.heir_nature = keep;
+  content.nature.heir_nature = keep;
   check('B41 ตัวควบคุม: heir_nature 0 ⇒ ทายาทนิสัยเดียวกันลดลง', zero.all === real.all && zero.same < real.same, `${zero.same}/${zero.all} = ${f2(zero.pct)}% · จริง ${real.same}`);
 }
 
@@ -453,7 +513,9 @@ const f2 = (v) => v.toFixed(2);
   check('ขั้นค่าซ้อนทับ: ค่า 0 = ขั้น 0 การ์ดขั้น 1 ไม่ออก ตัวคูณ ×1', before.join() === '0,false,1', before.join());
   check('ขั้นค่าซ้อนทับ: ขึ้นค่ากลางชีวิต → ขั้น 1 การ์ดออกได้ทันที ตัวคูณ ×3 · ตัวคูณ 0 ปิดการ์ด', after.join() === '1,true,3,0', after.join());
   st.overlap = 1e6;
-  check('ขั้นค่าซ้อนทับ: ขั้น 2–4 ยังไปไม่ถึงจนใบ 16 ใส่เกณฑ์ (ค่าสูงแค่ไหนก็ขั้น 1)', E.OVERLAP_STAGE_MIN.length === 5 && E.OVERLAP_STAGE_MIN[1] === 1 && E.overlapStageOf(st) === 1, String(E.overlapStageOf(st)));
+  const edge = [0, 1, 2, 5, 6, 11, 12].map((v) => { st.overlap = v; return E.overlapStageOf(st); });
+  st.overlap = 1e6;
+  check('ขั้นค่าซ้อนทับ: เกณฑ์ใบ 16 [0,1,2,6,12] ขอบแต่ละขั้นถูก · ค่าสูงมาก = ขั้น 4', E.OVERLAP_STAGE_MIN.join() === '0,1,2,6,12' && edge.join() === '0,1,2,2,3,3,4' && E.overlapStageOf(st) === 4, `${edge.join()} · ${E.overlapStageOf(st)}`);
 }
 
 // ใบตามเกตที่ปล่อยไว้: นัดจากทาง pass ไม่ติดป้ายตารางซ้อน ⇒ ทอยตารางใหม่ไม่ล้าง ไม่กินโควตาซ้อน · ถึงคิวกินโควตาปี 1 · ขั้นไม่ใช่ 3–4 ตอนถึงคิว = ไม่ออก
@@ -502,6 +564,20 @@ const f2 = (v) => v.toFixed(2);
   } finally {
     keep.forEach((v, i) => { E.OVERLAP_STAGE_MIN[i] = v; });
   }
+}
+
+// การ์ดจากโค้ดมีครบ 4 ปุ่ม และปุ่มที่เติมต่อท้าย: การ์ดชวนข้ามโลกกดปุ่มใหม่แล้วชีวิตเดินต่อเหมือนปฏิเสธ
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const entries = Object.entries(E.ENTRY_EVENTS);
+  check('ปุ่มการ์ดโค้ด: การ์ดชวนข้ามโลกทุกแบบมี 4 ปุ่ม', entries.every(([, e]) => e.choices.length === 4), entries.map(([k, e]) => `${k}:${e.choices.length}`).join(' '));
+  const st = newLife(mixSeed(1, 4300), content);
+  st.age = 20;
+  const [id, e] = entries[0];
+  st.pending = { entry: id, choices: e.choices.map((text) => ({ text })) };
+  E.choose(st, 3);
+  check('ปุ่มการ์ดโค้ด: ปุ่มที่เติมไม่พาข้ามโลก', !st.dead && !st.trip && !st.flags.isekai_call);
 }
 
 // ไอเทมติดตัว (B78): ห้องบอสให้ชิ้นแรกที่ยังไม่มี · ช่องชนิดตรงว่างก่อน แล้วเป้ · เป้เต็มขาย · ครบแล้วไม่ได้เพิ่ม · ชีวิต/เซฟที่ไม่เคยได้ของไม่มีช่อง
@@ -650,7 +726,7 @@ const f2 = (v) => v.toFixed(2);
 
   // ปุ่มผู้สืบสายเลือด (B76 · ทายาทอายุจริง) ข้ามวงเหมือนถูกเรียกตัว — หาชีวิตที่มีรายชื่อ แล้วกดปุ่มนั้นด้วย id คนแรก
   let blood = null;
-  for (let k = 10; k < 400 && !blood; k++) {
+  for (let k = 10; k < 2000 && !blood; k++) {
     const st = life(k);
     if (!E.heirCandidates(st).length) continue;
     const af = E.startAfterlife(st);
@@ -848,6 +924,67 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
 }
 
+// ใบ tld14 พี่น้องตามมาในชาติทายาท (เจ้าของเคาะ 11-23): ทายาทสายเลือด = ลูกคนอื่นที่ยังอยู่ตามมาเป็น sibling ชื่อเดิม · ไม่ดึง kinRng · ไม่เข้า KIN_HOUSEHOLD · ทางอื่นไม่มี
+{
+  const { startAfterlife, nextAfterCard, chooseAfter, heirCandidates, HEIR_AGE } = await import('../src/engine/index.mjs');
+  const { addMember, heirSibs, sibsAtBirth, kinAid, FUNERAL_WHO } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  // หน่วย: heirSibs เลือกลูกคนอื่นที่ยังอยู่ (รวมย้ายออก) · ไม่รวมคนตาย/คนที่เลือก · หลานเอาเฉพาะ of เดียวกัน
+  const u = newLife(7, content);
+  u.age = 60;
+  const yr = u.birthYear + 60;
+  const k1 = addMember(u, 'child', { born: yr - 40 }), k2 = addMember(u, 'child', { born: yr - 35 }), k3 = addMember(u, 'child', { born: yr - 30 }), k4 = addMember(u, 'child', { born: yr - 25 });
+  k3.left = true;
+  k4.alive = false;
+  const g1 = addMember(u, 'grandchild', { born: yr - 10, of: k1.id }), g2 = addMember(u, 'grandchild', { born: yr - 8, of: k1.id }), g3 = addMember(u, 'grandchild', { born: yr - 6, of: k2.id });
+  const sc = heirSibs(u, k2);
+  check('ใบ tld14 heirSibs ทายาทเป็นลูก: ลูกคนอื่นที่ยังอยู่ (รวมย้ายออก) ไม่รวมคนตาย/ตัวเอง/หลาน', sc.length === 2 && sc.map((s) => s.name).join() === [k1.name, k3.name].join() && sc.find((s) => s.name === k3.name).left === true, sc.map((s) => s.name).join());
+  const sg = heirSibs(u, g1);
+  check('ใบ tld14 heirSibs ทายาทเป็นหลาน: หลานคนอื่นที่ of เดียวกันเท่านั้น (ไม่เอาหลานสายอื่น/ลูก/ลุงป้า)', sg.length === 1 && sg[0].name === g2.name, sg.map((s) => s.name).join());
+  check('ใบ tld14 heirSibs ไม่ใช่ทางสายเลือด (blood=null) = ไม่มี', heirSibs(u, null).length === 0);
+  // เข้าบ้านทายาท: ชื่อ/เพศ/ปีเกิดเดิม · rank ตามปีเกิดเทียบทายาท · แฝด · ไม่ดึง kinRng · ไม่เข้า household
+  const mk = (sibs) => { const st = newLife(11, content); sibsAtBirth(st, sibs ? { sibs } : null); return st; };
+  const by = newLife(11, content).birthYear;
+  const withS = mk([{ sex: 'ชาย', name: 'สมชาย', born: by - 3 }, { sex: 'หญิง', name: 'สมหญิง', born: by + 2 }, { sex: 'หญิง', name: 'แฝดน้อง', born: by }, { sex: 'ชาย', name: 'ไกลบ้าน', born: by - 5, left: true }]);
+  const rk = Object.fromEntries(familyOf(withS).filter((m) => m.role === 'sibling').map((m) => [m.name, m.rank]));
+  check('ใบ tld14 พี่น้องเข้าบ้านทายาท: ชื่อเดิม · rank พี่/น้อง/แฝด · id นับแยก (SIB base) ไม่ชนคนจีบ/แฟน', rk['สมชาย'] === 'elder' && rk['สมหญิง'] === 'younger' && rk['แฝดน้อง'] === 'twin' && withS.kin.filter((m) => m.role === 'sibling').every((m) => m.id >= 20000), JSON.stringify(rk));
+  check('ใบ tld14 พี่น้องที่ย้ายออก (left) ยังอยู่ในรายการ · familyOk ไม่นับคน left', withS.kin.filter((m) => m.role === 'sibling').length === 4 && familyOk(withS, { role: 'sibling', count: [3, 3] }));
+  const base = mk(null);
+  check('ใบ tld14 ไม่ดึง kinRng/kinSeq/kinCauseRng: ลำดับสุ่มของคนในบ้านเท่าชีวิตที่ไม่มีพี่น้อง', JSON.stringify(withS.kinRng) === JSON.stringify(base.kinRng) && withS.kinSeq === base.kinSeq && JSON.stringify(withS.kinCauseRng) === JSON.stringify(base.kinCauseRng));
+  const track = (st) => { st.age = 22; applyFamily(st, { family: [{ add: 'child' }, { add: 'child' }] }); for (let y = 0; y < 12; y++) ageKin(st, st.birthYear + 23 + y); return JSON.stringify([st.kin.filter((m) => m.role === 'child').map((m) => [m.id, m.name, m.sex, m.born, m.alive]), st.kinRng.next()]); };
+  check('ใบ tld14 ลูกที่ตามมา + ผลตาย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีพี่น้อง', track(mk([{ sex: 'ชาย', name: 'สมชาย', born: by - 3 }, { sex: 'หญิง', name: 'สมหญิง', born: by + 2 }])) === track(mk(null)));
+  const bond0 = withS.kin.filter((m) => m.role === 'sibling').map((m) => m.bond);
+  for (let y = 0; y < 5; y++) ageKin(withS, withS.birthYear + 5 + y);
+  check('ใบ tld14 พี่น้องไม่เข้า household: bond ไม่ขยับรายปี · ไม่เป็นผู้ช่วย kinAid', withS.kin.filter((m) => m.role === 'sibling').every((m, i) => m.bond === bond0[i]) && kinAid(withS) === null);
+  const old = mk([{ sex: 'ชาย', name: 'พี่แก่', born: by - 2 }]);
+  for (let y = 0; y < 100; y++) ageKin(old, old.birthYear + 1 + y);
+  check('ใบ tld14 พี่น้องตายตามตารางชีพภายใน 100 ปี (ไม่อยู่ยั้งยืน) · ไม่ลงบันทึกสูญเสียในบ้าน', old.kin[0].alive === false && (old.kinLoss ?? []).every((l) => l.role !== 'sibling'));
+  check('ใบ tld14 งานศพนับพี่น้อง: FUNERAL_WHO.roles มี sibling', FUNERAL_WHO.roles.includes('sibling'));
+  // ครบทาง: ตายมีลูก 3 → เลือกคนกลาง → ทายาทมีพี่ 1 น้อง 1 (ชื่อเดิม) · ทางอื่น (เกิดใหม่) ไม่มี
+  const bot = BOTS['สายครอบครัว'];
+  const died = () => { for (let i = 0; i < 50; i++) { const { state } = playLife(mixSeed(0x14b, i), content, bot); if (state.kin && !state.tripLost) return state; } return null; };
+  const toPath = (af) => { for (let g = 0; g < 400; g++) { const card = nextAfterCard(af); if (af.pending?.path) return card; if (card.done) return null; if (card.choices?.length) chooseAfter(af, bot(card, af.botRng, af)); } return null; };
+  const st = died();
+  let e2e = { err: 'ไม่มีชีวิตที่มีครอบครัว' };
+  if (st) {
+    for (const k of st.kin.filter((m) => m.role === 'child')) { k.alive = false; k.diedAge = 30; }
+    const year = st.birthYear + st.age;
+    const kids = [0, 1, 2].map((i) => addMember(st, 'child', { born: year - HEIR_AGE[0] - 4 - i * 2 }));
+    const heirs = heirCandidates(st);
+    const af = startAfterlife(st);
+    const card = toPath(af);
+    const bi = (card?.manual ?? []).findIndex(Boolean);
+    if (bi >= 0) {
+      const mid = heirs.find((h) => h.id === kids[1].id);
+      chooseAfter(af, bi, mid.id);
+      for (let g = 0; g < 400 && !af.heir; g++) { const c = nextAfterCard(af); if (c.done) break; if (c.choices?.length) chooseAfter(af, bot(c, af.botRng, af)); }
+      if (af.heir) { const nl = nextLife(af); e2e = { names: nl.kin.filter((m) => m.role === 'sibling').map((m) => m.name), ranks: familyOf(nl).filter((m) => m.role === 'sibling').map((m) => m.rank), sibs: af.heir.sibs?.length, want: [kids[0].name, kids[2].name], name: nl.name, mid: kids[1].name }; }
+      else e2e = { err: 'ไม่ถึงการ์ดส่งต่อ' };
+    } else e2e = { err: 'ไม่มีปุ่มสายเลือด' };
+  }
+  check('ใบ tld14 ครบทาง: ตายมีลูก 3 → เลือกคนกลาง → ทายาทมีพี่ 1 น้อง 1 ชื่อเดิม', !e2e.err && e2e.name === e2e.mid && e2e.sibs === 2 && [...e2e.names].sort().join() === [...e2e.want].sort().join() && e2e.ranks.includes('elder') && e2e.ranks.includes('younger'), e2e.err ?? JSON.stringify(e2e));
+}
+
 // เฟส 3 เตรียมทหาร ช่วง 2 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ตายระหว่างฝึก = สาเหตุ training ผ่านด่านตายเดียว
 // การ์ดฉากสุดท้ายที่รอในคิวต้องเล่าก่อนงานศพ · สัญญารอดตายยังกันได้ · คำบนการ์ดตายต้องมี
 {
@@ -1009,6 +1146,636 @@ const f2 = (v) => v.toFixed(2);
     }
   }
   check('เฟส 3 ชื่อผู้เล่นชนชื่อเพื่อน = เพื่อนใช้ชื่อสำรอง', Object.keys(fn).length > 0 && bad.length === 0, bad.join(' ') || `${Object.keys(fn).length} ชื่อ`);
+}
+
+// ผีบรรพบุรุษ (ใบ 18): แถวชาติไทยล่าสุดในผัง ข้ามชาติต่างโลก/แถวไม่มีชื่อ · ไม่มีแถวไทย = เงื่อนไขไม่ผ่าน · ช่องแทนค่าอ่านจากแถวนั้น
+{
+  const E = await import('../src/engine/index.mjs');
+  const st = newLife(mixSeed(1, 1801), loadContent());
+  const want = { ancestor: true };
+  const seen = [];
+  const got = (lineage) => {
+    st.lineage = lineage;
+    return [E.whenOk(st, want), E.ancestorOf(st)?.name ?? '-'];
+  };
+  seen.push(got([]), got([{ isekai: true, name: 'ไรนา', world: 'x' }]), got([{ name: 'ก้อย', sex: 'หญิง', province: 'น่าน', age: 71 }, { name: 'ต้น', sex: 'ชาย', province: 'กรุงเทพมหานคร', age: 40 }, { name: null, sex: 'ชาย', age: 9 }, { isekai: true, name: 'ไรนา', world: 'x' }]));
+  check('ผีบรรพบุรุษ: ผังว่าง/มีแต่ต่างโลก = ไม่ออก · เลือกแถวไทยล่าสุดที่มีชื่อ', seen.map((r) => r.join(':')).join() === 'false:-,false:-,true:ต้น', seen.map((r) => r.join(':')).join());
+  const text = E.fill('{บรรพบุรุษ}|{ชื่อบรรพบุรุษ}|{จังหวัดบรรพบุรุษ}|{อายุตายบรรพบุรุษ}', st);
+  st.lineage = [{ name: 'ก้อย', sex: 'หญิง', province: 'น่าน', age: 71 }];
+  const old = E.fill('{บรรพบุรุษ}|{จังหวัดบรรพบุรุษ}', st);
+  check('ผีบรรพบุรุษ: ช่องแทนค่า = เพศ/ชื่อ/จังหวัด/อายุตายของแถว', text === 'ผู้ชาย|ต้น|กรุงเทพมหานคร|40' && old === 'หญิงชรา|จ.น่าน', `${text} · ${old}`);
+}
+
+// ใบ 08 ตัวเร่ง/ชะลอการปลด: ความเร็วต่อปีคิดถูกบนตัวอย่างมือ · ปิดตัวเร่ง/ไม่มีค่า = 1 เป๊ะ · ปีเศษส่วนทำให้โหนด 5 ปีปลดเร็วขึ้นจริง
+{
+  const cfg = { age_end: 75, age_end_mul: 0.6, teacher: 1.25, learn: 1.15, class_step: 0.02, class_mid: 4.5 };
+  const only = (o) => Object.assign(treePaceCtl, { teacher: false, cls: false, learn: false, age: false }, o);
+  const near = (a, b) => Math.abs(a - b) < 1e-9;
+  try {
+    only({ age: true });
+    check('ใบ 08 ยิ่งแก่ยิ่งช้า: อายุ 0 = 1 · 75 = 0.6 · เกิน 75 คงที่', near(treePace({}, cfg, 0), 1) && near(treePace({}, cfg, 75), 0.6) && near(treePace({}, cfg, 120), 0.6) && treePace({}, cfg, 40) < treePace({}, cfg, 20), `${treePace({}, cfg, 0)} · ${treePace({}, cfg, 75)}`);
+    only({ teacher: true, learn: true });
+    check('ใบ 08 ครูธง ×1.25 · ใฝ่รู้ ×1.15 · ไม่มี = 1', near(treePace({ flags: { tree_teacher: true } }, cfg, 5), 1.25) && near(treePace({ nature: 'learn' }, cfg, 5), 1.15) && treePace({ flags: {}, nature: 'duty' }, cfg, 5) === 1);
+    only({ cls: true });
+    check('ใบ 08 ฐานะตอนเกิด: กลาง 4.5 = 1 · สูงกว่าเร็วกว่า · ไม่มีฐานะ = 1', near(treePace({ standing: [{ cls: 9 }] }, cfg, 5), 1.09) && near(treePace({ standing: [{ cls: 0 }] }, cfg, 5), 0.91) && treePace({}, cfg, 5) === 1);
+    only({});
+    check('ตัวควบคุม ใบ 08: ปิดทุกตัวเร่ง หรือไม่ส่งค่า = 1 เป๊ะ', treePace({ flags: { tree_teacher: true }, nature: 'learn', standing: [{ cls: 9 }] }, cfg, 60) === 1 && treePace({}, null, 60) === 1);
+    only({ teacher: true });
+    const defs = { a: { years: 5, cards: 0, cat: [], stages: ['เด็ก'] } };
+    const ticks = (pace, flags) => {
+      const h = { flags };
+      treeInvest(h, defs, 'a', 'เด็ก');
+      let n = 0;
+      for (; n < 20; ) { n++; if (treeYearEnd(h, defs, 'เด็ก', 5 + n, pace)?.unlocked) break; }
+      return n;
+    };
+    const ticks3 = (flags) => {
+      const d3 = { a: { years: 3, cards: 0, cat: [], stages: ['เด็ก'] }, b: { years: 3, cards: 0, cat: [], stages: ['เด็ก'] } };
+      const h = { flags };
+      treeInvest(h, d3, 'a', 'เด็ก');
+      const out = [];
+      for (let y = 1; y <= 12 && out.length < 2; y++) {
+        const r = treeYearEnd(h, d3, 'เด็ก', y, cfg);
+        if (r?.unlocked) out.push(y);
+      }
+      return out;
+    };
+    check('ใบ 08 เศษทบ: 2 โหนด 3 ปี มีครู ×1.25 ปลดปีที่ 3 และ 5 (ไม่มีครู 3 และ 6)', JSON.stringify(ticks3({ tree_teacher: true })) === '[3,5]' && JSON.stringify(ticks3({})) === '[3,6]', `${JSON.stringify(ticks3({ tree_teacher: true }))} · ${JSON.stringify(ticks3({}))}`);
+    check('ใบ 08 โหนด 5 ปี: มีครู ×1.25 ปลดที่ปีที่ 4 · ไม่มีครูปีที่ 5', (() => { const a = ticks(cfg, { tree_teacher: true }), b = ticks(cfg, {}); return a === 4 && b === 5; })());
+  } finally {
+    Object.assign(treePaceCtl, { teacher: true, cls: true, learn: true, age: true });
+  }
+}
+
+// ใบ 237 สถานะอยู่นอกบ้าน: ใบ fixture ในกองจริง · บอทเลือกตัวแรก ยกเว้นการ์ดโทรมาบอกที่กดปุ่มกลับบ้าน (ตัวท้าย) เมื่อ back = true
+// ตัวควบคุม: ไม่เข้าสถานะ ⇒ ใบติดป้ายต้องออกอายุเดิม และสถานะไม่เกิด
+{
+  const base = loadContent();
+  const ch = (extra = {}) => ({ text: 'ตัวเลือก', merit: [{ cat: 'neutral' }], ...extra });
+  const card = (id, at_age, extra = {}, first = {}) => ({ id, type: 'A', category: 'family', stage: 'หนุ่มสาว', years: [2400, 2700], age: at_age, text: 'ข้อความ', choices: [ch(first), ch(), ch(), ch()], ...extra });
+  const run = (enter, back) => {
+    const events = [
+      card('t237_enter', 20, {}, enter ? { effects: { away_enter: 'abroad' } } : {}),
+      card('t237_block', 22, { away_block: ['abroad'] }),
+      card('t237_call', 24, { away_call: { text: 'สายจากบ้าน' } }),
+    ];
+    // ตัดสายที่เข้าสถานะจริงออก ใบ fixture จะได้เป็นทางเข้าเดียว
+    const content = { ...base, events: [...base.events.filter((e) => !e.id.startsWith('abroad_') && !e.id.startsWith('pali_')), ...events] };
+    const pick = (c) => (c.kind === 'event' && c.id === 't237_call' && back && c.choices.length === 5 ? 4 : openChoices(c)[0]);
+    const r = { block: [], call: [], lives: 0, awayAfterCall: [], paid: 0, moneyBack: 0 };
+    for (let i = 0; i < 400 && r.lives < 40; i++) {
+      let reached = false, before = null, after = null;
+      playLife(mixSeed(0x237, i), content, pick, (c, st) => {
+        if (before !== null && after === null && c.kind === 'event') { after = st.money; r.awayAfterCall.push(!!st.outside); if (back) r.moneyBack += before - after; }
+        if (c.kind !== 'event') return;
+        if (c.id === 't237_block') r.block.push(c.age);
+        if (c.id === 't237_call') { reached = true; before = st.money; r.call.push({ text: c.text, n: c.choices.length, age: c.age }); }
+      });
+      if (reached) r.lives++;
+    }
+    return r;
+  };
+  const stay = run(true, false), back = run(true, true), none = run(false, false);
+  const callOk = (r) => r.lives > 0 && r.call.every((c) => c.text === 'สายจากบ้าน' && c.n === 5);
+  check('ใบ 237 นอกบ้าน: ใบติดป้ายไม่ออกอายุเดิม และไม่ออกตลอดช่วงที่ยังไม่กลับ', stay.lives > 0 && stay.block.length === 0, `lives ${stay.lives} ออก ${stay.block.length}`);
+  check('ใบ 237 โทรมาบอก: ใช้คำแทนและมีปุ่มกลับบ้านต่อท้าย', callOk(stay), `lives ${stay.lives}`);
+  check('ใบ 237 กดกลับบ้าน: จบสถานะ', back.lives > 0 && back.awayAfterCall.length > 0 && back.awayAfterCall.every((a) => !a), `n ${back.awayAfterCall.length}`);
+  check('ใบ 237 ใบที่เลื่อนออกปีแรกหลังกลับ (อายุ 25)', back.block.length > 0 && back.block.every((a) => a === 25), `อายุ ${[...new Set(back.block)]}`);
+  check('ใบ 237 ตัวควบคุม: ไม่เข้าสถานะ ใบติดป้ายออกอายุเดิม 22 การ์ดโทรไม่แปลงร่าง', none.block.length > 0 && none.block.every((a) => a === 22) && none.call.every((c) => c.n === 4 && c.text === 'ข้อความ'), `อายุ ${[...new Set(none.block)]}`);
+}
+
+// ระดับใช้จ่าย (B29 · ใบ 52): ตัวคูณมีผลแค่เงินเก็บที่เข้ากระเป๋า — ราคาการ์ด income_x (ได้ · จ่าย · ค่าใช้จ่าย) ต้องเท่ากันทุกระดับ
+// บอทที่ประกาศนโยบายเลือกต่างกันจริง · บอทที่ไม่ประกาศไม่เคยแตะแถว (ตัวควบคุม: ไม่งั้นด่าน lifehash 0 ไม่ได้พิสูจน์อะไร)
+{
+  const content = loadContent();
+  const st = newLife(mixSeed(52, 1), content);
+  st.age = 30;
+  const price = () => [{ unit: 'income_x', amount: 2 }, { unit: 'income_x', amount: -1 }].flatMap((m) => [moneyValue(st, m), moneyValue(st, m, true)]);
+  const prices = ['frugal', 'normal', 'luxury'].map((id) => ((st.spendLevel = id), JSON.stringify(price())));
+  check('ใบ 52 ราคาการ์ด income_x เท่ากันทุกระดับใช้จ่าย', prices.every((p) => p === prices[0]) && JSON.parse(prices[0]).some((v) => v !== 0), prices[0]);
+  const levels = (bot) => Array.from({ length: 40 }, (_, i) => playLife(mixSeed(52, i), content, bot).state.spendLevel);
+  const rich = levels(withSpend(BOTS.สายเงิน, SPEND_WAY.สายเงิน));
+  const care = levels(withSpend(BOTS.สายสุขภาพ, SPEND_WAY.สายสุขภาพ));
+  check('ใบ 52 บอทสายเงินกับสายสุขภาพเลือกระดับต่างกัน', rich.includes('frugal') && care.includes('luxury') && !rich.includes('luxury') && !care.includes('frugal'), `เงิน ${rich.filter(Boolean).length}/40 · สุขภาพ ${care.filter(Boolean).length}/40`);
+  check('ใบ 52 ตัวควบคุม: บอทที่ไม่ประกาศนโยบายไม่แตะระดับใช้จ่าย', levels(BOTS.สายเงิน).every((l) => l === undefined));
+  let threw = false;
+  try {
+    chooseSpend(newLife(mixSeed(52, 2), content), 'frugal');
+  } catch {
+    threw = true;
+  }
+  check('ใบ 52 เลือกระดับนอกการ์ดทบทวนเงินไม่ได้', threw);
+}
+// สถานะบนตัวคู่ (ใบ 89 B114 ข้อ 145 164): แยกทาง = ยังมีคู่ · หย่า = ไม่นับในงานศพ/จดหมาย/สูญเสีย · คู่ปัจจุบันตามสถานะ · เซฟเก่าไม่มีช่อง = อยู่ด้วยกัน
+{
+  const content = loadContent();
+  const wedding = content.events.find((e) => e.id === 'young_wedding_01');
+  const fresh = () => {
+    const st = newLife(7, content);
+    st.age = 30;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return st;
+  };
+  const wedOk = (st) => whenOk(st, wedding.when);
+  const a = fresh();
+  const was = wedOk({ ...a, age: 25 });
+  applyFamily(a, { family: [{ separate: 'spouse' }] });
+  const sp = a.kin.find((m) => m.role === 'spouse');
+  check('ใบ 89 แยกทาง: สถานะ apart · ออกจากบ้านแต่ธง married ไม่หาย', sp.status === 'apart' && sp.left === true && a.flags.married === true && spouseOf(a) === sp);
+  check('ใบ 89 แยกทาง: การ์ดขอแต่งงานไม่ขึ้น (ธง married ยังอยู่) · ก่อนแยกก็ไม่ขึ้นเพราะมีคู่', wedOk({ ...a, age: 25 }) === false && was === false);
+  applyFamily(a, { sets_flags: ['married'] });
+  check('ใบ 89 แยกทาง: แต่งซ้ำไม่เพิ่มคู่คนที่สอง', a.kin.filter((m) => m.role === 'spouse').length === 1);
+  const b = fresh();
+  applyFamily(b, { family: [{ divorce: 'spouse' }] });
+  const sb = b.kin.find((m) => m.role === 'spouse');
+  check('ใบ 89 หย่า: สถานะ divorced · ธง married หาย · ธง divorced ติด · ไม่มีคู่ปัจจุบัน', sb.status === 'divorced' && !b.flags.married && b.flags.divorced === true && spouseOf(b) === null);
+  check('ใบ 89 หย่า: การ์ดขอแต่งงานขึ้นได้อีก', wedOk({ ...b, age: 25 }) === true);
+  const after = (st, m) => { m.born = st.birthYear - 112; for (let y = 0; y < 6 && m.alive; y++) ageKin(st, st.birthYear + st.age + y); return m.alive; };
+  const stillB = after(b, sb);
+  check('ใบ 89 หย่าแล้วตาย: ไม่ลงบันทึกสูญเสียคู่ · ไม่เข้าช่วงไว้ทุกข์ (when.loss)', !stillB && !(b.kinLoss ?? []).some((l) => l.role === 'spouse') && !lossOk(b, { roles: ['spouse'], within: 3 }), `alive ${stillB}`);
+  const c = fresh();
+  applyFamily(c, { family: [{ separate: 'spouse' }] });
+  const sc = c.kin.find((m) => m.role === 'spouse');
+  const stillC = after(c, sc);
+  check('ใบ 89 แยกทางแล้วตาย: ลงสูญเสียคู่ (ยังเป็นคู่ตามกฎหมาย)', !stillC && (c.kinLoss ?? []).some((l) => l.role === 'spouse'), `alive ${stillC}`);
+  const d = fresh();
+  d.kin.find((m) => m.role === 'spouse').bond = 90;
+  check('ใบ 89 งานศพ/จดหมาย: คู่ที่ยังอยู่นับ', !!funeralWho(d, 0)?.text?.includes('คู่ชีวิต') && letterTo(d)?.role === 'spouse');
+  applyFamily(d, { family: [{ divorce: 'spouse' }] });
+  check('ใบ 89 งานศพ/จดหมาย: คู่ที่หย่าไม่นับ', funeralWho(d, 0) === null && letterTo(d) === null);
+  const e = fresh();
+  const old = e.kin.find((m) => m.role === 'spouse');
+  applyFamily(e, { family: [{ divorce: 'spouse' }] });
+  applyFamily(e, { sets_flags: ['married'] });
+  const rows2 = e.kin.filter((m) => m.role === 'spouse');
+  check('ใบ 89 หย่าแล้วแต่งใหม่: คู่ปัจจุบัน = คนใหม่ ไม่ใช่คู่ที่หย่าไป (หยิบเป็นพ่อ/แม่ทายาท)', rows2.length === 2 && spouseOf(e) === rows2[1] && spouseOf(e) !== old);
+  const g = fresh();
+  applyFamily(g, { family: [{ leave: 'spouse' }] });
+  check('ใบ 89 ตัวควบคุม: op leave เดิม (ไม่ใช่แยกทาง) ธง married หาย → การ์ดขอแต่งงานขึ้นได้ · ต่างจากแยกทาง', !g.flags.married && wedOk({ ...g, age: 25 }) === true);
+  const f = fresh();
+  delete f.kin.find((m) => m.role === 'spouse').status;
+  check('ใบ 89 เซฟเก่าไม่มีช่อง status = อยู่ด้วยกัน', spouseStatus(f.kin.find((m) => m.role === 'spouse')) === 'together' && spouseOf(f) === f.kin.find((m) => m.role === 'spouse'));
+}
+
+// บทแฟน (ใบ 90 B114 ข้อ 146 165): แฟนเป็นคนมีชื่อในบ้าน · แต่งกับแฟน = คนเดิมเป็นคู่ · เลิกได้สองฝ่าย ชื่อยังอ้างได้ · เลิกแล้วตายไม่ลงสูญเสีย
+{
+  const content = loadContent();
+  const fresh = () => {
+    const st = newLife(7, content);
+    st.age = 22;
+    applyFamily(st, { family: [{ add: 'partner' }] });
+    return st;
+  };
+  const a = fresh();
+  const pa = a.kin.find((m) => m.role === 'partner');
+  const panel = familyOf(a).find((m) => m.role === 'partner');
+  check('ใบ 90 แฟนเป็นคนมีชื่อในบ้าน: familyOk · แผงครอบครัวเห็นพร้อมชื่อ · เพศแบบคู่ · ไม่ตั้งธง married', familyOk(a, { role: 'partner', alive: true }) && panel?.name === pa.name && !!pa.name && pa.sex === a.kin[0].sex && !a.flags.married);
+  check('ใบ 90 แฟน: ปีเกิดใกล้ผู้เล่น (ไม่ใช่ปีนี้)', Math.abs(pa.born - a.birthYear) <= 12 && pa.born !== a.birthYear + a.age);
+  applyFamily(a, { sets_flags: ['married'] });
+  const sa = a.kin.filter((m) => m.role === 'spouse');
+  check('ใบ 90 แต่งแล้ว (ธง married): แฟนคนเดิมเป็นคู่ id/ชื่อเดิม · ไม่เพิ่มคนที่สอง · ไม่เหลือแฟน', sa.length === 1 && sa[0].id === pa.id && sa[0].name === pa.name && a.kin.every((m) => m.role !== 'partner') && a.flags.married === true && sa[0].since === 22);
+  const b = fresh();
+  const pb = b.kin[0];
+  applyFamily(b, { family: [{ marry: 'partner' }] });
+  check('ใบ 90 op marry: แฟนคนเดิมเป็นคู่ · ธง married ตามสมาชิก', b.kin.length === 1 && b.kin[0].role === 'spouse' && b.kin[0].id === pb.id && b.flags.married === true);
+  const c = fresh();
+  const pc = c.kin[0];
+  applyFamily(c, { family: [{ breakup: 'partner', by: 'them' }] });
+  check('ใบ 90 เลิก (เขาบอกเลิก): ออกจากบ้าน · ไม่นับเป็นแฟนอยู่ · ชื่อแฟนเก่ายังอ้างได้ · ไม่ใช่คู่', pc.status === 'ex' && pc.endedBy === 'them' && !familyOk(c, { role: 'partner', alive: true }) && exPartnerOf(c)?.name === pc.name && !c.flags.married);
+  const d = fresh();
+  applyFamily(d, { family: [{ breakup: 'partner' }] });
+  check('ใบ 90 เลิก (เราบอกเลิก = ค่าตั้งต้น)', d.kin[0].endedBy === 'us' && d.kin[0].status === 'ex');
+  const old = (st, m) => { m.born = st.birthYear - 112; for (let y = 0; y < 6 && m.alive; y++) ageKin(st, st.birthYear + st.age + y); return m.alive; };
+  const stillC = old(c, pc);
+  check('ใบ 90 แฟนเก่าตาย: ไม่ลงบันทึกสูญเสีย', !stillC && (c.kinLoss ?? []).length === 0, `alive ${stillC}`);
+  const e = fresh();
+  const stillE = old(e, e.kin[0]);
+  check('ใบ 90 แฟนที่ยังคบอยู่ตาย: ลงสูญเสียบท แฟน + ข้อความเรียกแฟน', !stillE && e.kinLoss.some((l) => l.role === 'partner') && lossText(e.kinLoss.at(-1)).startsWith('แฟน'), `alive ${stillE}`);
+  const f = fresh();
+  applyFamily(f, { family: [{ breakup: 'partner' }] });
+  applyFamily(f, { sets_flags: ['married'] });
+  check('ใบ 90 เลิกแล้วแต่งใหม่: คู่เป็นคนใหม่ (id ไม่ใช่แฟนเก่า) · แฟนเก่ายังเป็นแฟนเก่า', f.kin.filter((m) => m.role === 'spouse').length === 1 && f.kin.find((m) => m.role === 'spouse').id !== f.kin[0].id && f.kin[0].status === 'ex');
+  const g = newLife(7, content);
+  g.age = 30;
+  applyFamily(g, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  applyFamily(g, { family: [{ add: 'partner' }] });
+  // แฟนเข้ากลางชีวิตไม่ขยับลำดับสุ่ม/ชื่อของคนที่มาทีหลัง (172 K3): กับ/ไม่มีแฟน คนถัดไปและทอยของ kinRng ต้องเท่ากัน · ตัวควบคุม: คู่ (ใช้สายเดียวกัน) ต้องขยับ
+  const track = (role) => {
+    const st = newLife(7, content);
+    st.age = 22;
+    if (role) applyFamily(st, { family: [{ add: role }] });
+    applyFamily(st, { family: [{ add: 'child' }, { add: 'child' }] });
+    const kids = st.kin.filter((m) => m.role === 'child').map((m) => [m.id, m.name, m.sex, m.born].join('|'));
+    for (let y = 0; y < 12; y++) ageKin(st, st.birthYear + 23 + y);
+    return { kids, next: st.kinRng.next(), alive: st.kin.filter((m) => m.role === 'child').map((m) => m.alive).join() };
+  };
+  const base = track(null), withP = track('partner'), withS = track('spouse');
+  check('ใบ 90 แฟนไม่แตะ kinSeq/kinRng: ลูกที่ตามมา (id ชื่อ เพศ ปีเกิด) + ผลตายราย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีแฟน', JSON.stringify(withP) === JSON.stringify(base), JSON.stringify([base, withP]));
+  check('ใบ 90 ตัวควบคุม: เพิ่มคู่ (ใช้สายสุ่มเดิม) แล้วลูกที่ตามมา/เลขสุ่มต่าง · สคริปต์วัดจับความต่างได้', JSON.stringify(withS) !== JSON.stringify(base));
+  const h = newLife(7, content);
+  h.age = 24;
+  applyFamily(h, { family: [{ add: 'peer' }] });
+  const peer = h.kin.find((m) => m.role === 'peer');
+  const was = [peer.id, peer.name, peer.born, peer.sex].join('|');
+  const moved = becomePartner(h, peer);
+  check('ใบ 90 becomePartner: คนนอกบ้าน (peer) ย้ายเข้าเป็นแฟน id/ชื่อ/ปีเกิด/เพศเดิม · เริ่มนับปีคบ · แต่งต่อเป็นคู่ได้', moved === peer && peer.role === 'partner' && [peer.id, peer.name, peer.born, peer.sex].join('|') === was && peer.since === 24 && (applyFamily(h, { sets_flags: ['married'] }), h.kin.find((m) => m.id === peer.id).role === 'spouse'));
+  check('ใบ 90 becomePartner: คู่/แฟนอยู่แล้ว = ไม่ทำอะไร (null)', becomePartner(h, peer) === null && becomePartner(h, null) === null);
+  check('ใบ 90 ชีวิตไม่มีแฟน: แต่งตามเดิม (ธง married เพิ่มคู่ ไม่ผ่านทางแปลงบท)', g.kin.filter((m) => m.role === 'spouse').length === 1 && g.kin.some((m) => m.role === 'partner'));
+}
+
+// คนจีบ (ใบ 172 ข้อ 289 305 · K2 บทแยก · K3 สายสุ่มแยก): คนมีชื่อนอกบ้านแบบเพื่อนรุ่น · ไม่ทอยตาย ไม่นับงานศพ/คำฝาก · ไม่ขยับลำดับสุ่ม/ชื่อของญาติ
+{
+  const content = loadContent();
+  const withCourters = (n) => {
+    const st = newLife(7, content);
+    st.age = 19;
+    applyFamily(st, { family: Array.from({ length: n }, () => ({ add: 'courter' })) });
+    return st;
+  };
+  const a = withCourters(1);
+  const c = a.kin[0];
+  check('ใบ 172 คนจีบ: บทแยก courter · id นับแยก (OWN_ID_BASE+) · มีชื่อ/เพศ/ปีเกิดใกล้เรา · ไม่ตั้งธง married', c.role === 'courter' && c.id >= 10000 && !!c.name && !!c.sex && Math.abs(c.born - a.birthYear) <= 6 && !(a.flags ?? []).includes?.('married'));
+  const row = familyOf(a).find((m) => m.role === 'courter');
+  check('ใบ 172 คนจีบ: familyOk เห็น (role courter) · familyOf ส่งแถวคนจีบพร้อม stage เป็น met และไม่ส่ง bond', familyOk(a, { role: 'courter' }) && row?.stage === 'met' && row.id === c.id && row.name === c.name && !('bond' in row) && !('bondLevel' in row));
+  const gone = withCourters(1);
+  gone.kin[0].left = true;
+  gone.kin[0].status = 'dropped';
+  check('ใบ 172 คนจีบที่หลุดแล้ว (left/dropped) ไม่อยู่ใน familyOf', !familyOf(gone).some((m) => m.role === 'courter'));
+  const dated = withCourters(1);
+  becomePartner(dated, dated.kin[0]);
+  dated.age += 3;
+  const prow = familyOf(dated).find((m) => m.role === 'partner');
+  check('ใบ 172 แฟนที่ยังคบ: familyOf ส่ง together = อายุเรา − since · ไม่มี stage', prow?.together === 3 && !('stage' in prow), String(prow?.together));
+  const sinceSave = dated.kin[0].since;
+  delete dated.kin[0].since;
+  check('ใบ 172 แฟนไม่มี since (เซฟเก่า): ไม่ส่งช่อง together', !('together' in familyOf(dated).find((m) => m.role === 'partner')));
+  dated.kin[0].since = sinceSave;
+  dated.kin[0].status = 'ex';
+  check('ใบ 172 แฟนเก่า (status ex): ไม่ส่ง together', !('together' in familyOf(dated).find((m) => m.role === 'partner')));
+  const old = withCourters(1);
+  old.kin[0].due = 999; // คงเป็นคนจีบตลอด (ไม่ให้นัดเลื่อนเป็นแฟนกลางทาง)
+  for (let y = 0; y < 70; y++) ageKin(old, old.birthYear + 20 + y);
+  check('ใบ 172 คนจีบไม่ทอยตายตลอด 70 ปี · ไม่ลงบันทึกสูญเสีย · ไม่นับงานศพ/คำฝาก', old.kin[0].alive && (old.kinLoss ?? []).length === 0 && !Object.keys(funeralWho(old, 10)?.came ?? funeralWho(old, 10) ?? {}).some((k) => k === 'courter') && letterTo(old) === null);
+  // จีบพร้อมกัน 2 คน: คนละคน (id/ชื่อ) · การ์ดเรียกได้ทั้งสอง (เลือกเป้าจาก seed ไม่ใช่ kinRng) · ตัวควบคุม: เป้าสลับตามปี = เลือกจริง ไม่ติดคนเดียว
+  const two = withCourters(2);
+  check('ใบ 172 จีบ 2 คนพร้อมกัน: คนละ id คนละชื่อ · familyOk count 2', two.kin[0].id !== two.kin[1].id && two.kin[0].name !== two.kin[1].name && familyOk(two, { role: 'courter', count: [2, 2] }));
+  const picked = new Set();
+  for (let age = 19; age < 45; age++) { two.age = age; pickFocus(two); picked.add(two.kinFocus.courter); }
+  check('ใบ 172 เป้าการ์ดจีบ: เลือกได้ทั้งสองคนตามปี · ตัวควบคุม (ถ้าเลือกคนเดียวตลอดตัวนี้ต้องตก)', picked.size === 2);
+  // K3: มี/ไม่มีคนจีบ ญาติที่ตามมา (id ชื่อ เพศ ปีเกิด) + ผลตายราย 12 ปี + เลขสุ่มถัดไปของ kinRng ต้องเท่ากัน · ตัวควบคุม: เพิ่มคู่แทน (ใช้สายเดิม) ต้องต่าง
+  const track = (role, n = 1) => {
+    const st = newLife(7, content);
+    st.age = 22;
+    if (role) applyFamily(st, { family: Array.from({ length: n }, () => ({ add: role })) });
+    pickFocus(st);
+    applyFamily(st, { family: [{ add: 'child' }, { add: 'child' }] });
+    const kids = st.kin.filter((m) => m.role === 'child').map((m) => [m.id, m.name, m.sex, m.born].join('|'));
+    for (let y = 0; y < 12; y++) ageKin(st, st.birthYear + 23 + y);
+    return { kids, next: st.kinRng.next(), alive: st.kin.filter((m) => m.role === 'child').map((m) => m.alive).join() };
+  };
+  const base = track(null), one = track('courter'), twoT = track('courter', 2), spouseT = track('spouse');
+  check('ใบ 172 คนจีบไม่แตะ kinSeq/kinRng/kinCauseRng: ลูกที่ตามมา + ผลตาย 12 ปี + เลขสุ่มถัดไป เท่าชีวิตที่ไม่มีคนจีบ (1 คน และ 2 คน)', JSON.stringify(one) === JSON.stringify(base) && JSON.stringify(twoT) === JSON.stringify(base));
+  check('ใบ 172 ตัวควบคุม: เพิ่มคู่ (สายสุ่มเดิม) แทนคนจีบ ลูก/เลขสุ่มต่าง · สคริปต์วัดจับความต่างได้', JSON.stringify(spouseT) !== JSON.stringify(base));
+  // ขั้น 2: เจอ → จีบ → แฟน เดินด้วยนัดล่วงหน้า (ชีวิตบังคับ: เจอคน A อายุ 19 → ปีถัดไปจีบ → ต่อมาเป็นแฟน เข้าแผงครอบครัว)
+  const sched = newLife(7, content);
+  sched.age = 19;
+  applyFamily(sched, { family: [{ add: 'courter' }] });
+  const sc = sched.kin[0];
+  const trail = [`${sc.role}/${sc.stage}`];
+  for (let age = 20; age <= 26; age++) { sched.age = age; ageKin(sched, sched.birthYear + age + 1); trail.push(`${sc.role}/${sc.stage ?? '-'}`); }
+  check('ใบ 172 ขั้น 2: เจอ(met) → จีบ(courting) → แฟน(partner) ตามนัดภายใน 7 ปี · เข้าแผงครอบครัวเมื่อเป็นแฟน · id/ชื่อเดิม', trail[0] === 'courter/met' && trail.includes('courter/courting') && sc.role === 'partner' && sc.stage === undefined && sc.due === undefined && familyOf(sched).some((m) => m.id === sc.id) && trail.indexOf('courter/courting') < trail.indexOf('partner/-'));
+  check('ใบ 172 ขั้น 2: นัดครบกำหนดไม่เร็วกว่า 1 ปีต่อขั้น (ตัวควบคุมถอดนัด: เป็นแฟนทันทีปีเดียว ต้องตก)', trail.slice(0, 2).join() === 'courter/met,courter/met' || trail[1] !== 'partner/-');
+  const clone = (seed) => { const x = newLife(seed, content); x.age = 19; applyFamily(x, { family: [{ add: 'courter' }] }); return x.kin[0].due; };
+  check('ใบ 172 ขั้น 2: ปีนัดสุ่มจาก seed+id ซ้ำได้ (seed เดียวกันนัดเท่ากัน) ไม่ดึง kinRng', clone(7) === clone(7) && sched.kinRng.next() === (() => { const x = newLife(7, content); x.age = 19; applyFamily(x, { family: [{ add: 'courter' }] }); for (let age = 20; age <= 26; age++) { x.age = age; ageKin(x, x.birthYear + age + 1); } return x.kinRng.next(); })());
+  // ขั้น 3: เกณฑ์อายุ (แฟน ≥18 ทั้งสองฝ่าย) · จีบซ้อน ≤2 · เลือกคนเดียวเป็นแฟน อีกคนหลุด
+  const ageAtMeet = (age) => { const x = newLife(7, content); x.age = age; applyFamily(x, { family: [{ add: 'courter' }] }); return x; };
+  const youngLife = ageAtMeet(15);
+  const yc = youngLife.kin[0];
+  for (let age = 16; age <= 24; age++) { youngLife.age = age; ageKin(youngLife, youngLife.birthYear + age + 1); if (yc.role === 'partner') { check('ใบ 172 เกณฑ์: ผู้เล่นเป็นแฟนไม่ก่อน 18 และคนจีบอายุ ≥18 ตอนเป็นแฟน', age >= 18 && youngLife.birthYear + age - yc.born >= 18); break; } }
+  check('ใบ 172 เกณฑ์: ผู้เล่น 15 เจอคนจีบ ไม่เป็นแฟนก่อน 18 · ถึง 24 เป็นแฟนแล้ว', yc.role === 'partner' && yc.since >= 18);
+  const gap = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((sd) => { const x = newLife(sd, content); x.age = 18; applyFamily(x, { family: [{ add: 'courter' }] }); return x.birthYear + 18 - x.kin[0].born; });
+  check('ใบ 172 เกณฑ์: คนจีบทุก seed อายุ ≥18 ตอนเจอ (ผู้เล่น 18 · ช่วงห่าง ±5 ถูกดึงขึ้น)', gap.every((v) => v >= 18) , gap.join());
+  const three = withCourters(3);
+  check('ใบ 172 จีบซ้อน ≤2: คนที่ 3 ไม่เข้า', three.kin.length === 2);
+  const pick = withCourters(2);
+  const [p1, p2] = pick.kin;
+  becomePartner(pick, p2);
+  check('ใบ 172 เลือกคนเดียวเป็นแฟน: อีกคนหลุด (ไม่อยู่ในรายชื่อคนจีบ) · คนที่เลือกเข้าแผง', p2.role === 'partner' && p1.left === true && !familyOk(pick, { role: 'courter' }) && familyOf(pick).some((m) => m.id === p2.id) && !familyOf(pick).some((m) => m.id === p1.id));
+  // การ์ดหาคู่/จีบ/เจอคนใหม่ (food_night_market_01 · love_last_train_01 · love_old_photo_date_01) ต้องปิดเมื่อมีแฟน — เปิดเมื่อไม่มีทั้งคู่และแฟน · ตัวควบคุม: การ์ดที่ไม่ใช่หาคู่ (love_bouquet_elder_01) ไม่ถูกปิดด้วยแฟน
+  const famOf = (id) => content.events.find((e) => e.id === id).when.family;
+  const famPass = (st, id) => famOf(id).every((f) => familyOk(st, f));
+  const COURT_IDS = ['food_night_market_01', 'love_last_train_01', 'love_old_photo_date_01'];
+  const sgl = newLife(7, content); sgl.age = 30;
+  const dtd = newLife(7, content); dtd.age = 30;
+  applyFamily(dtd, { family: [{ add: 'courter' }] });
+  becomePartner(dtd, dtd.kin[0]);
+  check('ใบ 172 โสดในการ์ดหาคู่: ไม่มีคู่/แฟน = ผ่าน familyOk · มีแฟน = ไม่ผ่าน (3 ใบ) · ใบที่ไม่ใช่หาคู่ผ่านแม้มีแฟน', COURT_IDS.every((id) => famPass(sgl, id) && !famPass(dtd, id)) && famPass(dtd, 'love_bouquet_elder_01'));
+  // K4 (เจ้าของเคาะ 11-23): คู่ต้องอายุ ≥20 ตอนแต่ง · ปีเกิดสุ่มเดิมแล้วย้าย ไม่ดึง kinRng เพิ่ม
+  const spAges = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((sd) => { const x = newLife(sd, content); x.age = 22; const r0 = JSON.stringify(x.kinRng); applyFamily(x, { family: [{ add: 'spouse' }] }); const m = x.kin.find((k) => k.role === 'spouse'); return { age: x.birthYear + 22 - m.born, rngMoved: JSON.stringify(x.kinRng) !== r0 }; });
+  check('ใบ 172 K4: คู่ที่เข้าบ้านตอนผู้เล่น 22 อายุ ≥20 ทุก seed · ดึง kinRng เท่าเดิม (ครั้งเดียวต่อคู่)', spAges.every((v) => v.age >= 20) && new Set(spAges.map((v) => v.rngMoved)).size === 1, spAges.map((v) => v.age).join());
+  const yp = newLife(7, content); yp.age = 19;
+  applyFamily(yp, { family: [{ add: 'courter' }] });
+  yp.kin[0].born = yp.birthYear + yp.age - 18; // 18 ปี
+  becomePartner(yp, yp.kin[0]);
+  yp.age = 21;
+  applyFamily(yp, { family: [{ marry: 'partner' }] });
+  const pm = yp.kin.find((k) => k.role === 'spouse' || k.role === 'partner');
+  check('ใบ 172 K4: แฟนอายุ 18 ตอนแต่งผู้เล่น 21 ปีเกิดถูกย้ายให้ ≥20', pm.role === 'spouse' && yp.birthYear + 21 - pm.born >= 20);
+  // familyOk stage/years
+  const fk = newLife(7, content); fk.age = 19;
+  applyFamily(fk, { family: [{ add: 'courter' }] });
+  const fkOk = (f) => familyOk(fk, { role: 'courter', ...f });
+  const stageNow = fk.kin[0].stage;
+  check('ใบ 172 familyOk: stage met ผ่าน · courting ตก · รายการผ่าน · years [0,0] ผ่าน [1,5] ตก', stageNow === 'met' && fkOk({ stage: 'met' }) && !fkOk({ stage: 'courting' }) && fkOk({ stage: ['met', 'courting'] }) && fkOk({ years: [0, 0] }) && !fkOk({ years: [1, 5] }));
+  fk.age = 23; fk.kin[0].stage = undefined; becomePartner(fk, fk.kin[0]); fk.age = 27;
+  check('ใบ 172 familyOk: แฟนคบมา 4 ปี years [3,5] ผ่าน [5,9] ตก · แฟนไม่มี stage ตกเมื่อใส่ stage', familyOk(fk, { role: 'partner', years: [3, 5] }) && !familyOk(fk, { role: 'partner', years: [5, 9] }) && !familyOk(fk, { role: 'partner', stage: 'met' }));
+  const moved = becomePartner(a, c);
+  check('ใบ 172 คนจีบ → แฟน (becomePartner): id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบ · ไม่ใช่คนจีบอีก', moved === c && c.role === 'partner' && c.id >= 10000 && c.since === a.age && !familyOk(a, { role: 'courter' }) && familyOf(a).some((m) => m.id === c.id));
+}
+
+// จดพ่อ/แม่บนตัวลูก (ใบ 91 B114 ข้อ 149 154 166): ลูกจด by = คู่ปัจจุบันตอนเกิด · พ่อ/แม่ของลูกคือคู่คนนั้นแม้หย่าไปแล้ว · เซฟเก่าไม่มี by คิดย้อนจากปีเกิด
+{
+  const content = loadContent();
+  const st = newLife(7, content);
+  st.age = 22;
+  applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  const A = st.kin.find((m) => m.role === 'spouse');
+  st.age = 24;
+  applyFamily(st, { family: [{ add: 'child' }] });
+  const c1 = st.kin.filter((m) => m.role === 'child').at(-1);
+  st.age = 30;
+  applyFamily(st, { family: [{ divorce: 'spouse' }] });
+  st.age = 40;
+  applyFamily(st, { sets_flags: ['married'] });
+  const B = st.kin.filter((m) => m.role === 'spouse').at(-1);
+  st.age = 42;
+  applyFamily(st, { family: [{ add: 'child' }] });
+  const c2 = st.kin.filter((m) => m.role === 'child').at(-1);
+  check('ใบ 91 ลูกจดคู่ที่เป็นพ่อ/แม่ตอนเกิด: ลูกคนแรก = คู่แรก (หย่าไปแล้ว) · ลูกคนหลังแต่งใหม่ = คู่ใหม่', A.id !== B.id && c1.by === A.id && c2.by === B.id, `${c1.by} ${c2.by} ${A.id} ${B.id}`);
+  check('ใบ 91 parentSpouseOf: ลูกคู่แรกได้คู่แรกแม้หย่าแล้ว (ไม่ใช่คู่ล่าสุด) · spouseOf ปัจจุบัน = คู่ใหม่', parentSpouseOf(st, c1) === A && parentSpouseOf(st, c2) === B && spouseOf(st) === B);
+  delete c1.by;
+  delete c2.by;
+  check('ใบ 91 เซฟเก่า (ไม่มี by): คิดย้อนจากปีเกิด — ลูกเกิดตอนอายุ 24 = คู่ที่ since ไม่เกิน 24 · ลูกอายุ 42 = คู่ใหม่', parentSpouseOf(st, c1) === A && parentSpouseOf(st, c2) === B);
+  const s = newLife(7, content);
+  s.age = 25;
+  applyFamily(s, { family: [{ add: 'child' }] });
+  const kid = s.kin.find((m) => m.role === 'child');
+  check('ใบ 91 พ่อ/แม่เลี้ยงเดี่ยว (ไม่มีคู่ตอนลูกเกิด): by = null → parentSpouseOf null', kid.by === null && parentSpouseOf(s, kid) === null);
+  const o = newLife(7, content);
+  o.age = 30;
+  applyFamily(o, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  applyFamily(o, { family: [{ add: 'child' }] });
+  const ok = o.kin.find((m) => m.role === 'child');
+  delete ok.by;
+  check('ใบ 91 เซฟเก่าแต่งครั้งเดียว: ลูกไม่มี by ได้คู่คนเดียวนั้น (เท่าฐาน)', parentSpouseOf(o, ok) === o.kin.find((m) => m.role === 'spouse'));
+}
+
+// แยกทาง → คืนดี | หย่า (ใบ 92 B114 ข้อ 145 153 154 162): when.spouse · คืนดี · bond ลดไม่ทะลุพื้น · หย่าแบ่งสินสมรสครึ่ง · ลูกเล็กเลือกอยู่กับใคร (ยังเป็นทายาท)
+{
+  const content = loadContent();
+  const fresh = (age = 25) => {
+    const st = newLife(7, content);
+    st.age = age;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return st;
+  };
+  const sp = (st) => st.kin.find((m) => m.role === 'spouse');
+  const a = fresh();
+  a.age = 30;
+  sp(a).bond = 40;
+  check('ใบ 92 when.spouse: คู่อยู่ด้วยกัน 5 ปี bond 40 ผ่าน [38,48]/[3,99] · bond 60 ตก · อยู่ด้วยกันไม่ถึง 3 ปีตก', spouseOk(a, { status: 'together', bond: [38, 48], together: [3, 99] }) && (sp(a).bond = 60, !spouseOk(a, { bond: [38, 48] })) && (sp(a).bond = 40, !spouseOk({ ...a, age: 26 }, { together: [3, 99] })));
+  const sepCard = content.events.find((e) => e.id === 'fam_separate_work_01');
+  check('ใบ 92 การ์ดแยกทางด้วยผูกพันต่ำ: ขึ้นเมื่อ bond 40 อยู่ด้วยกันนาน · ไม่ขึ้นเมื่อ bond 70', whenOk(a, sepCard.when) === true && (sp(a).bond = 70, whenOk(a, sepCard.when) === false));
+  check('ใบ 93 when.spouse wed: ปีแต่ง = birthYear + since ผ่านเฉพาะช่วง · ไม่มี since ตก', spouseOk(a, { wed: [a.birthYear + a.age - 20, a.birthYear + a.age] }) && !spouseOk(a, { wed: [a.birthYear - 50, a.birthYear + a.age - 6] }) && (delete sp(a).since, !spouseOk(a, { wed: [2400, 2700] })) && (sp(a).since = a.age - 5, true));
+  sp(a).bond = 40;
+  applyFamily(a, { family: [{ separate: 'spouse' }] });
+  check('ใบ 92 when.spouse apart: ปีที่แยกทางมาแล้ว 0 ไม่ผ่าน [1,6] · 2 ปีผ่าน · status together ตก', !spouseOk(a, { status: 'apart', apart: [1, 6] }) && spouseOk({ ...a, age: 32 }, { status: 'apart', apart: [1, 6] }) && !spouseOk({ ...a, age: 32 }, { status: 'together' }));
+  check('ใบ 92 แยกทางแล้ว: การ์ดแยกทางไม่ขึ้นซ้ำ (สถานะไม่ใช่ together)', whenOk({ ...a, age: 32 }, sepCard.when) === false);
+  const b = fresh(30);
+  sp(b).bond = 40;
+  applyFamily(b, { family: [{ separate: 'spouse' }] });
+  b.age = 32;
+  applyFamily(b, { family: [{ reconcile: 'spouse' }, { bond: 'spouse', d: 12 }] });
+  const sb = sp(b);
+  check('ใบ 92 คืนดี: กลับเป็น together · กลับเข้าบ้าน (left false · ไม่มี leftAge) · ธง married คง · bond +12', sb.status === 'together' && sb.left === false && sb.leftAge === undefined && b.flags.married === true && sb.bond === 52 && b.kin.filter((x) => x.role === 'spouse' && x.alive && !x.left).length === 1, `${sb.status} ${sb.left} ${sb.bond}`);
+  const c = fresh(30);
+  sp(c).bond = 40;
+  applyFamily(c, { family: [{ bond: 'spouse', d: -10 }] });
+  const lo = sp(c).bond;
+  sp(c).bond = 70;
+  applyFamily(c, { family: [{ bond: 'spouse', d: -10 }] });
+  check('ใบ 92 op bond ลบ: ไม่ทะลุพื้น 38 (40−10 → 38) · ที่สูงกว่าลดตรง ๆ (70−10 → 60)', lo === BOND_FLOOR && sp(c).bond === 60, `${lo} ${sp(c).bond}`);
+  const m = fresh(28);
+  m.trail = [{ year: m.birthYear + 28, money: 100000 }];
+  m.money = 300000;
+  m.age = 40;
+  applyFamily(m, { family: [{ separate: 'spouse' }] });
+  m.age = 42;
+  applyFamily(m, { family: [{ divorce: 'spouse' }] });
+  check('ใบ 92 หย่าแบ่งสินสมรส: เงินงอก 200000 หลังเริ่มอยู่ด้วยกัน เสียครึ่ง → เหลือ 200000', DIVORCE_SPLIT === 0.5 && m.money === 200000, `${m.money}`);
+  const flat = fresh(28);
+  flat.trail = [{ year: flat.birthYear + 28, money: 300000 }];
+  flat.money = 250000;
+  applyFamily(flat, { family: [{ divorce: 'spouse' }] });
+  const debt = fresh(28);
+  debt.trail = [{ year: debt.birthYear + 28, money: 100000 }];
+  debt.money = -50000;
+  applyFamily(debt, { family: [{ divorce: 'spouse' }] });
+  const oldSave = fresh(28);
+  oldSave.money = 400000;
+  delete sp(oldSave).since;
+  applyFamily(oldSave, { family: [{ divorce: 'spouse' }] });
+  check('ใบ 92 หย่าไม่แบ่ง: เงินไม่งอก · ติดลบ · เซฟเก่าไม่มี since = เงินเท่าเดิม', flat.money === 250000 && debt.money === -50000 && oldSave.money === 400000, `${flat.money} ${debt.money} ${oldSave.money}`);
+  // ลูกเล็กหลังหย่า
+  const k = fresh(30);
+  applyFamily(k, { family: [{ add: 'child' }] });
+  const kid = k.kin.find((x) => x.role === 'child');
+  k.age = 36;
+  applyFamily(k, { family: [{ separate: 'spouse' }, { custody: 'other' }] });
+  const beforeDivorce = kid.custody;
+  k.age = 38;
+  applyFamily(k, { family: [{ divorce: 'spouse' }, { custody: 'other' }] });
+  check('ใบ 92 ลูกเล็ก: ยังไม่หย่า (แยกทาง) op custody ไม่จด · หย่าแล้วจด other · ลูกยังเป็นทายาท (ไม่ left · ยังอยู่ในบ้าน)', beforeDivorce === undefined && kid.custody === 'other' && !kid.left && kid.alive && parentSpouseOf(k, kid) === sp(k) && sp(k).status === 'divorced');
+  const grown = fresh(30);
+  applyFamily(grown, { family: [{ add: 'child' }] });
+  const big = grown.kin.find((x) => x.role === 'child');
+  grown.age = 50;
+  applyFamily(grown, { family: [{ divorce: 'spouse' }, { custody: 'self' }] });
+  check('ใบ 92 ลูกโตแล้ว (≥ 18): custody ไม่จด', big.custody === undefined);
+  const decay = (way) => {
+    const st = fresh(30);
+    applyFamily(st, { family: [{ add: 'child' }] });
+    const ch = st.kin.find((x) => x.role === 'child');
+    st.age = 36;
+    applyFamily(st, { family: [{ divorce: 'spouse' }, { custody: way }] });
+    ch.bond = 80;
+    for (let y = 0; y < 3; y++) ageKin(st, st.birthYear + st.age + y);
+    return ch.alive ? ch.bond : null;
+  };
+  const other = decay('other');
+  const self = decay('self');
+  check('ใบ 92 ลูกอยู่กับอีกฝ่าย: ผูกพันจางเร็วกว่าเราเลี้ยงเอง 3 ปี (ต่างกัน KIN_CUSTODY.decay × 3) · ไม่ต่ำกว่าพื้น', other !== null && self !== null && self - other === KIN_CUSTODY.decay * 3 && other >= BOND_FLOOR, `other ${other} self ${self}`);
+  const kidsCard = content.events.find((e) => e.id === 'fam_divorce_kids_01');
+  const noKidCard = content.events.find((e) => e.id === 'fam_divorce_01');
+  const j = fresh(30);
+  applyFamily(j, { family: [{ separate: 'spouse' }] });
+  j.age = 33;
+  const noKids = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
+  applyFamily(j, { family: [{ add: 'child' }] });
+  const withKid = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
+  j.age = 40;
+  j.kin.find((x) => x.role === 'child').born = j.birthYear + 20;
+  const grownKid = [whenOk(j, kidsCard.when), whenOk(j, noKidCard.when)];
+  check('ใบ 92 การ์ดหย่า: ไม่มีลูกเล็ก = การ์ดไม่มีลูก · มีลูกเล็ก = การ์ดเลือกผู้ปกครอง · ลูกโตแล้ว = การ์ดไม่มีลูก (ไม่ซ้อนกัน)', !noKids[0] && noKids[1] && withKid[0] && !withKid[1] && !grownKid[0] && grownKid[1], `${noKids} ${withKid} ${grownKid}`);
+}
+
+// ลูกไม่ใช่ลูก (ใบ 95 B114 ข้อ 149 166): ทอยตอนลูกเกิดช่วงคู่นอกใจ · ผู้เล่นชายเท่านั้น · when.child_not_mine · op paternity keep/cut
+{
+  const content = loadContent();
+  const born = (seed, { sex = 'ชาย', flag = true, at = 28, age = 29 } = {}) => {
+    const st = newLife(seed, content);
+    st.sex = sex;
+    st.age = 25;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    if (flag) {
+      st.flags.spouse_cheated = true;
+      st.flagAge.spouse_cheated = at;
+    }
+    st.age = age;
+    applyFamily(st, { family: [{ add: 'child' }] });
+    return st;
+  };
+  const rate = (opt) => {
+    let n = 0;
+    const N = 400;
+    for (let i = 0; i < N; i++) if (born(9000 + i, opt).kin.find((m) => m.role === 'child').notMine) n++;
+    return n / N;
+  };
+  const r = rate({});
+  check('ใบ 95 ลูกเกิดช่วงคู่นอกใจ (ผู้เล่นชาย): สัดส่วนไม่ใช่ลูกเราใกล้ NOT_MINE.p', Math.abs(r - NOT_MINE.p) < 0.08, `${r}`);
+  check('ใบ 95 ไม่นับ: ผู้เล่นหญิง · ไม่มีธง spouse_cheated · ลูกเกิดนอกช่วง (ก่อน 2 ปี / หลัง 5 ปี)', rate({ sex: 'หญิง' }) === 0 && rate({ flag: false }) === 0 && rate({ age: 26 }) === 0 && rate({ age: 33 }) === 0);
+  const seed = Array.from({ length: 400 }, (_, i) => 9000 + i).find((x) => born(x).kin.find((m) => m.role === 'child').notMine);
+  const card = content.events.find((e) => e.id === 'fam_not_mine_mid_01');
+  const st = born(seed);
+  const kid = st.kin.find((m) => m.role === 'child');
+  st.birthYear = 2500;
+  kid.born = st.birthYear + 29;
+  st.age = 49;
+  check('ใบ 95 การ์ดเปิดความลับ: ออกเมื่อลูกโต 18+ และเป็นผู้ชาย · ผู้เล่นหญิงไม่ออก', whenOk(st, card.when) === true && (st.sex = 'หญิง', whenOk(st, card.when) === false));
+  st.sex = 'ชาย';
+  kid.bond = 80;
+  st.kinFocus = { child: kid.id };
+  applyFamily(st, { family: [{ paternity: 'keep' }] });
+  const kept = kid.bond;
+  check('ใบ 95 keep: จด kept · ผูกพันขึ้น NOT_MINE.keepBond · ลูกยังเป็นทายาท (alive ไม่ left) · การ์ดไม่ซ้ำ', kid.paternity === 'kept' && kept === 80 + NOT_MINE.keepBond && kid.alive && !kid.left && whenOk(st, card.when) === false);
+  const st2 = born(seed);
+  const kid2 = st2.kin.find((m) => m.role === 'child');
+  kid2.bond = 90;
+  applyFamily(st2, { family: [{ paternity: 'cut' }] });
+  check('ใบ 95 cut: จด cut · ผูกพันตกเหลือไม่เกิน NOT_MINE.cutTo · ตัดซ้ำไม่ขยับ', kid2.paternity === 'cut' && kid2.bond <= NOT_MINE.cutTo && (applyFamily(st2, { family: [{ paternity: 'keep' }] }), kid2.paternity === 'cut'));
+  // ทายาทสายเลือดที่เป็นลูกไม่ใช่ลูกเรา: ผู้เล่นตายด้วยโรคถ่ายทอด (มะเร็ง) → ลูกปกติได้ประวัติโรค · ลูกไม่ใช่ลูกไม่ได้ · ชีวิตไม่มีลูกในช่วง HEIR_AGE (ทายาทจากลูกหายาก ~0–3% ของชีวิตบอท · seed ตายตัวพังเมื่อเนื้อหาเปลี่ยน) = ใส่ลูกเอง ไม่ขึ้นกับ RNG
+  const E = await import('../src/engine/index.mjs');
+  const { addMember: addKin } = await import('../src/engine/family.mjs');
+  const heirHeredity = (notMine) => {
+    const { state: p } = playLife(mixSeed(1, 5314), content, BOTS.สุ่ม);
+    if (!E.heirCandidates(p).some((m) => m.role === 'child')) addKin(p, 'child', { born: p.birthYear + p.age - E.HEIR_AGE[0] });
+    const c = E.heirCandidates(p).find((m) => m.role === 'child');
+    p.cause = 'cancer';
+    if (notMine) p.kin.find((m) => m.id === c.id).notMine = true;
+    const af = E.startAfterlife(p);
+    const P = E.PATHS.findIndex((x) => x.id === 'blood');
+    for (let card = E.nextAfterCard(af); !card.done; card = E.nextAfterCard(af)) {
+      if (card.kind === 'path') E.chooseAfter(af, P, c.id);
+      else if (card.choices?.length) E.chooseAfter(af, Math.max(0, (card.locked ?? []).findIndex((x) => !x)));
+    }
+    return E.nextLife(af).heredity;
+  };
+  const hn = heirHeredity(false), hy = heirHeredity(true);
+  check('ใบ 95 ทายาทจากลูกไม่ใช่ลูกเรา: ไม่ได้ประวัติโรคกรรมพันธุ์ของผู้ตาย (ลูกปกติ seed เดียวกันได้ cancer)', hn.includes('cancer') && !hy.includes('cancer'), `ปกติ ${hn} · ไม่ใช่ลูก ${hy}`);
+  const pt = JSON.parse(readFileSync('data/paternity-test.json', 'utf8'));
+  const ev95 = (id) => content.events.find((e) => e.id === id);
+  check('ใบ 95 ปีตรวจพ่อ 2 ช่วง: การ์ดฐาน years[0] = pt.common · สำเนาหายาก years[0] = pt.from จบก่อน common และจำกัด กทม.', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => ev95(id).years[0] === pt.common) && ['fam_not_mine_mid_rare_01', 'fam_not_mine_old_rare_01'].every((id) => ev95(id).years[0] === pt.from && ev95(id).years[1] === pt.common - 1 && ev95(id).when.province?.join() === 'กรุงเทพมหานคร') && pt.from < pt.common);
+}
+
+// คืนดีกับคู่เก่าหลังหย่า (ใบ 97 B114 ข้อ 158 161 162): when.ex_spouse · op remarry · ครั้งเดียวต่อชีวิต
+{
+  const content = loadContent();
+  const cards = ['fam_reconcile_ex_work_01', 'fam_reconcile_ex_mid_01'].map((id) => content.events.find((e) => e.id === id));
+  const divorced = (seed = 7) => {
+    const st = newLife(seed, content);
+    st.age = 26;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    st.age = 32;
+    st.flags.ex_bitter = true;
+    applyFamily(st, { family: [{ divorce: 'spouse' }] });
+    return st;
+  };
+  const st = divorced();
+  const ex = st.kin.find((m) => m.role === 'spouse');
+  const at = (age) => { st.age = age; return cards.map((c) => whenOk(st, c.when)); };
+  check('ใบ 97 ออกเฉพาะหลังหย่า 1–5 ปี (ปีเดียวกับที่หย่า · 6 ปีผ่านไป = ไม่ออก)', at(32).every((x) => !x) && at(33).every(Boolean) && at(37).every(Boolean) && at(38).every((x) => !x));
+  const st2 = divorced(); st2.age = 34;
+  applyFamily(st2, { family: [{ add: 'partner' }] });
+  check('ใบ 97 ไม่ออกเมื่อมีแฟนคบอยู่ (ไม่โสด)', cards.every((c) => !whenOk(st2, c.when)));
+  const st3 = divorced(); st3.age = 34;
+  ex.alive; st3.kin.find((m) => m.role === 'spouse').alive = false;
+  check('ใบ 97 ไม่ออกเมื่อคู่เก่าตายแล้ว', cards.every((c) => !whenOk(st3, c.when)));
+  st.age = 34;
+  st.kinFocus = { spouse: ex.id };
+  const bondBefore = ex.bond;
+  applyFamily(st, { family: [{ remarry: 'spouse' }] });
+  check('ใบ 97 คืนดี: คนเดิม (id/ชื่อ) กลับเป็นคู่ · together · ไม่ left · ธง married กลับ', ex.status === 'together' && !ex.left && ex.leftAge === undefined && st.flags.married === true && st.kin.filter((m) => m.role === 'spouse').length === 1);
+  check('ใบ 97 คืนดี: อายุแต่งนับรอบใหม่ (since = อายุตอนนี้) · ผูกพันคงค่าที่ค้าง · ex_bitter จบ', ex.since === 34 && ex.bond === bondBefore && !st.flags.ex_bitter);
+  check('ใบ 97 คืนดีได้ครั้งเดียวต่อชีวิต: หย่าอีกรอบแล้วการ์ดไม่ออก · op ซ้ำไม่ทำอะไร', (applyFamily(st, { family: [{ divorce: 'spouse' }] }), st.age = 36, cards.every((c) => !whenOk(st, c.when))) && (applyFamily(st, { family: [{ remarry: 'spouse' }] }), ex.status === 'divorced'));
+  const st4 = divorced(8); st4.age = 34;
+  applyFamily(st4, { family: [{ add: 'spouse' }] });
+  const second = st4.kin.findLast((m) => m.role === 'spouse');
+  applyFamily(st4, { family: [{ remarry: 'spouse' }] });
+  check('ใบ 97 มีคู่ใหม่อยู่แล้ว = remarry ไม่ทำอะไร (คู่เก่ายังหย่า)', st4.kin.find((m) => m.role === 'spouse').status === 'divorced' && second.alive);
+  const lowered = cards.every((c) => c.multipliers?.flags?.we_cheated < 1);
+  check('ใบ 97 หย่าเพราะเรานอกใจ (we_cheated): น้ำหนักการ์ดคืนดีต่ำลง', lowered);
+}
+
+// ศาสนาตอนเกิด (ใบ 26 B93): ตารางศาสนาต่อจังหวัด · ทายาท/เซฟเก่าถือศาสนาเดิม · ไม่มีตาราง = พุทธ ไม่ขยับค่าอื่น
+// ตารางในเทสเป็นของสังเคราะห์ ไม่ใช่ตัวเลขจริงของ สสช.
+{
+  const content = loadContent();
+  const withTable = (provinces, def = 'พุทธ') => ({ ...content, era: { ...content.era, birth: { ...content.era.birth, religion: { default: def, provinces } } } });
+  const base0 = newLife(31, content);
+  check('ศาสนา: ไม่มีตารางในข้อมูล = พุทธ', base0.religion === 'พุทธ', String(base0.religion));
+  const onlyMuslim = withTable({ [base0.province]: { อิสลาม: 1 } });
+  const m = newLife(31, onlyMuslim);
+  check('ศาสนา: จังหวัดที่ตารางว่าอิสลามล้วน เกิดที่นั่น = อิสลาม', m.religion === 'อิสลาม', String(m.religion));
+  const other = newLife(31, withTable({ ไม่มีจังหวัดนี้: { อิสลาม: 1 } }, 'พุทธ'));
+  check('ศาสนา: จังหวัดที่ไม่อยู่ในตาราง = ค่า default', other.religion === 'พุทธ');
+  // ตัวควบคุม: ศาสนาใช้ stream แยก — เปิดตารางแล้วชื่อ/ปีเกิด/จังหวัด/ฐานะ/เลขสุ่มโลกถัดไปต้องเท่าเดิม
+  const keep = (x) => JSON.stringify([x.name, x.birthYear, x.province, x.cls, x.sex, x.rng.next()]);
+  check('ศาสนา: เปิดตารางแล้วค่าอื่นของชีวิตไม่ขยับ (stream แยก)', keep(newLife(31, content)) === keep(newLife(31, onlyMuslim)));
+  const allProv = (w) => Object.fromEntries(content.era.birth.regions.flatMap((r) => r.provinces.map((x) => [x.name, w])));
+  // สัดส่วน: 70/30 ทุกจังหวัด ต้องใกล้ 0.7 (1500 seed)
+  const split = withTable(allProv({ อิสลาม: 7, พุทธ: 3 }));
+  let mus = 0;
+  for (let i = 0; i < 1500; i++) if (newLife(mixSeed(31, i), split).religion === 'อิสลาม') mus++;
+  check('ศาสนา: สัดส่วนที่เกิดใน harness ใกล้ตาราง (0.7 ±0.05)', Math.abs(mus / 1500 - 0.7) < 0.05, `${mus}/1500`);
+  // เซฟเก่า: ไม่มีช่อง → repairLife เติมค่าเดียวกับตอนเกิด โหลดกี่ครั้งก็เท่าเดิม
+  const old = newLife(31, onlyMuslim);
+  delete old.religion;
+  repairLife(old, null);
+  const old2 = newLife(31, onlyMuslim);
+  delete old2.religion;
+  repairLife(old2, null);
+  check('ศาสนา: เซฟเก่าไม่มีช่อง repairLife ได้ค่าเดียวกับตอนเกิดและซ้ำได้', old.religion === 'อิสลาม' && old2.religion === old.religion);
+  // ทายาท: ทางเป็นลูก/สายเลือด (จังหวัดบ้านเดิม) ถือศาสนาของบ้าน · ชีวิตถัดไปได้ค่าเดียวกัน
+  const half = withTable(allProv({ อิสลาม: 1, พุทธ: 1 }));
+  let kept = 0, child = 0;
+  for (let i = 0; i < 120; i++) {
+    const { state: parent } = playLife(mixSeed(31, i * 131), half, random);
+    const af = playAfterlife(parent, (card, r, a) => (card.kind === 'path' && !card.locked?.[0] ? 0 : random(card, r, a)));
+    if (af.path !== 'child' || !af.heir || af.heir.province !== parent.province) continue;
+    child++;
+    if (af.heir.religion === parent.religion && nextLife(af).religion === parent.religion) kept++;
+  }
+  check('ศาสนา: ทายาททางเป็นลูก/สายเลือดถือศาสนาของบ้าน', child > 0 && kept === child, `${kept}/${child}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

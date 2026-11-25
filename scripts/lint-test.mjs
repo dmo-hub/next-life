@@ -16,6 +16,9 @@ import { checkMeritTable, MERIT_WEIGHTS, OMEN_TEXT, MERIT_LEVELS, KARMA, omenTex
 import { ISEKAI_EVENTS, ISEKAI_MERIT, ISEKAI_SKILLS, checkSkillThai } from '../src/engine/isekai.mjs';
 import { lintIsekai, formatIsekaiProblem, ISEKAI_RULES } from '../src/node/lint/isekai.mjs';
 import { checkTree } from '../src/node/lint/tree.mjs';
+import { sillyGaps } from '../src/node/lint/heavy.mjs';
+import { officeGaps, hasWord } from '../src/node/lint/office.mjs';
+import { checkNature } from '../src/node/lint/nature.mjs';
 
 const root = new URL('../', import.meta.url);
 const dir = (d) => readdirSync(new URL(d, root)).filter((n) => n.endsWith('.yaml')).sort();
@@ -162,7 +165,40 @@ for (const [name, extra, pass] of overlapCases) {
   const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.overlap_stage'));
   if (!ok) fails.push(`overlap_stage "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง overlap_stage'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
 }
+// ผีบรรพบุรุษ (ใบ 18): การ์ด when.ancestor ทวงบาป/ขอส่วนบุญไม่ได้ — ตกต้องตกที่ป้าย merit / ช่อง ancestor · ตัวควบคุม: ป้ายเดียวกันบนการ์ดไม่มี ancestor ผ่าน
+const ancestorCard = (when, merit) => ({ ...overlapCard({ when }), choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, merit: n === 1 ? merit : [{ cat: 'neutral' }] })) });
+const ancestorCases = [
+  ['neutral ล้วน', { overlap_stage: [2, 2], ancestor: true }, [{ cat: 'neutral' }], true, ''],
+  ['ขอส่วนบุญ (ทาน)', { overlap_stage: [2, 2], ancestor: true }, [{ cat: 'dana', level: 1 }], false, '.merit[0]'],
+  ['ทวงบาป (ศีล)', { overlap_stage: [2, 2], ancestor: true }, [{ cat: 'sila', level: 2 }], false, '.merit[0]'],
+  ['ancestor ไม่ใช่ true', { overlap_stage: [2, 2], ancestor: 'yes' }, [{ cat: 'neutral' }], false, '.ancestor'],
+  ['ตัวควบคุม: ทานบนการ์ดไม่มี ancestor', { overlap_stage: [2, 2] }, [{ cat: 'dana', level: 1 }], true, ''],
+];
+for (const [name, when, merit, pass, at] of ancestorCases) {
+  const ps = lintDocs([{ file: `ancestor-case:${name}`, doc: { events: [ancestorCard(when, merit)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith(at));
+  if (!ok) fails.push(`ผีบรรพบุรุษ "${name}": ต้อง${pass ? 'ผ่าน' : `ตกที่ ${at}`} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['ผีบรรพบุรุษ ป้ายบุญบาป', `${ancestorCases.length} เคส`]);
 rows.push(['overlap_stage ตก/ผ่าน', `${overlapCases.length} เคส`]);
+// อัตลักษณ์ (ใบ 215): การ์ดเดียวกัน ต่างแค่ when/effects.identity — ตกต้องตกที่ช่อง identity เท่านั้น
+const idCard = (when, fx) => ({ id: 'identity_case_01', type: 'A', stage: 'วัยรุ่น', years: [2500, 2650], weight: 1, text: 'ข้อความการ์ด', ...(when && { when }), choices: [1, 2, 3, 4].map((n) => ({ text: `ทางเลือก ${n}`, ...(n === 1 && fx && { effects: fx }), merit: [{ cat: 'neutral' }] })) });
+const idCases = [
+  ['ตั้งค่า กั้นชาย', { sex: ['ชาย'] }, { identity: 'หญิงข้ามเพศ' }, true],
+  ['ล้างค่า กั้นชาย', { sex: ['ชาย'] }, { identity: 'ตามเพศกำเนิด' }, true],
+  ['when หญิงข้ามเพศ', { identity: ['หญิงข้ามเพศ'] }, null, true],
+  ['ตั้งค่า ไม่กั้นเพศ', null, { identity: 'หญิงข้ามเพศ' }, false],
+  ['ตั้งค่า กั้นหญิง', { sex: ['หญิง'] }, { identity: 'หญิงข้ามเพศ' }, false],
+  ['ตั้งค่า กั้นทั้งสองเพศ', { sex: ['ชาย', 'หญิง'] }, { identity: 'หญิงข้ามเพศ' }, false],
+  ['ค่าที่ตัดไปแล้ว (เกย์)', { sex: ['ชาย'] }, { identity: 'เกย์' }, false],
+  ['when ค่าไม่รู้จัก', { identity: ['ทอม'] }, null, false],
+];
+for (const [name, when, fx, pass] of idCases) {
+  const ps = lintDocs([{ file: `identity-case:${name}`, doc: { events: [idCard(when, fx)] } }], ctx);
+  const ok = pass ? !ps.length : ps.length > 0 && ps.every((p) => p.path.endsWith('.identity'));
+  if (!ok) fails.push(`identity "${name}": ต้อง${pass ? 'ผ่าน' : 'ตกที่ช่อง identity'} ได้ [${ps.map(formatProblem).join(' | ') || 'ผ่าน'}]`);
+}
+rows.push(['identity ตก/ผ่าน', `${idCases.length} เคส`]);
 // ความจำชาติก่อน (ใบ 159): การ์ดเดียวกัน ต่างแค่ช่อง when.past_life — ตกต้องตกที่ past_life เท่านั้น · ช่องที่ไม่มีแล้ว (ตัวควบคุม) ต้องตกด้วย
 const pastCases = [
   ['มีชาติก่อน', { any: true }, true],
@@ -215,6 +251,38 @@ for (const sex of SEXES) {
   }
 }
 rows.push(['ช่องแทนค่าแกนเติมครบ', `${Object.keys(PLACEHOLDERS).length} ช่อง × ${SEXES.length} เพศ`]);
+
+// ---- คำแทนตามงาน (ใบ 181): {ที่ทำงาน} {คนคุมงาน} ไล่ทุกอาชีพ × ทุกสาย × (ทำงานอยู่/ไม่ได้ทำ) ----
+{
+  const occs = JSON.parse(readFileSync(new URL('data/finance.json', root), 'utf8')).occupations.list.map((o) => o.id);
+  const ladders = [undefined, ...Object.keys(JSON.parse(readFileSync(new URL('data/careers.json', root), 'utf8')).ladders)];
+  const base = { ...newLife(1, loadContent()), age: 30, workFrom: 20, retiredAt: undefined };
+  let n = 0;
+  for (const k of ['ที่ทำงาน', 'คนคุมงาน']) {
+    for (const occ of occs) for (const ladder of ladders) for (const working of [true, false]) {
+      const st = { ...base, occupation: occ, ladder: ladder ? { id: ladder } : null, ...(working ? {} : { workFrom: null }) };
+      const out = fill(`{${k}}`, st);
+      n++;
+      if (/[{}]/.test(out) || !out.trim()) fails.push(`ช่อง {${k}} ว่าง/ไม่เติม (${occ} · สาย ${ladder ?? '-'} · ${working ? 'ทำงานอยู่' : 'ไม่ได้ทำงาน'}): "${out}"`);
+      else if (out.length > PLACEHOLDERS[k].length) fails.push(`ช่อง {${k}} ยาว ${out.length} เกินค่ายาวสุด ${PLACEHOLDERS[k].length} ที่ด่านความยาวใช้ (${occ} · สาย ${ladder ?? '-'}): "${out}"`);
+    }
+  }
+  rows.push(['คำแทนตามงาน อาชีพ×สาย×ทำ/ไม่ทำ', `${n} ชุด`]);
+  // เดโมของใบ: การ์ดเดียว พนักงานบริษัท = ออฟฟิศ · คนค้าขาย = ร้าน · เด็ก (ก่อนทำงาน) = ที่ทำงาน · เกษียณ = ที่ทำงาน · ชาวนา = คำสำรองคนคุมงาน
+  const jobCases = [
+    ['พนักงานบริษัท', { occupation: 'clerk', ladder: { id: 'private' } }, 'ออฟฟิศ', 'หัวหน้าแผนก'],
+    ['คนค้าขาย', { occupation: 'service', ladder: { id: 'trade' } }, 'ร้าน', 'เจ้าของร้าน'],
+    ['เด็กก่อนทำงาน', { occupation: 'clerk', ladder: null, workFrom: null, age: 10 }, 'ที่ทำงาน', 'หัวหน้างาน'],
+    ['เกษียณแล้ว', { occupation: 'clerk', ladder: { id: 'private' }, retiredAt: 55, age: 58 }, 'ที่ทำงาน', 'หัวหน้างาน'],
+    ['ชาวนา (ไม่มีนาย)', { occupation: 'farmer', ladder: { id: 'trade' } }, 'ไร่นา', 'เจ้าของที่นา'],
+    ['ทหาร ใช้คำสาย', { occupation: 'officer', ladder: { id: 'army' } }, 'ค่าย', 'ผู้บังคับบัญชา'],
+  ];
+  for (const [name, patch, wantPlace, wantBoss] of jobCases) {
+    const out = fill('{ที่ทำงาน}|{คนคุมงาน}', { ...base, ...patch });
+    if (out !== `${wantPlace}|${wantBoss}`) fails.push(`คำแทนตามงาน "${name}": ต้อง ${wantPlace}|${wantBoss} ได้ ${out}`);
+  }
+  rows.push(['คำแทนตามงาน เดโม+ตัวควบคุม', `${jobCases.length} เคส`]);
+}
 
 // ชื่อเล่น (B27): ด่านต้องจับชื่อที่หลุดรายการ avoid/ยุคมีรู
 const namesRaw = JSON.parse(readFileSync(new URL('data/names.json', root), 'utf8'));
@@ -336,7 +404,8 @@ const CADET_FLAG_KEYS = ['setFlags', 'clearFlags', 'setFlagsPoor', 'flagsHas', '
 // ธงที่แกนตั้งเอง (ป้ายหมวด 9 · ศาลสั่งล้มละลาย) มีในทะเบียนเพื่อให้เนื้อหาอ่านได้ ไม่ต้องรอเนื้อหาใช้
 // cheat_death: แกนอ่านตอนผลสุ่มตาย (ถูกเรียกตัว B153) — มีผู้อ่านแล้วแม้ยังไม่มีการ์ดตั้ง
 // army_family / police_family (B5): แกนตั้งตอนเข้าสายยศ army/police (rank.mjs markService)
-const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family'];
+// tree_teacher (ใบ 08): ด่านจบประถมของแกนตั้ง · treePace ในแกนอ่าน
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family', 'tree_teacher'];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายลี้ลับ) จึงไม่นับว่าค้าง
@@ -478,8 +547,11 @@ try {
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูปต้องตก (ขอบชี้โหนดที่ไม่มี · วนเป็นวง · หมวด/ช่วงวัย/ผลผิด) · ทะเบียนถูกรูปต้องผ่าน · ของจริงต้องผ่าน
 {
-  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ['เด็ก'], pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, ...over });
-  const doc = (nodes) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, nodes });
+  const ALL_STAGES = ['เด็ก', 'วัยรุ่น', 'หนุ่มสาว', 'ทำงาน', 'กลางคน', 'ชรา'];
+  const node = (over = {}) => ({ name: 'โหนดทดสอบ', branch: 'occ', size: 's', stages: ALL_STAGES, pre: [], years: 2, cards: 1, cat: ['belief'], fx: { happiness: 1 }, light: { happiness: 1 }, roll: 1, ...over });
+  const gate = (over = {}) => ({ title: 'ด่านทดสอบ', text: 'ถึงทางแยกของโหนดทดสอบ', results: [{ text: 'ทางหนึ่ง', fx: { happiness: 1 } }, { text: 'อีกทางหนึ่ง', fx: { knowledge: 1 } }], ...over });
+  const doc = (nodes, over = {}) => ({ year_scale: 0.25, light_unit: { s: 0.007, b: 0.014, k: 0.025 }, roll_k: 0.1, card_mul: 1.25, budget: 0.5, nodes, ...over });
+  const START = { base: 1, parent_branch: 1, class: { low: { occ: 1 }, mid: { occ: 1 }, high: { occ: 1 } }, job: { clerk: { occ: 1 } } };
   const treeCases = [
     ['good: สองโหนดต่อกัน', doc({ a: node(), b: node({ pre: ['a'] }) }), 0],
     ['bad: ขอบชี้โหนดที่ไม่มี', doc({ a: node({ pre: ['ghost'] }) }), 1],
@@ -490,6 +562,49 @@ try {
     ['bad: ปีเป็นศูนย์', doc({ a: node({ years: 0 }) }), 1],
     ['bad: ผลเกินระดับ', doc({ a: node({ fx: { happiness: 5 } }) }), 1],
     ['bad: ชื่อมีตัวเลข', doc({ a: node({ name: 'โหนด 1' }) }), 1],
+    // ใบ 04: ผลติดตัว · ทอย · อาชีพตรง · งบ
+    ['good: โหนดแขนงงานผูกอาชีพ', doc({ a: node({ cat: ['work_money'], jobs: ['clerk'], job_roll: 1 }) }), 0],
+    ['bad: ไม่มีระดับทอย', doc({ a: node({ roll: undefined }) }), 1],
+    ['bad: jobs ไม่มี job_roll', doc({ a: node({ jobs: ['clerk'] }) }), 1],
+    ['bad: job_roll ไม่มี jobs', doc({ a: node({ job_roll: 1 }) }), 1],
+    ['bad: งบผลเบารวมเกินเพดาน', doc({ a: node() }, { budget: 0.001 }), 1],
+    ['bad: card_mul ต่ำกว่า 1', doc({ a: node() }, { card_mul: 0.5 }), 1],
+    ['ok: สนิม years 5 floor 0.5', doc({ a: node() }, { rust: { years: 5, floor: 0.5 } }), 0],
+    ['bad: สนิม years 0', doc({ a: node() }, { rust: { years: 0, floor: 0.5 } }), 1],
+    ['bad: สนิม floor 1 (ไม่จาง)', doc({ a: node() }, { rust: { years: 5, floor: 1 } }), 1],
+    ['bad: สนิม floor 0 (หายหมด)', doc({ a: node() }, { rust: { years: 5, floor: 0 } }), 1],
+    ['bad: สนิมไม่ใช่ตาราง', doc({ a: node() }, { rust: 5 }), 1],
+    ['ok: ประตูบนโหนดใหญ่', doc({ a: node({ size: 'b', gate: gate() }) }, { gates: ['a'] }), 0],
+    ['bad: ประตูชี้โหนดที่ไม่มี', doc({ a: node() }, { gates: ['zz'] }), 1],
+    ['bad: ประตูบนโหนดเล็ก', doc({ a: node() }, { gates: ['a'] }), 1],
+    ['bad: ประตูเป็นตารางเก่า (โหนด → โฟกัส)', doc({ a: node({ size: 'b', gate: gate() }) }, { gates: { a: 'business' } }), 1],
+    ['bad: ประตูว่าง', doc({ a: node() }, { gates: [] }), 1],
+    // ใบ 05: การ์ดด่านโหนดใหญ่ · keystone
+    ['good: โหนดใหญ่มีการ์ดด่าน 2 ทาง', doc({ a: node({ size: 'b', gate: gate() }) }), 0],
+    ['bad: การ์ดด่านบนโหนดเล็ก', doc({ a: node({ gate: gate() }) }), 1],
+    ['bad: การ์ดด่านทางเดียว', doc({ a: node({ size: 'b', gate: gate({ results: [{ text: 'ทางเดียว', fx: { happiness: 1 } }] }) }) }), 1],
+    ['bad: การ์ดด่านผล 4 ทาง', doc({ a: node({ size: 'b', gate: gate({ results: Array.from({ length: 4 }, (_, i) => ({ text: `ทาง${'กขคง'[i]}`, fx: { happiness: 1 } })) }) }) }), 1],
+    ['good: keystone ครบ', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: -1 } }) }), 0],
+    ['bad: keystone เป็นโหนดซ่อน', doc({ a: node({ size: 'k', keystone: true, hidden: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: -1 } }) }), 1],
+    ['bad: keystone ไม่มีคำบอกข้อเสีย', doc({ a: node({ size: 'k', keystone: true, cost: { health: -1 } }) }), 1],
+    ['bad: keystone ไม่มีข้อเสียถาวร', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร' }) }), 1],
+    ['bad: keystone ข้อเสียเป็นค่าบวก', doc({ a: node({ size: 'k', keystone: true, warn: 'ได้แรงแต่เสียถาวร', cost: { health: 1 } }) }), 1],
+    // ใบ 06: ทุกวัย ≥1 โหนดที่เห็นต่อแขนง (ข้อ 44 61) · โหนดกลาง (and) · nolight
+    ['good: แขนงเดียวครอบทุกวันด้วยสองโหนด', doc({ a: node({ stages: ALL_STAGES.slice(0, 3) }), b: node({ stages: ALL_STAGES.slice(3), pre: ['a'] }) }), 0],
+    ['bad: แขนงไม่มีโหนดในช่วงวัยหนึ่ง', doc({ a: node({ stages: ALL_STAGES.slice(0, 5) }) }), 1],
+    ['bad: ช่วงวัยนั้นมีแต่โหนดซ่อน', doc({ a: node({ stages: ALL_STAGES.slice(0, 5) }), h: node({ stages: ['ชรา'], hidden: true, pre: ['a'] }) }), 1],
+    ['good: โหนดกลางแม่สองแขนง', doc({ a: node(), x: node({ branch: 'know', cat: ['study'] }), m: node({ branch: 'mid', and: true, pre: ['a', 'x'], cat: ['belief', 'study'] }) }), 0],
+    ['bad: โหนดกลางแม่แขนงเดียว', doc({ a: node(), b: node({ pre: ['a'] }), m: node({ branch: 'mid', and: true, pre: ['a', 'b'] }) }), 1],
+    ['bad: โหนดกลางไม่มี and', doc({ a: node(), x: node({ branch: 'know', cat: ['study'] }), m: node({ branch: 'mid', pre: ['a', 'x'] }) }), 1],
+    ['bad: โหนดในแขนงมี and', doc({ a: node(), b: node({ pre: ['a'], and: true }) }), 1],
+    ['good: nolight ปลดตัวเลือกอย่างเดียว', doc({ a: node({ light: undefined, nolight: true, roll: 0 }) }), 0],
+    ['bad: nolight แต่มี light', doc({ a: node({ nolight: true, roll: 0 }) }), 1],
+    // ใบ 06: จุดเกิด (ข้อ 97)
+    ['good: ตารางจุดเกิดครบแขนง', doc({ a: node() }, { start: START }), 0],
+    ['bad: ตารางจุดเกิดขาดแขนง', doc({ a: node() }, { start: { ...START, class: { ...START.class, mid: {} } } }), 1],
+    ['bad: ตารางจุดเกิดชี้แขนงที่ไม่มี', doc({ a: node() }, { start: { ...START, job: { clerk: { ghost: 1 } } } }), 1],
+    ['bad: ตารางจุดเกิดแต้มติดลบ', doc({ a: node() }, { start: { ...START, class: { ...START.class, low: { occ: -1 } } } }), 1],
+    ['bad: keystone สองตัวในแขนงเดียว', doc({ a: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }), b: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }) }), 1],
   ];
   for (const [name, d, want] of treeCases) {
     const ps = checkTree(d);
@@ -498,6 +613,21 @@ try {
   const real = checkTree(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')));
   if (real.length) fails.push(`content/rules/tree.yaml ไม่ผ่าน: ${real.join(' | ')}`);
   rows.push(['ต้นไม้โฟกัส ทะเบียนตก/ผ่าน', `${treeCases.length} เคส + ของจริง`]);
+  // โหนดนิสัยวัยเด็ก (ใบ ft07): natures.<id>.nodes ต้องชี้โหนดจริง · โหนดเดียวผูกนิสัยเดียว · node_pts จำนวนเต็ม ≥ 1
+  const focusDoc = () => parse(readFileSync(new URL('content/rules/nature.yaml', root), 'utf8'));
+  const treeIds = Object.keys(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')).nodes);
+  const focusCases = [
+    ['good: ของจริง', (d) => d, 0],
+    ['bad: nodes ชี้โหนดที่ไม่มี', (d) => { d.natures.calm.nodes = ['ghost']; return d; }, 1],
+    ['bad: โหนดเดียวผูกสองนิสัย', (d) => { d.natures.bold.nodes = [...d.natures.bold.nodes, d.natures.calm.nodes[0]]; return d; }, 1],
+    ['bad: node_pts เป็น 0', (d) => { d.node_pts = 0; return d; }, 1],
+    ['bad: ไม่มี node_pts', (d) => { delete d.node_pts; return d; }, 1],
+  ];
+  for (const [name, mut, want] of focusCases) {
+    const ps = checkNature(mut(focusDoc()), { treeNodes: treeIds });
+    if ((ps.length > 0) !== (want > 0)) fails.push(`focus nature "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['นิสัยวัยเด็ก nodes ตก/ผ่าน', `${focusCases.length} เคส`]);
 }
 
 // ชื่อที่ src/ui import ต้องมีจริงในไฟล์ปลายทาง — build ต่อไฟล์เป็นสคริปต์เดียวแล้วตัด import ทิ้ง ชื่อหายจึงไม่พังตอน build แต่พังทั้งเกมตอนกด (bookAdd v0.6.55)
@@ -515,6 +645,80 @@ try {
     }
   }
   rows.push(['ui-imports (src/ui ← import)', `${n} ชื่อ`]);
+}
+
+// ---- B64 ป้ายเรื่องหนัก (heavy: turning/sad) + ตัวเลือกปั่น (silly: true): ตัวควบคุมทีละแบบ · คำเตือนนับการ์ดไม่มีตัวเลือกปั่น (ไม่ตก) ----
+{
+  const card = (extra = {}, silly) => ({ id: 'hv_case', type: 'A', category: 'family', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'ญาติมาถามว่าปีนี้จะกลับบ้านไหม', choices: [1, 2, 3, 4].map((i) => ({ text: `ทางเลือก ${i}`, merit: [{ cat: 'neutral' }], ...(silly !== undefined && i === 4 ? { silly } : {}) })), ...extra });
+  const heavyCases = [
+    ['turning', { heavy: ['turning'] }, 0], ['sad', { heavy: ['sad'] }, 0], ['ทั้งคู่', { heavy: ['turning', 'sad'] }, 0],
+    ['ค่านอกรายการ', { heavy: ['funny'] }, 1], ['ซ้ำ', { heavy: ['sad', 'sad'] }, 1], ['ไม่ใช่รายการ', { heavy: 'sad' }, 1], ['รายการว่าง', { heavy: [] }, 1],
+    ['การ์ดแกนสร้าง promo_', { id: 'promo_x', heavy: ['sad'] }, 1], ['การ์ดแกนสร้าง recruit_gov', { id: 'recruit_gov', heavy: ['sad'] }, 1],
+  ];
+  for (const [name, extra, want] of heavyCases) {
+    const ps = lintDocs([{ file: `heavy-case:${name}`, doc: { events: [card(extra)] } }], ctx).filter((p) => p.rule === 'heavy-tag');
+    if ((ps.length > 0) !== (want > 0)) fails.push(`heavy-tag "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.map((p) => p.msg).join(' | ') || 'ผ่าน'}]`);
+  }
+  for (const [name, silly, want] of [['silly true', true, 0], ['silly false', false, 1], ['silly "yes"', 'yes', 1]]) {
+    const ps = lintDocs([{ file: `silly-case:${name}`, doc: { events: [card({}, silly)] } }], ctx).filter((p) => p.rule === 'heavy-tag');
+    if ((ps.length > 0) !== (want > 0)) fails.push(`silly "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.map((p) => p.msg).join(' | ') || 'ผ่าน'}]`);
+  }
+  rows.push(['heavy-tag/silly ตัวควบคุม', `${heavyCases.length + 3} เคส`]);
+  // ตัวนับ: sad ข้าม · silly ผ่าน · ที่เหลือนับ · การ์ดไม่มีตัวเลือก (เล่าเรื่อง) ไม่นับ
+  const g = sillyGaps([{ file: 'gap-case', doc: { events: [card({ id: 'a' }), card({ id: 'b' }, true), card({ id: 'c', heavy: ['sad'] }), card({ id: 'd', heavy: ['turning'] }), card({ id: 'e', choices: [] })] } }]);
+  if (g.total !== 4 || g.missing.map((m) => m.id).join() !== 'a,d') fails.push(`silly-gaps: ต้องนับ 4 ขาด a,d ได้ total ${g.total} ขาด [${g.missing.map((m) => m.id)}]`);
+  const real = dir('content/').map((f) => load('content/', f));
+  const gap = sillyGaps(real);
+  rows.push(['เตือน: การ์ดไม่มีตัวเลือกปั่น (silly)', `${gap.missing.length}/${gap.total} ใบ (ไม่ตก · ใบ 158 เปลี่ยนเป็นตก · ค่าเริ่มคือทุกใบ)`]);
+}
+
+// ---- ใบ 182 คำออฟฟิศในการ์ดวัยทำงาน: ด่านตก office-filter + ป้ายยกเว้น office_ok ต้องมีเหตุผล (ตก) ----
+{
+  const card = (extra = {}) => ({ id: 'of_case', type: 'A', category: 'work', stage: 'ทำงาน', years: [2500, 2650], weight: 1, text: 'กลางประชุมเช้าวันจันทร์ น้ำตาคุณไหลออกมาเองโดยไม่รู้ตัว', choices: [1, 2, 3, 4].map((i) => ({ text: `ทางเลือก ${i}`, merit: [{ cat: 'neutral' }] })), ...extra });
+  const cases = [
+    ['ไฟมอดกรองกว้าง service', { when: { occupation: ['service', 'clerk'] } }, 1],
+    ['ไฟมอดกรองสาย trade', { when: { occupation: ['clerk'], ladder: ['trade', 'private'] } }, 1],
+    ['ไม่มีตัวกรอง', {}, 1],
+    ['กรองอาชีพออฟฟิศ + สาย none private (การ์ดไฟมอดจริง)', { when: { occupation: ['clerk', 'professional', 'manager', 'technician'], ladder: ['none', 'private'] } }, 0],
+    ['กรองสาย gov อย่างเดียว', { when: { ladder: ['gov'] } }, 0],
+    ['ใช้คำแทน {คนคุมงาน}', { text: 'กลางประชุม {คนคุมงาน} เรียกคุณเข้าไปคุย' }, 0],
+    ['ยกเว้นพร้อมเหตุผล', { office_ok: 'ที่ประชุมหมู่บ้าน ไม่ใช่ออฟฟิศ' }, 0],
+    ['ช่วงเด็กไม่นับ', { stage: 'เด็ก', years: [2500, 2650] }, 0],
+    ['ไม่มีคำออฟฟิศ', { text: 'คุณเดินกลับบ้านตอนเย็น ฝนตกหนักจนรองเท้าเปียก' }, 0],
+    ['วางแผนก่อน ไม่ใช่แผนก', { text: 'คุณนั่งวางแผนก่อนลงมือทำนาปีนี้' }, 0],
+    ['ตัวควบคุม: แผนกจริงในประโยคเดียวกัน', { text: 'คุณนั่งวางแผนก่อน แล้วเดินไปบอกทั้งแผนก' }, 1],
+  ];
+  // ขอบพยางค์: [ข้อความ, คำ, ต้องเจอ]
+  const words = [
+    ['หัวหน้าแผนก', 'แผนก', true],
+    ['ตัวแทนแผนกลงแข่ง', 'แผนก', true],
+    ['วางแผนก่อน', 'แผนก', false],
+    ['แผนการตลาด', 'แผนก', false],
+    ['วางแผนก่อน ทั้งแผนกรู้', 'แผนก', true],
+    ['สลิปเงินเดือนเดือนนี้', 'เงินเดือน', true],
+    ['ไปประชุมเช้า', 'ประชุม', true],
+  ];
+  for (const [s, w, want] of words) if (hasWord(s, w) !== want) fails.push(`office-word "${s}" คำ ${w}: ต้อง${want ? 'เจอ' : 'ไม่เจอ'}`);
+  for (const [name, extra, want] of cases) {
+    const g = officeGaps([{ file: `office-case:${name}`, doc: { events: [card(extra)] } }]);
+    if (g.missing.length !== want) fails.push(`office-gaps "${name}": ต้องค้าง ${want} ใบ ได้ ${g.missing.length}`);
+  }
+  for (const [name, ok, want] of [['เหตุผลปกติ', 'ที่ประชุมหมู่บ้าน', 0], ['สตริงว่าง', '', 1], ['สั้นเกิน', 'สั้น', 1], ['ไม่ใช่ข้อความ', true, 1]]) {
+    const ps = lintDocs([{ file: `office-exempt:${name}`, doc: { events: [card({ office_ok: ok })] } }], ctx).filter((p) => p.rule === 'office-exempt');
+    if ((ps.length > 0) !== (want > 0)) fails.push(`office-exempt "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.map((p) => p.msg).join(' | ') || 'ผ่าน'}]`);
+  }
+  for (const [name, extra] of [['ไม่มีคำออฟฟิศ', { text: 'คุณเดินกลับบ้านตอนเย็น' }], ['ช่วงเด็ก', { stage: 'เด็ก' }]]) {
+    const ps = lintDocs([{ file: `office-exempt:${name}`, doc: { events: [card({ office_ok: 'ที่ประชุมหมู่บ้าน', ...extra })] } }], ctx).filter((p) => p.rule === 'office-exempt');
+    if (!ps.length) fails.push(`office-exempt "${name}": ป้ายยกเว้นที่ไม่จำเป็นต้องตก`);
+  }
+  for (const [name, extra, want] of cases) {
+    const ps = lintDocs([{ file: `office-filter:${name}`, doc: { events: [card(extra)] } }], ctx).filter((p) => p.rule === 'office-filter');
+    if (ps.length !== want) fails.push(`office-filter "${name}": ต้องตก ${want} ได้ ${ps.length}`);
+  }
+  rows.push(['คำออฟฟิศ ตัวควบคุม', `${cases.length * 2 + words.length + 6} เคส`]);
+  const og = officeGaps(dir('content/').map((f) => load('content/', f)));
+  if (og.missing.length) fails.push(`office-filter: ของจริงค้าง ${og.missing.length} ใบ (${og.missing.slice(0, 5).map((m) => m.id).join(' ')})`);
+  rows.push(['คำออฟฟิศ การ์ดจริง', `${og.total} ใบมีคำ · ยกเว้น ${og.exempt} · ค้าง ${og.missing.length}`]);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

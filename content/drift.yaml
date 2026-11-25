@@ -4,6 +4,7 @@
 # when.age = ช่วงที่นัดได้ (ตัดกับช่วงแผน) ⇒ การ์ดออกตรงปีที่นัด
 events:
   - id: drift_bridge_sink_01
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน

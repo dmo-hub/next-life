@@ -201,6 +201,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: kru_exam_01
+    office_ok: "ทางเลือกนอกสายครูที่ไปทำงานบริษัท (ธง kru_student)"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -236,6 +237,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: kru_temp_01
+    office_ok: "เงินเดือนครูอัตราจ้างและทางเลือกลาออกไปบริษัท (ธง kru_temp)"
     type: A
     category: work_money
     stage: หนุ่มสาว
@@ -359,6 +361,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   - id: kru_loan_01
+    office_ok: "เงินเดือนข้าราชการครูที่ใช้ค้ำสหกรณ์ (ธง kru_civil)"
     type: A
     category: work_money
     stage: ทำงาน
@@ -390,6 +393,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: kru_loan_02
+    office_ok: "สลิปเงินเดือนข้าราชการครูที่ถูกสหกรณ์หัก (ธง kru_coop_debt)"
     type: A
     category: work_money
     stage: กลางคน

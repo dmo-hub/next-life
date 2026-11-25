@@ -212,7 +212,7 @@ Measured after each placeholder is filled with its longest value (rule `text-len
 | belief (17) | `belief-shape`, `belief-category`, `outside-canon`, `belief-effects`, `lottery-*` (9 rules), `ledger-read`, `ledger-text`, `pair-match`, `vow-light` |
 | afterlife | `afterlife-shape` (stage ระหว่างชาติ needs scene, `type: B`, effects only on stats); `afterlife-coverage` (every scene × realm has a card with no `when`); `court-shape` |
 | kin | `kin-unguarded`: text that mentions แม่ / พ่อ / คู่ / ลูก / สัตว์เลี้ยง needs a `when.family` or `requires.family` guard |
-| focus | `focus-tag` (`tags: {}` is empty, so only the 6 categories are valid); `focus-gate` (gate ids must be politics_base / ordain / business / occult / shortcut_money, and not every choice may be gated) |
+| focus | `focus-tag` (`tags: {}` is empty, so only the 6 categories are valid); `focus-gate` (gate ids must be a node in `tree.yaml gates` (mo5 / mo7 / r5 / o5 / m4), and not every choice may be gated) |
 
 ### `npm run lint:test` (`scripts/lint-test.mjs`)
 Fixture checks:

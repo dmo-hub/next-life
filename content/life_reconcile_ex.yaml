@@ -1,0 +1,69 @@
+# คืนดีกับคู่เก่าหลังหย่า (ใบ 97 · B114 ข้อ 158 161 162): ละครหลังข่าว ไม่มีฉาก · คำทั่วไป (ใบหย่า · คู่เก่า)
+# เงื่อนไข: ยังโสดและคู่เก่าที่หย่าไปยังอยู่ · หย่ามาแล้ว 1–5 ปี (engine when.ex_spouse) · คืนดีได้ครั้งเดียวต่อชีวิต (engine m.reunited) · หย่าเพราะเรานอกใจ (ธง we_cheated) น้ำหนักต่ำลง
+# ตัวเลือก: family remarry = คู่เก่าคนเดิม (id ชื่อ ผูกพันที่ค้าง) กลับเป็นคู่ · อายุแต่งนับรอบใหม่ · ex_bitter จบลง (engine) · ปฏิเสธแล้วอาจเก็บความขมไว้
+events:
+  - id: fam_reconcile_ex_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 4
+    multipliers: {flags: {we_cheated: 0.4}}
+    when: {ex_spouse: {within: [1, 5]}}
+    title: "ข้อความตอนดึก"
+    text: "ข้อความจาก“{ชื่อคู่}”เด้งขึ้นมาตอนคุณกำลังปิดงาน ไม่ได้ขอเงิน ไม่ได้ขอให้ช่วยอะไร แค่ถามว่าถ้าวันนั้นทั้งสองคนไม่รีบเซ็นใบหย่า ป่านนี้จะเป็นยังไง"
+    choices:
+      - id: take_back
+        text: "ชวนกลับมาเริ่มใหม่ด้วยกัน"
+        family: [{remarry: spouse}]
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: meet_first
+        text: "นัดเจอกันก่อน ยังไม่ตอบ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: ask_kids
+        text: "ถามก่อนว่าใครรู้เรื่องนี้บ้าง"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: close_door
+        text: "ตอบว่าเรื่องของเราจบแล้ว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "อีกฝ่ายตอบมาสั้น ๆ ว่าเข้าใจ แล้วข้อความก็ไม่เข้ามาอีก", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขาตอบกลับมายาวเหยียดเรื่องวันเก่า ๆ ที่คุณไม่อยากเปิดอ่านอีกรอบ", effects: {relations: -2, happiness: -1}, sets_flags: [ex_bitter], merit: [{cat: neutral}]}
+
+  - id: fam_reconcile_ex_mid_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: กลางคน
+    years: [2500, 2650]
+    weight: 4
+    multipliers: {flags: {we_cheated: 0.4}}
+    when: {ex_spouse: {within: [1, 5]}}
+    title: "ที่นั่งริมหน้าต่าง"
+    text: "เพื่อนเก่าคนหนึ่งนัดกินข้าว พอไปถึงก็เห็น“{ชื่อคู่}”นั่งรออยู่ก่อนแล้ว เพื่อนบอกว่าไม่ได้ตั้งใจจัดฉาก แต่สองคนนั้นเงียบมาหลายปีเกินไป เขาเลยอยากให้ได้คุยกันสักครั้ง"
+    choices:
+      - id: take_back
+        text: "นั่งลง แล้วขอเริ่มกันใหม่"
+        family: [{remarry: spouse}]
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: just_lunch
+        text: "กินข้าวด้วยกันมื้อเดียว"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: bring_friend
+        text: "ชวนเพื่อนอยู่ต่อทั้งโต๊ะ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: walk_away
+        text: "ขอตัวกลับ ไม่อยากเปิดเรื่องเก่า"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 3, ok: true, text: "เพื่อนส่งข้อความขอโทษตามมา คุณตอบว่าไม่เป็นไร แล้วเรื่องก็จบแค่นั้น", effects: {relations: -1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ข้าวมื้อนั้นทำให้เพื่อนกลุ่มเดียวกันแบ่งข้าง คุณเลยเลิกไปงานรวมรุ่นอีกหลายปี", effects: {relations: -2, happiness: -1}, sets_flags: [ex_bitter], merit: [{cat: neutral}]}

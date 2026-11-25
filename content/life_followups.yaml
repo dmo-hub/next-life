@@ -1,0 +1,106 @@
+# การ์ดต่อของการ์ดสุ่มที่สายครอบครัว/สุขภาพจับบ่อยแต่ผลสุ่มไม่มีเรื่องต่อ (ใบ 325 · แบบเดียวกับ job_*.yaml ของ 316)
+# ต้นทางชี้ next มาที่นี่เฉพาะผลสุ่มที่เนื้อเรื่องต่อกันได้ (ไม่ใช่ทุกผล) · ไม่มี weight ไม่มี age = ไม่อยู่ในกองสุ่ม ออกได้ทางผลสุ่มของต้นทางเท่านั้น
+events:
+  # ต้นทาง: oldh_hipfall/cancer/kidney (ทุกผล) · old_care_home (ผลทรุด/ล้ม) · food_coconut_ice (ฟันเสียว) · sport_taichi_park join_line (ผลเมื่อย)
+  - id: after_care_old_01
+    type: B
+    category: health
+    stage: ชรา
+    years: [2400, 2700]
+    title: "เพื่อนบ้านแวะมาถามไถ่"
+    text: "อีกไม่กี่วันต่อมา เพื่อนบ้านวัยเดียวกันแวะมาถามว่าเรื่องร่างกายที่เพิ่งเกิดเป็นยังไงบ้าง ถือยาดมกับกล้วยหนึ่งหวีมาด้วย นั่งลงที่ชานบ้านแล้วเล่าเรื่องคนที่เจอแบบเดียวกันให้ฟังจนเกือบค่ำ"
+    choices:
+      - id: after_care_old_tell
+        text: "เล่าให้ฟังตามจริงทั้งหมด"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: after_care_old_ask
+        text: "ขอถามวิธีดูแลตัวเองจากเขา"
+        effects: {knowledge: 1, health: 1}
+        merit: [{cat: neutral}]
+      - id: after_care_old_walk
+        text: "ชวนกันเดินเบา ๆ รอบหมู่บ้าน"
+        effects: {health: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: after_care_old_rest
+        text: "บอกว่าไม่เป็นไร ขอพักก่อน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  # ต้นทาง: fest_songkran_adult_01 party ผลดี (เพื่อนในแผนกสนิทกัน)
+  - id: after_fest_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2400, 2700]
+    title: "ปีหน้าเล่นน้ำกันที่ไหนดี"
+    text: "สงกรานต์ผ่านไปได้สองสามวัน เสื้อลายดอกกับปืนฉีดน้ำยังกองอยู่หน้าบ้าน เพื่อนร่วมงานโทรมาชวนคุยว่าปีหน้าจะนัดกันที่ไหนดี มีคนอยากกลับบ้านต่างจังหวัด มีคนอยากรวมเงินเช่าบ้านพักริมน้ำ"
+    choices:
+      - id: after_fest_work_lead
+        text: "อาสาเป็นคนนัดวงปีหน้า"
+        effects: {network: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: after_fest_work_clean
+        text: "ช่วยกันเก็บของแล้วแยกย้าย"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: after_fest_work_split
+        text: "ขอให้ทุกคนแบ่งค่าใช้จ่ายกัน"
+        effects: {relations: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: after_fest_work_skip
+        text: "ขอพักปีหน้า กลับไปหาที่บ้าน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  # ต้นทาง: era_dis_sars_adult_01 hoard_masks (ทั้งสองผล)
+  - id: after_era_young_01
+    type: B
+    category: society
+    stage: หนุ่มสาว
+    years: [2400, 2700]
+    title: "ข่าวหลังเหตุการณ์ใหญ่"
+    text: "หลายสัปดาห์หลังเหตุการณ์ใหญ่ที่ทุกคนเพิ่งผ่านมา ราคาของในตลาดยังไม่กลับเป็นปกติ วงเพื่อนเริ่มคุยกันว่าใครช่วยใครไปแล้วบ้าง และยังมีใครที่ไม่ได้รับความช่วยเหลือเลย"
+    choices:
+      - id: after_era_young_give
+        text: "บริจาคของให้คนที่ยังลำบาก"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: after_era_young_group
+        text: "รวมกลุ่มเพื่อนบ้านช่วยกัน"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: after_era_young_save
+        text: "ประหยัดไว้ก่อน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: after_era_young_news
+        text: "ติดตามข่าวแล้วเตรียมตัวรอบหน้า"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  # ต้นทาง: era_dis_typhoon_adult_01 contractor · era_dis_flood_adult_01 wade_to_work (ทั้งสองผล)
+  - id: after_era_work_01
+    type: B
+    category: society
+    stage: ทำงาน
+    years: [2400, 2700]
+    title: "ข่าวหลังเหตุการณ์ใหญ่"
+    text: "หลายสัปดาห์หลังเหตุการณ์ใหญ่ที่ทุกคนเพิ่งผ่านมา ราคาของในตลาดยังไม่กลับเป็นปกติ ที่ทำงานเริ่มมีเรื่องคุยกันว่าใครช่วยใครไปแล้วบ้าง และยังมีใครที่ไม่ได้รับความช่วยเหลือเลย"
+    choices:
+      - id: after_era_work_give
+        text: "บริจาคของให้คนที่ยังลำบาก"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: after_era_work_group
+        text: "รวมกลุ่มเพื่อนร่วมงานช่วยกัน"
+        effects: {network: 1}
+        merit: [{cat: neutral}]
+      - id: after_era_work_save
+        text: "ประหยัดไว้ก่อน"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+      - id: after_era_work_news
+        text: "ติดตามข่าวแล้วเตรียมตัวรอบหน้า"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]

@@ -1,0 +1,221 @@
+# การ์ดบ้านเมือง · เมือง — มือถือ · อินเทอร์เน็ต · รถไฟฟ้า · สนามบินใหม่ — เหตุละ 2 ใบ · ไม่ใส่ค่าเศรษฐกิจ (เหตุดีของเมือง ไม่ขยับรายได้แบบวิกฤต)
+events:
+  # ---------- โทรศัพท์มือถือ 2533 ----------
+  - id: era_city_mobile_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: mobile_phone_boom
+    when: {age: [19, 59], occupation: [clerk, professional, manager, technician, officer, senior_officer], flags: {not: [own_business]}, ladder: [none, private, gov]}
+    title: "เครื่องโทรศัพท์เท่าอิฐ"
+    text: "เพื่อนร่วมงานคนหนึ่งถือโทรศัพท์มือถือเครื่องเท่าอิฐเข้าที่ทำงาน เสียงดังกลางประชุม ทุกคนหันไปมองพร้อมกัน เขาบอกว่าไปไหนก็ติดต่อได้ แต่ค่าโทรนาทีละหลายบาท"
+    choices:
+      - id: ask_try
+        text: "ขอลองกดโทรดูสักครั้ง"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: keep_landline
+        text: "ยังใช้โทรศัพท์บ้านตามเดิม"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: learn_how
+        text: "ถามว่าสัญญาณมาจากไหนได้อย่างไร"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: envy_quiet
+        text: "แอบอยากได้แต่ไม่กล้าบอกใคร"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_city_mobile_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: mobile_phone_boom
+    when: {age: [60, 110]}
+    title: "ลูกหลานซื้อโทรศัพท์มาให้"
+    text: "ลูกหลานซื้อโทรศัพท์มือถือมาให้เครื่องหนึ่ง บอกว่าจะได้โทรหากันง่าย คุณกดปุ่มสองสามครั้งก็ไม่รู้ว่าอันไหนรับสาย อันไหนวางสาย"
+    choices:
+      - id: learn_call
+        text: "ให้หลานสอนกดรับสายจนคล่อง"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: put_drawer
+        text: "เก็บใส่ลิ้นชักไม่ได้ใช้"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: call_old_mates
+        text: "โทรหาเพื่อนเก่าที่ไม่ได้เจอกัน"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: carry_pocket
+        text: "พกติดกระเป๋าเสื้อทุกวัน"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+
+  # ---------- อินเทอร์เน็ตเชิงพาณิชย์ 2538 ----------
+  - id: era_city_net_adult_01
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    era: internet_commercial
+    when: {age: [19, 45]}
+    title: "เสียงโมเด็มดังทั้งคืน"
+    text: "อินเทอร์เน็ตเปิดให้บริการแล้ว เพื่อนที่ทำงานพาไปดูหน้าจอที่ต่อสายโทรศัพท์ รอนานหลายนาทีรูปจึงค่อย ๆ ขึ้นทีละบรรทัด แต่ทุกคนยืนดูกันจนเลิกงาน"
+    choices:
+      - id: try_chat
+        text: "ลองห้องแชตคุยกับคนแปลกหน้า"
+        effects: {relations: 1, happiness: 1, network: 1}
+        merit: [{cat: neutral}]
+      - id: read_news
+        text: "ลองเปิดหาข่าวจากต่างประเทศ"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: tell_family
+        text: "ไปเล่าให้คนที่บ้านฟัง"
+        effects: {relations: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: wait_see
+        text: "รอดูก่อนว่าจะอยู่ได้นานไหม"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_city_net_kid_01
+    type: A
+    category: society
+    stage: เด็ก
+    years: [2500, 2650]
+    era: internet_commercial
+    when: {age: [6, 12], school: [primary, lower]}
+    title: "ห้องคอมพิวเตอร์ใหม่"
+    text: "โรงเรียนมีห้องคอมพิวเตอร์ห้องใหม่ ครูบอกว่าวันหน้าทุกคนจะใช้เครื่องนี้หาความรู้จากทั่วโลก เด็ก ๆ ต่อแถวรอคิวเข้าห้องทีละกลุ่มอย่างตื่นเต้น"
+    choices:
+      - id: play_game
+        text: "แอบเปิดเกมแทนที่จะเรียน"
+        effects: {happiness: 1, knowledge: -1}
+        merit: [{cat: neutral}]
+      - id: learn_type
+        text: "ฝึกพิมพ์ดีดจนเร็วกว่าเพื่อน"
+        effects: {knowledge: 2}
+        merit: [{cat: neutral}]
+      - id: help_friend
+        text: "สอนเพื่อนที่ยังไม่กล้าจับเมาส์"
+        effects: {relations: 2, knowledge: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: scared_machine
+        text: "กลัวเครื่องจนไม่อยากแตะ"
+        effects: {knowledge: -1}
+        merit: [{cat: neutral}]
+
+  # ---------- รถไฟฟ้าบีทีเอส 2542 ----------
+  - id: era_city_bts_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: bts_opening
+    when: {age: [19, 59], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "นั่งรถไฟลอยฟ้าครั้งแรก"
+    text: "รถไฟฟ้าลอยฟ้าเปิดให้บริการวันแรก ผู้คนต่อแถวยาวเพื่อขึ้นไปนั่งชมเมืองจากด้านบน รถบนถนนด้านล่างติดยาวเหมือนเคย แต่ในโบกี้เย็นสบายและเงียบกว่าที่คิด"
+    choices:
+      - id: ride_all
+        text: "นั่งไปจนสุดสายเพื่อชมวิว"
+        effects: {happiness: 2, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: commute_try
+        text: "ลองใช้ไปทำงานเช้าวันรุ่งขึ้น"
+        effects: {health: 1, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: give_seat
+        text: "ลุกให้ที่นั่งผู้สูงอายุ"
+        effects: {relations: 1}
+        merit: [{cat: help_others, level: 1}]
+      - id: keep_bus
+        text: "ยังนั่งรถเมล์สายเดิมต่อไป"
+        effects: {relations: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_city_bts_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: bts_opening
+    when: {age: [60, 110], region: [กรุงเทพฯ และปริมณฑล]}
+    title: "หลานพาขึ้นรถไฟฟ้า"
+    text: "หลานชวนคุณขึ้นรถไฟฟ้าไปเที่ยวห้างกลางเมือง ทางขึ้นสถานีสูงจนต้องหยุดพักกลางทาง แต่พอขึ้นไปนั่งเห็นเมืองที่เคยเดินทั่วทั้งเมืองเปลี่ยนไปหมด"
+    choices:
+      - id: enjoy_view
+        text: "นั่งชมเมืองเก่าจากมุมสูง"
+        effects: {happiness: 2}
+        merit: [{cat: neutral}]
+      - id: tell_old_street
+        text: "เล่าให้หลานฟังว่าถนนเคยเป็นยังไง"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]
+      - id: tired_stairs
+        text: "เหนื่อยกับบันไดจนไม่อยากขึ้นอีก"
+        effects: {health: -1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: buy_card
+        text: "ซื้อบัตรโดยสารไว้ใช้เองบ้าง"
+        effects: {happiness: 1, relations: 1}
+        merit: [{cat: neutral}]
+
+  # ---------- สนามบินสุวรรณภูมิ 2549 ----------
+  - id: era_city_airport_adult_01
+    type: A
+    category: society
+    stage: ทำงาน
+    years: [2500, 2650]
+    era: suvarnabhumi_opening
+    when: {age: [19, 59]}
+    title: "สนามบินแห่งใหม่เปิดวันแรก"
+    text: "สนามบินแห่งใหม่เปิดให้บริการ ทีวีถ่ายทอดสดภาพอาคารกระจกขนาดใหญ่ เพื่อนร่วมงานบางคนอยากไปดูกับตา บางคนบอกว่าเดินทางไกลเกินไปจากตัวเมือง"
+    choices:
+      - id: go_look
+        text: "ขับรถไปดูสนามบินใหม่"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: plan_trip
+        text: "ฝันวางแผนไปต่างประเทศสักครั้ง"
+        effects: {happiness: 1, knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: pick_up
+        text: "อาสาไปรับญาติที่บินกลับมา"
+        effects: {relations: 2, health: -1}
+        merit: [{cat: help_others, level: 1}]
+      - id: skip_it
+        text: "ไม่สนใจ ไม่เคยไปไหนอยู่แล้ว"
+        effects: {happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: era_city_airport_old_01
+    type: A
+    category: society
+    stage: ชรา
+    years: [2500, 2650]
+    era: suvarnabhumi_opening
+    when: {age: [60, 110]}
+    title: "เครื่องบินลำใหญ่ที่สนามบินใหม่"
+    text: "ลูกหลานพาไปส่งญาติที่สนามบินใหม่ คุณยืนมองเครื่องบินลำใหญ่ขึ้นฟ้าแล้วนึกถึงสมัยที่ต้องนั่งเรือข้ามฟากเป็นวัน ๆ ญาติถามว่าอยากขึ้นสักครั้งไหม"
+    choices:
+      - id: say_yes
+        text: "ตอบว่าอยากลองสักครั้งก่อนตาย"
+        effects: {happiness: 2, relations: 1}
+        merit: [{cat: neutral}]
+      - id: say_no
+        text: "ตอบว่าอยู่บนดินปลอดภัยกว่า"
+        effects: {health: 1}
+        merit: [{cat: neutral}]
+      - id: watch_plane
+        text: "นั่งดูเครื่องขึ้นลงทั้งบ่าย"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: tell_sea_story
+        text: "เล่าเรื่องนั่งเรือให้ลูกหลานฟัง"
+        effects: {relations: 2}
+        merit: [{cat: neutral}]

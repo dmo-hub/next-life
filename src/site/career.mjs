@@ -3,12 +3,12 @@
 // การ์ดที่ไม่มีในไฟล์ผล (ใหม่กว่าผลจำลอง) ขึ้นว่ายังไม่มีผลจำลอง ไม่เดาเลข · สร้างไฟล์ผลด้วย node harness/career-sim.mjs
 import { existsSync, readFileSync } from 'node:fs';
 import { esc, text, spoilSlot } from './catalog.mjs';
+import { ENGINE_CARD } from '../node/lint/vocab.mjs';
 
 export const OFFICE_UNIT = 'office';
 export const unitKey = (ladder, occ) => `${ladder}|${occ}`;
 export const SIM_FILE = 'data/career-sim.json';
 // การ์ดเลือกที่แกนสร้างตอนอยู่ในงาน — ไม่อยู่ใน content จึงนับจาก prefix ของ id
-const ENGINE_CARD = /^(promo_|office_|recruit_gov$|early_retire$)/;
 export const isCareerCard = (id) => ENGINE_CARD.test(id);
 // ต่ำกว่านี้รวบเป็นบรรทัดเดียว — การ์ดเกี่ยวกับงานมีหลายสิบใบต่ออาชีพ ใบที่แทบไม่มีใครเจอดันใบหลักตกจอ
 export const RARE_PCT = 1;
@@ -30,12 +30,26 @@ export function careerSim(root = new URL('../../', import.meta.url)) {
   return sim;
 }
 
+// key กล่องบนหน้า (สาย|อาชีพ + office) — ผลจำลองเก็บชุดนี้ไว้ ไม่งั้นแยก "key ตกรุ่น" ออกจาก "ไม่มีใครเคยทำงานนี้" ไม่ได้
+export function careerUnitKeys(content) {
+  const careers = content.era.careers;
+  const keys = Object.entries(careers.ladders).flatMap(([lad, ladder]) => ladderOccs(ladder).map((occ) => unitKey(lad, occ)));
+  return careers.office ? [...keys, OFFICE_UNIT] : keys;
+}
+
 // ชุดการ์ดในกองไม่ตรงไฟล์ผล = ผลจำลองค้าง (การ์ดเพิ่ม/ลบ/เปลี่ยน id) — site:check เตือน ไม่ตก
 export function simDrift(content, sim = careerSim()) {
-  if (!sim) return { missing: [...careerCardIds(content)], gone: [], noFile: true };
+  if (!sim) return { missing: [...careerCardIds(content)], gone: [], staleKeys: [], noFile: true };
   const now = careerCardIds(content);
   const then = new Set(sim.cards ?? []);
-  return { missing: [...now].filter((id) => !then.has(id)).sort(), gone: [...then].filter((id) => !now.has(id)).sort(), noFile: false };
+  const keysNow = careerUnitKeys(content);
+  const keysThen = new Set(sim.unitKeys ?? []);
+  return {
+    missing: [...now].filter((id) => !then.has(id)).sort(),
+    gone: [...then].filter((id) => !now.has(id)).sort(),
+    staleKeys: keysNow.filter((k) => !keysThen.has(k)).sort(),
+    noFile: false,
+  };
 }
 
 // สายที่อาชีพเปลี่ยนตามขั้น (ราชการ ทหาร ตำรวจ) ไล่อาชีพจากขั้น · สายเอกชน/สายอาชีพอ่านรายการอาชีพของสาย

@@ -3,6 +3,7 @@
 events:
   # ---- 65-2 เพื่อนวัยเด็กกลับมา 20 ปีให้หลัง ----
   - id: kid_friend_lunch_01
+    away_block: [monk]
     type: A
     category: society
     stage: เด็ก
@@ -34,6 +35,8 @@ events:
         schedules: [{event: echo_old_friend_cold_01, after_years: [20, 22]}]
 
   - id: echo_old_friend_help_01
+    office_ok: "บริษัทของเพื่อนเก่าและเงินเดือนคืองานที่เขาเสนอ ไม่ใช่ที่ทำงานเดิมของผู้เล่น"
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -63,6 +66,8 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_old_friend_cold_01
+    office_ok: "บริษัทของเพื่อนเก่าที่มางานเลี้ยง ไม่ใช่ที่ทำงานของผู้เล่น"
+    away_block: [abroad]
     type: A
     category: society
     stage: ทำงาน
@@ -91,6 +96,7 @@ events:
 
   # ---- 65-1 ความผิดวัยเด็กโดนจับได้ → สอบราชการ/เรียนต่อยาก ----
   - id: kid_exam_copy_01
+    away_block: [monk]
     type: A
     category: study
     stage: เด็ก
@@ -126,6 +132,7 @@ events:
           - {weight: 1, text: "ภารโรงเดินผ่านมาเห็น ชื่อถูกจดลงสมุดประวัติพร้อมเพื่อน", effects: {happiness: -1}, sets_flags: [school_record], schedules: [{event: echo_school_record_exam_01, after_years: [10, 13]}], merit: [{cat: neutral}]}
 
   - id: teen_record_turn_01
+    away_block: [monk]
     type: A
     category: study
     stage: วัยรุ่น
@@ -154,6 +161,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: echo_school_record_exam_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: หนุ่มสาว

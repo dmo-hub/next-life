@@ -117,8 +117,8 @@ events:
       - id: contractor
         text: "รับจ้างซ่อมบ้านหลังพายุ"
         outcomes:
-          - {weight: 2, ok: true, multipliers: {stats: {health: 1.5}, occupation: {craft: 2, technician: 1.5, labor: 1.3}}, text: "งานล้นมือจนต้องจ้างลูกน้อง กลายเป็นผู้รับเหมาเจ้าประจำของทั้งอำเภอ", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.3}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "รับงานเกินตัว ตกนั่งร้านขาเดาะ ลูกค้าทวงมัดจำคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {next: after_era_work_01, weight: 2, ok: true, multipliers: {stats: {health: 1.5}, occupation: {craft: 2, technician: 1.5, labor: 1.3}}, text: "งานล้นมือจนต้องจ้างลูกน้อง กลายเป็นผู้รับเหมาเจ้าประจำของทั้งอำเภอ", effects: {money: {unit: income_x, amount: 1}, income_mult: 1.3}, merit: [{cat: neutral}]}
+          - {next: after_era_work_01, weight: 1, text: "รับงานเกินตัว ตกนั่งร้านขาเดาะ ลูกค้าทวงมัดจำคืน", effects: {health: -2, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: price_gouge
         text: "กักน้ำดื่มไว้ขายราคาสามเท่า"
@@ -206,12 +206,13 @@ events:
 
   # มุมใหม่ (ใบ 217): คนงานบริการ · ออกแทนใบผู้ใหญ่เมื่อ when ผ่าน
   - id: era_dis_sars_service_01
+    office_ok: "ใบกรองอาชีพ service แล้ว ลูกจ้างร้านที่ถูกเรียกประชุมให้ลาไม่รับเงินเดือน"
     type: A
     category: work_money
     stage: ทำงาน
     years: [2500, 2650]
     era: sars
-    when: {age: [19, 59], occupation: [service]}
+    when: {age: [19, 59], occupation: [service], flags: {not: [own_business]}}
     title: "แขกยกเลิกทั้งกรุ๊ป"
     text: "ทัวร์จากต่างประเทศยกเลิกติดกันทั้งเดือน ห้องพักว่างเกินครึ่ง หัวหน้าเรียกประชุมแล้วบอกว่าใครอยากลาไม่รับเงินเดือน ให้ยกมือ"
     choices:
@@ -241,6 +242,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: era_dis_sars_adult_01
+    office_ok: "เงินเดือนเป็นตัวเทียบกำไรขายหน้ากาก ผู้เล่นทุกอาชีพอ่านได้"
     type: A
     category: society
     stage: หนุ่มสาว
@@ -260,8 +262,8 @@ events:
         text: "ตุนหน้ากากไว้ขาย"
         hint: "ราคา: บาปเบา"
         outcomes:
-          - {weight: 1, text: "ขายหมดเกลี้ยงในสามวัน กำไรเท่าเงินเดือนครึ่งปี", effects: {happiness: 1, money: {unit: income_x, amount: 1.5, grey: true}}, merit: [{cat: greed_harm, level: 1}], sets_flags: [dirty_money]}
-          - {weight: 2, text: "ข่าวซาเร็วกว่าคิด หน้ากากค้างเต็มห้องไปอีกหลายปี", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
+          - {next: after_era_young_01, weight: 1, text: "ขายหมดเกลี้ยงในสามวัน กำไรเท่าเงินเดือนครึ่งปี", effects: {happiness: 1, money: {unit: income_x, amount: 1.5, grey: true}}, merit: [{cat: greed_harm, level: 1}], sets_flags: [dirty_money]}
+          - {next: after_era_young_01, weight: 2, text: "ข่าวซาเร็วกว่าคิด หน้ากากค้างเต็มห้องไปอีกหลายปี", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: greed_harm, level: 1}]}
         merit: [{cat: greed_harm, level: 1}]
       - id: study_in_slump
         text: "ใช้ช่วงซบเซาไปเรียนเพิ่ม"
@@ -513,8 +515,8 @@ events:
       - id: wade_to_work
         text: "ลุยน้ำไปทำงานไปเรียนทุกวัน"
         outcomes:
-          - {weight: 2, ok: true, multipliers: {stats: {health: 2}}, text: "ความอึดเป็นที่เลื่องลือ ใครมีงานดี ๆ ก็นึกถึงเป็นคนแรก", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
-          - {weight: 1, multipliers: {occupation: {factory: 1.5, labor: 1.5}}, text: "ติดเชื้อจากน้ำขัง ตับไตไม่เหมือนเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
+          - {next: after_era_work_01, weight: 2, ok: true, multipliers: {stats: {health: 2}}, text: "ความอึดเป็นที่เลื่องลือ ใครมีงานดี ๆ ก็นึกถึงเป็นคนแรก", effects: {happiness: 1, income_mult: 1.2}, merit: [{cat: neutral}]}
+          - {next: after_era_work_01, weight: 1, multipliers: {occupation: {factory: 1.5, labor: 1.5}}, text: "ติดเชื้อจากน้ำขัง ตับไตไม่เหมือนเดิม", effects: {health: -2, chronic: {health: -1}}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: back_to_farm
         text: "ย้ายกลับไปอยู่บ้านเกิดทำสวน"
@@ -601,7 +603,7 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     era: covid19
-    when: {age: [19, 59], occupation: [clerk, technician, professional, manager]}
+    when: {age: [19, 59], occupation: [clerk, technician, professional, manager], flags: {not: [own_business]}}
     title: "ประชุมจากโต๊ะกินข้าว"
     text: "บริษัทสั่งทำงานจากบ้านไม่มีกำหนด โต๊ะกินข้าวกลายเป็นโต๊ะทำงาน ประชุมออนไลน์ติดกันจนค่ำ คนในบ้านต้องเดินผ่านหลังกล้องแบบก้มหัว"
     choices:
@@ -681,6 +683,7 @@ events:
 
   # ---------- เรื่องต่อ (ออกทาง next เท่านั้น) ----------
   - id: era_dis_tsunami_land_offer_01
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
@@ -711,6 +714,8 @@ events:
         merit: [{cat: dana, level: 2}]
 
   - id: era_dis_covid_shop_boom_01
+    office_ok: "เงินเดือนเป็นตัวเทียบรายได้เสริมจากขายของ ผู้เล่นทุกอาชีพอ่านได้"
+    away_block: [abroad, monk]
     type: A
     category: work_money
     stage: ทำงาน
