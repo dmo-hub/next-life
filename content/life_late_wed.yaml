@@ -24,7 +24,7 @@ events:
       - id: wedding_feast
         text: "ตกลง แล้วจัดโต๊ะจีนให้ญาติ"
         requires: {money: {unit: income_x, amount: 1.5}, reason: "เงินเก็บยังไม่พอจัดโต๊ะ"}
-        result: "ญาติสองฝ่ายนั่งเต็มร้าน เจ้าสาวกับเจ้าบ่าวผมขาวแซมกันทั้งคู่ ป้าข้างบ้านร้องไห้ก่อนใคร ซองมาเกือบครบค่าอาหาร"
+        result: "ญาติสองฝ่ายนั่งเต็มร้าน เจ้าสาวกับเจ้าบ่าวยืนรับแขกจนขาแข็งทั้งคู่ ป้าข้างบ้านร้องไห้ก่อนใคร ซองมาเกือบครบค่าอาหาร"
         effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -1.5}}
         sets_flags: [married]
         merit: [{cat: neutral}]
