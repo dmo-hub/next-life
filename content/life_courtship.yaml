@@ -1,0 +1,259 @@
+# การ์ดเจอ → จีบ (ใบ 173) · การ์ดเจอเพิ่มคนจีบแล้วนัดการ์ดจีบของตัวเองไว้ปีที่ 1 และ 2 — ขั้นจีบยาว 1–2 ปี ไม่รู้ล่วงหน้าว่าปีไหน นัดครั้งเดียวหรือหวังกองสุ่มจะหลุดช่วง
+# การ์ดจีบไม่มี weight (ออกจากนัดเท่านั้น) · สำเร็จ = ปล่อยให้แกนเลื่อนเป็นแฟนตามนัด จึงห้ามเขียนว่าเป็นแฟนแล้ว · จบกัน = drop courter
+# ข้อความการ์ดจีบไม่ย้อนเล่าว่าเจอกันที่ไหน: จีบซ้อนสองคน ชื่อบนใบอาจเป็นคนจากการ์ดเจออีกใบ
+events:
+  - id: court_meet_uni_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 3
+    when: {love_free: true, age: [19, 23], school: [uni, hvoc], flags: {not: [married]}, family: [{role: spouse, count: [0, 0]}, {role: partner, count: [0, 0]}, {role: courter, count: [0, 1]}]}
+    title: "โต๊ะหินหน้าคณะตัวสุดท้าย"
+    text: "ช่วงสอบ โต๊ะหินหน้าคณะเหลือตัวเดียว มีคนต่างสาขานั่งอยู่ครึ่งหนึ่งพร้อมชีทกองโต เขาเลื่อนกองชีทให้โดยไม่เงยหน้า แล้วถามว่าพอจะมีปากกาที่ยังเขียนติดสักด้ามไหม"
+    choices:
+      - id: court_uni_share
+        text: "ให้ยืมปากกา แล้วชวนติวด้วยกัน"
+        result: "ติวกันจนไฟหน้าคณะดับ บนปกชีทของคุณมีลายมือเขาเขียนว่า “{ชื่อคนจีบ}” ตามด้วยเบอร์โทร ส่วนปากกาไม่ได้คืน"
+        effects: {happiness: 1, knowledge: 1}
+        family: [{add: courter}]
+        schedules: [{event: court_date_uni_01, after_years: [1, 1]}, {event: court_date_uni_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: court_uni_pen_only
+        text: "ให้ปากกา แล้วอ่านของตัวเองต่อ"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+      - id: court_uni_move
+        text: "ย้ายไปอ่านในห้องสมุด"
+        effects: {knowledge: 2, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: court_uni_borrow_notes
+        text: "ขอยืมชีทเขาไปถ่ายเอกสาร"
+        effects: {knowledge: 1, network: 1, money: {unit: income_x, amount: -0.01}}
+        merit: [{cat: neutral}]
+
+  - id: court_meet_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 3
+    when: {love_free: true, age: [20, 30], occupation: [clerk, professional, technician, manager, factory, service], flags: {not: [married]}, family: [{role: spouse, count: [0, 0]}, {role: partner, count: [0, 0]}, {role: courter, count: [0, 1]}]}
+    title: "เวรอยู่ดึกคู่กับคนใหม่"
+    text: "งานด่วนเข้าตอนเลิกงาน เหลือคุณกับคนที่เพิ่งย้ายมาใหม่สองคน เขาหิ้วข้าวกล่องมาสองกล่อง บอกว่าร้านแถมมา แต่ใบเสร็จที่โผล่จากถุงเขียนว่าสองกล่องเต็มราคา"
+    choices:
+      - id: court_work_eat
+        text: "นั่งกินด้วยกันแล้วคุยยาว"
+        result: "งานเสร็จตอนสี่ทุ่ม คุยกันต่ออีกชั่วโมงที่ป้ายรถ ก่อนขึ้นรถเขาบอกว่าชื่อเล่นจริง ๆ คือ{ชื่อคนจีบ} คนที่ทำงานยังไม่มีใครเรียก"
+        effects: {happiness: 2, health: -1}
+        family: [{add: courter}]
+        schedules: [{event: court_date_work_01, after_years: [1, 1]}, {event: court_date_work_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: court_work_pay_back
+        text: "จ่ายค่าข้าวคืน แล้วรีบทำงาน"
+        effects: {money: {unit: income_x, amount: -0.02}, network: 1}
+        merit: [{cat: neutral}]
+      - id: court_work_go_home
+        text: "ขอเอางานกลับไปทำที่บ้าน"
+        effects: {health: 1, network: -1}
+        merit: [{cat: neutral}]
+      - id: court_work_invite_all
+        text: "โทรชวนคนอื่นมาช่วยอีกแรง"
+        effects: {relations: 1, health: 1}
+        merit: [{cat: neutral}]
+
+  - id: court_meet_friend_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    weight: 3
+    when: {love_free: true, age: [31, 45], flags: {not: [married]}, family: [{role: spouse, count: [0, 0]}, {role: partner, count: [0, 0]}, {role: courter, count: [0, 1]}]}
+    title: "เพื่อนนัดแล้วหายตัว"
+    text: "เพื่อนชวนกินหมูกระทะ ไปถึงมีคนแปลกหน้านั่งย่างหมูรออยู่คนเดียว โทรศัพท์สั่นพอดี เพื่อนส่งข้อความว่าติดธุระกะทันหัน ฝากดูแลคนนี้ด้วย"
+    choices:
+      - id: court_friend_stay
+        text: "นั่งลง ช่วยกันย่างให้หมดเตา"
+        result: "ต่างคนต่างรู้ว่าโดนเพื่อนจัดฉาก เลยนินทาเพื่อนกันจนร้านเก็บเตา {ชื่อคนจีบ}ขอเบอร์ไว้ บอกว่าเผื่อมีเรื่องนินทาเพิ่ม"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.03}}
+        family: [{add: courter}]
+        schedules: [{event: court_date_friend_01, after_years: [1, 1]}, {event: court_date_friend_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: court_friend_polite
+        text: "กินอิ่มแล้วแยกกันจ่าย"
+        effects: {health: -1, happiness: 1, money: {unit: income_x, amount: -0.03}}
+        merit: [{cat: neutral}]
+      - id: court_friend_leave
+        text: "ขอตัวกลับ แล้วโทรไปว่าเพื่อน"
+        effects: {relations: -1, money: {unit: income_x, amount: 0.02}}
+        merit: [{cat: neutral}]
+      - id: court_friend_call_more
+        text: "โทรเรียกเพื่อนคนอื่นมาเต็มโต๊ะ"
+        effects: {relations: 1, network: 1, money: {unit: income_x, amount: -0.05}}
+        merit: [{cat: neutral}]
+
+  - id: court_meet_app_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2556, 2650]
+    weight: 3
+    when: {love_free: true, age: [20, 30], flags: {not: [married]}, family: [{role: spouse, count: [0, 0]}, {role: partner, count: [0, 0]}, {role: courter, count: [0, 1]}]}
+    title: "ปัดขวาตอนรถติด"
+    text: "รถติดนิ่งมาครึ่งชั่วโมง คุณไถแอปหาคู่แก้เบื่อ ขึ้นว่าตรงกันกับคนที่เขียนแนะนำตัวไว้บรรทัดเดียวว่าหาคนกินผักชีแทน ข้อความแรกเด้งมาก่อนไฟเขียว"
+    choices:
+      - id: court_app_meet
+        text: "ตอบกลับ แล้วนัดเจอตัวจริง"
+        result: "เจอกันที่ร้านก๋วยเตี๋ยว {ชื่อคนจีบ}ตักผักชีใส่ชามคุณก่อนจะทันสวัสดี ตัวจริงพูดเก่งกว่าในแชทมาก"
+        effects: {happiness: 2, money: {unit: income_x, amount: -0.03}}
+        family: [{add: courter}]
+        schedules: [{event: court_date_app_01, after_years: [1, 1]}, {event: court_date_app_01, after_years: [2, 2]}]
+        merit: [{cat: neutral}]
+      - id: court_app_chat_only
+        text: "คุยเล่นในแชทพอแก้เบื่อ"
+        effects: {happiness: 1}
+        merit: [{cat: neutral}]
+      - id: court_app_delete
+        text: "ลบแอปทิ้ง ตั้งใจขับรถ"
+        effects: {health: 1, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: court_app_friend
+        text: "ส่งโปรไฟล์ให้เพื่อนที่โสดกว่า"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+
+  - id: court_date_uni_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {family: [{role: courter, stage: courting}]}
+    title: "ดอกไม้หนึ่งช่อวันซ้อมรับปริญญา"
+    text: "ใกล้วันซ้อมรับปริญญาของรุ่นพี่ {ชื่อคนจีบ}ถามว่าจะไปถ่ายรูปด้วยกันไหม แล้วเสริมว่าถ้าไปในฐานะคนรู้จักเฉย ๆ ก็ไม่ต้องไปก็ได้"
+    choices:
+      - id: court_uni_bouquet
+        text: "ถือช่อดอกไม้ไปให้เขา"
+        outcomes:
+          - {weight: 3, ok: true, text: "{ชื่อคนจีบ}รับดอกไม้ไปถือถ่ายรูปทั้งวัน ใครถามว่าใครให้ก็ชี้มาที่คุณ", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -0.05}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}รับดอกไม้ไว้ แล้วบอกตรง ๆ ว่าคิดกับคุณได้แค่เพื่อน ช่อดอกไม้ถูกส่งต่อให้รุ่นพี่", effects: {happiness: -3, money: {unit: income_x, amount: -0.05}}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_uni_go_plain
+        text: "ไปตัวเปล่า อาสาเป็นตากล้อง"
+        outcomes:
+          - {weight: 1, ok: true, text: "รูปที่คุณถ่ายออกมาสวยทุกใบ {ชื่อคนจีบ}ขอให้ส่งให้ แล้วคุยต่อจนดึกดื่น", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณมัวแต่ถ่ายให้คนอื่น {ชื่อคนจีบ}กลับไปก่อน หลังจากวันนั้นข้อความสั้นลงจนเงียบ", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_uni_step_back
+        text: "บอกว่าขอเป็นเพื่อนกันดีกว่า"
+        result: "{ชื่อคนจีบ}พยักหน้าช้า ๆ บอกว่าเข้าใจ แล้วเดินไปหาเพื่อนกลุ่มของเขา"
+        effects: {happiness: -1, knowledge: 1}
+        family: [{drop: courter}]
+        merit: [{cat: neutral}]
+      - id: court_uni_exam_excuse
+        text: "อ้างว่าติดอ่านหนังสือ"
+        effects: {knowledge: 1, happiness: -1}
+        merit: [{cat: neutral}]
+
+  - id: court_date_work_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {family: [{role: courter, stage: courting}]}
+    title: "ข่าวลือจากโต๊ะข้าง ๆ"
+    text: "เรื่องคุณกับ{ชื่อคนจีบ}ลือไปถึงคนรอบตัวแล้ว มีคนถามกลางวงข้าวว่าตกลงเป็นอะไรกัน {ชื่อคนจีบ}วางช้อน แล้วหันมารอคำตอบจากคุณ"
+    choices:
+      - id: court_work_admit
+        text: "ตอบว่ากำลังจีบอยู่"
+        outcomes:
+          - {weight: 3, ok: true, text: "ทั้งวงโห่ {ชื่อคนจีบ}หูแดง ตักไข่ดาวของตัวเองมาใส่จานคุณแทนคำตอบ", effects: {happiness: 3, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}หัวเราะแห้ง ๆ ตกเย็นส่งข้อความมาว่ายังไม่พร้อมให้เรื่องเป็นแบบนี้ ขอเว้นระยะกันไป", effects: {happiness: -3, relations: -1}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_work_dodge
+        text: "เฉไฉไปคุยเรื่องกับข้าว"
+        outcomes:
+          - {weight: 1, ok: true, text: "{ชื่อคนจีบ}ยิ้มแล้วเล่นตามน้ำ คืนนั้นโทรมาถามว่าตอนอยู่กันสองคนจะตอบว่ายังไง", effects: {happiness: 2}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}กินต่อเงียบ ๆ ตั้งแต่วันนั้นก็ไปกินข้าวกับกลุ่มอื่น", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_work_deny
+        text: "ปฏิเสธว่าไม่มีอะไร"
+        result: "{ชื่อคนจีบ}พูดว่าใช่ ไม่มีอะไร แล้วหลังจากนั้นก็ไม่มีอะไรจริง ๆ"
+        effects: {happiness: -1, network: 1}
+        family: [{drop: courter}]
+        merit: [{cat: neutral}]
+      - id: court_work_treat_all
+        text: "เลี้ยงน้ำทั้งวงให้เลิกถาม"
+        effects: {money: {unit: income_x, amount: -0.05}, network: 1}
+        merit: [{cat: neutral}]
+
+  - id: court_date_friend_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: ทำงาน
+    years: [2500, 2650]
+    when: {family: [{role: courter, stage: courting}]}
+    title: "นัดที่ไม่มีใครจัดให้"
+    text: "{ชื่อคนจีบ}ชวนไปตลาดนัดวันหยุด คราวนี้ไม่มีเพื่อนคอยจัดฉาก เดินกันมาครึ่งตลาดก็ถูกถามว่าที่คุยกันอยู่นี่จริงจังแค่ไหน"
+    choices:
+      - id: court_friend_serious
+        text: "ตอบว่าจริงจัง"
+        outcomes:
+          - {weight: 3, ok: true, text: "{ชื่อคนจีบ}บอกว่าดี แล้วซื้อกระถางต้นไม้เล็ก ๆ สองใบ ให้เอากลับไปเลี้ยงคนละใบ", effects: {happiness: 3, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}เงียบไปนาน ก่อนบอกว่ายังไม่คิดไปไกลขนาดนั้น แยกกันที่ลานจอดรถแล้วไม่ได้นัดอีก", effects: {happiness: -3}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_friend_slow
+        text: "ขอค่อย ๆ ดูกันไป"
+        outcomes:
+          - {weight: 1, ok: true, text: "{ชื่อคนจีบ}ว่าไม่รีบเหมือนกัน แล้วถามว่าวันหยุดหน้าว่างไหม", effects: {happiness: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}ว่าอายุขนาดนี้ไม่อยากรอแบบไม่มีกำหนด ของที่ซื้อมาด้วยกันถูกแบ่งคนละถุง", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_friend_stop
+        text: "บอกว่าเป็นเพื่อนกินกันก็พอ"
+        result: "{ชื่อคนจีบ}รับคำง่าย ๆ เดินซื้อของต่อจนครบตลาด แล้วต่างคนต่างกลับ"
+        effects: {happiness: -1, money: {unit: income_x, amount: 0.03}}
+        family: [{drop: courter}]
+        merit: [{cat: neutral}]
+      - id: court_friend_ask_first
+        text: "ถามกลับว่าเขาคิดยังไง"
+        effects: {knowledge: 1}
+        merit: [{cat: neutral}]
+
+  - id: court_date_app_01
+    away_block: [abroad, monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2556, 2650]
+    when: {family: [{role: courter, stage: courting}]}
+    title: "แอปยังอยู่ในเครื่อง"
+    text: "{ชื่อคนจีบ}ยืมโทรศัพท์คุณดูเส้นทาง ไอคอนแอปหาคู่ยังอยู่หน้าแรก เขาส่งเครื่องคืนแล้วถามว่ายังต้องใช้อยู่ไหม"
+    choices:
+      - id: court_app_remove
+        text: "กดลบต่อหน้า"
+        outcomes:
+          - {weight: 3, ok: true, text: "{ชื่อคนจีบ}เปิดเครื่องตัวเองแล้วกดลบตาม เสร็จแล้วถามว่ามื้อเย็นกินอะไรดี", effects: {happiness: 3, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}บอกว่าของตัวเองยังไม่อยากลบ คุยกันจบตรงป้ายรถเมล์", effects: {happiness: -3}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_app_ask_back
+        text: "ถามกลับว่าของเขาล่ะ"
+        outcomes:
+          - {weight: 1, ok: true, text: "{ชื่อคนจีบ}ยื่นเครื่องให้ดู ลบไปตั้งแต่เดือนแรกแล้ว คุณรีบลบของตัวเองตาม", effects: {happiness: 2, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ต่างคนต่างไม่ยอมยื่นเครื่องก่อน เถียงกันอยู่นานจนเลิกคุยกันไปเลย", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
+        merit: [{cat: neutral}]
+      - id: court_app_keep
+        text: "ตอบว่ายังอยากคุยหลายคน"
+        result: "{ชื่อคนจีบ}บอกว่าขอบคุณที่พูดตรง แล้วชื่อของเขาก็หายจากรายการคู่ในคืนนั้น"
+        effects: {happiness: -1, network: 1}
+        family: [{drop: courter}]
+        merit: [{cat: neutral}]
+      - id: court_app_battery
+        text: "บอกว่าแบตจะหมด ขอเก็บเครื่อง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
