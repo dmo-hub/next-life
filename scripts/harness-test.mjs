@@ -1686,6 +1686,37 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 97 หย่าเพราะเรานอกใจ (we_cheated): น้ำหนักการ์ดคืนดีต่ำลง', lowered);
 }
 
+// ใบ tld333 ผลรายปีของคู่ใจคูณตามความผูกพัน · kinCared กันความผูกพันลดรายปีก่อนคิดผล
+{
+  const { addMember, PET_KINDS, HERD_KINDS } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  const year = (role, kind, bond) => {
+    const st = newLife(333, content);
+    st.age = 30;
+    st.parents = [];
+    st.kin = [];
+    const m = addMember(st, role, { kind, maxAge: 99, sex: 'ชาย', born: st.birthYear + 29 });
+    if (bond === undefined) delete m.bond;
+    else m.bond = bond;
+    Object.assign(st, { happiness: 50, health: 50, relations: 50, money: 0, kinCared: true });
+    const next = st.kinRng.next;
+    let draws = 0;
+    st.kinRng.next = (...a) => (draws++, next.apply(st.kinRng, a));
+    ageKin(st, st.birthYear + 31, 100);
+    return { happy: st.happiness - 50, health: st.health - 50, rel: st.relations - 50, money: st.money, draws };
+  };
+  const cat = PET_KINDS['แมว'].gives.happiness;
+  const rows333 = [[38, 0.5], [52, 0.5], [57, 0.5], [60, 0.8], [62, 1], [65, 1.3], [67, 1.5], [72, 1.5], [100, 1.5]];
+  const got = rows333.map(([b]) => year('pet', 'แมว', b).happy / cat);
+  check('ใบ tld333 ตัวคูณ = 1 + (bond − 62)/10 ตัด 0.5–1.5', rows333.every(([, k], i) => near(got[i], k)), got.map(f2).join(' '));
+  const dog = year('pet', 'หมา', 72);
+  check('ใบ tld333 คูณทุกค่าสถานะของชนิด ไม่ปัดเศษ', near(dog.health, PET_KINDS['หมา'].gives.health * 1.5) && near(dog.rel, PET_KINDS['หมา'].gives.relations * 1.5), `${f2(dog.health)} ${f2(dog.rel)}`);
+  check('ใบ tld333 ค่าเลี้ยงไม่ขึ้นกับความผูกพัน', [38, 62, 100].every((b) => near(year('pet', 'แมว', b).money, -PET_KINDS['แมว'].cost * 100)));
+  check('ใบ tld333 คู่ใจที่ไม่มีช่อง bond (เซฟเก่า) ใช้ค่าตั้งต้นของคู่ใจ', near(year('pet', 'แมว').happy, cat * 1.3));
+  check('ใบ tld333 ฝูงไม่ขึ้นกับความผูกพัน', [38, 100].every((b) => { const r = year('herd', 'วัว', b); return near(r.money, HERD_KINDS['วัว'].net * 100) && r.happy === 0 && r.health === 0 && r.rel === 0; }));
+  check('ใบ tld333 ผลรายปีของคู่ใจไม่ดึง kinRng', year('pet', 'แมว', 72).draws === 0);
+}
+
 // ศาสนาตอนเกิด (ใบ 26 B93): ตารางศาสนาต่อจังหวัด · ทายาท/เซฟเก่าถือศาสนาเดิม · ไม่มีตาราง = พุทธ ไม่ขยับค่าอื่น
 // ตารางในเทสเป็นของสังเคราะห์ ไม่ใช่ตัวเลขจริงของ สสช.
 {

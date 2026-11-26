@@ -63,6 +63,9 @@ export const HERD_KINDS = {
 };
 // ความสุขที่เสียไปตอนคู่ใจตายตามอายุขัย (ตายจากการ์ดป่วย/หาย การ์ดใบนั้นหักเอง)
 export const PET_GRIEF = 6;
+// ผลรายปีของคู่ใจคูณตามความผูกพัน: 1 + (bond − mid) / per ตัดช่วง min–max · ค่าเลี้ยงไม่คูณ
+// mid = มัธยฐานความผูกพันรายปีของคู่ใจจากการจำลอง — ค่าสถานะรวมจากคู่ใจจึงแทบไม่ขยับ · การ์ดดูแลสัตว์เปลี่ยนต้องวัดใหม่
+export const PET_BOND = { mid: 62, per: 10, min: 0.5, max: 1.5 };
 // ติดบ้านตอนเกิด: บ้านฐานะดี (ชั้น ≥ richFrom) · บ้านในเมือง (ภาค city) · บ้านนอก — [โอกาส, ชนิด] คู่ใจกับฝูงสุ่มแยกกัน ได้ทั้งคู่ก็ได้
 export const PET_AT_BIRTH = {
   richFrom: 7,
@@ -505,7 +508,7 @@ function kinLost(st, m, age, year, out) {
   out.push(loss);
 }
 
-// ผลต่อปีของสัตว์ (B44): คู่ใจให้ค่าสถานะตามชนิด หักค่าเลี้ยง · ฝูงให้เงินสุทธิ · บาทของปีนั้น — ไม่ดึงเลขสุ่ม
+// ผลต่อปีของสัตว์ (B44): คู่ใจให้ค่าสถานะตามชนิดคูณความผูกพัน หักค่าเลี้ยง · ฝูงให้เงินสุทธิ · บาทของปีนั้น — ไม่ดึงเลขสุ่ม
 function petYear(st, saving) {
   const live = st.kin.filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
   if (!live.length) return;
@@ -515,7 +518,8 @@ function petYear(st, saving) {
       continue;
     }
     const k = PET_KINDS[m.kind] ?? {};
-    for (const [stat, v] of Object.entries(k.gives ?? {})) st[stat] = bondClamp(st[stat] + v);
+    const close = Math.max(PET_BOND.min, Math.min(PET_BOND.max, 1 + ((m.bond ?? BOND_START.pet) - PET_BOND.mid) / PET_BOND.per));
+    for (const [stat, v] of Object.entries(k.gives ?? {})) st[stat] = bondClamp(st[stat] + v * close);
     st.money -= (k.cost ?? 0) * saving;
   }
 }
