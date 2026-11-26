@@ -1100,18 +1100,18 @@ const f2 = (v) => v.toFixed(2);
 {
   const I = await import('../src/engine/isekai.mjs');
   const M = await import('../src/engine/merit.mjs');
-  const { spoilersHtml } = await import('../src/site/spoilers.mjs');
+  const { catalogHtml } = await import('../src/site/spoilers.mjs');
   const content = loadContent();
   const shown = (html) => html.includes('บาป ทรยศ ระดับ 2');
-  const before = shown(spoilersHtml(content));
+  const before = shown(catalogHtml(content));
   const probe = { id: 'zz_betrayal_probe', regions: ['helvard'], ch: [2], title: 'โพรบ', text: 'โพรบ', choices: [{ t: 'หักหลังคนที่ไว้ใจ', text: 'ผลก', merit: [{ cat: 'betrayal', level: 2 }] }, { t: 'ข', text: 'ผลข' }] };
   I.useIsekaiCards([probe]);
   const led = M.newLedger();
   M.recordMerit(led, I.ISEKAI_MERIT[probe.id]?.[0], probe.id);
   const want = M.MERIT_WEIGHTS.betrayal * M.MERIT_LEVELS[2];
-  check('ใบ 09 หมวดทรยศ: เป็นบาปหมวดเกม (เบากว่าบาปตามคติระดับ 1) · ไม่นับในบาปตามคติ', M.SIN_CATS.includes('betrayal') && M.GAME_CATS.includes('betrayal') && M.ISEKAI_CATS.includes('betrayal') && M.meritName('betrayal') === 'ทรยศ' && M.meritId('ทรยศ') === 'betrayal' && M.SIN_CATS.filter((c) => !M.FLAG_CATS.includes(c) && !M.ISEKAI_CATS.includes(c)).length === 8);
+  check('ใบ 09 หมวดทรยศ: เป็นบาปหมวดเกม (เบากว่าบาปตามคติระดับ 1) · ไม่นับในบาปตามคติ', M.SIN_CATS.includes('betrayal') && M.GAME_CATS.includes('betrayal') && M.ISEKAI_CATS.includes('betrayal') && M.meritName('betrayal') === 'ทรยศ' && M.meritId('ทรยศ') === 'betrayal' && M.SIN_CATS.filter((c) => !M.FLAG_CATS.includes(c) && !M.ISEKAI_CATS.includes(c)).length === 10);
   check('ใบ 09 หมวดทรยศ: ตัวเลือกติดป้ายลงบัญชีหมวดนี้ (ฉีดการ์ด)', led.byCat.betrayal === want && led.sin === want, JSON.stringify(led.byCat));
-  check('ใบ 09 หมวดทรยศ: หน้าเฉลยขึ้น "บาป ทรยศ ระดับ 2" หลังฉีดการ์ด ก่อนฉีดไม่มี', !before && shown(spoilersHtml(content)), `${before}`);
+  check('ใบ 09 หมวดทรยศ: หน้าเฉลยขึ้น "บาป ทรยศ ระดับ 2" หลังฉีดการ์ด ก่อนฉีดไม่มี', !before && shown(catalogHtml(content)), `${before}`);
 }
 
 // ผีบรรพบุรุษ (ใบ 18): แถวชาติไทยล่าสุดในผัง ข้ามชาติต่างโลก/แถวไม่มีชื่อ · ไม่มีแถวไทย = เงื่อนไขไม่ผ่าน · ช่องแทนค่าอ่านจากแถวนั้น
