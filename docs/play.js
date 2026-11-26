@@ -11138,38 +11138,38 @@ const has = (f, ...k) => k.some((x) => f.flags[x]);
 // ฉายาตามเงื่อนไข (ใบ 04) — ทุกตัวตรวจแยกกัน ได้หลายตัวพร้อมกัน ไม่มีลำดับ · ด้านลบใช้คำเห็นใจ ไม่ตำหนิ
 // harness ต้องพิสูจน์ทุกตัว ≥0.1% · ระดับตั้งจากอัตรา raw ก่อนตัดเพดาน (ทั่วไป ≥10% · หายาก 1–<10% · ตำนาน <1% รวมทุกบุคลิก) ไม่ใช่ความยากที่คิดเอา
 const TITLES = [
-  { id: 'hard_worker', tier: 'ทั่วไป', name: 'มือไม่เคยว่าง', hint: 'ทำงานยาวนานหลายสิบปี', test: (f) => f.workYears >= 40 },
-  { id: 'boss', tier: 'หายาก', name: 'เถ้าแก่ตัวเล็ก', hint: 'เคยเปิดกิจการของตัวเอง', test: (f) => has(f, 'own_business') },
-  { id: 'vendor', tier: 'ทั่วไป', name: 'คนค้าขายหัวใจสู้', hint: 'หาเลี้ยงชีพด้วยการค้าขายรายวัน', test: (f) => has(f, 'street_vendor', 'online_seller') },
-  { id: 'grateful', tier: 'ทั่วไป', name: 'ลูกกตัญญู', hint: 'เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก', test: (f) => (f.tagCount.care_parents ?? 0) >= 2 },
-  { id: 'giver', tier: 'ทั่วไป', name: 'มือที่ไม่เคยหุบ', hint: 'ให้ทานบ่อยจนเป็นนิสัย', test: (f) => (f.tagCount.dana ?? 0) >= 3 },
-  { id: 'parent', tier: 'หายาก', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', test: (f) => has(f, 'has_kids') },
-  { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', test: (f) => f.crises >= 2 },
-  { id: 'homeowner', tier: 'ทั่วไป', name: 'มีบ้านเป็นของตัวเอง', hint: 'ได้บ้านมาด้วยน้ำพักน้ำแรง', test: (f) => has(f, 'home_owner') },
-  { id: 'runner', tier: 'ทั่วไป', name: 'นักวิ่งตอนเช้า', hint: 'ดูแลร่างกายเป็นกิจวัตร', test: (f) => has(f, 'sporty') },
-  { id: 'first_grad', tier: 'หายาก', name: 'บัณฑิตคนแรกของบ้าน', hint: 'เรียนจบสูงกว่าที่บ้านเคยมีใครได้', test: (f) => f.st.edu === 'อุดมศึกษา' && LOW_FAMILY_OCC.includes(f.st.familyOcc) },
-  { id: 'debt_bearer', tier: 'ทั่วไป', name: 'ผู้แบกหนี้จนวันสุดท้าย', hint: 'ยังผ่อนไม่หมดจนวันที่จากไป', test: (f) => f.debt > 0 || f.worth < 0 },
-  { id: 'scarred', tier: 'หายาก', name: 'แผลในใจที่ผ่านมาได้', hint: 'เคยถูกรังแก แต่จากไปอย่างมีความสุข', test: (f) => has(f, 'bullied') && f.st.happiness >= 75 },
-  { id: 'kind_fooled', tier: 'ทั่วไป', name: 'ใจดีจนโดนหลอก', hint: 'ไว้ใจคนผิดเรื่องเงิน', test: (f) => has(f, 'ponzi_victim') },
+  { id: 'hard_worker', tier: 'ทั่วไป', name: 'มือไม่เคยว่าง', hint: 'ทำงานยาวนานหลายสิบปี', say: 'คนในซอยจำได้ว่าไฟบ้านนี้เปิดก่อนไก่ขัน', test: (f) => f.workYears >= 40 },
+  { id: 'boss', tier: 'หายาก', name: 'เถ้าแก่ตัวเล็ก', hint: 'เคยเปิดกิจการของตัวเอง', say: 'ลูกค้าเก่ายังเรียกว่าเถ้าแก่ ถึงกิจการจะเล็กแค่นั้น', test: (f) => has(f, 'own_business') },
+  { id: 'vendor', tier: 'ทั่วไป', name: 'คนค้าขายหัวใจสู้', hint: 'หาเลี้ยงชีพด้วยการค้าขายรายวัน', say: 'แถวตลาดจำได้ว่าฝนตกแดดออกก็ยังมาตั้งร้าน', test: (f) => has(f, 'street_vendor', 'online_seller') },
+  { id: 'grateful', tier: 'ทั่วไป', name: 'ลูกกตัญญู', hint: 'เลือกดูแลพ่อแม่ซ้ำแล้วซ้ำอีก', say: 'เพื่อนบ้านเล่าให้ลูกตัวเองฟังว่าคนข้างบ้านดูแลพ่อแม่ยังไง', test: (f) => (f.tagCount.care_parents ?? 0) >= 2 },
+  { id: 'giver', tier: 'ทั่วไป', name: 'มือที่ไม่เคยหุบ', hint: 'ให้ทานบ่อยจนเป็นนิสัย', say: 'ใครเดือดร้อนมาหาก็ไม่ค่อยได้กลับไปมือเปล่า แถวบ้านรู้กันดี', test: (f) => (f.tagCount.dana ?? 0) >= 3 },
+  { id: 'parent', tier: 'หายาก', name: 'พ่อแม่ของใครสักคน', hint: 'มีลูกให้ห่วง', say: 'คุยกันทีไรก็วกมาเรื่องลูก เพื่อนจำได้แม่น', test: (f) => has(f, 'has_kids') },
+  { id: 'storm', tier: 'ทั่วไป', name: 'ผ่านมรสุมเศรษฐกิจ', hint: 'เป็นผู้ใหญ่ทันวิกฤตเศรษฐกิจหลายครั้ง', say: 'รุ่นน้องชอบถามว่าปีที่ของแพง งานหายาก ผ่านมาได้ยังไง', test: (f) => f.crises >= 2 },
+  { id: 'homeowner', tier: 'ทั่วไป', name: 'มีบ้านเป็นของตัวเอง', hint: 'ได้บ้านมาด้วยน้ำพักน้ำแรง', say: 'ญาติพูดกันว่าบ้านหลังนั้นได้มาทีละบาท', test: (f) => has(f, 'home_owner') },
+  { id: 'runner', tier: 'ทั่วไป', name: 'นักวิ่งตอนเช้า', hint: 'ดูแลร่างกายเป็นกิจวัตร', say: 'คนตื่นเช้าแถวนั้นคุ้นกับเสียงฝีเท้าวิ่งผ่านหน้าบ้าน', test: (f) => has(f, 'sporty') },
+  { id: 'first_grad', tier: 'หายาก', name: 'บัณฑิตคนแรกของบ้าน', hint: 'เรียนจบสูงกว่าที่บ้านเคยมีใครได้', say: 'ที่บ้านยังเอารูปวันรับปริญญาให้แขกดู', test: (f) => f.st.edu === 'อุดมศึกษา' && LOW_FAMILY_OCC.includes(f.st.familyOcc) },
+  { id: 'debt_bearer', tier: 'ทั่วไป', name: 'ผู้แบกหนี้จนวันสุดท้าย', hint: 'ยังผ่อนไม่หมดจนวันที่จากไป', say: 'ที่บ้านรู้ว่าแบกไว้หนัก แต่ไม่ค่อยได้ยินบ่น', test: (f) => f.debt > 0 || f.worth < 0 },
+  { id: 'scarred', tier: 'หายาก', name: 'แผลในใจที่ผ่านมาได้', hint: 'เคยถูกรังแก แต่จากไปอย่างมีความสุข', say: 'เพื่อนเก่าแปลกใจว่าเด็กที่เคยก้มหน้า โตมาเป็นคนหัวเราะง่าย', test: (f) => has(f, 'bullied') && f.st.happiness >= 75 },
+  { id: 'kind_fooled', tier: 'ทั่วไป', name: 'ใจดีจนโดนหลอก', hint: 'ไว้ใจคนผิดเรื่องเงิน', say: 'ใครรู้เรื่องก็ว่าเสียเงินเพราะมองคนในแง่ดีเกินไป', test: (f) => has(f, 'ponzi_victim') },
   // caught_fraud = ทุจริตเองแล้วถูกจับ/ไล่ออก — แยกจากฉายาเหยื่อ ใช้คำเห็นใจแบบเดียวกับด้านลบตัวอื่น
-  { id: 'stumbled', tier: 'ทั่วไป', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', test: (f) => has(f, 'caught_fraud') },
-  { id: 'guarantor', tier: 'หายาก', name: 'ผู้แบกหนี้แทนคนอื่น', hint: 'เซ็นค้ำให้คนที่ไว้ใจ', test: (f) => has(f, 'guarantor') },
-  { id: 'lone_walker', tier: 'หายาก', name: 'ผู้เดินทางคนเดียว', hint: 'อยู่จนแก่โดยไม่มีครอบครัวของตัวเอง', test: (f) => f.age >= 70 && !has(f, 'has_kids', 'married') && f.st.relations < 20 },
-  { id: 'comeback', tier: 'ตำนาน', name: 'ล้มแล้วลุก', hint: 'ล้มละลายแล้วกลับมามีเงินเหลือ', test: (f) => f.st.bankruptcies >= 1 && f.debt <= 0 && f.worth >= 0 },
-  { id: 'quiet_rich', tier: 'หายาก', name: 'เศรษฐีเงียบ', hint: 'เกิดไม่สูง แต่จากไปพร้อมทรัพย์ก้อนใหญ่', test: (f) => f.clsIdx <= 4 && f.wealth >= 10 },
-  { id: 'folk_sage', tier: 'หายาก', name: 'ปราชญ์ชาวบ้าน', hint: 'รู้มากโดยไม่ต้องมีปริญญา', test: (f) => f.st.knowledge >= 95 && (!f.st.edu || f.st.edu === 'ประถม') },
-  { id: 'outlived', tier: 'ทั่วไป', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', test: (f) => f.age >= f.expected + 25 },
-  { id: 'clean_hands', tier: 'หายาก', name: 'มือสะอาดในที่สกปรก', hint: 'เจอทางลัดหลายครั้งแต่ไม่เคยเลือก', test: (f) => f.declined >= 10 && f.sinPicks === 0 },
-  { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', test: (f) => f.disasters >= 3 },
-  { id: 'lucky_number', tier: 'ทั่วไป', name: 'ผู้รอเลขเด็ด', hint: 'ซื้อหวยจนเป็นนิสัย', test: (f) => has(f, 'lottery_habit') },
-  { id: 'grandparent', tier: 'ตำนาน', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', test: (f) => has(f, 'raised_grandkids') },
-  { id: 'centenarian', tier: 'หายาก', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', test: (f) => f.age >= 100 },
-  { id: 'rags_riches', tier: 'หายาก', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
-  { id: 'never_dark', tier: 'หายาก', name: 'ผู้ไม่เคยเลือกทางมืด', hint: 'ทั้งชีวิตไม่เคยเลือกทางผิดเลยสักครั้ง', test: (f) => f.age >= 60 && f.sinPicks === 0 && f.declined >= 11 },
-  { id: 'peaceful', tier: 'ตำนาน', name: 'จากไปอย่างสงบ', hint: 'แก่เฒ่า ไม่มีหนี้ มีคนรักรายล้อม และมีความสุข', test: (f) => f.age >= 80 && f.debt <= 0 && f.worth >= 0 && f.st.relations >= 70 && f.st.happiness >= 70 && has(f, 'has_kids') },
+  { id: 'stumbled', tier: 'ทั่วไป', name: 'ผู้เคยก้าวพลาด', hint: 'เคยถูกจับได้เพราะเลือกทางลัด', say: 'คนสนิทว่าพลาดไปครั้งนั้น แล้วก็ต้องอยู่กับมันต่อมา', test: (f) => has(f, 'caught_fraud') },
+  { id: 'guarantor', tier: 'หายาก', name: 'ผู้แบกหนี้แทนคนอื่น', hint: 'เซ็นค้ำให้คนที่ไว้ใจ', say: 'ญาติยังพูดถึงลายเซ็นใบนั้น ว่าเซ็นให้เพราะเชื่อใจเขา', test: (f) => has(f, 'guarantor') },
+  { id: 'lone_walker', tier: 'หายาก', name: 'ผู้เดินทางคนเดียว', hint: 'อยู่จนแก่โดยไม่มีครอบครัวของตัวเอง', say: 'เพื่อนบ้านจำภาพคนนั่งกินข้าวคนเดียว ที่ทักทีไรก็ทักตอบ', test: (f) => f.age >= 70 && !has(f, 'has_kids', 'married') && f.st.relations < 20 },
+  { id: 'comeback', tier: 'ตำนาน', name: 'ล้มแล้วลุก', hint: 'ล้มละลายแล้วกลับมามีเงินเหลือ', say: 'ใครที่นึกว่าจบแล้ว ได้เห็นลุกกลับมายืนอีกรอบ', test: (f) => f.st.bankruptcies >= 1 && f.debt <= 0 && f.worth >= 0 },
+  { id: 'quiet_rich', tier: 'หายาก', name: 'เศรษฐีเงียบ', hint: 'เกิดไม่สูง แต่จากไปพร้อมทรัพย์ก้อนใหญ่', say: 'ในซอยเพิ่งรู้ตอนงานศพว่าคนใส่เสื้อเก่าคนนั้นมีทรัพย์แค่ไหน', test: (f) => f.clsIdx <= 4 && f.wealth >= 10 },
+  { id: 'folk_sage', tier: 'หายาก', name: 'ปราชญ์ชาวบ้าน', hint: 'รู้มากโดยไม่ต้องมีปริญญา', say: 'มีเรื่องคิดไม่ตก คนในหมู่บ้านก็มาถามที่บ้านนี้', test: (f) => f.st.knowledge >= 95 && (!f.st.edu || f.st.edu === 'ประถม') },
+  { id: 'outlived', tier: 'ทั่วไป', name: 'อายุยืนเกินคาด', hint: 'อยู่นานกว่าคนรุ่นเดียวกันมาก', say: 'เพื่อนรุ่นเดียวกันเคยแซวว่าอึดกว่าใคร จะอยู่ดูจนหมดรุ่น', test: (f) => f.age >= f.expected + 25 },
+  { id: 'clean_hands', tier: 'หายาก', name: 'มือสะอาดในที่สกปรก', hint: 'เจอทางลัดหลายครั้งแต่ไม่เคยเลือก', say: 'ที่ทำงานรู้ว่าชวนไปทางลัดกี่ทีก็ส่ายหน้า', test: (f) => f.declined >= 10 && f.sinPicks === 0 },
+  { id: 'survivor', tier: 'ทั่วไป', name: 'รอดมาได้ทุกภัย', hint: 'ผ่านภัยพิบัติใหญ่มาหลายครั้ง', say: 'เด็กรุ่นหลังได้ฟังเรื่องภัยใหญ่จากปากคนที่อยู่ตรงนั้นจริง', test: (f) => f.disasters >= 3 },
+  { id: 'lucky_number', tier: 'ทั่วไป', name: 'ผู้รอเลขเด็ด', hint: 'ซื้อหวยจนเป็นนิสัย', say: 'แผงหวยหน้าปากซอยจำได้ว่าแวะมาถามหาเลขอยู่เรื่อย', test: (f) => has(f, 'lottery_habit') },
+  { id: 'grandparent', tier: 'ตำนาน', name: 'ผู้เลี้ยงหลานแทนพ่อแม่', hint: 'รับหลานมาเลี้ยงเอง', say: 'หลานเล่าว่าคนที่มารอหน้าโรงเรียนทุกเย็นคือคนนี้', test: (f) => has(f, 'raised_grandkids') },
+  { id: 'centenarian', tier: 'หายาก', name: 'ร้อยปีไม่สาย', hint: 'อยู่ถึงร้อยปี', say: 'คนทั้งตำบลเคยแวะมาขอพรวันเกิด', test: (f) => f.age >= 100 },
+  { id: 'rags_riches', tier: 'หายาก', name: 'จากศูนย์สู่เศรษฐี', hint: 'เกิดลำบากที่สุด จากไปพร้อมทรัพย์มหาศาล', say: 'บ้านเดิมยังเล่ากันว่าแต่ก่อนแม้ข้าวสารยังต้องเชื่อเขา', test: (f) => f.clsIdx <= 2 && f.wealth >= 20 },
+  { id: 'never_dark', tier: 'หายาก', name: 'ผู้ไม่เคยเลือกทางมืด', hint: 'ทั้งชีวิตไม่เคยเลือกทางผิดเลยสักครั้ง', say: 'ให้นึกเรื่องเสียหายของคนคนนี้ คนรู้จักกันมานานก็นึกไม่ออก', test: (f) => f.age >= 60 && f.sinPicks === 0 && f.declined >= 11 },
+  { id: 'peaceful', tier: 'ตำนาน', name: 'จากไปอย่างสงบ', hint: 'แก่เฒ่า ไม่มีหนี้ มีคนรักรายล้อม และมีความสุข', say: 'ลูกหลานบอกกันว่าบั้นปลายยิ้มง่าย และไม่เคยต้องอยู่เหงา', test: (f) => f.age >= 80 && f.debt <= 0 && f.worth >= 0 && f.st.relations >= 70 && f.st.happiness >= 70 && has(f, 'has_kids') },
   // ฉายารูปต้นไม้ (ใบ ft14) — อ่านแค่ความลึกกับแขนงกายใจ ไม่ซ้ำแกนฉายาแบบชีวิต
-  { id: 'tree_deep', tier: 'หายาก', name: 'รากหยั่งลึก', hint: 'ปลดโหนดต้นไม้ไล่ลงไปลึกถึงสี่ชั้น', test: (f) => f.treeDepth >= 4 },
-  { id: 'tree_mind', tier: 'หายาก', name: 'ฝึกกายฝึกใจ', hint: 'ปลดโหนดสายกายใจครบสามโหนด', test: (f) => f.treeSkill >= 3 },
+  { id: 'tree_deep', tier: 'หายาก', name: 'รากหยั่งลึก', hint: 'ปลดโหนดต้นไม้ไล่ลงไปลึกถึงสี่ชั้น', say: 'สนใจเรื่องไหนแล้วต้องไปให้สุด ใคร ๆ ก็ว่าอย่างนั้น', test: (f) => f.treeDepth >= 4 },
+  { id: 'tree_mind', tier: 'หายาก', name: 'ฝึกกายฝึกใจ', hint: 'ปลดโหนดสายกายใจครบสามโหนด', say: 'เพื่อนบอกว่าเรื่องหนักแค่ไหนก็ยังนิ่งได้', test: (f) => f.treeSkill >= 3 },
 ];
 
 // ฉายาตระกูล (ใบ 04) — ข้ามรุ่น · ch = ผังตระกูลรุ่นก่อน + ชีวิตนี้ · lin = รุ่นก่อนเท่านั้น
@@ -11201,13 +11201,13 @@ const goalsMet = (st, broke) => {
   return FAMILY_GOALS.filter((g) => !had.has(g.id) && g.test(ch)).map((g) => g.id);
 };
 const FAMILY_TITLES = [
-  { id: 'fam_climb', name: 'ตระกูลไต่บันได', hint: 'จากรุ่นที่ลำบาก ลูกหลานไต่ขึ้นไปถึงชนชั้นกลางบน', test: (ch) => climb(ch) },
-  { id: 'fam_no_hell', name: 'บรรพบุรุษไม่เคยตกนรก', hint: 'สองรุ่นก่อนหน้าไม่มีใครไปภูมินรก', test: (ch, lin) => lastN(lin, 2, (l) => l.realm !== 'นรก') },
-  { id: 'fam_debt', name: 'หนี้ที่ส่งต่อกันมาสามรุ่น', hint: 'สามรุ่นติดกันจากไปพร้อมหนี้', test: (ch) => lastN(ch, 3, (l) => l.broke) },
-  { id: 'fam_long', name: 'ตระกูลอายุยืน', hint: 'สามรุ่นติดกันอยู่ถึงแปดสิบ', test: (ch) => lastN(ch, 3, (l) => l.age >= 80) },
-  { id: 'fam_guardian', name: 'ผีบรรพบุรุษเฝ้าบ้าน', hint: 'รุ่นก่อนกลับมาเกิดเป็นลูกหลานของตัวเอง', test: (ch, lin) => lastN(lin, 1, (l) => l.path === 'child') },
-  { id: 'fam_wander', name: 'ดวงวิญญาณพเนจร', hint: 'สองรุ่นติดกันไปเกิดใหม่ที่อื่น', test: (ch, lin) => lastN(lin, 2, (l) => l.path === 'reborn') },
-  { id: 'fam_deva', name: 'ตระกูลมีเทวดา', hint: 'มีบรรพบุรุษไปเกิดเป็นเทวดาอย่างน้อยสองรุ่น', test: (ch, lin) => lin.filter((l) => l.realm === 'เทวดา').length >= 2 },
+  { id: 'fam_climb', name: 'ตระกูลไต่บันได', hint: 'จากรุ่นที่ลำบาก ลูกหลานไต่ขึ้นไปถึงชนชั้นกลางบน', say: 'คนเก่าในหมู่บ้านยังจำได้ว่าบ้านนี้เคยลำบากแค่ไหน', test: (ch) => climb(ch) },
+  { id: 'fam_no_hell', name: 'บรรพบุรุษไม่เคยตกนรก', hint: 'สองรุ่นก่อนหน้าไม่มีใครไปภูมินรก', say: 'ชาวบ้านว่าคนตระกูลนี้จากไปแล้วไม่ต้องห่วง', test: (ch, lin) => lastN(lin, 2, (l) => l.realm !== 'นรก') },
+  { id: 'fam_debt', name: 'หนี้ที่ส่งต่อกันมาสามรุ่น', hint: 'สามรุ่นติดกันจากไปพร้อมหนี้', say: 'เจ้าหนี้รู้จักบ้านนี้มาตั้งแต่รุ่นปู่ย่า', test: (ch) => lastN(ch, 3, (l) => l.broke) },
+  { id: 'fam_long', name: 'ตระกูลอายุยืน', hint: 'สามรุ่นติดกันอยู่ถึงแปดสิบ', say: 'ใครผ่านไปก็ว่าบ้านนี้คนแก่นั่งเต็มแคร่', test: (ch) => lastN(ch, 3, (l) => l.age >= 80) },
+  { id: 'fam_guardian', name: 'ผีบรรพบุรุษเฝ้าบ้าน', hint: 'รุ่นก่อนกลับมาเกิดเป็นลูกหลานของตัวเอง', say: 'ยายข้างบ้านทักว่าเด็กคนนี้ท่าทางเหมือนคนรุ่นก่อนไม่มีผิด', test: (ch, lin) => lastN(lin, 1, (l) => l.path === 'child') },
+  { id: 'fam_wander', name: 'ดวงวิญญาณพเนจร', hint: 'สองรุ่นติดกันไปเกิดใหม่ที่อื่น', say: 'คนแถวบ้านว่าตระกูลนี้ใครจากไปก็ไม่หันกลับมา', test: (ch, lin) => lastN(lin, 2, (l) => l.path === 'reborn') },
+  { id: 'fam_deva', name: 'ตระกูลมีเทวดา', hint: 'มีบรรพบุรุษไปเกิดเป็นเทวดาอย่างน้อยสองรุ่น', say: 'คนเฒ่าคนแก่ยกให้บ้านนี้เป็นเชื้อสายคนมีบารมี', test: (ch, lin) => lin.filter((l) => l.realm === 'เทวดา').length >= 2 },
 ];
 
 // ผลรวมของชีวิตนี้ที่การ์ดตาย/สมุดฉายาใช้ · titles เรียงหายากก่อน (ลำดับใน TITLES ภายในระดับเดียวกัน)
@@ -13618,6 +13618,12 @@ function lifeTitles(card) {
   }
   return card.lifeTitles;
 }
+// อ่านจากตารางฉายาด้วย id — ผลของ titlesOf ไม่พาข้อความนี้ การ์ดและเซฟจึงไม่เปลี่ยน · เป้าตระกูลไม่มีบรรทัด
+const TITLE_SAY = new Map([...TITLES, ...FAMILY_TITLES].map((t) => [t.id, t.say]));
+function addSay(li, id) {
+  const say = TITLE_SAY.get(id);
+  if (say) li.append(el('span', 'say', say));
+}
 // ฉายาบนใบมรณะ (ui-redo 57 · แบบ line ของหนังสืองานศพ): ฉายาของชีวิตนี้เรียงในบรรทัดเดียว
 // ไม่มีฉายา = ไม่มีบรรทัด (แผงฉายาด้านล่างบอก "ยังไม่ได้ฉายา" อยู่แล้ว)
 function titleLine(card) {
@@ -13643,6 +13649,7 @@ function titlesBox(card) {
   for (const t of titles) {
     const li = el('li', null, `${t.name} · ${t.tier}`);
     if (isNew(newKey('t', t.id))) li.append(newTag());
+    addSay(li, t.id);
     ul.append(li);
   }
   box.append(ul);
@@ -13652,6 +13659,7 @@ function titlesBox(card) {
     for (const t of family) {
       const li = el('li', null, t.name);
       if (isNew(newKey('f', t.id))) li.append(newTag());
+      addSay(li, t.id);
       fl.append(li);
     }
     box.append(fl);
@@ -13767,6 +13775,7 @@ function titleShelf(body, fresh) {
       if (got.includes(x.id)) li.textContent = x.name;
       else li.append(el('b', null, '???'), x.hint);
       if (fresh.includes(newKey(group, x.id))) li.append(newTag());
+      if (got.includes(x.id)) addSay(li, x.id);
       ul.append(li);
     }
     return ul;
