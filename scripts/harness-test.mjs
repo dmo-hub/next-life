@@ -1489,6 +1489,32 @@ const f2 = (v) => v.toFixed(2);
     check(`ใบ 173 มี ${add} แล้ว คนจีบหลุด ไม่กลายเป็นแฟนซ้อน`, r.mates === 1 && r.courter?.role === 'courter' && r.courter.left === true, `${r.courter?.role} ${r.mates}`);
   }
   check('ใบ 173 ตัวควบคุม: โสด คนจีบเป็นแฟนตามนัด', run(null).mates === 1);
+  // การ์ดที่ระบุขั้นจีบต้องเรียกคนที่อยู่ขั้นนั้น · ผ่านทางออกการ์ดจริง (นัด → nextCard)
+  const named = (stage) => {
+    const card = { id: 't173_stage', type: 'A', category: 'family', stage: 'หนุ่มสาว', years: [2400, 2700], when: { family: [{ role: 'courter', stage }] }, title: 't', text: '{ชื่อคนจีบ}', choices: [{ id: 'go', text: 'ไป', effects: {}, merit: [{ cat: 'neutral' }] }] };
+    const own = { ...content, events: [card, ...content.events] };
+    const hit = [];
+    for (let seed = 1; seed <= 12; seed++) {
+      const st = newLife(seed, own);
+      st.age = 22;
+      applyFamily(st, { family: [{ add: 'courter' }, { add: 'courter' }] });
+      const [x, y] = courters(st);
+      x.stage = 'courting';
+      x.due = y.due = 999;
+      st.scheduled.push({ event: card.id, age: st.age });
+      let got = nextCard(st);
+      for (let i = 0; i < 5 && got.id !== card.id; i++) {
+        if (got.choices?.length) choose(st, 0);
+        got = nextCard(st);
+      }
+      hit.push(got.id === card.id && got.text === (stage === 'courting' ? x : y).name);
+    }
+    return hit;
+  };
+  for (const stage of ['met', 'courting']) {
+    const hit = named(stage);
+    check(`ใบ 173 การ์ดขั้น ${stage} เรียกชื่อคนจีบที่อยู่ขั้นนั้นทุก seed`, hit.every(Boolean), `${hit.filter(Boolean).length}/${hit.length}`);
+  }
 }
 
 // จดพ่อ/แม่บนตัวลูก (ใบ 91 B114 ข้อ 149 154 166): ลูกจด by = คู่ปัจจุบันตอนเกิด · พ่อ/แม่ของลูกคือคู่คนนั้นแม้หย่าไปแล้ว · เซฟเก่าไม่มี by คิดย้อนจากปีเกิด

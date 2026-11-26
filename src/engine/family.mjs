@@ -332,6 +332,12 @@ export function pickFocus(st) {
   const courting = livingOf(st, 'courter');
   if (courting.length) st.kinFocus.courter = (courting.length > 1 ? courting[makeRng(mixSeed(st.seed ^ 0xc0e7, st.age)).int(0, courting.length - 1)] : courting[0]).id;
 }
+// การ์ดที่ระบุขั้นจีบ (when.family courter + stage) ต้องเรียกคนที่อยู่ขั้นนั้น · คนที่ pickFocus สุ่มได้ตรงขั้นอยู่แล้ว = คงไว้ · ไม่ดึงเลขสุ่ม
+export function focusCourter(st, conds) {
+  const stages = conds.filter((f) => f.role === 'courter' && f.stage !== undefined).flatMap((f) => f.stage);
+  const fit = livingOf(st, 'courter').filter((m) => stages.includes(m.stage));
+  if (fit.length && !fit.some((m) => m.id === st.kinFocus.courter)) st.kinFocus.courter = fit[0].id;
+}
 // คนเป้าของการ์ดใบปัจจุบัน (ยังคืนคนเดิมแม้ผลการ์ดใบนี้ทำให้เขาจากไป — การ์ดผลจะได้เรียกชื่อถูกคน) · นอกการ์ด = คนล่าสุดที่ยังอยู่
 export function focusOf(st, role) {
   const id = st.kinFocus?.[role];
