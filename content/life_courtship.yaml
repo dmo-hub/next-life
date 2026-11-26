@@ -457,6 +457,7 @@ events:
         merit: [{cat: neutral}]
 
   # ขอแต่ง: รอบแรกเขาขอ (ring) หรือเราขอ (dinner) · ไม่แต่งแต่ยังคบ = นัดรอบสองจากอีกฝั่ง · รอบสองไม่แต่งก็ไม่นัดอีก
+  # เพดานอายุการ์ดขอแต่ง: สูงกว่านี้คู่จากสายจีบแต่งช้าจนอายุแต่งแรกเฉลี่ยกับอัตราหย่าตามยุคของ harness family หลุดกรอบ
 
   - id: court_ask_them_ring_01
     away_block: [abroad, monk]
@@ -464,7 +465,7 @@ events:
     category: family
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {love_free: true, age: [20, 60], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
+    when: {love_free: true, age: [20, 37], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
     title: "แหวนในถุงกล้วยแขก"
     text: "{ชื่อแฟน}ยื่นถุงกล้วยแขกให้ ก้นถุงมีแหวนวงหนึ่งเปื้อนน้ำมันอยู่ แล้วถามว่าแต่งกันไหม"
     choices:
@@ -497,7 +498,7 @@ events:
     category: family
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {love_free: true, age: [20, 60], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
+    when: {love_free: true, age: [20, 37], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
     title: "ซ้อมประโยคเดียวมาทั้งอาทิตย์"
     text: "คุณนัด{ชื่อแฟน}กินข้าวร้านประจำ ซ้อมประโยคขอแต่งงานหน้ากระจกมาทั้งอาทิตย์ ถึงเวลาจริงพนักงานเดินมาถามว่ารับน้ำแข็งเพิ่มไหม"
     choices:
@@ -530,7 +531,7 @@ events:
     category: family
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {love_free: true, age: [20, 60], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
+    when: {love_free: true, age: [20, 37], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
     title: "คราวนี้ตาคุณถาม"
     text: "ผ่านมาพักใหญ่จากวันที่คุณขอเวลา {ชื่อแฟน}ล้างจานอยู่ แล้วพูดลอย ๆ ว่าเวลาที่ขอไว้ใกล้หมดหรือยัง"
     choices:
@@ -561,7 +562,7 @@ events:
     category: family
     stage: หนุ่มสาว
     years: [2500, 2650]
-    when: {love_free: true, age: [20, 60], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
+    when: {love_free: true, age: [20, 37], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
     title: "ใบคำร้องบนโต๊ะกินข้าว"
     text: "{ชื่อแฟน}วางแบบฟอร์มจดทะเบียนสมรสที่กรอกฝั่งตัวเองเสร็จแล้วลงตรงหน้าคุณ พร้อมปากกาหนึ่งด้าม รอบนี้ขอเป็นฝ่ายถามเอง"
     choices:
