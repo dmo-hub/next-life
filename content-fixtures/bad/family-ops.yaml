@@ -24,6 +24,7 @@ events:
   - id: ok_case_partner
     type: A
     stage: ทำงาน
+    when: {love_free: true}
     years: [2500, 2650]
     text: "ข้อความการ์ด"
     choices:
@@ -78,7 +79,7 @@ events:
     type: A
     stage: ทำงาน
     years: [2500, 2650]
-    when: {age: [30, 50]}
+    when: {love_free: true, age: [30, 50]}
     text: "ข้อความการ์ด"
     choices:
       - {text: "ทางที่หนึ่ง", family: [{add: child, adopted: true}], merit: [{cat: neutral}]}

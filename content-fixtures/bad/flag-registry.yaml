@@ -3,6 +3,7 @@ events:
   - id: bad_case_01
     type: A
     stage: ทำงาน
+    when: {love_free: true}
     years: [2500, 2650]
     text: "ข้อความการ์ด"
     choices:

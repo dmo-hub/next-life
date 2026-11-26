@@ -10,6 +10,7 @@ events:
     lore_ref: lore-finance-series.html#1
     systems: [stock]
     when:
+      love_free: true
       age: [31, 45]
       year: [2518, 2650]
       class: [ชนชั้นกลาง, ร่ำรวย]

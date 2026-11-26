@@ -15,7 +15,7 @@ export const CARD_GROUPS = [
   { name: 'อาชีพเฉพาะทาง', files: ['job_*', '*_career', 'singer', 'boxer', 'pageant'] },
   { name: 'งานและเงิน', files: ['work_*', 'business', 'debt*', 'corruption', 'lottery', 'grey_money', 'career_first', 'crop_rural', 'labor_abroad'] },
   { name: 'สายเตรียมทหาร', files: ['cadet_*'] },
-  { name: 'ครอบครัว', files: ['child_family', 'child_far', 'old_family', 'echoes_family', 'life_divorce', 'life_not_mine', 'life_reconcile_ex', 'pets', 'remarry', 'heir', 'grief', 'funeral'] },
+  { name: 'ครอบครัว', files: ['child_family', 'child_far', 'old_family', 'echoes_family', 'life_divorce', 'life_not_mine', 'life_reconcile_ex', 'pets', 'remarry', 'remarry_divorced', 'heir', 'grief', 'funeral'] },
   { name: 'ชีวิตประจำวัน', files: ['daily_*', 'life_*', 'street_*', 'tour_local'] },
   { name: 'คนรอบตัว', files: ['people_*', 'nbr_home'] },
   { name: 'วัฒนธรรม', files: ['culture_*', 'meme', 'festivals'] },

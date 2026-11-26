@@ -217,6 +217,28 @@ export function focusExSpouse(st, w) {
   if (m) st.kinFocus.spouse = m.id;
 }
 
+// พักใจหลังหย่า (ใบ 96 ข้อ 163): when.love_free = ไม่ได้หย่าภายใน LOVE_PAUSE ปี · การ์ดหาคู่ทุกใบต้องติด (lint love-free)
+export const LOVE_PAUSE = 1;
+export const loveFreeOk = (st) => !(st.kin ?? []).some((m) => m.divorcedAge !== undefined && st.age - m.divorcedAge < LOVE_PAUSE);
+// คนหย่า/คนม่ายตัดสินจากชีวิตคู่ที่จบล่าสุด — คนเคยม่ายแล้วหย่ารอบหลังคือคนหย่า และกลับกัน · ยังมีคู่ตามกฎหมาย = ไม่ใช่ทั้งสองอย่าง
+// คืนค่าอายุเราตอนหย่า (null = ไม่ใช่คนหย่า) · คู่เก่าที่ตายหลังหย่ายังนับว่าหย่า (ข้อ 164)
+function divorcedSince(st) {
+  let last = null;
+  for (const m of st.kin ?? []) {
+    if (m.role !== 'spouse') continue;
+    if (!isDivorced(m) && m.alive) return null;
+    const divorced = isDivorced(m);
+    const age = divorced ? (m.divorcedAge ?? m.leftAge) : m.born + m.diedAge - st.birthYear;
+    if (!last || age >= last.age) last = { age, divorced };
+  }
+  return last?.divorced ? last.age : null;
+}
+// when.divorced = {after, within} — คนหย่าที่ยังโสด (ไม่มีแฟนในบ้าน) หย่ามาแล้ว after–within ปี
+export function divorcedOk(st, w) {
+  const age = divorcedSince(st);
+  return age !== null && !livingOf(st, 'partner').length && kinInRange(st.age - age, [w.after, w.within]);
+}
+
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
 // สถานะคู่ (ใบ 89 B114 ข้อ 145 164): together อยู่ด้วยกัน · apart แยกทาง (ยังมีคู่ตามกฎหมาย แต่งใหม่ไม่ได้) · divorced หย่า · ม่าย = ตายแล้วและไม่ได้หย่า (derived)
 // ไม่มีช่อง = together (เซฟเก่า) · หย่าแล้วไม่นับเป็นคู่ในงานศพ/จดหมาย/ผู้ถูกหยิบเป็นพ่อแม่ทายาท และคู่ที่หย่าแล้วตายไม่ลงบันทึกสูญเสีย
@@ -600,6 +622,8 @@ export function kinIllOk(st, w) {
 // เงื่อนไขการ์ดสูญเสีย (when.loss): มีคนในบ้านบทบาทที่ระบุ (ไม่ใส่ = ทุกบทบาท) จากไปเองภายใน within ปีที่ผ่านมา (ไม่ใส่ = ปีนี้)
 // after = ต้องผ่านมาอย่างน้อยกี่ปี (B165 ช่วงไว้ทุกข์ — การ์ดรักใหม่ไม่ขึ้นก่อนพ้นช่วง)
 export function lossOk(st, w) {
+  // B165 เป็นของคนม่าย: คนที่ชีวิตคู่ล่าสุดจบด้วยการหย่ามีการ์ดชุดของตัวเอง (when.divorced)
+  if (w.after > 0 && w.roles?.includes('spouse') && divorcedSince(st) !== null) return false;
   const year = kinYearOf(st);
   const match = (st.kinLoss ?? []).filter((l) => !w.roles || w.roles.includes(l.role));
   // after > 0: ช่วงไว้ทุกข์นับจากการสูญเสียล่าสุดเท่านั้น — คู่คนก่อนที่จากไปนานแล้วต้องไม่ปลดล็อกให้ตอนคู่คนใหม่เพิ่งตาย

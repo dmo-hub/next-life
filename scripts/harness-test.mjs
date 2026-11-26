@@ -1233,10 +1233,11 @@ const f2 = (v) => v.toFixed(2);
   applyFamily(a, { sets_flags: ['married'] });
   check('ใบ 89 แยกทาง: แต่งซ้ำไม่เพิ่มคู่คนที่สอง', a.kin.filter((m) => m.role === 'spouse').length === 1);
   const b = fresh();
+  b.age = 25;
   applyFamily(b, { family: [{ divorce: 'spouse' }] });
   const sb = b.kin.find((m) => m.role === 'spouse');
   check('ใบ 89 หย่า: สถานะ divorced · ธง married หาย · ธง divorced ติด · ไม่มีคู่ปัจจุบัน', sb.status === 'divorced' && !b.flags.married && b.flags.divorced === true && spouseOf(b) === null);
-  check('ใบ 89 หย่า: การ์ดขอแต่งงานขึ้นได้อีก', wedOk({ ...b, age: 25 }) === true);
+  check('ใบ 89 หย่า: การ์ดขอแต่งงานขึ้นได้อีกหลังพ้นปีที่หย่า (ใบ 96)', wedOk({ ...b, age: 25 }) === false && wedOk({ ...b, age: 26 }) === true);
   const after = (st, m) => { m.born = st.birthYear - 112; for (let y = 0; y < 6 && m.alive; y++) ageKin(st, st.birthYear + st.age + y); return m.alive; };
   const stillB = after(b, sb);
   check('ใบ 89 หย่าแล้วตาย: ไม่ลงบันทึกสูญเสียคู่ · ไม่เข้าช่วงไว้ทุกข์ (when.loss)', !stillB && !(b.kinLoss ?? []).some((l) => l.role === 'spouse') && !lossOk(b, { roles: ['spouse'], within: 3 }), `alive ${stillB}`);
@@ -1715,6 +1716,71 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ tld333 คู่ใจที่ไม่มีช่อง bond (เซฟเก่า) ใช้ค่าตั้งต้นของคู่ใจ', near(year('pet', 'แมว').happy, cat * 1.3));
   check('ใบ tld333 ฝูงไม่ขึ้นกับความผูกพัน', [38, 100].every((b) => { const r = year('herd', 'วัว', b); return near(r.money, HERD_KINDS['วัว'].net * 100) && r.happy === 0 && r.health === 0 && r.rel === 0; }));
   check('ใบ tld333 ผลรายปีของคู่ใจไม่ดึง kinRng', year('pet', 'แมว', 72).draws === 0);
+}
+
+// รักใหม่ของคนหย่า (ใบ 96 B114 ข้อ 157 163): when.love_free พักใจ 1 ปี · when.divorced เฉพาะคนหย่า · B165 เฉพาะคนม่าย
+{
+  const content = loadContent();
+  const ev = (id) => content.events.find((e) => e.id === id);
+  const wed = (age, seed = 7) => {
+    const st = newLife(seed, content);
+    st.age = age;
+    applyFamily(st, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+    return st;
+  };
+  const split = (st, age) => { st.age = age; applyFamily(st, { family: [{ divorce: 'spouse' }] }); return st; };
+  const lose = (st, age) => {
+    st.age = age;
+    const m = st.kin.findLast((x) => x.role === 'spouse' && x.alive);
+    m.alive = false;
+    m.diedAge = st.birthYear + age - m.born;
+    delete st.flags.married;
+    st.kinLoss.push({ id: m.id, role: 'spouse', name: m.name, age: m.diedAge, year: st.birthYear + age });
+    return st;
+  };
+  const SEEK = ['young_wedding_01', 'tech_night_status_01', 'food_night_market_01', 'love_last_train_01', 'love_old_photo_date_01', 'love_dowry_rent_01'];
+  check('ใบ 96 การ์ดหาคู่เดิมติด when.love_free ครบ', SEEK.every((id) => ev(id)?.when?.love_free === true), SEEK.filter((id) => ev(id)?.when?.love_free !== true).join(' '));
+  const st = split(wed(22), 24);
+  const free = (age) => { st.age = age; return whenOk(st, { love_free: true }); };
+  check('ใบ 96 พักใจ: ปีที่หย่าการ์ดหาคู่ไม่ขึ้น · ปีถัดไปขึ้น', !free(24) && free(25));
+  st.age = 24;
+  const y0 = whenOk(st, ev('young_wedding_01').when);
+  st.age = 25;
+  check('ใบ 96 young_wedding_01: หย่าปีนี้ไม่ขึ้น · ปีถัดไปขึ้น', !y0 && whenOk(st, ev('young_wedding_01').when));
+  const single = newLife(9, content);
+  single.age = 24;
+  check('ใบ 96 คนไม่เคยหย่า: love_free ผ่าน · ไม่ใช่คนหย่า', whenOk(single, { love_free: true }) && !whenOk(single, { divorced: { after: 0, within: 60 } }));
+
+  const cards = ['divlove_work_01', 'divlove_mid_01', 'divlove_old_01'].map(ev);
+  check('ใบ 96 มีการ์ดชุดคนหย่าครบ 3 วัย เงื่อนไข after 1', cards.every((c) => c?.when?.divorced?.after === 1 && c.when.flags?.not?.includes('married')));
+  const when = { divorced: { after: 1, within: 10 } };
+  const d = split(wed(30), 40);
+  const at = (s, age) => { s.age = age; return whenOk(s, when); };
+  check('ใบ 96 การ์ดคนหย่า: ปีที่หย่าไม่ขึ้น · 1–10 ปีหลังหย่าขึ้น · ปีที่ 11 ไม่ขึ้น', !at(d, 40) && at(d, 41) && at(d, 50) && !at(d, 51));
+  const widow = lose(wed(30), 40);
+  check('ใบ 96 คนม่าย: การ์ดคนหย่าไม่ขึ้น · B165 ยังขึ้น', !at(widow, 44) && whenOk(widow, { loss: { roles: ['spouse'], after: 3, within: 10 } }));
+  const withNew = split(wed(30), 40);
+  withNew.age = 42;
+  applyFamily(withNew, { family: [{ add: 'partner' }] });
+  check('ใบ 96 มีแฟนอยู่ = ไม่ขึ้น', !whenOk(withNew, when));
+  const lostThenDivorced = lose(wed(25), 30);
+  lostThenDivorced.age = 33;
+  applyFamily(lostThenDivorced, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  split(lostThenDivorced, 35);
+  lostThenDivorced.age = 36;
+  check('ใบ 96 เคยม่ายแล้วหย่ารอบหลัง = คนหย่า · B165 ไม่ขึ้น', whenOk(lostThenDivorced, when) && !whenOk(lostThenDivorced, { loss: { roles: ['spouse'], after: 3, within: 10 } }));
+  const divorcedThenLost = split(wed(25), 28);
+  divorcedThenLost.age = 30;
+  applyFamily(divorcedThenLost, { sets_flags: ['married'], family: [{ add: 'spouse' }] });
+  lose(divorcedThenLost, 33);
+  check('ใบ 96 เคยหย่าแล้วม่ายรอบหลัง = คนม่าย: การ์ดคนหย่าไม่ขึ้น · B165 ขึ้น', !at(divorcedThenLost, 37) && whenOk(divorcedThenLost, { loss: { roles: ['spouse'], after: 3, within: 10 } }));
+
+  const again = split(wed(30), 35);
+  again.age = 37;
+  const vow = ev('divlove_wedding_work_01')?.choices[0];
+  if (vow) applyFamily(again, vow);
+  const now = again.kin.filter((m) => m.role === 'spouse');
+  check('ใบ 96 แต่งใหม่: ได้คู่คนใหม่ สถานะอยู่ด้วยกัน · คู่เก่ายังหย่า', !!vow && now.length === 2 && now[0].status === 'divorced' && now[1].alive && !now[1].left && (now[1].status ?? 'together') === 'together' && again.flags.married === true);
 }
 
 // ศาสนาตอนเกิด (ใบ 26 B93): ตารางศาสนาต่อจังหวัด · ทายาท/เซฟเก่าถือศาสนาเดิม · ไม่มีตาราง = พุทธ ไม่ขยับค่าอื่น
