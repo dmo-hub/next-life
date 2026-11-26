@@ -1044,6 +1044,12 @@ function lifeTitles(card) {
   }
   return card.lifeTitles;
 }
+// อ่านจากตารางฉายาด้วย id — ผลของ titlesOf ไม่พาข้อความนี้ การ์ดและเซฟจึงไม่เปลี่ยน · เป้าตระกูลไม่มีบรรทัด
+const TITLE_SAY = new Map([...TITLES, ...FAMILY_TITLES].map((t) => [t.id, t.say]));
+function addSay(li, id) {
+  const say = TITLE_SAY.get(id);
+  if (say) li.append(el('span', 'say', say));
+}
 // ฉายาบนใบมรณะ (ui-redo 57 · แบบ line ของหนังสืองานศพ): ฉายาของชีวิตนี้เรียงในบรรทัดเดียว
 // ไม่มีฉายา = ไม่มีบรรทัด (แผงฉายาด้านล่างบอก "ยังไม่ได้ฉายา" อยู่แล้ว)
 function titleLine(card) {
@@ -1069,6 +1075,7 @@ function titlesBox(card) {
   for (const t of titles) {
     const li = el('li', null, `${t.name} · ${t.tier}`);
     if (isNew(newKey('t', t.id))) li.append(newTag());
+    addSay(li, t.id);
     ul.append(li);
   }
   box.append(ul);
@@ -1078,6 +1085,7 @@ function titlesBox(card) {
     for (const t of family) {
       const li = el('li', null, t.name);
       if (isNew(newKey('f', t.id))) li.append(newTag());
+      addSay(li, t.id);
       fl.append(li);
     }
     box.append(fl);
@@ -1193,6 +1201,7 @@ function titleShelf(body, fresh) {
       if (got.includes(x.id)) li.textContent = x.name;
       else li.append(el('b', null, '???'), x.hint);
       if (fresh.includes(newKey(group, x.id))) li.append(newTag());
+      if (got.includes(x.id)) addSay(li, x.id);
       ul.append(li);
     }
     return ul;
