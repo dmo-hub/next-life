@@ -112,15 +112,15 @@ events:
     category: family
     stage: วัยรุ่น
     years: [2500, 2650]
-    when: {age: [14, 18], school: [lower, upper, voc]}
+    when: {age: [15, 18], school: [lower, upper, voc]}
     weight: 2
     title: "จดหมายใต้โต๊ะ"
     text: "มีจดหมายสอดไว้ใต้โต๊ะ ลงท้ายว่า 'ชอบมานานแล้ว' ลายมือคุ้นตาเหมือนของเพื่อนสนิทที่สุดของคุณ"
     choices:
-      - id: say_yes
-        text: "ตอบตกลงทันที"
+      - id: reply_letter
+        text: "เขียนตอบ แล้วสอดคืนใต้โต๊ะ"
         outcomes:
-          - {ok: true, weight: 2, text: "รักแรกหวานฉ่ำ เกรดร่วงพร้อมกันทั้งคู่", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "เขียนตอบกันไปมาจนสมุดหมดเล่ม ใจฟูทุกเช้า ส่วนสมุดจดวิชาเรียนยังว่าง", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ที่แท้เพื่อนในห้องแกล้งเขียน ทั้งห้องหัวเราะลั่น", effects: {happiness: -2, relations: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: keep_friend
@@ -129,11 +129,11 @@ events:
           - {weight: 1, text: "เพื่อนเงียบหายไปทั้งเทอม", effects: {relations: -2}, merit: [{cat: neutral}], next: teen_friend_silent_01}
           - {ok: true, weight: 1, text: "เพื่อนขอบคุณที่จริงใจ กลายเป็นเพื่อนกันตลอดชีวิต", multipliers: {stats: {relations: 2}}, effects: {relations: 2, happiness: 1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
-      - id: secret_date
-        text: "แอบคบ ไม่ให้ที่บ้านรู้"
+      - id: walk_to_stop
+        text: "ชวนเดินไปป้ายรถด้วยกัน"
         outcomes:
-          - {ok: true, weight: 2, text: "แอบเจอกันหลังเลิกเรียนทุกวัน ที่บ้านไม่เคยรู้", effects: {happiness: 2, relations: -1, knowledge: -1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ที่บ้านจับได้ สั่งให้เลิกต่อหน้า คุณเลือกที่บ้าน เขาด่าคุณกลางโรงเรียนแล้วไม่พูดด้วยอีกเลย", effects: {happiness: -2, relations: -1}, sets_flags: [ex_bitter], merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "เดินช้าลงทุกวันจนพลาดรถคันแรกเป็นประจำ ไม่มีใครบ่น", effects: {happiness: 2, health: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เดินเงียบกันมาจนถึงป้าย แล้วต่างคนต่างรีบขึ้นรถคนละสาย", effects: {happiness: -1}, merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: study_first
         text: "ขอเรียนให้จบก่อนนะ"

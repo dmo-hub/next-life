@@ -243,7 +243,7 @@ events:
         effects: {happiness: 1}
         merit: [{cat: neutral}]
 
-  # แฟนเก่าที่เลิกไม่ดี (B166) ← young_wedding_01 "ปฏิเสธ" · teen_first_love_01 "แอบคบ" ผลที่บ้านจับได้
+  # แฟนเก่าที่เลิกไม่ดี (B166) ← young_wedding_01 "ปฏิเสธ"
   - id: fam_ex_return_01
     away_block: [abroad, monk]
     type: A
