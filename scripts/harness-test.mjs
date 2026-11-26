@@ -1898,6 +1898,36 @@ const f2 = (v) => v.toFixed(2);
 
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
+// ตัวเลือกฝืนใจ (dynasty-4): ขาดแค่ค่าสถานะไม่เกิน RELUCT.gap ทุกตัว = กดได้ + ป้าย · ขาดเกินเพดาน/ขาดธงด้วย/ไม่ติด reluctant = ล็อกเหมือนเดิม
+{
+  const E = await import('../src/engine/index.mjs');
+  const base = loadContent();
+  const PROBE = 'reluct_probe_01';
+  const stat = { health: { min: 50 } };
+  const probe = {
+    id: PROBE, type: 'A', stage: 'ทำงาน', years: [1900, 2600], text: 'ใบทดสอบฝืนใจ',
+    choices: [
+      { text: 'ฝืนใจ', requires: { stats: stat, reluctant: true, reason: 'ฝืนไปก่อน' }, merit: [{ cat: 'neutral' }] },
+      { text: 'ฝืนใจแต่ขาดธงด้วย', requires: { stats: stat, flags: { has: ['reluct_probe_flag'] }, reluctant: true, reason: 'ขาดธง' }, merit: [{ cat: 'neutral' }] },
+      { text: 'ไม่ฝืน', requires: { stats: stat, reason: 'ไม่ถึง' }, merit: [{ cat: 'neutral' }] },
+      { text: 'ปกติ', merit: [{ cat: 'neutral' }] },
+    ],
+  };
+  const content = { ...base, events: [...base.events, probe] };
+  const cardAt = (health) => {
+    const st = newLife(mixSeed(1, 9000), content);
+    st.age = 30;
+    st.health = health;
+    st.scheduled = [{ event: PROBE, age: 30, from: 29, pick: 'x' }];
+    st.due = [];
+    st.advance = false;
+    return E.nextCard(st);
+  };
+  const near = cardAt(50 - E.RELUCT.gap), far = cardAt(50 - E.RELUCT.gap - 1), ok = cardAt(50);
+  check('ฝืนใจ: ขาดสถานะพอดีเพดาน = กดได้ มีป้าย · ขาดธงด้วย/ไม่ติด reluctant ยังล็อก', near.locked[0] === null && near.reluctant?.[0]?.includes('ฝืนใจ') && near.locked[1] && near.locked[2] && !near.reluctant[1] && !near.reluctant[2], JSON.stringify([near.locked, near.reluctant]));
+  check('ฝืนใจ: ขาดเกินเพดาน 1 = ล็อก (soft ไม่เท่า why)', far.locked[0] === 'ฝืนไปก่อน' && !far.reluctant, JSON.stringify([far.locked, far.reluctant]));
+  check('ฝืนใจ: ถึงเกณฑ์แล้ว = ตัวเลือกปกติ ไม่มีป้าย', ok.locked[0] === null && !ok.reluctant, JSON.stringify([ok.locked, ok.reluctant]));
+}
 if (fails.length) {
   for (const f of fails) console.log(`  ✗ ${f}`);
   console.log(`ไม่ผ่าน ${fails.length} ข้อ`);

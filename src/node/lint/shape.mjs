@@ -20,7 +20,7 @@ const DUNGEON_CAUSES = ['accident', 'assault'];
 
 const KEYS = {
   event: ['away_block', 'away_call', 'away_only', 'id', 'type', 'stage', 'years', 'at_age', 'category', 'title', 'text', 'choices', 'when', 'weight', 'multipliers', 'hidden', 'lore_ref', 'fact', 'systems', 'belief', 'era', 'repeat', 'scene', 'realm', 'prelude', 'near', 'first_of', 'herald_of', 'ambient', 'run', 'arc', 'heavy', 'office_ok'],
-  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly'],
+  choice: ['id', 'text', 'label', 'effects', 'cost', 'outcomes', 'merit', 'sets_flags', 'clears_flags', 'schedules', 'hidden', 'pair_id', 'intent', 'redeem', 'requires', 'ticket', 'family', 'hint', 'pact', 'filial', 'gate', 'letter', 'nature', 'upgrade', 'arc_end', 'show_if', 'hide_if', 'result', 'only_sex', 'silly', 'breaks'],
   outcome: ['weight', 'ok', 'text', 'effects', 'merit', 'sets_flags', 'schedules', 'multipliers', 'next', 'family', 'upgrade', 'arc_end'],
   familyOp: ['add', 'n', 'leave', 'separate', 'divorce', 'reconcile', 'remarry', 'custody', 'paternity', 'breakup', 'by', 'marry', 'far', 'back', 'die', 'cause', 'bond', 'd', 'kind', 'life', 'name', 'adopted', 'age'],
   effects: [...EFFECT_KEYS, 'invest', 'income_mult', 'chronic', 'job', 'ladder', 'school', 'debt', 'settle', 'away_enter', 'away_leave', 'complain', 'severance', 'grey_seize', 'grey_launder', 'die', 'loot', 'identity'],
@@ -39,7 +39,7 @@ const KEYS = {
   multipliers: ['class', 'sex', 'stats', 'karma', 'family_fame', 'flags', 'parent_flags', 'home_flags', 'occupation', 'wish', 'rank', 'overlap_stage', ...MONEY_KEYS],
   repeat: ['gap', 'max'],
   prelude: ['before', 'chance'],
-  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'isekai_lineage', 'reason', 'reasons'],
+  requires: ['money', 'stats', 'flags', 'edu', 'family', 'age', 'nature', 'isekai_lineage', 'reason', 'reasons', 'reluctant'],
   belief: ['kind', 'tradition', 'outside_canon', 'vow', 'trigger', 'cap_per_life', 'prize_table', 'stake', 'odds_modifier'],
   vow: ['deadline_years', 'due_event', 'redeem_full_cost', 'redeem_light_cost', 'defer_once'],
   trigger: ['money_state'],
@@ -606,7 +606,7 @@ export const rules = [
   },
   {
     id: 'choice-lock',
-    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), isekai_lineage?: true (ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยกลับจากต่างโลก), reason?} · ล็อกด้วยธง/isekai_lineage ต้องมี reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
+    desc: 'requires = {money?: เงินมีหน่วย amount > 0, stats?: {ค่า: {min, max}}, flags?: {has, not}, edu?: วุฒิขั้นต่ำ, family?: [{role: parent|spouse|child|grandchild, sex?, alive?, age?, count?}], age?: {min, max} 0–120 (เหตุผลแกนเขียนเอง), nature?: id นิสัย (เหตุผลแกนเขียนเอง), isekai_lineage?: true (ผังตระกูลมีรุ่นต่างโลก หรือชาตินี้เคยกลับจากต่างโลก), reason?, reluctant?: true} · ล็อกด้วยธง/isekai_lineage ต้องมี reason · reluctant (ฝืนใจ) ต้องมี stats.min และ reason · การ์ดต้องมีตัวเลือกไม่ล็อกอย่างน้อย 1 ตัว',
     event(e, ctx, r) {
       const cs = choicesOf(e);
       for (const { c, path } of cs) {
@@ -630,6 +630,10 @@ export const rules = [
         // B1 requires.reasons = {ข้อ: เหตุ} · ข้อต้องเป็นเงื่อนไขที่มีจริงใน requires นี้ · เหตุเป็นข้อความ
         if (q.reasons !== undefined && !(isObj(q.reasons) && Object.entries(q.reasons).every(([k, v]) => ['money', 'stats', 'flags', 'edu', 'family', 'isekai_lineage'].includes(k) && q[k] !== undefined && typeof v === 'string' && v.trim()))) r(`${at}.reasons`, 'reasons ต้องเป็น {money|stats|flags|edu|family|isekai_lineage: ข้อความ} ของข้อที่มีใน requires');
         if (q.reason !== undefined && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'reason ต้องเป็นข้อความ');
+        // ฝืนใจปลดเฉพาะค่าสถานะที่ขาด — ไม่มี stats.min ป้ายไม่มีวันขึ้น · ป้ายใช้ reason เป็นคำบอกว่าใจติดตรงไหน
+        if (q.reluctant !== undefined && q.reluctant !== true) r(`${at}.reluctant`, 'reluctant ต้องเป็น true');
+        if (q.reluctant === true && !(isObj(q.stats) && Object.values(q.stats).some((b) => isObj(b) && b.min !== undefined))) r(`${at}.reluctant`, 'ฝืนใจต้องมี stats ที่มี min อย่างน้อยหนึ่งค่า');
+        if (q.reluctant === true && !(typeof q.reason === 'string' && q.reason.trim())) r(`${at}.reason`, 'ฝืนใจต้องมี reason (คำบนป้าย)');
       }
       if (cs.length && cs.every(({ c }) => c.requires !== undefined)) r('.choices', 'ทุกตัวเลือกล็อกได้ — ต้องมีตัวเลือกที่ไม่มี requires อย่างน้อย 1 ตัว ไม่งั้นการ์ดค้าง');
     },

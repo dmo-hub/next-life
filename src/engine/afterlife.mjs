@@ -10,7 +10,7 @@ import { newLedger, recordMerit, netLedger, SIN_CATS } from './merit.mjs';
 import { goalsMet, titlesOf } from './titles.mjs';
 import { heirPets, heirSibs, letterTo, deadKinOf, speechSex, spouseOf, parentSpouseOf } from './family.mjs';
 import { CHRONIC } from './death.mjs';
-import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeTreeMain, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN } from './life.mjs';
+import { newLife, causeWords, CLASSES, STAT_KEYS, STAT_LABELS, levelValue, whenOk, poolMultiplier, fill, reckoning, weighted, AFTERLIFE_STAGE, disputes, choiceHints, noteDeed, standingOf, funeralGuests, realAt, netWorth, lifeTreeMain, lifeGatesOpen, overlapOf, overlapStep, overlapLeftIsekai, overlapStageOf, OVERLAP_STAGE_MIN, TABOO } from './life.mjs';
 import { ISEKAI, ISEKAI_SKILLS, SKILL, carryPick, skillsBack, startIsekai, nextIsekaiCard, chooseIsekai, isekaiFocusCard, isekaiFocusPick, isekaiCalled, isekaiMemory, isekaiLineage, isekaiWorldLore, isekaiWorldLegends, lifeEndWord, isGone } from './isekai.mjs';
 import { ladderOf } from './rank.mjs';
 import { warnPick } from './warn.mjs';
@@ -530,6 +530,16 @@ const heirFlags = (st, tier) => Object.fromEntries(Object.entries(st.content.hei
 // ธงเลี้ยงดูไม่มีทางส่งต่อ (ไม่มีการ์ดไหนตั้ง · ตัวเลือกเลี้ยงลูกเป็นใบแยก) · ไม่ดึงเลขสุ่ม
 const heirHome = (st, tier) => (tier === 1 ? Object.fromEntries(Object.entries(st.content.home ?? {}).filter(([, h]) => h.from_life_flags && (h.from_life_flags.some((f) => st.flags[f]) || st.bankruptcies > 0)).map(([f]) => [f, 1])) : {});
 
+// ข้อห้ามตระกูลของทายาท: ที่บ้านถืออยู่ห่างออกไปอีก tier · ต้นเหตุชาตินี้เริ่มที่ระยะ tier · ซ้อนกันเอาระยะใกล้ · ถึง TABOO.forget หาย
+// ต้นเหตุ = เคยติดธง (flagAge จดไว้แม้ธงถูกล้าง) · ชาตินี้ฝ่าฝืน (tabooBroken) = ข้อห้ามเดิมไม่ส่งต่อ · ไม่ดึงเลขสุ่ม
+const everFlag = (st, f) => !!st.flags[f] || st.flagAge?.[f] !== undefined;
+function heirTaboos(st, tier) {
+  const out = {};
+  for (const [k, d] of Object.entries(st.taboos ?? {})) if (!st.tabooBroken?.[k] && d + tier < TABOO.forget) out[k] = d + tier;
+  for (const [k, t] of Object.entries(st.content.taboo ?? {})) if (tier < TABOO.forget && t.cause.flags.some((f) => everFlag(st, f))) out[k] = Math.min(out[k] ?? tier, tier);
+  return out;
+}
+
 function makeHeir(af, r) {
   const st = af.st;
   const era = st.content.era;
@@ -537,7 +547,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null, taboos = {};
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -560,6 +570,7 @@ function makeHeir(af, r) {
     if (me) ({ sex, name } = me);
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
+    taboos = heirTaboos(st, tier.tier);
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
@@ -661,6 +672,7 @@ function makeHeir(af, r) {
     parentFlags,
     homeFlags,
     letter,
+    taboos,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
