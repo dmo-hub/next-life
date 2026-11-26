@@ -1783,6 +1783,23 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 96 แต่งใหม่: ได้คู่คนใหม่ สถานะอยู่ด้วยกัน · คู่เก่ายังหย่า', !!vow && now.length === 2 && now[0].status === 'divorced' && now[1].alive && !now[1].left && (now[1].status ?? 'together') === 'together' && again.flags.married === true);
 }
 
+// ใบ tld334 ฉายามีบรรทัดเสียงคนรอบตัว · เป็นข้อความแสดงผลจากตารางฉายา ไม่เข้าผลของ titlesOf (การ์ด/เซฟไม่เปลี่ยน)
+{
+  const { TITLES, FAMILY_TITLES, FAMILY_GOALS, titlesOf } = await import('../src/engine/titles.mjs');
+  const content = loadContent();
+  const all = [...TITLES, ...FAMILY_TITLES];
+  const bad = (f) => all.filter(f).map((t) => t.id).join(' ');
+  const noSay = bad((t) => typeof t.say !== 'string' || !t.say.trim());
+  check('ใบ tld334 ฉายาประจำตัวและฉายาตระกูลมีบรรทัดเสียงคนรอบตัวครบ', all.length === 37 && !noSay, `${all.length} ฉายา ${noSay}`);
+  check('ใบ tld334 บรรทัดไม่ซ้ำกัน และไม่ซ้ำคำใบ้', new Set(all.map((t) => t.say)).size === all.length && !bad((t) => t.say === t.hint));
+  const leak = bad((t) => /[0-9๐-๙]|บุญ|บาป|กุศล|นรก/.test(t.say ?? ''));
+  check('ใบ tld334 บรรทัดไม่มีตัวเลขและไม่บอกบัญชีบุญบาป', !leak, leak);
+  check('ใบ tld334 เป้าตระกูลไม่ใช่ฉายา ไม่มีบรรทัด', FAMILY_GOALS.every((t) => t.say === undefined));
+  const dead = playLife(334, content, BOTS['สายครอบครัว']).state;
+  const t = titlesOf(dead);
+  check('ใบ tld334 ผลของ titlesOf ไม่มีช่องใหม่', t.titles.length > 0 && [...t.titles, ...t.family].every((x) => !('say' in x)), `${t.titles.length} ฉายา`);
+}
+
 // ศาสนาตอนเกิด (ใบ 26 B93): ตารางศาสนาต่อจังหวัด · ทายาท/เซฟเก่าถือศาสนาเดิม · ไม่มีตาราง = พุทธ ไม่ขยับค่าอื่น
 // ตารางในเทสเป็นของสังเคราะห์ ไม่ใช่ตัวเลขจริงของ สสช.
 {
