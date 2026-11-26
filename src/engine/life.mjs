@@ -715,6 +715,9 @@ export const FILL = {
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อแฟน: (st) => focusOf(st, 'partner')?.name ?? 'แฟน',
   ชื่อแฟนเก่า: (st) => exPartnerOf(st)?.name ?? 'แฟนเก่า',
+  ชื่อคนจีบ: (st) => focusOf(st, 'courter')?.name ?? 'คนที่คุยอยู่',
+  // จีบพร้อมกัน 2 คน: อีกคนที่ไม่ใช่คนเป้าของการ์ดใบนี้
+  ชื่อคนจีบอีกคน: (st) => st.kin?.find((m) => m.role === 'courter' && m.alive && !m.left && m.id !== focusOf(st, 'courter')?.id)?.name ?? 'อีกคน',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
   // ผีญาติ (ใบ 26): คนที่การ์ดผีญาติเลือกจากรายชื่อคนตายของตระกูล — ว่างเมื่อไม่มีรายชื่อ (การ์ดไม่ออกอยู่แล้วเพราะ when.kin_ghost)
   ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
