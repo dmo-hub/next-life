@@ -157,10 +157,13 @@ function flagCond(f, L, who = '') {
   return out;
 }
 
+const COURT_STAGE_TH = { met: 'เพิ่งเจอกัน', courting: 'กำลังจีบกัน' };
 const PARENT_BY_SEX = { ชาย: 'พ่อ', หญิง: 'แม่' };
 function famCond(f) {
   const role = f.role === 'parent' && PARENT_BY_SEX[f.sex] ? PARENT_BY_SEX[f.sex] : `${FAMILY_ROLE_NAMES[f.role] ?? f.role}${f.sex ? `เพศ${esc(f.sex)}` : ''}`;
-  const who = `${role}${f.age ? ` อายุ ${range(f.age, ' ปี')}` : ''}`;
+  const stage = f.stage === undefined ? '' : ` ที่${[].concat(f.stage).map((x) => COURT_STAGE_TH[x]).join('หรือ')}`;
+  const years = f.years ? ` จีบหรือคบมา ${range(f.years, ' ปี')}` : '';
+  const who = `${role}${f.age ? ` อายุ ${range(f.age, ' ปี')}` : ''}${stage}${years}`;
   const alive = f.alive === undefined ? '' : f.alive ? 'ที่ยังอยู่' : 'ที่จากไปแล้ว';
   if (f.count) return f.count[1] === 0 ? `ไม่มี${who}${alive}` : `มี${who}${alive} ${range(f.count, ' คน')}`;
   return `มี${who}${alive}`;
