@@ -1779,6 +1779,32 @@ const f2 = (v) => v.toFixed(2);
   check('ศาสนา: ทายาททางเป็นลูก/สายเลือดถือศาสนาของบ้าน', child > 0 && kept === child, `${kept}/${child}`);
 }
 
+// คนจบโรงเรียนเตรียมทหาร (เฟส 3) ต้องไม่เจอการ์ดบวชเรียนต่อ ม.ปลาย (pali_late_01) — เดิมขึ้น ~17% ของคนจบ แล้วเลือกบวชจะค้าง นตท. ไม่ได้ติดยศ (S3 g-64 เจอ · ฮับ g-f3 เคาะ 2026-11-26)
+// เดินลูปปีจริงจากการ์ดรายงานตัวตอนอายุ 15 จนจบเฟส 3 (17) แล้วเล่นต่อถึงพ้นอายุของการ์ด (18)
+{
+  const content = loadContent();
+  let grads = 0, saw = 0;
+  for (let i = 0; i < 60; i++) {
+    const st = newLife(mixSeed(0x9a1e, i), content);
+    Object.assign(st, { age: 15, sex: 'ชาย', health: 95, cadetInfo: { tries: 1, order: ['army'] },
+      cadet: { steps: [['p2']], cur: null, p2: { branches: ['army'], written: { army: true }, reason: {}, body: { army: true }, final: ['army'], chosen: 'army', scores: { army: 20 }, askNs: {}, steps: [['arrive', 'army']] } } });
+    const R = makeRng(i);
+    let grad = false, pali = false;
+    for (let g = 0; g < 1500 && !st.dead && st.age <= 18; g++) {
+      const c = nextCard(st);
+      if (c.kind === 'death' || st.trip || st.court) break;
+      if (c.id === 'pali_late_01') pali = true;
+      if (!st.cadet && st.school === 'cadet') grad = true;
+      const open = c.choices?.length ? openChoices(c).filter((k) => !/ยื่นลาออก|ขึ้นเลย ไม่รอเช็ก/.test(c.choices[k])) : [];
+      if (open.length) choose(st, open[R.int(0, open.length - 1)]);
+    }
+    if (!grad) continue;
+    grads++;
+    if (pali) saw++;
+  }
+  check('เฟส 3 คนจบโรงเรียนเตรียมทหารไม่เจอการ์ดบวชเรียนต่อ ม.ปลาย', grads > 0 && saw === 0, `เจอ ${saw}/${grads}`);
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 if (fails.length) {
