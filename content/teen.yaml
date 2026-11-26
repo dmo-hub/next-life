@@ -120,7 +120,7 @@ events:
       - id: reply_letter
         text: "เขียนตอบ แล้วสอดคืนใต้โต๊ะ"
         outcomes:
-          - {ok: true, weight: 2, text: "เขียนตอบกันไปมาจนสมุดหมดเล่ม ใจฟูทุกเช้า ส่วนสมุดจดวิชาเรียนยังว่าง", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
+          - {ok: true, weight: 2, text: "จดหมายไปกลับกันทุกวันจนกระดาษในสมุดเกือบหมดเล่ม ใจฟูทุกเช้า ส่วนการบ้านยังว่าง", effects: {happiness: 3, knowledge: -1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ที่แท้เพื่อนในห้องแกล้งเขียน ทั้งห้องหัวเราะลั่น", effects: {happiness: -2, relations: -1}, sets_flags: [bullied], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: keep_friend
