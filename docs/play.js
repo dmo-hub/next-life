@@ -1451,19 +1451,21 @@ const MERIT_WEIGHTS = {
   against_nature: 0.5,
   // สัญญากับมาร (B156) — กลไกเกมตั้งเอง ความหนักมาจากระดับ 3 + ไม่จางข้ามชาติ (FULL_CARRY ใน afterlife) ไม่ใช่น้ำหนักหมวด
   mara_pact: 0.5,
+  // ทรยศคนที่ไว้ใจในต่างโลก (เช่นมีคู่เพิ่มโดยคู่เดิมไม่ยอม) — แยกจาก vow_broken ที่เป็นสัญญากับเทพธิดา · กลไกเกมตั้งเอง เบาเท่าหมวดเกมอื่น
+  betrayal: 0.5,
 };
-const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'kill_animal', 'wrong_view', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
+const SIN_CATS = ['greed_harm', 'disturb_monk', 'abuse_elders', 'unjust_judgment', 'adultery', 'love_charm', 'oppress_subjects', 'intoxicants', 'kill_animal', 'wrong_view', 'vow_broken', 'kill_for_gain', 'cheat_exploit', 'forbidden_knowledge', 'against_nature', 'mara_pact', 'betrayal'];
 const FLAG_CATS = ['vow_broken'];
-const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
+const GAME_CATS = ['vow_broken', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact', 'betrayal'];
 // หมวดที่ไม่นับเป็นบาปตามคติพระมาลัยที่หน้าเว็บอ้าง (ส่วนใหญ่ใช้เฉพาะต่างโลก · mara_pact ใช้ได้ทั้งสองโลก)
-const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact'];
+const ISEKAI_CATS = ['kill_for_gain', 'cheat_exploit', 'keep_goddess_vow', 'forbidden_knowledge', 'against_nature', 'mara_pact', 'betrayal'];
 // ชื่อไทยที่เนื้อหาใช้แทน id ได้ (ใบ 12 เขียนหมวดเป็นไทย) — ต้องตรงกับ vocab ของด่าน build
 const TH = {
   โลภจนเบียดเบียน: 'greed_harm', รบกวนนักบวช: 'disturb_monk', ด่าตีพ่อแม่ผู้ใหญ่: 'abuse_elders', ตัดสินไม่เป็นธรรม: 'unjust_judgment',
   ผิดเมียผู้อื่น: 'adultery', เสน่ห์ยาแฝด: 'love_charm', กดขี่ผู้ใต้ปกครอง: 'oppress_subjects', ดื่มสุรา: 'intoxicants', ฆ่าสัตว์: 'kill_animal', มิจฉาทิฏฐิ: 'wrong_view', บนแล้วไม่แก้: 'vow_broken',
   ทาน: 'dana', ศีล: 'sila', ภาวนา: 'bhavana', ดูแลพ่อแม่: 'care_parents', ช่วยคน: 'help_others', กลาง: 'neutral',
   ฆ่าเพื่อแต้ม: 'kill_for_gain', ใช้สกิลโกงเอาเปรียบ: 'cheat_exploit', รักษาสัญญาเทพธิดา: 'keep_goddess_vow',
-  ความรู้อันตราย: 'forbidden_knowledge', ฝืนธรรมชาติ: 'against_nature', สัญญากับมาร: 'mara_pact',
+  ความรู้อันตราย: 'forbidden_knowledge', ฝืนธรรมชาติ: 'against_nature', สัญญากับมาร: 'mara_pact', ทรยศ: 'betrayal',
 };
 const meritId = (cat) => TH[cat] ?? cat;
 const TH_BY_ID = Object.fromEntries(Object.entries(TH).map(([th, id]) => [id, th]));
@@ -9086,34 +9088,34 @@ function useIsekaiCards(cards = []) {
 }
 
 // ป้ายบุญบาปต่างโลก (B68c) ตามเจตนาของตัวเลือก ไม่ตามผลทอย · id เหตุการณ์ → ลำดับตัวเลือก → [หมวด, ระดับ]
-// ฆ่าเพื่อปกป้องคน = กลาง · ชื่อเสียง (fame) เป็นอีกแกน ไม่ลงบัญชีนี้
+// ปกป้องคน (ฆ่าหรือไม่ฆ่า) = ช่วยคน 1 · ล่า/ค้นเพื่อตัวเองไม่มีใครต้องปกป้อง = กลาง · ชื่อเสียง (fame) เป็นอีกแกน ไม่ลงบัญชีนี้
 const M = (cat, level) => ({ cat, level });
 const ISEKAI_MERIT = {
   h2: { 0: [M('help_others', 2)], 1: [M('help_others', 1)], 2: [M('greed_harm', 1)] },
-  h3: { 0: [M('neutral')], 1: [M('help_others', 2)], 2: [M('neutral')] },
+  h3: { 0: [M('help_others', 1)], 1: [M('help_others', 2)], 2: [M('help_others', 1)] },
   h4: { 1: [M('kill_for_gain', 3)] },
   h5: { 2: [M('greed_harm', 2)] },
-  h9: { 0: [M('neutral')] },
+  h9: { 0: [M('help_others', 1)] },
   n2: { 1: [M('cheat_exploit', 1)] },
   n3: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
   n9: { 0: [M('help_others', 2)], 2: [M('help_others', 1)] },
-  m1: { 0: [M('help_others', 2)], 1: [M('neutral')] },
+  m1: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
   m2: { 0: [M('neutral')], 2: [M('greed_harm', 1)] },
   m9: { 0: [M('help_others', 3)], 1: [M('kill_for_gain', 3)], 2: [M('help_others', 2)] },
   v0: { 1: [M('sila', 1)] },
   v2: { 0: [M('help_others', 1)], 1: [M('help_others', 1)] },
   v5: { 1: [M('dana', 2), M('help_others', 1)] },
   s1: { 0: [M('help_others', 2)], 1: [M('help_others', 1)] },
-  s9: { 1: [M('neutral')], 2: [M('help_others', 1)] },
+  s9: { 1: [M('help_others', 1)], 2: [M('help_others', 1)] },
   gb1: { 2: [M('help_others', 1), M('dana', 1)] },
   gb2: { 0: [M('help_others', 1)], 1: [M('cheat_exploit', 1)] },
   gb3: { 0: [M('help_others', 2)], 1: [M('kill_for_gain', 2)], 2: [M('greed_harm', 1)] },
-  gb5: { 0: [M('help_others', 2)], 2: [M('neutral')] },
+  gb5: { 0: [M('help_others', 2)], 2: [M('help_others', 1)] },
   dk2: { 0: [M('unjust_judgment', 2)], 2: [M('help_others', 2)] },
   dk3: { 2: [M('greed_harm', 2)] },
   dk4: { 0: [M('help_others', 1)], 2: [M('greed_harm', 1)] },
   dk4b: { 0: [M('help_others', 1)] },
-  g_goblin: { 0: [M('neutral')], 1: [M('neutral')] },
+  g_goblin: { 0: [M('help_others', 1)], 1: [M('help_others', 1)] },
   g_slave: { 0: [M('help_others', 3), M('dana', 1)], 1: [M('help_others', 2)] },
   g_dragon: { 1: [M('greed_harm', 1)] },
   g_goddess: { 1: [M('care_parents', 1)] },
