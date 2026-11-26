@@ -46,7 +46,7 @@ events:
     choices:
       - id: court_work_eat
         text: "นั่งกินด้วยกันแล้วคุยยาว"
-        result: "งานเสร็จตอนสี่ทุ่ม คุยกันต่ออีกชั่วโมงที่ป้ายรถ ก่อนขึ้นรถเขาบอกว่าชื่อเล่นจริง ๆ คือ{ชื่อคนจีบ} คนที่ทำงานยังไม่มีใครเรียก"
+        result: "งานเสร็จตอนสี่ทุ่ม คุยกันต่ออีกชั่วโมงที่ป้ายรถ ก่อนขึ้นรถเขาบอกว่าชื่อเล่นจริง ๆ คือ{ชื่อคนจีบ} ที่ทำงานยังไม่มีใครรู้จักชื่อนี้"
         effects: {happiness: 2, health: -1}
         family: [{add: courter}]
         schedules: [{event: court_date_work_01, after_years: [1, 1]}, {event: court_date_work_01, after_years: [2, 2]}]
@@ -134,7 +134,7 @@ events:
     years: [2500, 2650]
     when: {family: [{role: courter, stage: courting}]}
     title: "ดอกไม้หนึ่งช่อวันซ้อมรับปริญญา"
-    text: "ใกล้วันซ้อมรับปริญญาของรุ่นพี่ {ชื่อคนจีบ}ถามว่าจะไปถ่ายรูปด้วยกันไหม แล้วเสริมว่าถ้าไปในฐานะคนรู้จักเฉย ๆ ก็ไม่ต้องไปก็ได้"
+    text: "ใกล้วันซ้อมรับปริญญาของรุ่นพี่ {ชื่อคนจีบ}ถามว่าจะไปถ่ายรูปด้วยกันไหม แล้วเสริมว่าถ้าไปในฐานะคนรู้จักเฉย ๆ ก็ไม่ต้องไป"
     choices:
       - id: court_uni_bouquet
         text: "ถือช่อดอกไม้ไปให้เขา"
@@ -168,13 +168,13 @@ events:
     years: [2500, 2650]
     when: {family: [{role: courter, stage: courting}]}
     title: "ข่าวลือจากโต๊ะข้าง ๆ"
-    text: "เรื่องคุณกับ{ชื่อคนจีบ}ลือไปถึงคนรอบตัวแล้ว มีคนถามกลางวงข้าวว่าตกลงเป็นอะไรกัน {ชื่อคนจีบ}วางช้อน แล้วหันมารอคำตอบจากคุณ"
+    text: "เรื่องคุณกับ{ชื่อคนจีบ}ลือไปทั่วแล้ว มีคนถามกลางวงข้าวว่าตกลงเป็นอะไรกัน {ชื่อคนจีบ}วางช้อน แล้วหันมารอคำตอบจากคุณ"
     choices:
       - id: court_work_admit
         text: "ตอบว่ากำลังจีบอยู่"
         outcomes:
           - {weight: 3, ok: true, text: "ทั้งวงโห่ {ชื่อคนจีบ}หูแดง ตักไข่ดาวของตัวเองมาใส่จานคุณแทนคำตอบ", effects: {happiness: 3, relations: 1}, schedules: [{event: court_go_money_01, after_years: [1, 1]}, {event: court_go_money_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อคนจีบ}หัวเราะแห้ง ๆ ตกเย็นส่งข้อความมาว่ายังไม่พร้อมให้เรื่องเป็นแบบนี้ ขอเว้นระยะกันไป", effects: {happiness: -3, relations: -1}, family: [{drop: courter}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}หัวเราะแห้ง ๆ ตกเย็นส่งข้อความมาว่ายังไม่พร้อมให้ใครรู้ ขอห่างกันไปก่อน", effects: {happiness: -3, relations: -1}, family: [{drop: courter}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_work_dodge
         text: "เฉไฉไปคุยเรื่องกับข้าว"
@@ -325,7 +325,7 @@ events:
         text: "หัวเราะว่าจดละเอียดขนาดนี้เชียว"
         outcomes:
           - {weight: 2, ok: true, text: "{ชื่อแฟน}หัวเราะตาม แล้วจดเพิ่มอีกบรรทัดว่าคุณติดค่าชานมอยู่หนึ่งแก้ว", effects: {happiness: 1}, schedules: [{event: court_go_trip_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อแฟน}ปิดสมุด บอกว่าโตมาในบ้านที่เงินไม่เคยพอ เรื่องนี้ไม่ตลก แล้วขอแยกทางกันหลังจากนั้นไม่นาน", effects: {happiness: -3}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อแฟน}ปิดสมุด บอกว่าโตมาในบ้านที่เงินไม่เคยพอ เรื่องนี้ไม่ตลก ผ่านไปไม่นานก็ขอเลิก", effects: {happiness: -3}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: court_go_hours_01
@@ -368,7 +368,7 @@ events:
     years: [2500, 2650]
     when: {age: [18, 60], family: [{role: partner, alive: true, count: [1, 1]}]}
     title: "ไข้ขึ้นตอนตีสอง"
-    text: "{ชื่อแฟน}โทรมาเสียงแหบกลางดึก บอกว่าไม่ได้เป็นอะไรมาก แค่ไข้ขึ้นสามสิบเก้าองศากว่ากับยาหมดตู้"
+    text: "{ชื่อแฟน}โทรมาเสียงแหบกลางดึก บอกว่าไม่ได้เป็นอะไรมาก แค่ไข้ขึ้นสามสิบเก้ากว่า แล้วยาก็หมดตู้"
     choices:
       - id: court_sick_porridge
         text: "หอบยากับข้าวต้มไปเฝ้า"
@@ -389,7 +389,7 @@ events:
         text: "บอกให้ห่มผ้าแล้วนอนซะ"
         outcomes:
           - {weight: 1, ok: true, text: "เช้ามา{ชื่อแฟน}ไข้ลดเอง แล้วทวงข้าวต้มย้อนหลังหนึ่งชาม", effects: {health: 1}, schedules: [{event: court_ask_them_ring_01, after_years: [1, 1]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อแฟน}ต้องเรียกรถไปหาหมอคนเดียว พอหายป่วยก็ขอเลิก บอกว่าคืนนั้นอยู่คนเดียวได้ ต่อไปก็คงได้", effects: {happiness: -3, health: 1}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อแฟน}ต้องเรียกรถไปหาหมอคนเดียว พอหายป่วยก็ขอเลิก บอกว่าคืนนั้นผ่านมาได้คนเดียว คืนอื่นก็คงเหมือนกัน", effects: {happiness: -3, health: 1}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
 
   - id: court_go_trip_01
@@ -511,7 +511,7 @@ events:
         text: "ยืนขึ้นขอกลางร้าน"
         outcomes:
           - {weight: 1, ok: true, text: "ทั้งร้านตบมือเชียร์ {ชื่อแฟน}พยักหน้าทั้งที่เอาเมนูบังหน้าอยู่", effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -0.3}}, family: [{marry: partner}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อแฟน}เกลียดการถูกจ้องที่สุดและคุณก็รู้ เขาลุกออกจากร้าน แล้วส่งข้อความตามมาว่าพอแค่นี้", effects: {happiness: -3, relations: -1}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณก็รู้ว่า{ชื่อแฟน}เกลียดการถูกจ้องที่สุด เขาลุกออกจากร้าน แล้วส่งข้อความตามมาว่าพอแค่นี้", effects: {happiness: -3, relations: -1}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_dinner_hold
         text: "เก็บคำไว้ สั่งของหวานแทน"
@@ -532,13 +532,13 @@ events:
     years: [2500, 2650]
     when: {love_free: true, age: [20, 60], family: [{role: partner, alive: true, count: [1, 1], age: [20, 99]}, {role: spouse, alive: true, count: [0, 0]}]}
     title: "คราวนี้ตาคุณถาม"
-    text: "สองปีหลังวันที่คุณขอเวลา {ชื่อแฟน}ล้างจานอยู่ แล้วพูดลอย ๆ ว่าเวลาที่ขอไว้ใกล้หมดหรือยัง"
+    text: "ผ่านมาพักใหญ่จากวันที่คุณขอเวลา {ชื่อแฟน}ล้างจานอยู่ แล้วพูดลอย ๆ ว่าเวลาที่ขอไว้ใกล้หมดหรือยัง"
     choices:
       - id: court_plain_ask
         text: "ขอแต่งงานตรงอ่างล้างจาน"
         outcomes:
           - {weight: 4, ok: true, text: "{ชื่อแฟน}ตอบตกลงทั้งที่ฟองยังเต็มมือ แล้วให้คุณล้างที่เหลือเป็นค่าที่ให้รอ", effects: {happiness: 3, relations: 2}, family: [{marry: partner}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อแฟน}ส่ายหน้า บอกว่าสองปีที่รอทำให้คิดได้หลายเรื่อง แล้วขอจบกันดี ๆ", effects: {happiness: -3}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อแฟน}ส่ายหน้า บอกว่าช่วงที่รอทำให้คิดได้หลายเรื่อง แล้วขอจบกันดี ๆ", effects: {happiness: -3}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_plain_party
         text: "ขอพร้อมสัญญาว่าจะจัดงานให้"
