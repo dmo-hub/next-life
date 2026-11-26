@@ -6,6 +6,7 @@
 // · สัตว์เลี้ยงตายตรงอายุขัย · เพื่อนรุ่นเกิดปีเดียวกับเรา · สองบทบาทนี้ไม่ตั้งธง
 // #9: %เคยแต่ง (อยู่ถึง 45) ต่างกันระหว่างช่วงปีเกิดไม่เกิน 3 pp · อายุแต่งครั้งแรกเฉลี่ย 24–28
 import { playLife, playAfterlife, nextLife, mixSeed, lifeQx, focusOf, memberAge, newLife, addMember, ageKin, BOND_START, BOND_FLOOR, FILIAL, openChoices, meritId, MERIT_LEVELS } from '../src/engine/index.mjs';
+import { NOT_MINE } from '../src/engine/family.mjs';
 import { readFileSync } from 'node:fs';
 import { loadContent } from '../src/node/load.mjs';
 import { BOTS, random } from './bots.mjs';
@@ -77,7 +78,8 @@ for (const [bot, pick] of Object.entries(BOTS)) {
           if (whoLeft(w)) whoLeak++;
         } else if (living || card.funeral.guests) whoShort++;
       }
-      for (const m of [...st.parents, ...st.kin]) if (m.alive && !(m.bond >= BOND_FLOOR && m.bond <= 100)) bondBad++;
+      // ลูกที่ตัดขาด (ใบ 95) ผูกพันตกเหลือ NOT_MINE.cutTo ต่ำกว่า BOND_FLOOR ได้โดยตั้งใจ
+      for (const m of [...st.parents, ...st.kin]) if (m.alive && !(m.bond >= (m.paternity === 'cut' ? NOT_MINE.cutTo : BOND_FLOOR) && m.bond <= 100)) bondBad++;
       for (const m of st.kin) {
         if (was.get(m.id) === false && m.alive) revive++;
         was.set(m.id, m.alive);
@@ -222,7 +224,7 @@ check('การ์ดไม่เรียกชื่อคนที่จา�
 check(`ชื่อในบ้านไม่ซ้ำ (${households} บ้าน)`, nameDup);
 check('ธง married/has_kids ตรงสมาชิกจริงทุกการ์ด', flagBad);
 check('ทางในตระกูลเกิดเป็นลูก/หลานจริง', heirChecks ? heirBad : 1, ` ${heirChecks - heirBad}/${heirChecks}`);
-check(`bond อยู่ใน ${BOND_FLOOR}–100 ทุกการ์ด`, bondBad);
+check(`bond อยู่ใน ${BOND_FLOOR}–100 ทุกการ์ด (ลูกที่ตัดขาด ${NOT_MINE.cutTo}–100)`, bondBad);
 check('การ์ดดูแลพา bond เกินค่าเริ่มได้', bondUp ? 0 : 1, ` ${bondUp} คน`);
 check('ญาติช่วยประคองเกิดได้', aided ? 0 : 1, ` ${aided} ครั้ง`);
 check('คนในบ้านจากไปเองทุกครั้งมีการ์ดแจ้ง', lossEvents && lossCards === lossEvents ? 0 : 1, ` ${lossCards}/${lossEvents}`);
