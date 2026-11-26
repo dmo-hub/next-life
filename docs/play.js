@@ -367,6 +367,9 @@ const HERD_KINDS = {
 };
 // ความสุขที่เสียไปตอนคู่ใจตายตามอายุขัย (ตายจากการ์ดป่วย/หาย การ์ดใบนั้นหักเอง)
 const PET_GRIEF = 6;
+// ผลรายปีของคู่ใจคูณตามความผูกพัน: 1 + (bond − mid) / per ตัดช่วง min–max · ค่าเลี้ยงไม่คูณ
+// mid = มัธยฐานความผูกพันรายปีของคู่ใจจากการจำลอง — ค่าสถานะรวมจากคู่ใจจึงแทบไม่ขยับ · การ์ดดูแลสัตว์เปลี่ยนต้องวัดใหม่
+const PET_BOND = { mid: 62, per: 10, min: 0.5, max: 1.5 };
 // ติดบ้านตอนเกิด: บ้านฐานะดี (ชั้น ≥ richFrom) · บ้านในเมือง (ภาค city) · บ้านนอก — [โอกาส, ชนิด] คู่ใจกับฝูงสุ่มแยกกัน ได้ทั้งคู่ก็ได้
 const PET_AT_BIRTH = {
   richFrom: 7,
@@ -516,6 +519,28 @@ const exSpouseOk = (st, w) => exSpouseOf(st, w) !== null;
 function focusExSpouse(st, w) {
   const m = exSpouseOf(st, w);
   if (m) st.kinFocus.spouse = m.id;
+}
+
+// พักใจหลังหย่า (ใบ 96 ข้อ 163): when.love_free = ไม่ได้หย่าภายใน LOVE_PAUSE ปี · การ์ดหาคู่ทุกใบต้องติด (lint love-free)
+const LOVE_PAUSE = 1;
+const loveFreeOk = (st) => !(st.kin ?? []).some((m) => m.divorcedAge !== undefined && st.age - m.divorcedAge < LOVE_PAUSE);
+// คนหย่า/คนม่ายตัดสินจากชีวิตคู่ที่จบล่าสุด — คนเคยม่ายแล้วหย่ารอบหลังคือคนหย่า และกลับกัน · ยังมีคู่ตามกฎหมาย = ไม่ใช่ทั้งสองอย่าง
+// คืนค่าอายุเราตอนหย่า (null = ไม่ใช่คนหย่า) · คู่เก่าที่ตายหลังหย่ายังนับว่าหย่า (ข้อ 164)
+function divorcedSince(st) {
+  let last = null;
+  for (const m of st.kin ?? []) {
+    if (m.role !== 'spouse') continue;
+    if (!isDivorced(m) && m.alive) return null;
+    const divorced = isDivorced(m);
+    const age = divorced ? (m.divorcedAge ?? m.leftAge) : m.born + m.diedAge - st.birthYear;
+    if (!last || age >= last.age) last = { age, divorced };
+  }
+  return last?.divorced ? last.age : null;
+}
+// when.divorced = {after, within} — คนหย่าที่ยังโสด (ไม่มีแฟนในบ้าน) หย่ามาแล้ว after–within ปี
+function divorcedOk(st, w) {
+  const age = divorcedSince(st);
+  return age !== null && !livingOf(st, 'partner').length && kinInRange(st.age - age, [w.after, w.within]);
 }
 
 const livingOf = (st, role) => st.kin.filter((m) => m.role === role && m.alive && !m.left);
@@ -809,7 +834,7 @@ function kinLost(st, m, age, year, out) {
   out.push(loss);
 }
 
-// ผลต่อปีของสัตว์ (B44): คู่ใจให้ค่าสถานะตามชนิด หักค่าเลี้ยง · ฝูงให้เงินสุทธิ · บาทของปีนั้น — ไม่ดึงเลขสุ่ม
+// ผลต่อปีของสัตว์ (B44): คู่ใจให้ค่าสถานะตามชนิดคูณความผูกพัน หักค่าเลี้ยง · ฝูงให้เงินสุทธิ · บาทของปีนั้น — ไม่ดึงเลขสุ่ม
 function petYear(st, saving) {
   const live = st.kin.filter((m) => ANIMAL.includes(m.role) && m.alive && !m.left);
   if (!live.length) return;
@@ -819,7 +844,8 @@ function petYear(st, saving) {
       continue;
     }
     const k = PET_KINDS[m.kind] ?? {};
-    for (const [stat, v] of Object.entries(k.gives ?? {})) st[stat] = bondClamp(st[stat] + v);
+    const close = Math.max(PET_BOND.min, Math.min(PET_BOND.max, 1 + ((m.bond ?? BOND_START.pet) - PET_BOND.mid) / PET_BOND.per));
+    for (const [stat, v] of Object.entries(k.gives ?? {})) st[stat] = bondClamp(st[stat] + v * close);
     st.money -= (k.cost ?? 0) * saving;
   }
 }
@@ -900,6 +926,8 @@ function kinIllOk(st, w) {
 // เงื่อนไขการ์ดสูญเสีย (when.loss): มีคนในบ้านบทบาทที่ระบุ (ไม่ใส่ = ทุกบทบาท) จากไปเองภายใน within ปีที่ผ่านมา (ไม่ใส่ = ปีนี้)
 // after = ต้องผ่านมาอย่างน้อยกี่ปี (B165 ช่วงไว้ทุกข์ — การ์ดรักใหม่ไม่ขึ้นก่อนพ้นช่วง)
 function lossOk(st, w) {
+  // B165 เป็นของคนม่าย: คนที่ชีวิตคู่ล่าสุดจบด้วยการหย่ามีการ์ดชุดของตัวเอง (when.divorced)
+  if (w.after > 0 && w.roles?.includes('spouse') && divorcedSince(st) !== null) return false;
   const year = kinYearOf(st);
   const match = (st.kinLoss ?? []).filter((l) => !w.roles || w.roles.includes(l.role));
   // after > 0: ช่วงไว้ทุกข์นับจากการสูญเสียล่าสุดเท่านั้น — คู่คนก่อนที่จากไปนานแล้วต้องไม่ปลดล็อกให้ตอนคู่คนใหม่เพิ่งตาย
@@ -4790,6 +4818,8 @@ function newLife(seed, content, heir = null) {
     ...(heir?.skills?.length && { skills: heir.skills }),
     // ค่าที่ได้จากช่องพกที่ไม่ใช้ (ใบ 201) — การ์ดเกิดบอกเป็นคำ · เซฟเก่าไม่มี = ไม่มีบรรทัด
     ...(heir?.spare && { spare: heir.spare }),
+    // ข้อห้ามตระกูล {ชนิด: ระยะรุ่น} (dynasty-3) — แยกจาก parentFlags เพราะถือได้ไกลกว่าเพดาน tier · เซฟเก่าไม่มีช่องนี้ อ่านแบบ ?.
+    taboos: heir?.taboos ?? {},
     scheduled: [],
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
@@ -6054,6 +6084,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
     // เพราะ harness/เซฟ/ผลย้อนจับตัวเลือกด้วยเลขลำดับในเนื้อหา · ใบที่ไม่มีป้ายไม่มีช่องนี้
     ...(ev.choices.some((c) => c.gate || c.show_if || c.hide_if || c.only_sex) && { hidden: ev.choices.map((c) => gateShut(st, c) || choiceHidden(st, c) || sexShut(st, c)) }),
     ...moneyShort(ev, st),
+    ...reluctantField(st, ev),
   });
 }
 
@@ -6153,8 +6184,9 @@ function lockReason(st, c, extra = 0) {
   // ตายแล้ว (การ์ดงานศพ) หนี้ต้องหักก่อน — จ่ายได้ไม่เกินทรัพย์สุทธิ ค่างานศพจึงไม่ทำให้ตายพร้อมหนี้
   const purse = (st.dead ? deadPurse(st) : st.money) + extra;
   if (q.money && purse < moneyValue(st, q.money, true)) why.push(['money', 'เงินไม่พอ']);
+  let soft = 0;
   for (const [k, b] of Object.entries(q.stats ?? {})) {
-    if (b.min !== undefined && st[k] < b.min) why.push(['stats', k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`]);
+    if (b.min !== undefined && st[k] < b.min) { why.push(['stats', k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`]); if (b.min - st[k] <= RELUCT.gap) soft++; }
     if (b.max !== undefined && st[k] > b.max) why.push(['stats', `${STAT_LABELS[k]}มากเกินไป`]);
   }
   if (q.flags && !flagsOk(st, q.flags)) why.push(['flags', 'ยังไม่เข้าเงื่อนไข']);
@@ -6165,9 +6197,53 @@ function lockReason(st, c, extra = 0) {
   if (!why.length) return null;
   // เหตุแยกข้อมาก่อน · R3 (เจ้าของเคาะ 2026-11-09): เหตุเรื่องเล่าก่อนเหตุเงิน (แอบสอบ + เงินไม่พอ → "ต้องให้ที่บ้านเซ็นยินยอม")
   // ไม่มีเหตุแยกข้อ = reason รวม · ไม่มีทั้งคู่ = เหตุอัตโนมัติ
+  // ฝืนใจ: ขาดแค่ค่าสถานะไม่เกินเพดานทุกตัว = กดได้ · ขาดเงิน/ธง/วุฒิ/ครอบครัว หรือขาดเกินเพดาน ยังล็อกด้วยเหตุผลเดิม
+  if (q.reluctant && soft === why.length) return null;
   const own = why.find(([k]) => k !== 'money' && q.reasons?.[k]) ?? why.find(([k]) => q.reasons?.[k]);
   if (own) return q.reasons[own[0]];
   return q.reason ?? why.map(([, t]) => t).join(' · ');
+}
+
+// ตัวเลือกฝืนใจ (dynasty-4) + ผิดข้อห้ามตระกูล (dynasty-3) ใช้ช่องเดียวกัน card.reluctant — ป้ายเป็นคำ ไม่บอกเลขที่ขาด (แนว goal.mjs)
+// gap = ค่าสถานะที่ขาดได้ไม่เกินเท่านี้ · cost = ระดับความสุขที่เสียตอนฝืน · taboo = ระดับความสุขที่เสียตอนผิดข้อห้ามที่บ้านยังรู้ต้นเหตุ
+const RELUCT = { gap: 10, cost: -2, taboo: -1 };
+
+// ตัวเลือกที่ requires.reluctant ซึ่งค่าสถานะยังไม่ถึงแต่กดได้ (ไม่ล็อก) — ถึงเกณฑ์แล้วเป็นตัวเลือกปกติ
+function reluctantWhy(st, c) {
+  const q = c.requires;
+  if (!q?.reluctant) return null;
+  const short = Object.entries(q.stats ?? {}).filter(([k, b]) => b.min !== undefined && st[k] < b.min);
+  if (!short.length || lockReason(st, c)) return null;
+  return q.reason ?? short.map(([k]) => (k === 'network' ? 'ยังไม่มีเส้นสายพอ' : `${STAT_LABELS[k]}ไม่ถึง`)).join(' · ');
+}
+
+// ข้อห้ามที่ตัวเลือกนี้ผิด [[ชนิด, ระยะ]] — นับเฉพาะที่ผู้เล่นเลือกเอง (ธงบนตัวเลือก หรือป้าย breaks) ผลสุ่มที่ตั้งธงไม่นับ
+function tabooHits(st, c) {
+  const reg = st.content.taboo ?? {};
+  return Object.entries(st.taboos ?? {}).filter(([k]) => reg[k] && (c.breaks?.includes(k) || (reg[k].breaks?.flags ?? []).some((f) => c.sets_flags?.includes(f))));
+}
+
+function reluctantLabel(st, c) {
+  const r = reluctantWhy(st, c);
+  const reg = st.content.taboo ?? {};
+  const parts = [...(r ? [`${r} · ฝืนใจ`] : []), ...tabooHits(st, c).map(([k, d]) => (d <= TABOO.know ? `ผิดคำที่บ้านถือ · ${reg[k].tell}` : reg[k].faded))];
+  return parts.length ? parts.join(' · ') : null;
+}
+
+// ช่องเฉพาะการ์ดที่มีตัวฝืนใจ (แบบ moneyGap) — การ์ดอื่นรูปเดิมทุกช่อง
+function reluctantField(st, ev) {
+  const reluctant = ev.choices.map((c) => reluctantLabel(st, c));
+  return reluctant.some((x) => x) ? { reluctant } : {};
+}
+
+// คิดจาก state ตอนกด ไม่ใช่จากการ์ดที่วาด — เซฟ/ผู้เรียกที่ไม่ผ่านหน้าจอได้ผลเท่ากัน · ผิดข้อห้ามแล้วข้อนั้นไม่ส่งต่อรุ่นถัดไป (ทุกระยะ)
+function payReluctance(st, c) {
+  let fx = reluctantWhy(st, c) ? levelValue(RELUCT.cost) : 0;
+  for (const [k, d] of tabooHits(st, c)) {
+    (st.tabooBroken ??= {})[k] = true;
+    if (d <= TABOO.know) fx += levelValue(RELUCT.taboo);
+  }
+  if (fx) st.happiness = clamp(st.happiness + fx);
 }
 
 // ดัชนีตัวเลือกที่กดได้ — บอทเลือกจากชุดนี้เท่านั้น · ไม่มีตัวล็อก = ทุกตัว (ลำดับสุ่มของบอทจึงเหมือนก่อนมีการล็อก)
@@ -6704,6 +6780,8 @@ function whenOk(st, when) {
   if (when.child_far && !childFarOk(st, when.child_far)) return false;
   if (when.child_not_mine && !childNotMineOk(st, when.child_not_mine)) return false;
   if (when.ex_spouse && !exSpouseOk(st, when.ex_spouse)) return false;
+  if (when.love_free && !loveFreeOk(st)) return false;
+  if (when.divorced && !divorcedOk(st, when.divorced)) return false;
   if (when.filial && !filialOk(st, when.filial)) return false;
   if (when.spouse && !spouseOk(st, when.spouse)) return false;
   if (when.heredity && !heredityOk(st, when.heredity)) return false;
@@ -6756,6 +6834,14 @@ function raiseFlag(st, f) {
   if (f === 'caught_fraud' && !st.flags[f]) greySeize(st, GREY.seize);
   st.flags[f] = true;
   st.flagAge[f] ??= st.age;
+}
+
+// ข้อห้ามตระกูล (dynasty-3): ระยะ 1–2 รุ่นบ้านยังรู้ต้นเหตุ · ถึง forget หายจากบ้าน
+const TABOO = { know: 2, forget: 5 };
+
+// ต้นเหตุข้อห้ามที่ไม่มีธงจากเนื้อหา (ค้ำแล้วโดนตามหนี้) — แกนตั้งธงตอนตอบการ์ดในรายชื่อของทะเบียน
+function markTaboo(st, ev) {
+  for (const t of Object.values(st.content.taboo ?? {})) if (t.mark?.cards.includes(ev.id)) raiseFlag(st, t.mark.flag);
 }
 
 // ป้ายบุญบาปเข้าบัญชีซ่อน · ธง · นัดเหตุการณ์ต่อเนื่อง (ใบ 07) — นัดสุ่มปีจาก rng ของโลก เพราะเป็นผลของการเลือก
@@ -6885,6 +6971,8 @@ function choose(st, idx, loan) {
   // เติมข้อความก่อนผลลง — {เงิน} ต้องเป็นยอดตอนที่ผู้เล่นเห็นตัวเลือก
   const text = fill(ev.choices[idx].text, st);
   const c = ev.choices[idx];
+  markTaboo(st, ev);
+  payReluctance(st, c);
   if (ev.id === FUNERAL.rite) {
     st.funeral = { id: c.id, text, cost: c.effects?.money ? -moneyValue(st, c.effects.money) : 0 };
     // คนมาส่งทำบุญอุทิศให้ — ลงบัญชีก่อนถึงปรโลก
@@ -10561,6 +10649,16 @@ const heirFlags = (st, tier) => Object.fromEntries(Object.entries(st.content.hei
 // ธงเลี้ยงดูไม่มีทางส่งต่อ (ไม่มีการ์ดไหนตั้ง · ตัวเลือกเลี้ยงลูกเป็นใบแยก) · ไม่ดึงเลขสุ่ม
 const heirHome = (st, tier) => (tier === 1 ? Object.fromEntries(Object.entries(st.content.home ?? {}).filter(([, h]) => h.from_life_flags && (h.from_life_flags.some((f) => st.flags[f]) || st.bankruptcies > 0)).map(([f]) => [f, 1])) : {});
 
+// ข้อห้ามตระกูลของทายาท: ที่บ้านถืออยู่ห่างออกไปอีก tier · ต้นเหตุชาตินี้เริ่มที่ระยะ tier · ซ้อนกันเอาระยะใกล้ · ถึง TABOO.forget หาย
+// ต้นเหตุ = เคยติดธง (flagAge จดไว้แม้ธงถูกล้าง) · ชาตินี้ฝ่าฝืน (tabooBroken) = ข้อห้ามเดิมไม่ส่งต่อ · ไม่ดึงเลขสุ่ม
+const everFlag = (st, f) => !!st.flags[f] || st.flagAge?.[f] !== undefined;
+function heirTaboos(st, tier) {
+  const out = {};
+  for (const [k, d] of Object.entries(st.taboos ?? {})) if (!st.tabooBroken?.[k] && d + tier < TABOO.forget) out[k] = d + tier;
+  for (const [k, t] of Object.entries(st.content.taboo ?? {})) if (tier < TABOO.forget && t.cause.flags.some((f) => everFlag(st, f))) out[k] = Math.min(out[k] ?? tier, tier);
+  return out;
+}
+
 function makeHeir(af, r) {
   const st = af.st;
   const era = st.content.era;
@@ -10568,7 +10666,7 @@ function makeHeir(af, r) {
   const rng = af.rng;
   const lastBirth = era.births.from + era.births.w.length - 1;
   let sex = rng.next() < 0.5 ? 'ชาย' : 'หญิง', name = null;
-  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null;
+  let cls, region, birthYear, parents = null, legacy = null, tier = null, occupation = null, familyLadder = null, province = null, religion = null, parentFlags = {}, homeFlags = {}, letter = null, taboos = {};
   const death = deathStanding(st);
   // เป้าตระกูลที่เพิ่งสำเร็จรุ่นนี้ ได้ชื่อเสียง +1 ต่อข้อ (ครั้งเดียวต่อตระกูล)
   const goals = goalsMet(st, (st.estate?.money ?? 0) < 0);
@@ -10591,6 +10689,7 @@ function makeHeir(af, r) {
     if (me) ({ sex, name } = me);
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
+    taboos = heirTaboos(st, tier.tier);
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
@@ -10692,6 +10791,7 @@ function makeHeir(af, r) {
     parentFlags,
     homeFlags,
     letter,
+    taboos,
     // ส่วนที่บ้านส่งต่อ แยกจาก bonus (ซึ่งรวมผลกรรม) ให้การ์ดเปิดชีวิตเล่าทิศได้โดยไม่เผยบัญชี
     kin: { relations: kin('relations'), network: kin('network') },
     lineage,
