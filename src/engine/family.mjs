@@ -266,6 +266,10 @@ function courtDue(st, m, after = COURT_STEP_YEARS) {
 }
 // เดินขั้นคนจีบปีละครั้ง (เรียกใน ageKin): ครบกำหนด met→courting→แฟน (becomePartner · เข้าบ้านตอนเป็นแฟนตามข้อ 305) · ขอแต่งเป็นของการ์ด/ใบ 173
 export function stepCourtship(st) {
+  // มีแฟนหรือคู่ตามกฎหมายแล้ว คนจีบหลุด — แต่งผ่านการ์ดอื่นระหว่างจีบ ต้องไม่ได้แฟนซ้อน (แฟน 1 คน)
+  if (st.kin.some((m) => m.alive && ((m.role === 'spouse' && !isDivorced(m)) || (m.role === 'partner' && !m.left)))) {
+    for (const m of livingOf(st, 'courter')) dropCourter(st, m);
+  }
   for (const m of st.kin) {
     if (m.role !== 'courter' || !m.alive || m.left || m.due === undefined || st.age < m.due) continue;
     if (m.stage === 'met') {
@@ -284,7 +288,7 @@ export function stepCourtship(st) {
 export function becomePartner(st, m) {
   if (!m || !m.alive || m.role === 'partner' || m.role === 'spouse') return null;
   // เลือกคนเดียวเป็นแฟน คนจีบที่เหลือหลุด (ข้อ 307) · ออกจากรายชื่อคนจีบแต่ชื่อยังอยู่ในบันทึก
-  for (const o of st.kin) if (o !== m && o.role === 'courter' && o.alive && !o.left) { o.left = true; o.leftAge = st.age; o.status = 'dropped'; }
+  for (const o of livingOf(st, 'courter')) if (o !== m) dropCourter(st, o);
   m.role = 'partner';
   m.since = st.age;
   m.bond = m.bond ?? BOND_START.partner;
@@ -292,6 +296,11 @@ export function becomePartner(st, m) {
   delete m.leftAge;
   delete m.status;
   return m;
+}
+function dropCourter(st, m) {
+  m.left = true;
+  m.leftAge = st.age;
+  m.status = 'dropped';
 }
 function marryPartner(st, m) {
   m.born = Math.min(m.born, kinYearOf(st) - COURT_MIN.spouse);
@@ -385,6 +394,11 @@ export function applyFamily(st, c, care = 0) {
     if (op.add === 'pet' && livingOf(st, 'pet').length) continue;
     if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : op.adopted ? { adopted: true, age: op.age } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
+    // คนจีบหลุด (โดนปฏิเสธ/เราปฏิเสธ): เฉพาะคนเป้าของการ์ด — สั่งซ้ำบนใบเดียวไม่ลามไปอีกคน
+    if (op.drop) {
+      const m = focusOf(st, op.drop);
+      if (m?.alive && !m.left) dropCourter(st, m);
+    }
     if (op.leave) for (const m of livingOf(st, op.leave)) {
       m.left = true;
       m.leftAge = st.age;

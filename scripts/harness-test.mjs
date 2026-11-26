@@ -1460,6 +1460,37 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 172 คนจีบ → แฟน (becomePartner): id/ชื่อ/เพศ/ปีเกิดเดิม · เริ่มนับปีคบ · ไม่ใช่คนจีบอีก', moved === c && c.role === 'partner' && c.id >= 10000 && c.since === a.age && !familyOk(a, { role: 'courter' }) && familyOf(a).some((m) => m.id === c.id));
 }
 
+// แกนใบ 173: ชื่อคนจีบในข้อความ · คนจีบหลุดจากการ์ด · มีแฟน/คู่แล้วคนจีบไม่กลายเป็นแฟนซ้อน
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const life = () => { const st = newLife(7, content); st.age = 22; pickFocus(st); return st; };
+  const courters = (st) => st.kin.filter((m) => m.role === 'courter' && m.alive && !m.left);
+  const a = life();
+  applyFamily(a, { family: [{ add: 'courter' }] });
+  const [first] = courters(a);
+  pickFocus(a);
+  applyFamily(a, { family: [{ add: 'courter' }] });
+  const second = courters(a)[1];
+  check('ใบ 173 {ชื่อคนจีบ} = คนที่เพิ่งเจอ · {ชื่อคนจีบอีกคน} = อีกคน · ไม่มีคนจีบ = คำกลาง', E.fill('{ชื่อคนจีบ}|{ชื่อคนจีบอีกคน}', a) === `${second.name}|${first.name}` && E.fill('{ชื่อคนจีบ}', life()) === 'คนที่คุยอยู่', E.fill('{ชื่อคนจีบ}|{ชื่อคนจีบอีกคน}', a));
+  const rng = JSON.stringify([a.rng, a.kinRng, a.kinCauseRng]);
+  applyFamily(a, { family: [{ drop: 'courter' }] });
+  applyFamily(a, { family: [{ drop: 'courter' }] });
+  check('ใบ 173 drop courter: คนเป้าหลุดคนเดียว (สั่งซ้ำไม่ลาม) · การ์ดผลยังเรียกชื่อเขา · ไม่ดึงเลขสุ่ม', second.left === true && second.status === 'dropped' && courters(a).length === 1 && courters(a)[0] === first && E.fill('{ชื่อคนจีบ}', a) === second.name && rng === JSON.stringify([a.rng, a.kinRng, a.kinCauseRng]));
+  const run = (add) => {
+    const st = life();
+    applyFamily(st, { family: [{ add: 'courter' }] });
+    if (add) applyFamily(st, { ...(add === 'spouse' && { sets_flags: ['married'] }), family: [{ add }] });
+    for (let age = 23; age <= 30; age++) { st.age = age; ageKin(st, st.birthYear + age + 1); }
+    return { courter: st.kin.find((m) => m.id >= 10000 && m.role !== add), mates: st.kin.filter((m) => ['partner', 'spouse'].includes(m.role) && m.alive && !m.left).length };
+  };
+  for (const add of ['spouse', 'partner']) {
+    const r = run(add);
+    check(`ใบ 173 มี ${add} แล้ว คนจีบหลุด ไม่กลายเป็นแฟนซ้อน`, r.mates === 1 && r.courter?.role === 'courter' && r.courter.left === true, `${r.courter?.role} ${r.mates}`);
+  }
+  check('ใบ 173 ตัวควบคุม: โสด คนจีบเป็นแฟนตามนัด', run(null).mates === 1);
+}
+
 // จดพ่อ/แม่บนตัวลูก (ใบ 91 B114 ข้อ 149 154 166): ลูกจด by = คู่ปัจจุบันตอนเกิด · พ่อ/แม่ของลูกคือคู่คนนั้นแม้หย่าไปแล้ว · เซฟเก่าไม่มี by คิดย้อนจากปีเกิด
 {
   const content = loadContent();
