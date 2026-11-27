@@ -514,6 +514,28 @@ const spouseAge = (rng, sex, age) => (sex === 'หญิง' ? age + rng.int(0, 
 // รุ่นก่อนในฐานะญาติของผู้เล่นใหม่ — หลานเรียกตามฝั่งของพ่อแม่ที่เป็นสายเลือด
 const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1 ? (sex === 'หญิง' ? 'แม่' : 'พ่อ') : linkSex === 'หญิง' ? (sex === 'หญิง' ? 'ยาย' : 'ตา') : sex === 'หญิง' ? 'ย่า' : 'ปู่');
 
+// ญาติที่จากไปก่อนทายาทสายเลือดรับช่วง (ใบ 22 · B76 ข้อ 5): ชื่อจริงจากบ้านรุ่นก่อน เรียกจากมุมทายาท · at = อายุทายาทตอนเขาจากไป (ติดลบ = ก่อนเกิด)
+// ไม่มีชื่อ (เซฟเก่า) / หายไปต่างโลก = ไม่เล่า · เอาคนที่จากไปล่าสุด CHRONICLE_GONE คน
+export const CHRONICLE_GONE = 3;
+function kinGoneOf(st, blood) {
+  const self = speechSex(st);
+  const link = blood.role === 'grandchild' ? st.kin.find((m) => m.id === blood.of) : null;
+  const sexOf = (id) => st.kin.find((m) => m.id === id)?.sex;
+  const out = st.parents
+    .filter((p) => !p.alive && !p.gone && p.name && p.diedAtYou !== undefined)
+    .map((p) => ({ word: link ? 'ทวด' : elderWord(2, self, p.sex), name: p.name, year: st.birthYear + p.diedAtYou }));
+  for (const l of st.kinLoss ?? []) {
+    if (!l.name || l.id === blood.id) continue;
+    const sex = sexOf(l.id);
+    let word = null;
+    if (l.role === 'child' && !link) word = `${st.kin.find((m) => m.id === l.id).born < blood.born ? 'พี่' : 'น้อง'}${sex === 'หญิง' ? 'สาว' : 'ชาย'}`;
+    else if (l.role === 'child' && l.id === link.id) word = sex === 'หญิง' ? 'แม่' : 'พ่อ';
+    else if (l.role === 'spouse' && l.id === parentSpouseOf(st, link ?? blood)?.id) word = link ? elderWord(2, link.sex, sex) : sex === 'หญิง' ? 'แม่' : 'พ่อ';
+    if (word) out.push({ word, name: l.name, year: l.year });
+  }
+  return out.sort((a, b) => a.year - b.year).slice(-CHRONICLE_GONE).map((g) => ({ word: g.word, name: g.name, at: g.year - blood.born }));
+}
+
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
@@ -650,6 +672,7 @@ function makeHeir(af, r) {
   if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
+  const kinGone = blood ? kinGoneOf(st, blood) : [];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -686,6 +709,8 @@ function makeHeir(af, r) {
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
+    // จดหมายเหตุบนการ์ดเปิด (ใบ 22) · ไม่มีใครจากไปก่อน = ไม่มีช่อง
+    ...(kinGone.length && { kinGone }),
     fame,
     ...(overlap && { overlap }),
     // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
