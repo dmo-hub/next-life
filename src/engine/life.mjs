@@ -1281,7 +1281,7 @@ function stepYear(st) {
     if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
   }
   if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeName(st)}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeName(st)}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง`, tag: 'retire' });
     st.office = null;
   }
   if (budgetDue(st)) officeDueCard(budgetCard(st));

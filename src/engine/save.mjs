@@ -11,7 +11,6 @@ import { OFFICE_V1 } from './rank.mjs';
 export const SNAP_V = 1;
 // o = รุ่นเลขขั้นการเมืองในภาพถ่าย · ภาพถ่ายไม่มี o = เลขขั้นก่อนรวบผู้ใหญ่บ้าน/กำนัน (05a) — แปลงตอนโหลด ไม่ขึ้น SNAP_V เพราะโครงภาพถ่ายเหมือนเดิม
 export const OFFICE_SCHEME = 2;
-const OFFICE_V1_SUB = ['ผู้ใหญ่บ้าน', 'กำนัน'];
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
 
 export function snapshot(root, content) {
@@ -73,15 +72,16 @@ export function restore(text, content) {
 function officeV1(root, content) {
   const skip = new Set([content, ...content.events]);
   const seen = new Set();
+  const subs = content.era.careers.office.steps[0].subs.map((s) => s.name);
   const map = (r) => (r >= 0 ? OFFICE_V1[r] ?? r : r);
   const walk = (v) => {
-    if (v === null || typeof v !== 'object' || skip.has(v) || seen.has(v) || typeof v.next === 'function') return;
+    if (v === null || typeof v !== 'object' || skip.has(v) || seen.has(v) || isRng(v)) return;
     seen.add(v);
     if (typeof v.officeTop === 'number') v.officeTop = map(v.officeTop);
     if (typeof v.office === 'number') v.office = map(v.office);
     else if (typeof v.office?.rank === 'number' && !seen.has(v.office)) {
       seen.add(v.office);
-      if (OFFICE_V1_SUB[v.office.rank]) v.office.sub = OFFICE_V1_SUB[v.office.rank];
+      if (subs[v.office.rank]) v.office.sub = subs[v.office.rank];
       v.office.rank = map(v.office.rank);
     }
     for (const x of Array.isArray(v) ? v : Object.values(v)) walk(x);

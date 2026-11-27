@@ -2127,6 +2127,17 @@ const f2 = (v) => v.toFixed(2);
   // ตัวควบคุม: ภาพถ่ายรุ่นใหม่ (มี o) ต้องไม่ถูกแปลงซ้ำ — ไม่งั้นเลขขั้นเซฟใหม่เลื่อนลงทุกครั้งที่โหลด
   const again = E.restore(E.snapshot({ st: life, af: null, card, ui: {} }, content), content).st;
   check('  ตัวควบคุม: เซฟรุ่นใหม่โหลดแล้วเลขขั้นเดิม (ไม่แปลงซ้ำ)', again.office.rank === 1 && !again.office.sub && again.lineage[0].office === 3);
+  // พ้นตำแหน่งตามอายุ: การ์ดผลต้องพกป้ายหมวด retire (หน้าเล่นเลือกภาพจากป้าย)
+  const mid = E.restore(E.snapshot({ st: life, af: null, card, ui: {} }, content), content);
+  const old = mid.st;
+  old.age = 59;
+  old.office = { rank: 0, sub: 'กำนัน', since: 59, next: 70 };
+  let bye = mid.card;
+  for (let k = 0; k < 200 && bye.kind !== 'death' && !bye.text?.includes('จัดงานเลี้ยงส่ง'); k++) {
+    if (bye.choices?.length) E.choose(old, openChoices(bye)[0] ?? 0);
+    bye = E.nextCard(old);
+  }
+  check('ผู้นำท้องถิ่น: อายุ 60 พ้นตำแหน่ง การ์ดผลป้าย retire', bye.text?.includes('ผู้นำท้องถิ่น (กำนัน)') && bye.tag === 'retire' && !old.office, `${bye.tag} · ${bye.text}`);
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));
