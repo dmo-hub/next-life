@@ -10194,7 +10194,7 @@ const mixStanding = (death, fate) => clampIdx(Math.round(STAND_MIX * death + (1 
 // มรดก (ใบ 05 · lore-finance-belief): แบ่งตามจำนวนลูก · ภาษีการรับมรดก 5% ส่วนที่เกิน 100 ล้าน ตั้งแต่ปีที่กฎหมายมีผล
 // จำนวนลูกเป็นค่าตั้งของเกม — ธง has_kids ไม่ได้บอกว่ากี่คน
 // dispute = ส่วนของมรดกที่เสียไปกับการทะเลาะแบ่งกันเองเมื่อไม่มีพินัยกรรม (B25 · ค่าตั้งของเกม)
-const LEGACY = { kids: 2, taxFrom: 100e6, tax: 0.05, taxYear: 2559, richUnits: [10, 40], dispute: 0.1 };
+const LEGACY = { kids: 2, floorKids: 2, taxFrom: 100e6, tax: 0.05, taxYear: 2559, richUnits: [10, 40], dispute: 0.1 };
 // ทางในตระกูล (B18): เกิดเป็นลูก/หลาน/เหลน ยิ่งห่างสายเลือดยิ่งได้ต่อน้อย — ค่าตั้งของเกม
 // w = น้ำหนักสุ่มชั้น · carry คูณสัดส่วนส่งต่อบุญบาป (ลูก 1 = กรอบ CARRY เดิม) · kin คูณความสัมพันธ์/คอนเน็คชั่นของบ้าน
 // legacy คูณมรดกต่อหัว: หลานได้ส่วนของพ่อแม่ที่แบ่งต่อให้ลูก LEGACY.kids คนอีกทอด เหลนอีกทอด
@@ -10635,6 +10635,28 @@ const spouseAge = (rng, sex, age) => (sex === 'หญิง' ? age + rng.int(0, 
 // รุ่นก่อนในฐานะญาติของผู้เล่นใหม่ — หลานเรียกตามฝั่งของพ่อแม่ที่เป็นสายเลือด
 const elderWord = (tier, linkSex, sex) => (tier === 3 ? 'ทวด' : tier === 1 ? (sex === 'หญิง' ? 'แม่' : 'พ่อ') : linkSex === 'หญิง' ? (sex === 'หญิง' ? 'ยาย' : 'ตา') : sex === 'หญิง' ? 'ย่า' : 'ปู่');
 
+// ญาติที่จากไปก่อนทายาทสายเลือดรับช่วง (ใบ 22 · B76 ข้อ 5): ชื่อจริงจากบ้านรุ่นก่อน เรียกจากมุมทายาท · at = อายุทายาทตอนเขาจากไป (ติดลบ = ก่อนเกิด)
+// ไม่มีชื่อ (เซฟเก่า) / หายไปต่างโลก = ไม่เล่า · เอาคนที่จากไปล่าสุด CHRONICLE_GONE คน
+const CHRONICLE_GONE = 3;
+function kinGoneOf(st, blood) {
+  const self = speechSex(st);
+  const link = blood.role === 'grandchild' ? st.kin.find((m) => m.id === blood.of) : null;
+  const sexOf = (id) => st.kin.find((m) => m.id === id)?.sex;
+  const out = st.parents
+    .filter((p) => !p.alive && !p.gone && p.name && p.diedAtYou !== undefined)
+    .map((p) => ({ word: link ? 'ทวด' : elderWord(2, self, p.sex), name: p.name, year: st.birthYear + p.diedAtYou }));
+  for (const l of st.kinLoss ?? []) {
+    if (!l.name || l.id === blood.id) continue;
+    const sex = sexOf(l.id);
+    let word = null;
+    if (l.role === 'child' && !link) word = `${st.kin.find((m) => m.id === l.id).born < blood.born ? 'พี่' : 'น้อง'}${sex === 'หญิง' ? 'สาว' : 'ชาย'}`;
+    else if (l.role === 'child' && l.id === link.id) word = sex === 'หญิง' ? 'แม่' : 'พ่อ';
+    else if (l.role === 'spouse' && l.id === parentSpouseOf(st, link ?? blood)?.id) word = link ? elderWord(2, link.sex, sex) : sex === 'หญิง' ? 'แม่' : 'พ่อ';
+    if (word) out.push({ word, name: l.name, year: l.year });
+  }
+  return out.sort((a, b) => a.year - b.year).slice(-CHRONICLE_GONE).map((g) => ({ word: g.word, name: g.name, at: g.year - blood.born }));
+}
+
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
@@ -10698,7 +10720,9 @@ function makeHeir(af, r) {
     religion = st.religion;
     // ชั้นลูกหารด้วยลูกที่ยังอยู่จริง · หลานจริงหารต่อด้วยพี่น้องของเขา · ชั้นที่ไม่มีคนจริงใช้ตัวคูณเดิมของชั้น
     const sibs = me?.role === 'grandchild' ? grand.filter((g) => g.of === me.of).length : 0;
-    const units = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
+    const share = st.kin ? legacyUnits(st, kids.length) * (tier.tier === 1 ? 1 : sibs ? 1 / sibs : tier.legacy) : legacyUnits(st) * tier.legacy;
+    // พื้นมรดกมีเฉพาะทางสายเลือด: ไม่ต่ำกว่าส่วนเท่าของบ้านที่มีลูก LEGACY.floorKids คน
+    const units = blood ? Math.max(share, legacyUnits(st, LEGACY.floorKids)) : share;
     const rich = LEGACY.richUnits.filter((u) => units >= u).length;
     const wealth = st.estate?.money < 0 ? -1 : rich;
     cls = CLASSES[mixStanding(death, clampIdx(CLASSES.indexOf(st.cls) + wealth + Math.round(x * FATE.childStep)))];
@@ -10771,6 +10795,7 @@ function makeHeir(af, r) {
   if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
+  const kinGone = blood ? kinGoneOf(st, blood) : [];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -10807,6 +10832,8 @@ function makeHeir(af, r) {
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
     // เริ่มกลางวัย (B76): อายุจริงปีที่รุ่นก่อนตาย · newLife อ่านแล้วข้ามวัยเด็ก
     ...(blood && { start: { age: st.birthYear + st.age - blood.born, kinId: blood.id } }),
+    // จดหมายเหตุบนการ์ดเปิด (ใบ 22) · ไม่มีใครจากไปก่อน = ไม่มีช่อง
+    ...(kinGone.length && { kinGone }),
     fame,
     ...(overlap && { overlap }),
     // ก้อน DLC ของตระกูลไปกับทายาททุกทาง · ตระกูลที่ไม่มีช่อง = ปลดครบ ต้องส่ง DLC_OPEN ตรง ๆ ไม่งั้น newLife ใช้ค่าเริ่มของเครื่อง
@@ -10967,6 +10994,55 @@ const spareText = (keys) => (keys.length ? `ติดตัวมาแต่เ
 // ธงบ้านเกิด (ใบ 105): บรรทัดเดียวต่อธงตามลำดับทะเบียน · ไม่มีธง/เซฟเก่า = ไม่มีบรรทัด · ข้อความอยู่ content/rules/flags.yaml home:
 const homeLines = (st) => Object.entries(st.content?.home ?? {}).filter(([f]) => st.homeFlags?.[f]).map(([, h]) => h.tell);
 
+// จดหมายเหตุย้อนหลังของทายาทสายเลือด (ใบ 22 · B76 ข้อ 5): รับช่วงกลางวัยแล้วไม่โหวง — อดีตสุ่ม + ฉากกับรุ่นก่อน/ครู 3 ฉาก + ญาติที่จากไปก่อน
+// อดีตเป็นสีสันล้วน ไม่อ้างการเรียน งาน ศาสนา ที่อยู่ พี่น้อง หรือสุขภาพ (ค่าพวกนั้นมีระบบของมันเอง) · สุ่มจาก stream แยก ไม่กินเลขสุ่มของโลก
+// จำนวนบรรทัดอดีตโตตามอายุที่รับช่วง: อายุต่ำสุดของปุ่ม = 2 บรรทัด ปีละ 1 บรรทัด ไม่เกิน 10
+const CHRONICLE_PAST = [
+  'ตอนเด็กเคยหลงทางในตลาด กว่าจะมีคนพากลับถึงบ้านก็มืดแล้ว',
+  'เคยตกจากที่สูงจนแขนหัก ต้องใส่เฝือกอยู่เดือนกว่า',
+  'ตอนประถมเคยได้รางวัลเรียงความ ใบประกาศยังเก็บอยู่ในลิ้นชัก',
+  'เพื่อนสนิทคนแรกย้ายบ้านไปตอนคุณสิบขวบ แล้วก็ไม่ได้ข่าวกันอีกเลย',
+  'ตอนเด็กกลัวความมืดมาก ต้องเปิดไฟนอนอยู่หลายปี',
+  'เคยแอบเก็บค่าขนมอยู่หลายเดือนเพื่อซื้อของเล่นชิ้นเดียว',
+  'ตอนมัธยมเคยโดดเรียนไปกับเพื่อน แล้วโดนจับได้ทั้งกลุ่ม',
+  'เคยทะเลาะกับเพื่อนจนไม่พูดกันทั้งเทอม แล้วกลับมาดีกันเพราะต้องทำงานกลุ่มด้วยกัน',
+  'ตอนเด็กชอบนั่งดูผู้ใหญ่ทำงานจนเลยเวลานอน',
+  'เคยเกือบจมน้ำตอนเด็ก ตั้งแต่นั้นก็ไม่ค่อยกล้าลงน้ำลึก',
+  'เคยวิ่งล้มกลางสนามวันกีฬาสีต่อหน้าคนทั้งโรงเรียน',
+  'ช่วงวัยรุ่นเคยแอบชอบคนในห้องอยู่ปีกว่า ไม่เคยกล้าบอก',
+  'เคยหนีออกจากบ้านไปค้างบ้านเพื่อนคืนหนึ่ง กลับมาโดนดุยกใหญ่',
+  'ตอนสิบสองขวบได้ค่าขนมเพิ่มจากการช่วยงานบ้านเป็นครั้งแรก',
+];
+// {e} = รุ่นก่อนตามที่ทายาทเรียก + ชื่อ ("พ่อสมชาย" · "ปู่สมชาย")
+const CHRONICLE_ELDER = [
+  '{e}เคยพาคุณไปเที่ยวไกลบ้าน คุณหลับตลอดทางทั้งขาไปและขากลับ',
+  '{e}สอนคุณขี่จักรยาน ปล่อยมือไปตอนไหนคุณก็ไม่รู้ตัว',
+  'คืนหนึ่งคุณไข้ขึ้นสูง {e}นั่งเช็ดตัวให้จนเช้า',
+  '{e}เคยตีคุณครั้งเดียว เพราะคุณโกหกเรื่องเงิน',
+  'วันรับใบประกาศ {e}มาสายแต่ก็มาจนได้ ยังใส่ชุดทำงานอยู่เลย',
+  '{e}ชอบเล่าเรื่องสมัยตัวเองยังหนุ่มยังสาวให้ฟังก่อนนอน',
+];
+const CHRONICLE_TEACHER = [
+  'ครูประจำชั้นตอนประถมเคยเรียกคุณไปคุยหลังเลิกเรียน บอกว่าคุณทำได้ดีกว่าที่ตัวเองคิด',
+  'ครูคนหนึ่งเคยให้คุณยืมหนังสือ ป่านนี้คุณยังไม่ได้เอาไปคืน',
+  'ครูพละเคยสั่งให้คุณวิ่งรอบสนามจนหมดคาบ เพราะมาสาย',
+];
+const CHRONICLE_ELDER_SCENES = 2;
+const CHRONICLE_PAST_MAX = 10;
+const pickSome = (rng, xs, n) => {
+  const left = [...xs];
+  return Array.from({ length: Math.min(n, left.length) }, () => left.splice(rng.int(0, left.length - 1), 1)[0]);
+};
+const goneAt = (at) => (at < 0 ? 'ก่อนคุณเกิด' : at === 0 ? 'ปีที่คุณเกิด' : `ตอนคุณอายุ ${at}`);
+function chronicleLines(st, heir) {
+  const rng = makeRng(st.seed ^ 0x22c4b76d);
+  const elder = `${heir.legacy.from}${st.lineage.findLast((l) => !l.isekai).name ?? ''}`;
+  const past = pickSome(rng, CHRONICLE_PAST, Math.min(CHRONICLE_PAST_MAX, 2 + st.age - HEIR_AGE[0]));
+  const scenes = [...pickSome(rng, CHRONICLE_ELDER, CHRONICLE_ELDER_SCENES).map((s) => s.replace('{e}', elder)), ...pickSome(rng, CHRONICLE_TEACHER, 1)];
+  const gone = heir.kinGone?.length ? [`ญาติที่จากไปก่อน: ${heir.kinGone.map((g) => `${g.word}${g.name} (${goneAt(g.at)})`).join(' · ')}`] : [];
+  return [...past, ...scenes, ...gone];
+}
+
 function introCard(st, heir) {
   return {
     kind: 'intro',
@@ -10977,7 +11053,7 @@ function introCard(st, heir) {
     text: st.age > 0
       ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
       : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
-    story: [familyText(st), eraText(st), ...homeLines(st), ...(st.spare ? [spareText(st.spare)] : [])],
+    story: [familyText(st), eraText(st), ...homeLines(st), ...(st.spare ? [spareText(st.spare)] : []), ...(heir?.start && heir.legacy && st.lineage?.length ? chronicleLines(st, heir) : [])],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),
