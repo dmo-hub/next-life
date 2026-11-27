@@ -136,7 +136,7 @@ const deckSeen = { regions: 0, dispute: 0, power: 0 }, contEvents = [];
 const REGION_BY_NAME = Object.fromEntries(Object.entries(CONT_REGIONS).map(([id, r]) => [`${CONT_LIFE.name} · ${r.name}`, id]));
 const DECK_RAW = /\{(land|major|falling|rising|dispute)\}/;
 let warnBad = 0, warnSeen = 0, warnFocus = 0, warnFocusBad = 0;
-const lens = [], clicks = [], humanAges = [];
+const lens = [], clicks = [], humanAges = [], raceAges = {};
 const commonerName = roleInfo('commoner').name;
 Object.values(BOTS).forEach((bot, b) => {
   for (let i = 0; i < n; i++) {
@@ -238,6 +238,7 @@ Object.values(BOTS).forEach((bot, b) => {
       moveCards += mc.length;
       moveCount.push(moves.length);
       contSeen.race.add(isk.race);
+      (raceAges[isk.race] ??= []).push(isk.age);
       contEvents.push(a.cards.filter((c) => c.step === 'event').length);
     } else if (a.cards.some((c) => c.step === 'move') || isk.moves) moveBad++;
     for (const c of a.cards) if ((typeof c.age === 'number' && !Number.isInteger(c.age)) || (c.status && !Number.isInteger(c.status.age))) ageFrac++;
@@ -274,6 +275,7 @@ check('ศาล: ดื่มเกินเพดานถูกเรีย�
 const total = n * Object.keys(BOTS).length;
 for (const xs of [lens, clicks, humanAges]) xs.sort((x, y) => x - y);
 const p50 = (xs) => xs[xs.length >> 1];
+const avg = (xs = []) => (xs.length ? xs.reduce((s, v) => s + v, 0) / xs.length : 0);
 console.log(`ชาติต่างโลก ${n} ต่อบอท × ${Object.keys(BOTS).length} บอท · seed ${seed} · การ์ด min/p50/max ${lens[0]}/${p50(lens)}/${lens.at(-1)} · กดต่อชาติ p50 ${p50(clicks)} · สิ้นอายุ (มนุษย์) p50 ${p50(humanAges)}`);
 check('seed เดิมผลเดิม (รวดเดียว)', mismatch, `${total} ชาติ`);
 check('เซฟ/โหลดกลางทางได้การ์ดเดิม', resumeBad);
@@ -292,6 +294,17 @@ check('เตือนแล้วเปลี่ยนโฟกัส: ชี�
 // กดน้อยกว่าชาติไทยชัดเจน (เจ้าของเคาะ) · อายุขัยแบบมนุษย์ ไม่สั้นจนวัยชราหาย ไม่ยาวจนวัยชราน่าเบื่อ
 check('กดต่อชาติ p50 ไม่เกิน 40', p50(clicks) > 40 ? 1 : 0, `p50 ${p50(clicks)}`);
 check('สิ้นอายุ (มนุษย์) p50 อยู่ในช่วง 65–95', p50(humanAges) < 65 || p50(humanAges) > 95 ? 1 : 0, `p50 ${p50(humanAges)}`);
+// ช่วงเดียวกับมนุษย์คูณ pace ของเผ่าเกิด · เฉลี่ยทุกการตาย (รวมตายก่อนสิ้นอายุ) · เผ่าที่ไม่มีชาติให้วัดนับว่าตก
+const raceBand = (r) => [65, 95].map((y) => y * CONT_RACES[r].pace);
+const raceAgeOut = (ages) => Object.keys(CONT_RACES).filter((r) => {
+  const [lo, hi] = raceBand(r);
+  const m = avg(ages[r]);
+  return !(m >= lo && m <= hi);
+});
+const raceOut = raceAgeOut(raceAges);
+for (const r of Object.keys(CONT_RACES)) {
+  check(`อายุตายเฉลี่ย ${CONT_RACES[r].name} อยู่ในช่วง ${raceBand(r).map((y) => +y.toFixed(1)).join('–')}`, raceOut.includes(r) ? 1 : 0, `${avg(raceAges[r]).toFixed(1)} · pace ${CONT_RACES[r].pace} · ${raceAges[r]?.length ?? 0} ชาติ`);
+}
 check('ความรู้อันตรายเฉพาะวัยผู้ใหญ่ขึ้นไป', knowAdultBad);
 // ทุกครั้งที่บอกว่าโลกจะจำ ต้องลงรายการจริง และชื่อเสียงถึงเกณฑ์ (สำเร็จ + คนยอมรับ)
 check('โลกจำเฉพาะที่ชื่อเสียงถึง', loreBad + (loreSys !== loreGot ? 1 : 0), `${loreGot} รายการ`);
@@ -304,7 +317,6 @@ const potionMiss = [
   ...POTION_SRC.filter((id) => !potionFrom.some((s) => s?.has(id))).map((id) => `ไม่มีบอทไหน:${id}`),
   ...POTION_SRC.filter((id) => !potionFrom[RANDOM_BOT]?.has(id)).map((id) => `สุ่ม:${id}`),
 ];
-const avg = (xs = []) => (xs.length ? xs.reduce((s, v) => s + v, 0) / xs.length : 0);
 const shopAvg = avg(potionAdd.shop), otherAvg = avg(potionAdd.other);
 check('ยาต่ออายุ: อายุที่ต่อไม่เกินเพดาน · บาปเฉพาะขวดที่เกิน · ทุกทางมีบอทถึงและบอทสุ่มถึงครบ', potionBad + potionMiss.length + (potionOver ? 0 : 1), `${POTION_SRC.length} ทาง · ดื่มเกิน ${ISEKAI_POTION.free} ขวด ${potionOver} ชาติ${potionMiss.length ? ` · ขาด ${potionMiss.slice(0, 6).join(' ')}` : ''}`);
 check('ซื้อร้านอย่างเดียวไม่ชนะขาด', !otherAvg || shopAvg > otherAvg * 1.5 ? 1 : 0, `ต่อเฉลี่ย ร้าน ${shopAvg.toFixed(1)} · ทางอื่น ${otherAvg.toFixed(1)} · ปน ${avg(potionAdd.mix).toFixed(1)} ปี`);
@@ -622,6 +634,8 @@ const ctl = [
   ['ข้อความทำบุญปกติไม่นับรั่ว', leakOf({ text: 'คนที่บ้านทำบุญให้คุณทุกวันพระ' }) === 0],
   ['HP ทะลุเพดาน', rangeOf({ hp: 101, goal: 0, gold: 0, fame: 0, str: 1, mag: 1, cha: 1, luk: 1 }) > 0],
   ['ทองติดลบ', rangeOf({ hp: 50, goal: 0, gold: -1, fame: 0, str: 1, mag: 1, cha: 1, luk: 1 }) > 0],
+  // ตัดอายุตายจริงของทีละเผ่าเหลือครึ่ง ด่านต้องชี้เผ่านั้นเพิ่มเผ่าเดียว
+  ['เผ่าตายเร็วผิดช่วง', Object.keys(CONT_RACES).every((r) => raceAgeOut({ ...raceAges, [r]: (raceAges[r] ?? []).map((a) => a / 2) }).join() === Object.keys(CONT_RACES).filter((x) => x === r || raceOut.includes(x)).join())],
 ];
 check('ตัวควบคุม', ctl.filter(([, ok]) => !ok).length, ctl.filter(([, ok]) => !ok).map(([k]) => k).join(' '));
 
