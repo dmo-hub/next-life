@@ -80,6 +80,9 @@ function inheritText(st, heir) {
   else out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
   if (who && heir.legacy) {
     out.push(legacyText(heir.legacy, who));
+    // ของตกทอด (ใบ 25): ชื่อของ + เจ้าของเดิม + เรื่องเล่าติดของจากทะเบียน
+    const loom = heir.heirloom && st.content.items.list[heir.heirloom.id];
+    if (loom) out.push(`ของตกทอด — ${loom.name}ของ${heir.heirloom.from} อยู่ในช่อง${st.content.items.slots[loom.slot]}ของคุณ · ${loom.text}`);
     for (const k of ['relations', 'network']) {
       const line = kinText(k, heir.kin?.[k] ?? 0, who);
       if (line) out.push(line);

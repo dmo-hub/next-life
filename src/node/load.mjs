@@ -528,6 +528,8 @@ export function loadItems(p = 'content/rules/items.yaml') {
     if (typeof it?.name !== 'string' || !it.name.trim() || it.name.length > MAX_LEN.title) bad.push(`${id}: name ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.title}`);
     if (typeof it?.text !== 'string' || !it.text.trim() || it.text.length > MAX_LEN.text) bad.push(`${id}: text ต้องเป็นข้อความไม่ว่าง ≤ ${MAX_LEN.text}`);
     if (!isMoney(it?.sell)) bad.push(`${id}: sell ต้องเป็นเงิน {unit, amount}`);
+    // ของตกทอด (ใบ 25): ตรวจรูปชื่อธงที่นี่ · ธงต้องมีการ์ดตั้งได้จริง ตรวจใน harness-test (ตัวโหลดไม่เห็นการ์ด)
+    if (it?.from_flag !== undefined && !(typeof it.from_flag === 'string' && /^[a-z0-9_]+(:[a-z0-9_]+)?$/.test(it.from_flag))) bad.push(`${id}: from_flag ต้องเป็นชื่อธง a-z0-9_ (มี :ชนิด ได้) ได้ ${it.from_flag}`);
   }
   if (bad.length) throw new Error(`${p} ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
   return { slots, cap: doc.cap, list: doc.items ?? {} };

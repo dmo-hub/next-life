@@ -338,6 +338,8 @@ export function newLife(seed, content, heir = null) {
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
     // คนตายที่ตระกูลจำได้ (deadKinOf) — มีเฉพาะตระกูลค่าซ้อน > 0 · เซฟเก่าไม่มีช่อง = ยังไม่มีผีญาติ
     ...(heir?.deadKin && { deadKin: heir.deadKin }),
+    // ของตกทอดจากรุ่นก่อน (ใบ 25) · ไม่มีของ = ไม่มีช่อง items เหมือนชีวิตที่ยังไม่เคยได้ของ
+    ...(heir?.heirloom && { items: heirItems(content.items, heir.heirloom.id) }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -932,7 +934,14 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
 }
 
 // ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
-export const itemsOf = (st) => st.items ?? { wear: Object.fromEntries(Object.keys(st.content.items.slots).map((k) => [k, null])), bag: [], cap: st.content.items.cap };
+const emptyItems = (reg) => ({ wear: Object.fromEntries(Object.keys(reg.slots).map((k) => [k, null])), bag: [], cap: reg.cap });
+export const itemsOf = (st) => st.items ?? emptyItems(st.content.items);
+// ของตกทอด (ใบ 25): ทายาทเกิดมาพร้อมชิ้นเดียวที่รุ่นก่อนส่งให้ ลงช่องชนิดของมัน
+function heirItems(reg, id) {
+  const it = emptyItems(reg);
+  it.wear[reg.list[id].slot] = id;
+  return it;
+}
 // จอโชว์ช่องไอเทมเมื่อโลกซ้อนทับถึงขั้น 3 หรือมีของแล้ว — ก่อนนั้นช่องว่างเปล่าบอกใบ้ระบบที่ผู้เล่นยังไปไม่ถึง
 export const itemsVisible = (st) => overlapStageOf(st) >= 3 || (st.items ? Object.values(st.items.wear).some(Boolean) || st.items.bag.length > 0 : false);
 

@@ -40,3 +40,17 @@ items:
     slot: outfit
     sell: {unit: income_x, amount: 0.5}
     text: "ปลอกแขนกิลด์ขาดไปครึ่งวง ยังอ่านเลขทะเบียนของเจ้าของเดิมออก"
+  # ของตกทอด (ใบ 25): ไม่มีการ์ดไหน loot ได้ · แกนส่งให้ทายาทในตระกูลเมื่อรุ่นก่อนถือธง from_flag (afterlife heirloomOf)
+  # text = เรื่องเล่าติดของ ขึ้นในกล่องสิ่งที่สืบทอดของการ์ดเปิด · สักยันต์ (has_amulet:yantra) ติดตัวคน ส่งต่อไม่ได้ จึงไม่มีชิ้นในทะเบียน
+  heir_phra:
+    name: พระเครื่ององค์เล็ก
+    slot: charm
+    from_flag: has_amulet:phra
+    sell: {unit: income_x, amount: 0.3}
+    text: "พระองค์เล็กที่ห้อยคอมาทั้งชีวิต กรอบเลี่ยมสึกจนขอบมน เชือกเปลี่ยนมาแล้วหลายเส้น"
+  heir_cloth:
+    name: ผ้ายันต์ผืนเก่า
+    slot: charm
+    from_flag: has_amulet:cloth
+    sell: {unit: income_x, amount: 0.1}
+    text: "ผ้ายันต์ที่เคยติดอยู่เหนือประตูบ้าน หมึกซีดจนอ่านอักขระไม่ออกแล้ว แต่ยังไม่มีใครกล้าทิ้ง"

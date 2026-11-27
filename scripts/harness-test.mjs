@@ -648,6 +648,44 @@ const f2 = (v) => v.toFixed(2);
   check('ไอเทม: เซฟก่อนมีระบบโหลดได้ ช่องว่าง', !!old && !('items' in old) && Object.values(E.itemsOf(old).wear).every((x) => x === null));
 }
 
+// ของตกทอด (ใบ 25): รุ่นก่อนถือธงพระ/ผ้ายันต์ หรือสวมของอยู่ → ทายาทในตระกูลได้ 1 ชิ้นในช่อง + บรรทัดที่มาในกล่องสืบทอด
+// ใส่ลูก + ธง/ของเอง ไม่ขึ้นกับว่าชีวิตบอทเจอการ์ดพระหรือไม่
+{
+  const E = await import('../src/engine/index.mjs');
+  const { addMember } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  const setters = new Set(content.events.flatMap((e) => e.choices.flatMap((c) => [...(c.sets_flags ?? []), ...(c.outcomes ?? []).flatMap((o) => o.sets_flags ?? [])])));
+  const looms = Object.entries(content.items.list).filter(([, it]) => it.from_flag);
+  check('ใบ 25 ของตกทอดทุกชิ้นมีการ์ดตั้งธง from_flag ได้จริง · สักยันต์ไม่มีชิ้น (ติดตัวคน)', looms.length >= 2 && looms.every(([, it]) => setters.has(it.from_flag)) && !looms.some(([, it]) => it.from_flag === 'has_amulet:yantra'), looms.map(([id, it]) => `${id}←${it.from_flag}`).join(' '));
+  const heirOf = (pathId, setup) => {
+    const { state: p } = playLife(mixSeed(1, 2525), content, BOTS.สุ่ม);
+    for (const f of Object.keys(p.flags)) if (f.startsWith('has_amulet')) delete p.flags[f];
+    delete p.items;
+    if (!p.kin.some((m) => m.role === 'child' && m.alive)) addMember(p, 'child', { born: p.birthYear + p.age - 30 });
+    p.flags.has_kids = true;
+    setup(p);
+    const af = E.startAfterlife(p);
+    const P = E.PATHS.findIndex((x) => x.id === pathId);
+    for (let card = E.nextAfterCard(af); !card.done; card = E.nextAfterCard(af)) {
+      if (card.kind === 'path') E.chooseAfter(af, P);
+      else if (card.choices?.length) E.chooseAfter(af, Math.max(0, (card.locked ?? []).findIndex((x) => !x)));
+    }
+    const heir = af.heir;
+    const st = nextLife(af);
+    return { p, heir, st, line: st.due.find((d) => d.kind === 'intro').inherit.find((s) => s.startsWith('ของตกทอด')) };
+  };
+  const phra = heirOf('child', (p) => { p.flags['has_amulet:phra'] = true; });
+  check('ใบ 25 รุ่นก่อนเช่าพระ → ทายาทเฝ้าลูกหลานได้พระในช่องเครื่องราง + บรรทัดบอกชื่อของและเจ้าของเดิม', phra.st.items?.wear.charm === 'heir_phra' && phra.st.items.bag.length === 0 && !!phra.line?.includes(`${content.items.list.heir_phra.name}ของ${phra.heir.legacy.from}${phra.p.name}`), phra.line ?? JSON.stringify(phra.st.items));
+  const both = heirOf('child', (p) => { p.flags['has_amulet:cloth'] = true; p.items = { wear: { charm: 'dg_takrut', weapon: 'dg_knife', outfit: null }, bag: ['dg_fang'], cap: 3 }; });
+  const worn = heirOf('child', (p) => { p.items = { wear: { charm: null, weapon: 'dg_knife', outfit: 'dg_vest' }, bag: ['dg_fang'], cap: 3 }; });
+  check('ใบ 25 ของของบ้านก่อนของดันเจียน · ไม่มีธง = ชิ้นแรกที่สวมตามลำดับช่อง · ได้ชิ้นเดียว เป้ไม่ส่ง', both.st.items.wear.charm === 'heir_cloth' && Object.values(both.st.items.wear).filter(Boolean).length === 1 && worn.st.items.wear.weapon === 'dg_knife' && Object.values(worn.st.items.wear).filter(Boolean).length === 1 && worn.st.items.bag.length === 0, `${JSON.stringify(both.st.items.wear)} · ${JSON.stringify(worn.st.items.wear)}`);
+  const tattoo = heirOf('child', (p) => { p.flags['has_amulet:yantra'] = true; });
+  const reborn = heirOf('reborn', (p) => { p.flags['has_amulet:phra'] = true; });
+  check('ใบ 25 ไม่มีของตกทอด (สักยันต์อย่างเดียว · เกิดใหม่ตามกรรม) = ไม่มีช่อง heirloom/items · ไม่มีบรรทัด', !('heirloom' in tattoo.heir) && !('items' in tattoo.st) && !tattoo.line && !('heirloom' in reborn.heir) && !('items' in reborn.st) && !reborn.line);
+  const back = E.restore(E.snapshot({ st: phra.st }, content), content).st;
+  check('ใบ 25 เซฟทายาทที่มีของตกทอดแล้วโหลด ของยังอยู่ช่องเดิม', back.items?.wear.charm === 'heir_phra');
+}
+
 // ใบ B99a ประตูทางมืด: ใบ fixture dark_gate ในกองจริง · สายบาปที่จนต้องถูกชวน · ทุกครั้งที่ออกต้องเงินตึง + เลือกบาปเองถึงเกณฑ์
 // ตัวควบคุม: ถอด dark_gate จากใบเดียวกัน ⇒ ต้องออกกับคนที่ประตูปิดด้วย ไม่งั้นข้อ "ทุกครั้งประตูเปิด" ผ่านเพราะใบไม่ออกเลย
 {

@@ -536,6 +536,14 @@ function kinGoneOf(st, blood) {
   return out.sort((a, b) => a.year - b.year).slice(-CHRONICLE_GONE).map((g) => ({ word: g.word, name: g.name, at: g.year - blood.born }));
 }
 
+// ของตกทอด 1 ชิ้น (ใบ 25 · decisions 43 57): ของของบ้านจากธงก่อน (ลำดับในทะเบียน) แล้วค่อยของที่สวมอยู่ตามลำดับช่อง · ของในเป้ไม่ส่ง
+// ไม่ดึงเลขสุ่ม ⇒ ทายาทที่รุ่นก่อนไม่มีของได้ทุกไบต์เท่าเดิม
+function heirloomOf(st) {
+  const reg = st.content.items;
+  const kept = Object.entries(reg.list).find(([, it]) => it.from_flag && st.flags[it.from_flag])?.[0];
+  return kept ?? Object.keys(reg.slots).map((k) => st.items?.wear[k]).find(Boolean) ?? null;
+}
+
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
@@ -675,6 +683,8 @@ function makeHeir(af, r) {
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   const kinGone = blood ? kinGoneOf(st, blood) : [];
+  // ของตกทอดถึงเฉพาะทายาทในตระกูล (เฝ้าลูกหลาน · สายเลือด) — เกิดใหม่ตามกรรมไปเกิดบ้านอื่น ของไม่ตามไป
+  const heirloom = tier && legacy ? heirloomOf(st) : null;
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -720,6 +730,7 @@ function makeHeir(af, r) {
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),
+    ...(heirloom && { heirloom: { id: heirloom, from: `${legacy.from}${st.name ?? ''}` } }),
   };
 }
 
