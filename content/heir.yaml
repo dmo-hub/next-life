@@ -299,7 +299,7 @@ events:
   # เรื่องค้างจากรุ่นก่อน (ใบ 17 · reigns-6 · 65-21): ทายาทปุ่มสายเลือดเริ่ม 16–22 ปีที่รุ่นก่อนเพิ่งจากไป พ้นช่วงการ์ดวัยรุ่นข้างบน
   # ⇒ ธงส่งทายาท 5 ตัวมีใบรุ่นโตของตัวเอง · blood_heir กั้นให้ทางเป็นลูก/เกิดใหม่ไม่เจอ (ชีวิตบอทไม่เคยกดปุ่มนี้ จึงเท่าเดิมทุกไบต์)
   # own_business
-  - id: heir_blood_shop_left_01
+  - id: blood_shop_left_01
     away_block: [monk]
     type: A
     category: work_money
@@ -330,7 +330,7 @@ events:
         merit: [{cat: neutral}]
 
   # home_owner
-  - id: heir_blood_home_deed_01
+  - id: blood_home_deed_01
     away_block: [monk]
     type: A
     category: family
@@ -359,7 +359,7 @@ events:
         merit: [{cat: help_others, level: 1}]
 
   # caught_fraud
-  - id: heir_blood_fraud_victim_01
+  - id: blood_fraud_victim_01
     away_block: [monk]
     type: A
     category: society
@@ -390,7 +390,7 @@ events:
         merit: [{cat: neutral}]
 
   # loan_shark — ทุกทางรวมกันเสียเงินไม่เกิน 1.5 เท่าเงินเก็บต่อปี (ต่อรอง 0.5 + ใบกลับมา 1) · ทวงได้ 2 ใบสูงสุด
-  - id: heir_blood_collector_01
+  - id: blood_collector_01
     away_block: [monk]
     type: A
     category: family
@@ -409,24 +409,24 @@ events:
         text: "บอกว่าไม่ได้เป็นคนกู้ ไม่จ่าย"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, text: "เขาหัวเราะ เก็บกระดาษใส่กระเป๋า แล้วบอกว่าจะกลับมาใหม่", effects: {happiness: -1}, next: heir_blood_collector_again_01, merit: [{cat: neutral}]}
+          - {weight: 2, text: "เขาหัวเราะ เก็บกระดาษใส่กระเป๋า แล้วบอกว่าจะกลับมาใหม่", effects: {happiness: -1}, next: blood_collector_again_01, merit: [{cat: neutral}]}
           - {weight: 1, ok: true, text: "เขายืนด่าอยู่พักหนึ่งแล้วขี่รถออกไป หลังจากนั้นไม่เห็นหน้าอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
       - id: call_police
         text: "แจ้งตำรวจ"
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "ตำรวจเรียกสองคนนั้นไปคุยที่โรงพัก ตั้งแต่นั้นซอยหน้าบ้านก็เงียบ", effects: {relations: 1}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ตำรวจรับเรื่องไว้ บอกว่าต้องมีหลักฐานมากกว่านี้ อีกไม่กี่เดือนสองคนนั้นก็กลับมา", effects: {happiness: -1}, next: heir_blood_collector_again_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจรับเรื่องไว้ บอกว่าต้องมีหลักฐานมากกว่านี้ อีกไม่กี่เดือนสองคนนั้นก็กลับมา", effects: {happiness: -1}, next: blood_collector_again_01, merit: [{cat: neutral}]}
       - id: bargain
         text: "ขอต่อรองผ่อนเฉพาะเงินต้น"
         effects: {money: {unit: income_x, amount: -0.5}}
         merit: [{cat: neutral}]
         outcomes:
           - {weight: 1, ok: true, text: "เขายอมรับเงินก้อนแรกแล้วฉีกกระดาษยอดหนี้ต่อหน้า", merit: [{cat: neutral}]}
-          - {weight: 1, text: "เขารับเงินไป แต่บอกว่าดอกเบี้ยยังเดินอยู่", next: heir_blood_collector_again_01, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขารับเงินไป แต่บอกว่าดอกเบี้ยยังเดินอยู่", next: blood_collector_again_01, merit: [{cat: neutral}]}
 
   # ใบต่อของเจ้าหนี้ — มาจาก next เท่านั้น ไม่อยู่ในกอง
-  - id: heir_blood_collector_again_01
+  - id: blood_collector_again_01
     away_block: [monk]
     type: A
     category: family
@@ -456,7 +456,7 @@ events:
         merit: [{cat: neutral}]
 
   # guarantor
-  - id: heir_blood_guarantor_01
+  - id: blood_guarantor_01
     away_block: [monk]
     type: A
     category: family
