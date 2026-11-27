@@ -73,7 +73,7 @@ events:
     weight: 3
     when: {love_free: true, age: [31, 45], flags: {not: [married]}, family: [{role: spouse, count: [0, 0]}, {role: partner, count: [0, 0]}, {role: courter, count: [0, 1]}]}
     title: "เพื่อนนัดแล้วหายตัว"
-    text: "เพื่อนชวนกินหมูกระทะ ไปถึงมีคนแปลกหน้านั่งย่างหมูรออยู่คนเดียว โทรศัพท์สั่นพอดี เพื่อนส่งข้อความว่าติดธุระกะทันหัน ฝากดูแลคนนี้ด้วย"
+    text: "เพื่อนชวนกินหมูกระทะ ไปถึงมีคนแปลกหน้านั่งย่างหมูรออยู่คนเดียว คนนั้นบอกว่าเพื่อนฝากมาบอกว่าติดธุระกะทันหัน ให้ช่วยดูแลกันเอง"
     choices:
       - id: court_friend_stay
         text: "นั่งลง ช่วยกันย่างให้หมดเตา"
@@ -133,20 +133,20 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     when: {family: [{role: courter, stage: courting}]}
-    title: "ดอกไม้หนึ่งช่อวันซ้อมรับปริญญา"
-    text: "ใกล้วันซ้อมรับปริญญาของรุ่นพี่ {ชื่อคนจีบ}ถามว่าจะไปถ่ายรูปด้วยกันไหม แล้วเสริมว่าถ้าไปในฐานะคนรู้จักเฉย ๆ ก็ไม่ต้องไป"
+    title: "ดอกไม้หนึ่งช่อวันรับปริญญา"
+    text: "ใกล้วันรับปริญญาของญาติ{ชื่อคนจีบ} {ชื่อคนจีบ}ถามว่าจะไปถ่ายรูปด้วยกันไหม แล้วเสริมว่าถ้าไปในฐานะคนรู้จักเฉย ๆ ก็ไม่ต้องไป"
     choices:
       - id: court_uni_bouquet
         text: "ถือช่อดอกไม้ไปให้เขา"
         outcomes:
           - {weight: 3, ok: true, text: "{ชื่อคนจีบ}รับดอกไม้ไปถือถ่ายรูปทั้งวัน ใครถามว่าใครให้ก็ชี้มาที่คุณ", effects: {happiness: 3, relations: 1, money: {unit: income_x, amount: -0.05}}, schedules: [{event: court_go_home_01, after_years: [1, 1]}, {event: court_go_home_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อคนจีบ}รับดอกไม้ไว้ แล้วบอกตรง ๆ ว่าคิดกับคุณได้แค่เพื่อน ช่อดอกไม้ถูกส่งต่อให้รุ่นพี่", effects: {happiness: -3, money: {unit: income_x, amount: -0.05}}, family: [{drop: courter}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}รับดอกไม้ไว้ แล้วบอกตรง ๆ ว่าคิดกับคุณได้แค่เพื่อน ช่อดอกไม้ถูกส่งต่อให้เจ้าของงาน", effects: {happiness: -3, money: {unit: income_x, amount: -0.05}}, family: [{drop: courter}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_uni_go_plain
         text: "ไปตัวเปล่า อาสาเป็นตากล้อง"
         outcomes:
           - {weight: 1, ok: true, text: "รูปที่คุณถ่ายออกมาสวยทุกใบ {ชื่อคนจีบ}ขอให้ส่งให้ แล้วคุยต่อจนดึกดื่น", effects: {happiness: 2, relations: 1}, schedules: [{event: court_go_home_01, after_years: [1, 1]}, {event: court_go_home_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "คุณมัวแต่ถ่ายให้คนอื่น {ชื่อคนจีบ}กลับไปก่อน หลังจากวันนั้นข้อความสั้นลงจนเงียบ", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณมัวแต่ถ่ายให้คนอื่น {ชื่อคนจีบ}กลับไปก่อน หลังจากวันนั้นก็คุยกันน้อยลงจนเงียบ", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_uni_step_back
         text: "บอกว่าขอเป็นเพื่อนกันดีกว่า"
@@ -167,20 +167,20 @@ events:
     stage: หนุ่มสาว
     years: [2500, 2650]
     when: {family: [{role: courter, stage: courting}]}
-    title: "ข่าวลือจากโต๊ะข้าง ๆ"
-    text: "เรื่องคุณกับ{ชื่อคนจีบ}ลือไปทั่วแล้ว มีคนถามกลางวงข้าวว่าตกลงเป็นอะไรกัน {ชื่อคนจีบ}วางช้อน แล้วหันมารอคำตอบจากคุณ"
+    title: "ข่าวลือในวงข้าว"
+    text: "เรื่องคุณกับ{ชื่อคนจีบ}ลือไปถึงหูเพื่อน ๆ แล้ว มีคนถามกลางวงข้าวว่าตกลงเป็นอะไรกัน {ชื่อคนจีบ}วางช้อน แล้วหันมารอคำตอบจากคุณ"
     choices:
       - id: court_work_admit
         text: "ตอบว่ากำลังจีบอยู่"
         outcomes:
           - {weight: 3, ok: true, text: "ทั้งวงโห่ {ชื่อคนจีบ}หูแดง ตักไข่ดาวของตัวเองมาใส่จานคุณแทนคำตอบ", effects: {happiness: 3, relations: 1}, schedules: [{event: court_go_money_01, after_years: [1, 1]}, {event: court_go_money_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อคนจีบ}หัวเราะแห้ง ๆ ตกเย็นส่งข้อความมาว่ายังไม่พร้อมให้ใครรู้ ขอห่างกันไปก่อน", effects: {happiness: -3, relations: -1}, family: [{drop: courter}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}หัวเราะแห้ง ๆ ตกเย็นมาบอกว่ายังไม่พร้อมให้ใครรู้ ขอห่างกันไปก่อน", effects: {happiness: -3, relations: -1}, family: [{drop: courter}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_work_dodge
         text: "เฉไฉไปคุยเรื่องกับข้าว"
         outcomes:
           - {weight: 1, ok: true, text: "{ชื่อคนจีบ}ยิ้มแล้วเล่นตามน้ำ คืนนั้นโทรมาถามว่าตอนอยู่กันสองคนจะตอบว่ายังไง", effects: {happiness: 2}, schedules: [{event: court_go_money_01, after_years: [1, 1]}, {event: court_go_money_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "{ชื่อคนจีบ}กินต่อเงียบ ๆ ตั้งแต่วันนั้นก็ไปกินข้าวกับกลุ่มอื่น", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "{ชื่อคนจีบ}กินต่อเงียบ ๆ ตั้งแต่วันนั้นก็ไม่มากินข้าววงนี้อีก", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_work_deny
         text: "ปฏิเสธว่าไม่มีอะไร"
@@ -201,8 +201,8 @@ events:
     stage: ทำงาน
     years: [2500, 2650]
     when: {family: [{role: courter, stage: courting}]}
-    title: "นัดที่ไม่มีใครจัดให้"
-    text: "{ชื่อคนจีบ}ชวนไปตลาดนัดวันหยุด คราวนี้ไม่มีเพื่อนคอยจัดฉาก เดินกันมาครึ่งตลาดก็ถูกถามว่าที่คุยกันอยู่นี่จริงจังแค่ไหน"
+    title: "ครึ่งทางตลาดนัด"
+    text: "{ชื่อคนจีบ}ชวนไปตลาดนัดวันหยุด เดินกันมาครึ่งตลาดก็ถูกถามว่าที่คุยกันอยู่นี่จริงจังแค่ไหน"
     choices:
       - id: court_friend_serious
         text: "ตอบว่าจริงจัง"
@@ -247,12 +247,12 @@ events:
       - id: court_app_ask_back
         text: "ถามกลับว่าของเขาล่ะ"
         outcomes:
-          - {weight: 1, ok: true, text: "{ชื่อคนจีบ}ยื่นเครื่องให้ดู ลบไปตั้งแต่เดือนแรกแล้ว คุณรีบลบของตัวเองตาม", effects: {happiness: 2, relations: 1}, schedules: [{event: court_go_home_01, after_years: [1, 1]}, {event: court_go_home_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "{ชื่อคนจีบ}ยื่นเครื่องให้ดู ลบไปนานแล้ว คุณรีบลบของตัวเองตาม", effects: {happiness: 2, relations: 1}, schedules: [{event: court_go_home_01, after_years: [1, 1]}, {event: court_go_home_01, after_years: [2, 2]}], merit: [{cat: neutral}]}
           - {weight: 1, text: "ต่างคนต่างไม่ยอมยื่นเครื่องก่อน เถียงกันอยู่นานจนเลิกคุยกันไปเลย", effects: {happiness: -2}, family: [{drop: courter}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_app_keep
         text: "ตอบว่ายังอยากคุยหลายคน"
-        result: "{ชื่อคนจีบ}บอกว่าขอบคุณที่พูดตรง แล้วชื่อของเขาก็หายจากรายการคู่ในคืนนั้น"
+        result: "{ชื่อคนจีบ}บอกว่าขอบคุณที่พูดตรง แล้วก็เลิกทักมาตั้งแต่คืนนั้น"
         effects: {happiness: -1, network: 1}
         family: [{drop: courter}]
         merit: [{cat: neutral}]
@@ -336,7 +336,7 @@ events:
     years: [2500, 2650]
     when: {age: [18, 60], family: [{role: partner, alive: true, count: [1, 1]}]}
     title: "เวลาว่างไม่ตรงกัน"
-    text: "ช่วงนี้คุณกับ{ชื่อแฟน}ว่างกันคนละเวลา นัดล่าสุดเลื่อนมาสี่รอบ ข้อความสุดท้ายในมือถือคือสติกเกอร์หมีนอนรอ"
+    text: "ช่วงนี้คุณกับ{ชื่อแฟน}ว่างกันคนละเวลา นัดล่าสุดเลื่อนมาสี่รอบ โน้ตที่ฝากไว้ล่าสุดเขียนแค่ว่ารออยู่นะ"
     choices:
       - id: court_hours_leave
         text: "ลางานไปหาทั้งวัน"
@@ -355,7 +355,7 @@ events:
         merit: [{cat: neutral}]
       - id: court_hours_end
         text: "บอกเลิก จะได้ไม่ต้องรอกัน"
-        result: "{ชื่อแฟน}อ่านแล้วเงียบไปทั้งคืน ตอนเช้าตอบมาคำเดียวว่าได้"
+        result: "{ชื่อแฟน}เงียบไปทั้งคืน ตอนเช้าตอบมาคำเดียวว่าได้"
         effects: {happiness: -3, knowledge: 1}
         family: [{breakup: partner}]
         merit: [{cat: neutral}]
@@ -512,7 +512,7 @@ events:
         text: "ยืนขึ้นขอกลางร้าน"
         outcomes:
           - {weight: 1, ok: true, text: "ทั้งร้านตบมือเชียร์ {ชื่อแฟน}พยักหน้าทั้งที่เอาเมนูบังหน้าอยู่", effects: {happiness: 3, relations: 2, money: {unit: income_x, amount: -0.3}}, family: [{marry: partner}], merit: [{cat: neutral}]}
-          - {weight: 1, text: "คุณก็รู้ว่า{ชื่อแฟน}เกลียดการถูกจ้องที่สุด เขาลุกออกจากร้าน แล้วส่งข้อความตามมาว่าพอแค่นี้", effects: {happiness: -3, relations: -1}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "คุณก็รู้ว่า{ชื่อแฟน}เกลียดการถูกจ้องที่สุด เขาลุกออกจากร้าน คืนนั้นโทรมาบอกว่าพอแค่นี้", effects: {happiness: -3, relations: -1}, family: [{breakup: partner, by: them}], merit: [{cat: neutral}]}
         merit: [{cat: neutral}]
       - id: court_dinner_hold
         text: "เก็บคำไว้ สั่งของหวานแทน"
