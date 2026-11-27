@@ -1,0 +1,64 @@
+# พี่น้องแย่งมรดก — ออกครั้งเดียวในชีวิตทายาทปุ่มสายเลือดที่ถือธง sib_feud · แกนเลือกใบแรกที่ when ผ่านตามวัย (ไม่มี weight ไม่เข้ากองสุ่ม)
+# ทายาทปุ่มสายเลือดเริ่มอายุ HEIR_AGE ขึ้นไป จึงไม่มีใบวัยเด็ก
+# เพดานผลต่อตัวเลือกหนึ่งทาง: ความผูกพันพี่น้อง -15 ถึง +10 · เงิน ±0.5 เท่าเงินเก็บต่อปี · ไม่มีใบต่อ
+# ไม่มีคำ พ่อ/แม่ เพราะเพศรุ่นก่อนรู้ตอนเล่นเท่านั้น
+events:
+  - id: sib_feud_teen_01
+    type: A
+    category: family
+    stage: วัยรุ่น
+    years: [2500, 2650]
+    when: {age: [16, 17], parent_flags: {has: [sib_feud]}}
+    title: "ใครได้อะไร"
+    text: "ไม่มีพินัยกรรมให้ยึด ญาติผู้ใหญ่จึงนัดมาตกลงกันเอง พี่น้องกระซิบกับ{ชื่อ}ว่าถ้าไม่พูดตอนนี้ ส่วนของเราสองคนอาจหายไปกับวงคุย"
+    choices:
+      - id: stand_together
+        text: "เข้าไปพูดพร้อมกันสองคน"
+        effects: {happiness: -1}
+        family: [{bond: sibling, d: 10}]
+        merit: [{cat: neutral}]
+      - id: speak_for_self
+        text: "ทวงเฉพาะส่วนของตัวเอง"
+        effects: {money: {unit: income_x, amount: 0.3}}
+        family: [{bond: sibling, d: -12}]
+        merit: [{cat: neutral}]
+      - id: trust_adults
+        text: "ให้ผู้ใหญ่ตัดสินกันไป"
+        family: [{bond: sibling, d: -3}]
+        merit: [{cat: neutral}]
+      - id: give_sibling
+        text: "ยกส่วนที่ดีกว่าให้พี่น้อง"
+        effects: {money: {unit: income_x, amount: -0.2}}
+        family: [{bond: sibling, d: 10}]
+        merit: [{cat: neutral}]
+
+  - id: sib_feud_01
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {age: [18, 120], parent_flags: {has: [sib_feud]}}
+    title: "แบ่งกันเอง"
+    text: "รุ่นก่อนไม่ได้ทำพินัยกรรมไว้ วงคุยเรื่องแบ่งทรัพย์ลากมาหลายรอบจนของหายไปกับค่าเดินเรื่องและของที่ขายถูก ๆ วันนี้พี่น้องวางกระดาษแผ่นหนึ่งตรงหน้า{ชื่อ}แล้วบอกว่าเซ็นเถอะ"
+    choices:
+      - id: split_equal
+        text: "ขอแบ่งใหม่ให้เท่ากันทุกคน"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "คุยกันอีกหลายคืน สุดท้ายทุกคนได้เท่ากัน ไม่มีใครยิ้มกว้าง แต่ยังกินข้าวโต๊ะเดียวกันได้", family: [{bond: sibling, d: 6}], merit: [{cat: neutral}]}
+          - {weight: 1, text: "พี่น้องหาว่าไม่ไว้ใจกัน เก็บกระดาษกลับไปแล้วไม่รับโทรศัพท์อยู่นาน", effects: {happiness: -2}, family: [{bond: sibling, d: -10}], merit: [{cat: neutral}]}
+      - id: sign_now
+        text: "เซ็นไป ให้มันจบ"
+        effects: {money: {unit: income_x, amount: -0.3}}
+        family: [{bond: sibling, d: 8}]
+        merit: [{cat: neutral}]
+      - id: fight_share
+        text: "สู้เอาส่วนที่ควรได้ให้ถึงที่สุด"
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: -2}
+        family: [{bond: sibling, d: -15}]
+        merit: [{cat: neutral}]
+      - id: find_elder
+        text: "ชวนญาติผู้ใหญ่มาเป็นคนกลาง"
+        effects: {money: {unit: income_x, amount: -0.1}, relations: 1}
+        family: [{bond: sibling, d: 3}]
+        merit: [{cat: neutral}]
