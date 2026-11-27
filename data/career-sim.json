@@ -1,7 +1,7 @@
 {
  "assumption": true,
  "note": "ผลจำลองจากบอทของเกม ไม่ใช่สถิติจริง — % = ชีวิตที่เจอ ÷ ชีวิตที่เคยทำงานนั้น · สร้างด้วย node harness/career-sim.mjs",
- "sha": "ed3b9c75",
+ "sha": "21f32cb0",
  "seed": 1,
  "perBot": 1000,
  "bots": [
@@ -33,6 +33,7 @@
   "career_poach_01",
   "career_poach_cornered_01",
   "career_transfer_01",
+  "court_meet_work_01",
   "debt_cash_short_01",
   "debt_refinance_01",
   "dilemma_team_cut_01",
@@ -200,121 +201,121 @@
  ],
  "units": {
   "army|officer": {
-   "lives": 152,
+   "lives": 153,
    "entries": [
     {
      "id": "recruit_gov",
      "text": "สมัครสอบนายทหารจากบุคคลภายนอก",
-     "n": 119
+     "n": 123
     },
     {
      "engine": "cadet",
-     "n": 33
+     "n": 30
     }
    ],
    "cards": [
     {
      "id": "promo_army_0",
-     "n": 150
+     "n": 149
     },
     {
      "id": "promo_army_1",
-     "n": 136
-    },
-    {
-     "id": "army_border_01",
-     "n": 44
-    },
-    {
-     "id": "army_batman_01",
-     "n": 40
+     "n": 132
     },
     {
      "id": "fraud_sign_bribe_01",
+     "n": 48
+    },
+    {
+     "id": "army_batman_01",
      "n": 38
     },
     {
-     "id": "work_checkup_offer_01",
-     "n": 29
-    },
-    {
-     "id": "echo_army_visit_01",
-     "n": 28
+     "id": "army_border_01",
+     "n": 34
     },
     {
      "id": "workh_smoker_cough_01",
-     "n": 24
+     "n": 31
     },
     {
-     "id": "army_clean_tempt_01",
-     "n": 24
+     "id": "echo_army_visit_01",
+     "n": 26
+    },
+    {
+     "id": "work_checkup_offer_01",
+     "n": 26
     },
     {
      "id": "work_online_shop_01",
-     "n": 21
+     "n": 25
     },
     {
-     "id": "lot_vendor_01",
+     "id": "army_clean_tempt_01",
      "n": 20
     },
     {
-     "id": "work_influencer_01",
-     "n": 19
+     "id": "young_abroad_01",
+     "n": 18
     },
     {
-     "id": "young_abroad_01",
-     "n": 16
+     "id": "echo_army_complaint_01",
+     "n": 17
+    },
+    {
+     "id": "work_influencer_01",
+     "n": 15
+    },
+    {
+     "id": "lot_vendor_01",
+     "n": 14
     },
     {
      "id": "debt_cash_short_01",
      "n": 14
     },
     {
-     "id": "echo_army_complaint_01",
+     "id": "fraud_whistle_01",
      "n": 12
     },
     {
-     "id": "fraud_whistle_01",
-     "n": 7
+     "id": "service_procure_01",
+     "n": 8
     },
     {
      "id": "army_bent_turn_01",
-     "n": 6
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 6
-    },
-    {
-     "id": "echo_debt_payroll_01",
-     "n": 6
+     "n": 7
     },
     {
      "id": "midh_pressure_01",
+     "n": 7
+    },
+    {
+     "id": "echo_debt_payroll_01",
      "n": 5
     },
     {
      "id": "mid_insurance_01",
-     "n": 4
+     "n": 5
     },
     {
-     "id": "service_procure_01",
-     "n": 3
-    },
-    {
-     "id": "midh_diabetes_01",
-     "n": 3
+     "id": "midh_heart_01",
+     "n": 5
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 3
+     "n": 4
+    },
+    {
+     "id": "midh_diabetes_01",
+     "n": 4
     },
     {
      "id": "fraud_village_fund_01",
      "n": 2
     },
     {
-     "id": "midh_kidney_stone_01",
+     "id": "mid_risky_bet_01",
      "n": 2
     },
     {
@@ -322,11 +323,11 @@
      "n": 1
     },
     {
-     "id": "midh_heart_after_01",
+     "id": "midh_cancer_early_01",
      "n": 1
     },
     {
-     "id": "mid_risky_bet_01",
+     "id": "midh_heart_after_01",
      "n": 1
     }
    ],
@@ -335,19 +336,19 @@
      "kind": "move",
      "to": "army|senior_officer",
      "id": "promo_army_1",
-     "n": 133
+     "n": 130
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_sign_bribe_01",
-     "n": 9
+     "n": 8
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_army_0",
-     "n": 3
+     "to": "trade|service",
+     "id": "fraud_whistle_01",
+     "n": 6
     },
     {
      "kind": "move",
@@ -356,9 +357,19 @@
      "n": 3
     },
     {
+     "kind": "death",
+     "n": 2
+    },
+    {
      "kind": "move",
-     "to": "trade|service",
-     "id": "workh_bone_healer_call_01",
+     "to": "trade|labor",
+     "id": "promo_army_0",
+     "n": 1
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "work_influencer_01",
      "n": 1
     },
     {
@@ -368,24 +379,20 @@
      "n": 1
     },
     {
-     "kind": "retire",
-     "n": 1
-    },
-    {
      "kind": "move",
-     "to": "trade|service",
-     "id": "fraud_whistle_01",
+     "to": "trade|farmer",
+     "id": "midh_heart_after_01",
      "n": 1
     }
    ]
   },
   "army|senior_officer": {
-   "lives": 133,
+   "lives": 130,
    "entries": [
     {
      "id": "promo_army_1",
      "text": "ไหว้ขอพรก่อนประเมิน",
-     "n": 51
+     "n": 42
     },
     {
      "id": "promo_army_1",
@@ -395,177 +402,185 @@
     {
      "id": "promo_army_1",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 24
+     "n": 27
     },
     {
      "id": "promo_army_1",
      "text": "รับงานยากมาโชว์ฝีมือ",
-     "n": 22
+     "n": 25
     }
    ],
    "cards": [
     {
      "id": "promo_army_2",
-     "n": 113
+     "n": 107
     },
     {
      "id": "promo_army_3",
-     "n": 94
+     "n": 85
     },
     {
      "id": "service_procure_01",
-     "n": 84
+     "n": 76
     },
     {
      "id": "midh_pressure_01",
      "n": 56
     },
     {
-     "id": "midh_heart_01",
-     "n": 52
-    },
-    {
-     "id": "fraud_village_fund_01",
-     "n": 49
-    },
-    {
-     "id": "midh_diabetes_01",
-     "n": 46
-    },
-    {
      "id": "mid_insurance_01",
-     "n": 45
+     "n": 43
     },
     {
-     "id": "mid_risky_bet_01",
-     "n": 45
-    },
-    {
-     "id": "fraud_sign_bribe_01",
-     "n": 42
+     "id": "midh_heart_01",
+     "n": 41
     },
     {
      "id": "army_batman_01",
-     "n": 38
+     "n": 40
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 32
+     "n": 39
+    },
+    {
+     "id": "mid_risky_bet_01",
+     "n": 36
+    },
+    {
+     "id": "fraud_sign_bribe_01",
+     "n": 36
+    },
+    {
+     "id": "fraud_village_fund_01",
+     "n": 35
+    },
+    {
+     "id": "midh_diabetes_01",
+     "n": 27
     },
     {
      "id": "army_border_01",
-     "n": 24
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 19
-    },
-    {
-     "id": "midh_heart_after_01",
-     "n": 19
-    },
-    {
-     "id": "midh_cancer_early_01",
-     "n": 19
-    },
-    {
-     "id": "workh_smoker_cough_01",
-     "n": 19
+     "n": 26
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 19
+     "n": 25
+    },
+    {
+     "id": "midh_cancer_early_01",
+     "n": 24
     },
     {
      "id": "work_checkup_offer_01",
+     "n": 22
+    },
+    {
+     "id": "workh_smoker_cough_01",
+     "n": 18
+    },
+    {
+     "id": "work_online_shop_01",
      "n": 16
     },
     {
-     "id": "echo_army_visit_01",
-     "n": 13
+     "id": "work_influencer_01",
+     "n": 12
     },
     {
      "id": "debt_cash_short_01",
-     "n": 9
+     "n": 11
     },
     {
-     "id": "work_influencer_01",
-     "n": 9
+     "id": "midh_heart_after_01",
+     "n": 11
     },
     {
-     "id": "army_clean_tempt_01",
-     "n": 8
-    },
-    {
-     "id": "army_bent_turn_01",
-     "n": 3
-    },
-    {
-     "id": "fraud_audit_back_01",
-     "n": 3
+     "id": "echo_army_visit_01",
+     "n": 10
     },
     {
      "id": "fraud_whistle_01",
-     "n": 3
+     "n": 10
+    },
+    {
+     "id": "army_clean_tempt_01",
+     "n": 9
+    },
+    {
+     "id": "echo_army_complaint_01",
+     "n": 4
+    },
+    {
+     "id": "fraud_audit_back_01",
+     "n": 4
+    },
+    {
+     "id": "army_bent_turn_01",
+     "n": 2
     },
     {
      "id": "midh_liver_01",
      "n": 2
     },
     {
-     "id": "echo_army_complaint_01",
-     "n": 2
+     "id": "mid_online_empire_01",
+     "n": 1
+    },
+    {
+     "id": "work_biz_boom_01",
+     "n": 1
     }
    ],
    "exits": [
     {
      "kind": "retire",
-     "n": 61
+     "n": 58
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 31
+     "n": 28
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_sign_bribe_01",
+     "n": 15
+    },
+    {
+     "kind": "death",
      "n": 13
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "service_procure_01",
-     "n": 8
-    },
-    {
-     "kind": "death",
-     "n": 8
+     "n": 6
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_heart_after_01",
-     "n": 5
-    },
-    {
-     "kind": "move",
-     "to": "trade|service",
-     "id": "midh_heart_after_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_army_2",
-     "n": 2
+     "n": 3
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "fraud_whistle_01",
+     "n": 3
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "work_influencer_01",
+     "n": 1
+    },
+    {
+     "kind": "move",
+     "to": "trade|service",
+     "id": "midh_heart_after_01",
      "n": 1
     },
     {
@@ -577,43 +592,43 @@
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_army_3",
+     "id": "promo_army_2",
      "n": 1
     }
    ]
   },
   "gov|officer": {
-   "lives": 902,
+   "lives": 910,
    "entries": [
     {
      "id": "recruit_gov",
      "text": "ฝากเส้นผู้ใหญ่ให้ช่วยดู",
-     "n": 563
+     "n": 585
     },
     {
      "id": "recruit_gov",
      "text": "สมัครสอบข้าราชการพลเรือน",
-     "n": 262
+     "n": 249
     },
     {
      "id": "first_job",
      "text": "สอบ ก.พ. เข้ารับราชการ",
-     "n": 71
-    },
-    {
-     "id": "kru_exam_01",
-     "text": "อ่านเอง แล้วเข้าสอบ",
-     "n": 4
-    },
-    {
-     "id": "kp_agency_01",
-     "text": "รอเรียกตัว ทำงานเดิมไปก่อน",
-     "n": 4
+     "n": 73
     },
     {
      "id": "kp_agency_01",
      "text": "ใช้บัญชีไปยื่นหน่วยงานอื่น",
      "n": 3
+    },
+    {
+     "id": "kru_exam_01",
+     "text": "อ่านเอง แล้วเข้าสอบ",
+     "n": 2
+    },
+    {
+     "id": "kp_agency_01",
+     "text": "รอเรียกตัว ทำงานเดิมไปก่อน",
+     "n": 1
     },
     {
      "id": "kru_exam_01",
@@ -624,86 +639,82 @@
    "cards": [
     {
      "id": "promo_gov_0",
-     "n": 864
+     "n": 876
     },
     {
      "id": "promo_gov_1",
-     "n": 667
+     "n": 685
     },
     {
      "id": "echo_gov_audit_01",
-     "n": 315
-    },
-    {
-     "id": "fraud_sign_bribe_01",
-     "n": 189
+     "n": 323
     },
     {
      "id": "gov_budget_rush_01",
-     "n": 179
+     "n": 183
     },
     {
      "id": "echo_gov_trusted_01",
-     "n": 156
+     "n": 161
+    },
+    {
+     "id": "fraud_sign_bribe_01",
+     "n": 154
+    },
+    {
+     "id": "gov_transfer_01",
+     "n": 132
     },
     {
      "id": "gov_bent_turn_01",
      "n": 129
     },
     {
-     "id": "gov_transfer_01",
-     "n": 127
-    },
-    {
      "id": "workh_smoker_cough_01",
-     "n": 111
-    },
-    {
-     "id": "lot_vendor_01",
-     "n": 106
-    },
-    {
-     "id": "work_checkup_offer_01",
-     "n": 101
+     "n": 117
     },
     {
      "id": "young_abroad_01",
-     "n": 97
+     "n": 109
+    },
+    {
+     "id": "work_checkup_offer_01",
+     "n": 91
+    },
+    {
+     "id": "lot_vendor_01",
+     "n": 88
     },
     {
      "id": "work_online_shop_01",
-     "n": 78
+     "n": 72
     },
     {
      "id": "gov_clean_tempt_01",
-     "n": 76
+     "n": 58
     },
     {
      "id": "debt_cash_short_01",
-     "n": 43
-    },
-    {
-     "id": "era_city_mobile_adult_01",
-     "n": 42
+     "n": 53
     },
     {
      "id": "work_influencer_01",
-     "n": 39
+     "n": 52
     },
     {
-     "id": "meme_cham_01",
-     "n": 27
+     "id": "era_city_mobile_adult_01",
+     "n": 43
     },
     {
      "id": "fraud_whistle_01",
-     "n": 25
+     "n": 15
     },
     {
      "id": "meme_slow_life_01",
-     "n": 19
+     "n": 14
     },
     {
-     "id": "meme_old_speech_01",
+     "id": "meme_cham_01",
      "n": 12
     },
     {
@@ -711,27 +722,31 @@
      "n": 11
     },
     {
-     "id": "sex_pay_gap_01",
+     "id": "meme_old_speech_01",
      "n": 11
     },
     {
-     "id": "workh_bone_healer_call_01",
+     "id": "debt_refinance_01",
      "n": 7
     },
     {
-     "id": "debt_refinance_01",
-     "n": 5
+     "id": "sex_pay_gap_01",
+     "n": 7
     },
     {
-     "id": "mid_insurance_01",
-     "n": 5
+     "id": "workh_bone_healer_call_01",
+     "n": 6
     },
     {
-     "id": "midh_pressure_01",
-     "n": 4
+     "id": "mid_risky_bet_01",
+     "n": 5
     },
     {
      "id": "risky_cert_caught_01",
+     "n": 5
+    },
+    {
+     "id": "school_loan_slip_01",
      "n": 4
     },
     {
@@ -739,23 +754,15 @@
      "n": 3
     },
     {
-     "id": "sky_crew_01",
-     "n": 2
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 2
-    },
-    {
-     "id": "mid_risky_bet_01",
-     "n": 2
+     "id": "med_license_01",
+     "n": 3
     },
     {
      "id": "swindle_office_sample_01",
-     "n": 2
+     "n": 3
     },
     {
-     "id": "med_license_01",
+     "id": "mid_insurance_01",
      "n": 2
     },
     {
@@ -763,31 +770,39 @@
      "n": 2
     },
     {
-     "id": "midh_kidney_stone_01",
-     "n": 2
-    },
-    {
-     "id": "tech_night_raid_01",
+     "id": "midh_pressure_01",
      "n": 2
     },
     {
      "id": "midh_cancer_early_01",
-     "n": 1
+     "n": 2
     },
     {
-     "id": "sky_hire_01",
-     "n": 1
+     "id": "tech_post_viral_01",
+     "n": 2
     },
     {
      "id": "fraud_village_fund_01",
      "n": 1
     },
     {
-     "id": "lot_underground_mid_01",
+     "id": "sky_crew_01",
      "n": 1
     },
     {
-     "id": "school_loan_slip_01",
+     "id": "school_term_delay_01",
+     "n": 1
+    },
+    {
+     "id": "midh_kidney_stone_01",
+     "n": 1
+    },
+    {
+     "id": "tech_night_raid_01",
+     "n": 1
+    },
+    {
+     "id": "midh_heart_01",
      "n": 1
     }
    ],
@@ -796,288 +811,288 @@
      "kind": "move",
      "to": "gov|senior_officer",
      "id": "promo_gov_1",
-     "n": 612
+     "n": 648
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "echo_gov_audit_01",
-     "n": 82
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_sign_bribe_01",
-     "n": 67
+     "n": 86
     },
     {
      "kind": "move",
      "to": "private|clerk",
      "id": "gov_transfer_01",
-     "n": 63
+     "n": 62
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "fraud_sign_bribe_01",
+     "n": 62
     },
     {
      "kind": "death",
-     "n": 35
+     "n": 28
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_gov_1",
-     "n": 27
+     "n": 20
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "fraud_whistle_01",
-     "n": 15
+     "n": 8
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_gov_0",
-     "n": 10
+     "n": 6
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "midh_pressure_01",
+     "n": 2
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "work_influencer_01",
+     "n": 1
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "workh_bone_healer_call_01",
-     "n": 3
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "work_influencer_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
-     "to": "private|professional",
-     "id": "sky_hire_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
-     "to": "private|professional",
-     "id": "med_license_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_pressure_01",
      "n": 1
     }
    ]
   },
   "gov|senior_officer": {
-   "lives": 612,
+   "lives": 648,
    "entries": [
     {
      "id": "promo_gov_1",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 253
+     "n": 278
     },
     {
      "id": "promo_gov_1",
      "text": "ไหว้ขอพรก่อนประเมิน",
-     "n": 139
+     "n": 153
     },
     {
      "id": "promo_gov_1",
      "text": "ตั้งใจทำงาน รอผลประเมินตามคิว",
-     "n": 129
+     "n": 117
     },
     {
      "id": "promo_gov_1",
      "text": "รับงานยากมาโชว์ฝีมือ",
-     "n": 92
+     "n": 100
     }
    ],
    "cards": [
     {
      "id": "promo_gov_2",
-     "n": 491
+     "n": 514
     },
     {
      "id": "promo_gov_3",
-     "n": 363
+     "n": 378
     },
     {
      "id": "gov_hire_nephew_01",
-     "n": 300
+     "n": 292
     },
     {
      "id": "fraud_sign_bribe_01",
-     "n": 226
+     "n": 223
     },
     {
      "id": "midh_pressure_01",
-     "n": 196
+     "n": 198
+    },
+    {
+     "id": "fraud_village_fund_01",
+     "n": 195
     },
     {
      "id": "midh_heart_01",
+     "n": 186
+    },
+    {
+     "id": "mid_risky_bet_01",
      "n": 185
     },
     {
      "id": "mid_insurance_01",
-     "n": 176
-    },
-    {
-     "id": "fraud_village_fund_01",
-     "n": 169
-    },
-    {
-     "id": "gov_transfer_01",
-     "n": 159
-    },
-    {
-     "id": "gov_budget_rush_01",
-     "n": 158
+     "n": 167
     },
     {
      "id": "midh_diabetes_01",
-     "n": 153
+     "n": 164
     },
     {
-     "id": "mid_risky_bet_01",
-     "n": 152
+     "id": "gov_budget_rush_01",
+     "n": 163
+    },
+    {
+     "id": "gov_transfer_01",
+     "n": 147
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 131
-    },
-    {
-     "id": "workh_smoker_cough_01",
-     "n": 104
-    },
-    {
-     "id": "work_checkup_offer_01",
-     "n": 97
-    },
-    {
-     "id": "midh_cancer_early_01",
-     "n": 95
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 87
+     "n": 126
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 83
+     "n": 99
+    },
+    {
+     "id": "work_online_shop_01",
+     "n": 98
+    },
+    {
+     "id": "work_checkup_offer_01",
+     "n": 94
+    },
+    {
+     "id": "workh_smoker_cough_01",
+     "n": 91
+    },
+    {
+     "id": "midh_cancer_early_01",
+     "n": 88
     },
     {
      "id": "echo_gov_audit_01",
-     "n": 71
+     "n": 85
     },
     {
      "id": "gov_bent_turn_01",
-     "n": 61
-    },
-    {
-     "id": "debt_cash_short_01",
-     "n": 59
+     "n": 75
     },
     {
      "id": "fraud_audit_back_01",
-     "n": 54
+     "n": 63
     },
     {
      "id": "gov_clean_tempt_01",
-     "n": 53
-    },
-    {
-     "id": "midh_heart_after_01",
-     "n": 51
+     "n": 62
     },
     {
      "id": "work_influencer_01",
+     "n": 62
+    },
+    {
+     "id": "debt_cash_short_01",
+     "n": 51
+    },
+    {
+     "id": "midh_heart_after_01",
      "n": 50
     },
     {
      "id": "era_city_mobile_adult_01",
-     "n": 36
+     "n": 37
     },
     {
      "id": "fraud_whistle_01",
-     "n": 36
-    },
-    {
-     "id": "echo_gov_trusted_01",
      "n": 33
     },
     {
-     "id": "midh_liver_01",
-     "n": 16
+     "id": "echo_gov_trusted_01",
+     "n": 27
     },
     {
-     "id": "meme_cham_01",
-     "n": 12
+     "id": "midh_liver_01",
+     "n": 20
     },
     {
      "id": "meme_old_speech_01",
-     "n": 11
+     "n": 20
+    },
+    {
+     "id": "meme_cham_01",
+     "n": 15
     },
     {
      "id": "debt_refinance_01",
-     "n": 8
+     "n": 11
     },
     {
-     "id": "mid_online_empire_01",
-     "n": 6
+     "id": "tech_post_viral_01",
+     "n": 5
     },
     {
      "id": "workh_bone_healer_call_01",
-     "n": 6
+     "n": 5
     },
     {
-     "id": "echo_debt_slip_audit_01",
+     "id": "mid_online_empire_01",
+     "n": 4
+    },
+    {
+     "id": "school_loan_slip_01",
      "n": 4
     },
     {
      "id": "sex_pay_gap_01",
+     "n": 3
+    },
+    {
+     "id": "echo_debt_slip_audit_01",
      "n": 2
     },
     {
      "id": "swindle_office_sample_01",
-     "n": 1
-    },
-    {
-     "id": "tech_post_viral_01",
-     "n": 1
-    },
-    {
-     "id": "mid_debt_spiral_01",
-     "n": 1
+     "n": 2
     }
    ],
    "exits": [
     {
      "kind": "retire",
-     "n": 245
+     "n": 240
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 72
+     "n": 79
+    },
+    {
+     "kind": "death",
+     "n": 66
     },
     {
      "kind": "move",
      "to": "private|clerk",
      "id": "gov_transfer_01",
-     "n": 67
+     "n": 66
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_sign_bribe_01",
-     "n": 61
+     "n": 63
     },
     {
-     "kind": "death",
-     "n": 56
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "echo_gov_audit_01",
+     "n": 33
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_gov_2",
+     "n": 24
     },
     {
      "kind": "move",
@@ -1088,49 +1103,37 @@
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_gov_2",
-     "n": 22
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "echo_gov_audit_01",
-     "n": 18
+     "id": "fraud_audit_back_01",
+     "n": 23
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_heart_after_01",
-     "n": 16
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_audit_back_01",
      "n": 12
     },
     {
      "kind": "move",
      "to": "trade|service",
-     "id": "fraud_whistle_01",
-     "n": 11
+     "id": "midh_heart_after_01",
+     "n": 10
     },
     {
      "kind": "move",
      "to": "trade|service",
-     "id": "midh_heart_after_01",
-     "n": 6
+     "id": "fraud_whistle_01",
+     "n": 7
+    },
+    {
+     "kind": "move",
+     "to": "trade|service",
+     "id": "workh_bone_healer_call_01",
+     "n": 1
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "work_influencer_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "private|manager",
-     "id": "mid_online_empire_01",
      "n": 1
     }
    ]
@@ -1140,41 +1143,27 @@
    "entries": [
     {
      "id": "office_0",
-     "text": "ไหว้ขอพรก่อนลงสมัครผู้นำท้องถิ่น",
+     "text": "ลงสมัครผู้นำท้องถิ่น แจกเงินซื้อเสียง",
      "n": 2
-    },
-    {
-     "id": "office_2",
-     "text": "ลงสมัครส.ส. หาเสียงด้วยผลงาน",
-     "n": 1
-    },
-    {
-     "id": "office_2",
-     "text": "ไหว้ขอพรก่อนลงสมัครส.ส.",
-     "n": 1
     },
     {
      "id": "office_0",
      "text": "ลงสมัครผู้นำท้องถิ่น หาเสียงด้วยผลงาน",
-     "n": 1
+     "n": 2
     },
     {
      "id": "office_0",
-     "text": "ลงสมัครผู้นำท้องถิ่น แจกเงินซื้อเสียง",
+     "text": "ไหว้ขอพรก่อนลงสมัครผู้นำท้องถิ่น",
      "n": 1
     }
    ],
    "cards": [
     {
-     "id": "office_budget_2",
-     "n": 1
-    },
-    {
-     "id": "office_4",
-     "n": 1
-    },
-    {
      "id": "office_budget_0",
+     "n": 4
+    },
+    {
+     "id": "office_1",
      "n": 1
     }
    ],
@@ -1186,81 +1175,85 @@
     },
     {
      "kind": "leave",
-     "id": "office_4",
+     "id": "office_budget_0",
      "n": 1
     },
     {
      "kind": "leave",
-     "id": "office_budget_0",
+     "id": "office_1",
      "n": 1
     }
    ]
   },
   "police|officer": {
-   "lives": 580,
+   "lives": 595,
    "entries": [
     {
      "id": "recruit_gov",
      "text": "สมัครสอบเป็นตำรวจ",
-     "n": 563
+     "n": 577
     },
     {
      "engine": "cadet",
-     "n": 17
+     "n": 18
     }
    ],
    "cards": [
     {
      "id": "promo_police_0",
-     "n": 551
+     "n": 571
     },
     {
      "id": "promo_police_1",
-     "n": 468
-    },
-    {
-     "id": "police_swap_driver_01",
-     "n": 178
-    },
-    {
-     "id": "fraud_sign_bribe_01",
-     "n": 172
+     "n": 494
     },
     {
      "id": "police_envelope_01",
-     "n": 169
+     "n": 176
     },
     {
-     "id": "work_checkup_offer_01",
-     "n": 119
+     "id": "fraud_sign_bribe_01",
+     "n": 167
+    },
+    {
+     "id": "police_swap_driver_01",
+     "n": 166
     },
     {
      "id": "police_night_shift_01",
-     "n": 112
+     "n": 118
     },
     {
-     "id": "workh_smoker_cough_01",
-     "n": 98
+     "id": "work_checkup_offer_01",
+     "n": 115
     },
     {
      "id": "echo_police_clean_01",
-     "n": 89
+     "n": 88
+    },
+    {
+     "id": "workh_smoker_cough_01",
+     "n": 84
     },
     {
      "id": "work_online_shop_01",
-     "n": 77
-    },
-    {
-     "id": "police_clean_tempt_01",
-     "n": 63
+     "n": 82
     },
     {
      "id": "lot_vendor_01",
-     "n": 58
+     "n": 68
+    },
+    {
+     "id": "police_clean_tempt_01",
+     "n": 64
     },
     {
      "id": "young_abroad_01",
-     "n": 53
+     "n": 59
+    },
+    {
+     "id": "debt_cash_short_01",
+     "n": 56
     },
     {
      "id": "echo_police_ledger_01",
@@ -1268,78 +1261,70 @@
     },
     {
      "id": "work_influencer_01",
-     "n": 49
-    },
-    {
-     "id": "debt_cash_short_01",
-     "n": 42
+     "n": 38
     },
     {
      "id": "fraud_whistle_01",
-     "n": 34
+     "n": 38
     },
     {
      "id": "police_bent_turn_01",
-     "n": 29
+     "n": 32
     },
     {
      "id": "service_procure_01",
-     "n": 21
+     "n": 13
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 14
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 11
-    },
-    {
-     "id": "mid_insurance_01",
      "n": 11
     },
     {
      "id": "midh_diabetes_01",
-     "n": 11
-    },
-    {
-     "id": "midh_pressure_01",
      "n": 10
     },
     {
-     "id": "echo_debt_payroll_01",
+     "id": "mid_insurance_01",
      "n": 10
     },
     {
-     "id": "lot_underground_mid_01",
-     "n": 8
-    },
-    {
-     "id": "midh_cancer_early_01",
-     "n": 8
+     "id": "midh_heart_01",
+     "n": 7
     },
     {
      "id": "fraud_village_fund_01",
-     "n": 8
+     "n": 6
     },
     {
-     "id": "midh_kidney_stone_01",
+     "id": "midh_pressure_01",
+     "n": 6
+    },
+    {
+     "id": "echo_debt_payroll_01",
      "n": 5
     },
     {
-     "id": "fraud_audit_back_01",
+     "id": "midh_kidney_stone_01",
+     "n": 4
+    },
+    {
+     "id": "lot_underground_mid_01",
      "n": 3
     },
     {
      "id": "workh_bone_healer_call_01",
+     "n": 3
+    },
+    {
+     "id": "fraud_audit_back_01",
+     "n": 2
+    },
+    {
+     "id": "midh_cancer_early_01",
      "n": 2
     },
     {
      "id": "midh_heart_after_01",
-     "n": 1
-    },
-    {
-     "id": "midh_liver_01",
      "n": 1
     }
    ],
@@ -1348,41 +1333,41 @@
      "kind": "move",
      "to": "police|senior_officer",
      "id": "promo_police_1",
-     "n": 443
+     "n": 474
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_sign_bribe_01",
-     "n": 37
-    },
-    {
-     "kind": "death",
-     "n": 22
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "police_swap_driver_01",
-     "n": 22
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "echo_police_ledger_01",
-     "n": 15
+     "n": 36
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "fraud_whistle_01",
-     "n": 14
+     "n": 18
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "echo_police_ledger_01",
+     "n": 17
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "police_swap_driver_01",
+     "n": 13
+    },
+    {
+     "kind": "death",
+     "n": 10
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_police_0",
-     "n": 7
+     "n": 8
     },
     {
      "kind": "move",
@@ -1398,305 +1383,313 @@
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "work_influencer_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_audit_back_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "service_procure_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 2
+     "n": 4
     },
     {
      "kind": "retire",
-     "n": 1
+     "n": 2
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_heart_after_01",
+     "n": 1
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "service_procure_01",
      "n": 1
     }
    ]
   },
   "police|senior_officer": {
-   "lives": 443,
+   "lives": 474,
    "entries": [
     {
      "id": "promo_police_1",
      "text": "ไหว้ขอพรก่อนประเมิน",
-     "n": 137
+     "n": 162
     },
     {
      "id": "promo_police_1",
      "text": "ตั้งใจทำงาน รอผลประเมินตามคิว",
-     "n": 133
+     "n": 137
     },
     {
      "id": "promo_police_1",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 110
+     "n": 105
     },
     {
      "id": "promo_police_1",
      "text": "รับงานยากมาโชว์ฝีมือ",
-     "n": 63
+     "n": 70
     }
    ],
    "cards": [
     {
      "id": "promo_police_2",
-     "n": 375
+     "n": 427
     },
     {
      "id": "service_procure_01",
-     "n": 263
+     "n": 322
     },
     {
      "id": "promo_police_3",
-     "n": 262
+     "n": 292
     },
     {
      "id": "midh_pressure_01",
-     "n": 177
+     "n": 194
     },
     {
      "id": "fraud_village_fund_01",
-     "n": 171
+     "n": 190
     },
     {
      "id": "mid_insurance_01",
-     "n": 147
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 131
-    },
-    {
-     "id": "midh_kidney_stone_01",
-     "n": 128
-    },
-    {
-     "id": "fraud_sign_bribe_01",
-     "n": 127
+     "n": 169
     },
     {
      "id": "midh_diabetes_01",
-     "n": 124
+     "n": 150
+    },
+    {
+     "id": "midh_heart_01",
+     "n": 150
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 118
+     "n": 146
+    },
+    {
+     "id": "midh_kidney_stone_01",
+     "n": 135
+    },
+    {
+     "id": "fraud_sign_bribe_01",
+     "n": 135
     },
     {
      "id": "police_envelope_01",
-     "n": 107
+     "n": 110
     },
     {
      "id": "police_swap_driver_01",
-     "n": 97
+     "n": 102
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 84
+     "n": 86
     },
     {
      "id": "midh_cancer_early_01",
-     "n": 82
+     "n": 80
     },
     {
      "id": "police_night_shift_01",
-     "n": 58
-    },
-    {
-     "id": "fraud_audit_back_01",
-     "n": 55
+     "n": 60
     },
     {
      "id": "workh_smoker_cough_01",
-     "n": 48
+     "n": 57
+    },
+    {
+     "id": "fraud_audit_back_01",
+     "n": 53
     },
     {
      "id": "work_checkup_offer_01",
-     "n": 46
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 43
-    },
-    {
-     "id": "debt_cash_short_01",
-     "n": 37
-    },
-    {
-     "id": "fraud_whistle_01",
-     "n": 36
+     "n": 48
     },
     {
      "id": "echo_police_clean_01",
-     "n": 31
+     "n": 43
+    },
+    {
+     "id": "work_online_shop_01",
+     "n": 41
+    },
+    {
+     "id": "debt_cash_short_01",
+     "n": 36
+    },
+    {
+     "id": "fraud_whistle_01",
+     "n": 30
     },
     {
      "id": "midh_heart_after_01",
-     "n": 31
+     "n": 28
+    },
+    {
+     "id": "police_clean_tempt_01",
+     "n": 25
     },
     {
      "id": "work_influencer_01",
      "n": 24
     },
     {
-     "id": "police_clean_tempt_01",
-     "n": 23
-    },
-    {
      "id": "echo_police_ledger_01",
-     "n": 19
+     "n": 22
     },
     {
      "id": "police_bent_turn_01",
-     "n": 14
+     "n": 15
     },
     {
      "id": "midh_liver_01",
-     "n": 13
+     "n": 7
+    },
+    {
+     "id": "workh_bone_healer_call_01",
+     "n": 4
     },
     {
      "id": "mid_online_empire_01",
-     "n": 2
+     "n": 1
+    },
+    {
+     "id": "mid_debt_spiral_01",
+     "n": 1
     }
    ],
    "exits": [
     {
      "kind": "retire",
-     "n": 210
+     "n": 236
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 93
+     "n": 102
+    },
+    {
+     "kind": "death",
+     "n": 24
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_sign_bribe_01",
-     "n": 28
-    },
-    {
-     "kind": "death",
-     "n": 28
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_police_2",
-     "n": 19
-    },
-    {
-     "kind": "move",
-     "to": "trade|service",
-     "id": "fraud_whistle_01",
-     "n": 15
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "police_swap_driver_01",
-     "n": 12
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_audit_back_01",
-     "n": 11
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_police_3",
-     "n": 10
+     "n": 21
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "service_procure_01",
-     "n": 8
+     "n": 17
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "fraud_audit_back_01",
+     "n": 16
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_police_2",
+     "n": 14
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_police_3",
+     "n": 13
+    },
+    {
+     "kind": "move",
+     "to": "trade|service",
+     "id": "fraud_whistle_01",
+     "n": 10
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "police_swap_driver_01",
+     "n": 7
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_heart_after_01",
-     "n": 6
+     "n": 5
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "midh_heart_after_01",
-     "n": 2
+     "n": 4
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "echo_police_ledger_01",
+     "n": 2
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "police_envelope_01",
+     "n": 2
+    },
+    {
+     "kind": "move",
+     "to": "private|manager",
+     "id": "mid_online_empire_01",
      "n": 1
     }
    ]
   },
   "private|clerk": {
-   "lives": 511,
+   "lives": 528,
    "entries": [
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน พนักงานสำนักงาน",
-     "n": 187
+     "n": 193
     },
     {
      "id": "gov_transfer_01",
      "text": "ลาออกจากราชการ หางานใกล้บ้าน",
-     "n": 130
+     "n": 128
     },
     {
      "id": "first_job",
      "text": "สมัครงานพนักงานสำนักงาน",
-     "n": 91
+     "n": 94
     },
     {
      "id": "career_nepotism_01",
      "text": "รับตำแหน่งที่ญาติฝาก",
-     "n": 43
+     "n": 45
     },
     {
      "id": "first_job",
      "text": "ฝากเส้นเข้าพนักงานสำนักงาน",
-     "n": 25
+     "n": 32
     },
     {
      "id": "career_midlife_restart_01",
      "text": "โทรหาคนรู้จักเก่าทุกคน",
-     "n": 19
+     "n": 21
     },
     {
      "id": "first_job",
      "text": "ขอพรก่อนไปสมัครพนักงานสำนักงาน",
-     "n": 19
+     "n": 21
     },
     {
      "id": "first_job",
      "text": "ทุ่มเงินติวสมัครพนักงานสำนักงาน",
-     "n": 11
+     "n": 12
     },
     {
      "id": "kru_exam_01",
@@ -1706,268 +1699,272 @@
     {
      "id": "kru_exam_01",
      "text": "อ่านเอง แล้วเข้าสอบ",
-     "n": 2
+     "n": 1
     }
    ],
    "cards": [
     {
      "id": "promo_private_0",
-     "n": 471
+     "n": 488
     },
     {
      "id": "promo_private_1",
-     "n": 388
+     "n": 400
     },
     {
      "id": "promo_private_2",
-     "n": 285
+     "n": 290
     },
     {
      "id": "recruit_gov",
-     "n": 203
+     "n": 231
     },
     {
      "id": "promo_private_3",
-     "n": 198
-    },
-    {
-     "id": "work_layoff_01",
-     "n": 120
-    },
-    {
-     "id": "workh_office_syndrome_01",
-     "n": 117
+     "n": 195
     },
     {
      "id": "fraud_sign_bribe_01",
-     "n": 103
+     "n": 119
     },
     {
-     "id": "dilemma_team_cut_01",
-     "n": 101
+     "id": "workh_office_syndrome_01",
+     "n": 118
     },
     {
      "id": "midh_pressure_01",
-     "n": 99
+     "n": 105
+    },
+    {
+     "id": "mid_insurance_01",
+     "n": 105
+    },
+    {
+     "id": "fraud_village_fund_01",
+     "n": 103
+    },
+    {
+     "id": "work_layoff_01",
+     "n": 102
+    },
+    {
+     "id": "dilemma_team_cut_01",
+     "n": 100
     },
     {
      "id": "young_abroad_01",
+     "n": 99
+    },
+    {
+     "id": "lot_vendor_01",
      "n": 98
     },
     {
      "id": "young_first_boss_01",
-     "n": 97
-    },
-    {
-     "id": "career_lead_01",
-     "n": 97
-    },
-    {
-     "id": "mid_insurance_01",
      "n": 96
     },
     {
      "id": "career_poach_01",
-     "n": 94
+     "n": 95
     },
     {
-     "id": "fraud_village_fund_01",
-     "n": 94
-    },
-    {
-     "id": "lot_vendor_01",
-     "n": 87
-    },
-    {
-     "id": "midh_diabetes_01",
-     "n": 86
+     "id": "court_meet_work_01",
+     "n": 90
     },
     {
      "id": "era_dis_covid_office_01",
-     "n": 84
+     "n": 87
     },
     {
-     "id": "career_transfer_01",
+     "id": "early_retire",
+     "n": 85
+    },
+    {
+     "id": "mid_risky_bet_01",
      "n": 83
     },
     {
+     "id": "midh_diabetes_01",
+     "n": 83
+    },
+    {
+     "id": "career_transfer_01",
+     "n": 82
+    },
+    {
+     "id": "career_lead_01",
+     "n": 82
+    },
+    {
      "id": "young_shop_01",
-     "n": 81
+     "n": 79
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 76
+     "n": 79
     },
     {
      "id": "workh_smoker_cough_01",
      "n": 75
     },
     {
-     "id": "career_dream_01",
-     "n": 73
-    },
-    {
-     "id": "early_retire",
+     "id": "workh_burnout_01",
      "n": 73
     },
     {
      "id": "midh_heart_01",
-     "n": 72
-    },
-    {
-     "id": "mid_risky_bet_01",
-     "n": 72
-    },
-    {
-     "id": "work_risky_string_01",
-     "n": 72
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 67
+     "n": 71
     },
     {
      "id": "stats_high_network_01",
-     "n": 66
+     "n": 69
     },
     {
-     "id": "young_risky_cert_01",
-     "n": 63
+     "id": "work_risky_string_01",
+     "n": 67
+    },
+    {
+     "id": "career_midlife_restart_01",
+     "n": 64
     },
     {
      "id": "work_checkup_offer_01",
-     "n": 63
+     "n": 61
     },
     {
-     "id": "workh_burnout_01",
-     "n": 56
+     "id": "work_online_shop_01",
+     "n": 61
+    },
+    {
+     "id": "career_dream_01",
+     "n": 58
+    },
+    {
+     "id": "young_risky_cert_01",
+     "n": 54
+    },
+    {
+     "id": "lot_underground_mid_01",
+     "n": 50
+    },
+    {
+     "id": "kp_exam_01",
+     "n": 49
     },
     {
      "id": "midh_cancer_early_01",
      "n": 48
     },
     {
-     "id": "lot_underground_mid_01",
-     "n": 48
-    },
-    {
-     "id": "career_midlife_restart_01",
-     "n": 43
-    },
-    {
-     "id": "era_city_mobile_adult_01",
-     "n": 41
-    },
-    {
      "id": "era_econ_tyk_office_01",
      "n": 41
     },
     {
-     "id": "kp_exam_01",
-     "n": 40
-    },
-    {
-     "id": "work_influencer_01",
-     "n": 32
+     "id": "era_city_mobile_adult_01",
+     "n": 36
     },
     {
      "id": "debt_cash_short_01",
-     "n": 31
+     "n": 35
     },
     {
-     "id": "midh_heart_after_01",
-     "n": 23
+     "id": "work_influencer_01",
+     "n": 33
     },
     {
      "id": "fraud_whistle_01",
-     "n": 19
-    },
-    {
-     "id": "social_freeze_01",
-     "n": 14
-    },
-    {
-     "id": "show_karaoke_01",
-     "n": 13
+     "n": 21
     },
     {
      "id": "fraud_audit_back_01",
-     "n": 13
+     "n": 18
     },
     {
-     "id": "meme_cham_01",
-     "n": 10
-    },
-    {
-     "id": "midh_liver_01",
-     "n": 10
+     "id": "midh_heart_after_01",
+     "n": 17
     },
     {
      "id": "meme_slow_life_01",
-     "n": 9
+     "n": 11
+    },
+    {
+     "id": "midh_liver_01",
+     "n": 11
     },
     {
      "id": "meme_old_speech_01",
-     "n": 8
+     "n": 10
     },
     {
      "id": "career_poach_cornered_01",
-     "n": 8
+     "n": 10
     },
     {
-     "id": "social_oldchat_01",
-     "n": 8
+     "id": "show_molam_live_01",
+     "n": 9
     },
     {
      "id": "echo_debt_payroll_01",
      "n": 8
     },
     {
+     "id": "show_karaoke_01",
+     "n": 7
+    },
+    {
+     "id": "sport_wc_night_01",
+     "n": 7
+    },
+    {
      "id": "risky_cert_caught_01",
      "n": 7
     },
     {
-     "id": "young_boss_room_01",
-     "n": 7
-    },
-    {
-     "id": "sport_pitch_split_01",
-     "n": 7
-    },
-    {
-     "id": "debt_refinance_01",
-     "n": 7
-    },
-    {
-     "id": "workday_leave_left_01",
+     "id": "sport_office_bet_01",
      "n": 6
     },
     {
-     "id": "workday_car_break_01",
+     "id": "social_oldchat_01",
      "n": 6
-    },
-    {
-     "id": "show_molam_live_01",
-     "n": 5
     },
     {
      "id": "kp_agency_01",
      "n": 5
     },
     {
+     "id": "workh_bone_healer_call_01",
+     "n": 5
+    },
+    {
+     "id": "young_boss_room_01",
+     "n": 4
+    },
+    {
+     "id": "workday_car_break_01",
+     "n": 4
+    },
+    {
+     "id": "meme_cham_01",
+     "n": 4
+    },
+    {
      "id": "workday_gift_swap_01",
      "n": 4
     },
     {
-     "id": "food_somtam_contest_01",
+     "id": "sport_pitch_split_01",
      "n": 4
     },
     {
-     "id": "food_curry_queue_01",
+     "id": "food_khanomkrok_leave_01",
      "n": 4
     },
     {
-     "id": "sport_office_bet_01",
+     "id": "social_freeze_01",
+     "n": 4
+    },
+    {
+     "id": "workday_ot_dayoff_01",
      "n": 4
     },
     {
@@ -1975,43 +1972,27 @@
      "n": 3
     },
     {
-     "id": "tech_post_viral_01",
+     "id": "debt_refinance_01",
      "n": 3
     },
     {
-     "id": "school_loan_slip_01",
+     "id": "food_somtam_contest_01",
      "n": 3
     },
     {
-     "id": "workday_payday_wait_01",
+     "id": "money_coop_slip_01",
      "n": 3
     },
     {
-     "id": "tour_company_trip_01",
+     "id": "sex_pay_gap_01",
      "n": 3
     },
     {
-     "id": "workday_late_chat_01",
-     "n": 2
+     "id": "workday_freelance_wait_01",
+     "n": 3
     },
     {
-     "id": "workh_bone_healer_call_01",
-     "n": 2
-    },
-    {
-     "id": "tech_night_raid_01",
-     "n": 2
-    },
-    {
-     "id": "workday_chili_pickup_01",
-     "n": 2
-    },
-    {
-     "id": "workday_sick_cert_01",
-     "n": 2
-    },
-    {
-     "id": "workday_ot_dayoff_01",
+     "id": "echo_debt_slip_audit_01",
      "n": 2
     },
     {
@@ -2019,23 +2000,51 @@
      "n": 2
     },
     {
+     "id": "workday_chili_pickup_01",
+     "n": 2
+    },
+    {
+     "id": "workday_leave_left_01",
+     "n": 2
+    },
+    {
+     "id": "work_biz_boom_01",
+     "n": 2
+    },
+    {
+     "id": "school_loan_slip_01",
+     "n": 2
+    },
+    {
+     "id": "workday_self_review_01",
+     "n": 2
+    },
+    {
+     "id": "money_app_fee_01",
+     "n": 2
+    },
+    {
+     "id": "workday_weekend_ot_01",
+     "n": 2
+    },
+    {
+     "id": "workday_boss_order_01",
+     "n": 1
+    },
+    {
+     "id": "tour_company_trip_01",
+     "n": 1
+    },
+    {
      "id": "workday_errand_leave_01",
      "n": 1
     },
     {
-     "id": "sex_pay_gap_01",
+     "id": "food_curry_queue_01",
      "n": 1
     },
     {
-     "id": "money_coop_slip_01",
-     "n": 1
-    },
-    {
-     "id": "work_biz_boom_01",
-     "n": 1
-    },
-    {
-     "id": "echo_debt_slip_audit_01",
+     "id": "workday_desk_clear_01",
      "n": 1
     },
     {
@@ -2043,38 +2052,30 @@
      "n": 1
     },
     {
-     "id": "sport_wc_night_01",
-     "n": 1
-    },
-    {
-     "id": "money_app_fee_01",
-     "n": 1
-    },
-    {
-     "id": "workday_self_review_01",
-     "n": 1
-    },
-    {
-     "id": "food_khanomkrok_leave_01",
+     "id": "tech_post_viral_01",
      "n": 1
     }
    ],
    "exits": [
     {
      "kind": "move",
-     "to": "trade|farmer",
-     "id": "work_layoff_01",
-     "n": 85
+     "to": "gov|officer",
+     "id": "recruit_gov",
+     "n": 78
     },
     {
      "kind": "retire",
-     "n": 79
+     "n": 73
     },
     {
      "kind": "move",
-     "to": "gov|officer",
-     "id": "recruit_gov",
-     "n": 68
+     "to": "trade|farmer",
+     "id": "work_layoff_01",
+     "n": 65
+    },
+    {
+     "kind": "early_retire",
+     "n": 55
     },
     {
      "kind": "move",
@@ -2083,36 +2084,38 @@
      "n": 54
     },
     {
-     "kind": "early_retire",
-     "n": 48
-    },
-    {
-     "kind": "move",
-     "to": "police|officer",
-     "id": "recruit_gov",
-     "n": 31
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_sign_bribe_01",
-     "n": 27
-    },
-    {
      "kind": "death",
-     "n": 27
+     "n": 36
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "career_midlife_restart_01",
-     "n": 20
+     "n": 33
+    },
+    {
+     "kind": "move",
+     "to": "police|officer",
+     "id": "recruit_gov",
+     "n": 32
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "fraud_sign_bribe_01",
+     "n": 23
     },
     {
      "kind": "move",
      "to": "trade|service",
-     "id": "career_transfer_01",
-     "n": 14
+     "id": "early_retire",
+     "n": 18
+    },
+    {
+     "kind": "move",
+     "to": "army|officer",
+     "id": "recruit_gov",
+     "n": 18
     },
     {
      "kind": "move",
@@ -2122,33 +2125,21 @@
     },
     {
      "kind": "move",
-     "to": "army|officer",
-     "id": "recruit_gov",
-     "n": 11
-    },
-    {
-     "kind": "move",
-     "to": "private|manager",
-     "id": "career_lead_01",
-     "n": 8
-    },
-    {
-     "kind": "move",
      "to": "trade|service",
-     "id": "early_retire",
-     "n": 6
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_private_1",
-     "n": 6
+     "id": "career_transfer_01",
+     "n": 10
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "fraud_whistle_01",
-     "n": 6
+     "n": 10
+    },
+    {
+     "kind": "move",
+     "to": "private|manager",
+     "id": "career_lead_01",
+     "n": 5
     },
     {
      "kind": "move",
@@ -2165,13 +2156,7 @@
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_private_2",
-     "n": 4
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_private_0",
+     "id": "promo_private_1",
      "n": 4
     },
     {
@@ -2182,14 +2167,26 @@
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "midh_heart_after_01",
+     "to": "trade|labor",
+     "id": "promo_private_0",
+     "n": 3
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_private_2",
      "n": 3
     },
     {
      "kind": "move",
      "to": "gov|officer",
      "id": "kp_agency_01",
+     "n": 1
+    },
+    {
+     "kind": "move",
+     "to": "trade|service",
+     "id": "workh_bone_healer_call_01",
      "n": 1
     },
     {
@@ -2201,279 +2198,279 @@
    ]
   },
   "private|manager": {
-   "lives": 502,
+   "lives": 469,
    "entries": [
     {
      "id": "first_job",
      "text": "ฝากเส้นเข้าผู้บริหาร",
-     "n": 191
+     "n": 185
     },
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน ผู้บริหาร",
-     "n": 138
+     "n": 132
     },
     {
      "id": "first_job",
      "text": "ขอพรก่อนไปสมัครผู้บริหาร",
-     "n": 48
+     "n": 42
     },
     {
      "id": "first_job",
      "text": "สมัครงานผู้บริหาร",
-     "n": 41
+     "n": 38
     },
     {
      "id": "career_nepotism_01",
      "text": "จ่ายใต้โต๊ะซื้อเก้าอี้ผู้จัดการ",
-     "n": 39
+     "n": 35
     },
     {
      "id": "first_job",
      "text": "ทุ่มเงินติวสมัครผู้บริหาร",
-     "n": 20
+     "n": 19
     },
     {
      "id": "career_lead_01",
      "text": "รับเลย แล้วบีบลูกน้องทำยอด",
-     "n": 13
+     "n": 9
     },
     {
      "id": "career_lead_01",
      "text": "รับตำแหน่งผู้จัดการ",
-     "n": 10
+     "n": 8
+    },
+    {
+     "id": "work_promotion_01",
+     "text": "ต่อรองขอทำงานทางไกล",
+     "n": 5
     },
     {
      "id": "work_promotion_01",
      "text": "รับเลย ย้ายไปคนเดียว",
-     "n": 6
+     "n": 4
     },
     {
      "id": "mid_online_empire_01",
      "text": "จดบริษัท นั่งเก้าอี้ผู้บริหาร",
      "n": 3
-    },
-    {
-     "id": "work_promotion_01",
-     "text": "ต่อรองขอทำงานทางไกล",
-     "n": 2
     }
    ],
    "cards": [
     {
      "id": "promo_private_2",
-     "n": 407
+     "n": 380
     },
     {
      "id": "promo_private_3",
-     "n": 306
+     "n": 296
     },
     {
      "id": "recruit_gov",
-     "n": 264
+     "n": 251
     },
     {
      "id": "fraud_sign_bribe_01",
-     "n": 160
+     "n": 146
     },
     {
      "id": "fraud_contract_01",
-     "n": 152
-    },
-    {
-     "id": "lot_vendor_01",
      "n": 121
     },
     {
+     "id": "court_meet_work_01",
+     "n": 117
+    },
+    {
      "id": "stats_high_network_01",
-     "n": 119
+     "n": 103
     },
     {
      "id": "young_abroad_01",
-     "n": 116
+     "n": 91
     },
     {
-     "id": "career_poach_01",
-     "n": 105
-    },
-    {
-     "id": "young_first_boss_01",
-     "n": 96
-    },
-    {
-     "id": "fraud_wage_squeeze_01",
+     "id": "lot_vendor_01",
      "n": 89
     },
     {
-     "id": "era_dis_covid_office_01",
-     "n": 82
+     "id": "career_poach_01",
+     "n": 89
     },
     {
-     "id": "workh_burnout_01",
-     "n": 79
+     "id": "young_first_boss_01",
+     "n": 86
     },
     {
-     "id": "dilemma_team_cut_01",
-     "n": 75
+     "id": "fraud_wage_squeeze_01",
+     "n": 85
     },
     {
      "id": "young_risky_cert_01",
-     "n": 73
+     "n": 76
     },
     {
-     "id": "fraud_village_fund_01",
+     "id": "workh_burnout_01",
+     "n": 71
+    },
+    {
+     "id": "era_dis_covid_office_01",
      "n": 69
     },
     {
-     "id": "midh_pressure_01",
-     "n": 65
+     "id": "dilemma_team_cut_01",
+     "n": 68
     },
     {
-     "id": "workh_smoker_cough_01",
+     "id": "midh_pressure_01",
      "n": 63
     },
     {
-     "id": "mid_risky_bet_01",
-     "n": 62
+     "id": "fraud_village_fund_01",
+     "n": 58
     },
     {
      "id": "career_transfer_01",
-     "n": 60
-    },
-    {
-     "id": "kp_exam_01",
-     "n": 60
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 59
-    },
-    {
-     "id": "work_checkup_offer_01",
-     "n": 56
-    },
-    {
-     "id": "workh_office_syndrome_01",
-     "n": 53
-    },
-    {
-     "id": "early_retire",
-     "n": 52
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 51
-    },
-    {
-     "id": "midh_diabetes_01",
-     "n": 50
-    },
-    {
-     "id": "work_risky_string_01",
-     "n": 49
+     "n": 58
     },
     {
      "id": "work_layoff_01",
-     "n": 47
+     "n": 53
     },
     {
-     "id": "era_econ_tyk_office_01",
-     "n": 43
+     "id": "workh_office_syndrome_01",
+     "n": 52
     },
     {
-     "id": "career_midlife_restart_01",
-     "n": 40
+     "id": "workh_smoker_cough_01",
+     "n": 51
     },
     {
-     "id": "midh_kidney_stone_01",
-     "n": 39
+     "id": "midh_heart_01",
+     "n": 51
+    },
+    {
+     "id": "mid_risky_bet_01",
+     "n": 51
+    },
+    {
+     "id": "work_risky_string_01",
+     "n": 48
+    },
+    {
+     "id": "kp_exam_01",
+     "n": 46
+    },
+    {
+     "id": "midh_diabetes_01",
+     "n": 45
+    },
+    {
+     "id": "early_retire",
+     "n": 42
     },
     {
      "id": "mid_insurance_01",
+     "n": 41
+    },
+    {
+     "id": "work_online_shop_01",
+     "n": 40
+    },
+    {
+     "id": "work_checkup_offer_01",
+     "n": 38
+    },
+    {
+     "id": "midh_kidney_stone_01",
      "n": 37
     },
     {
-     "id": "era_city_mobile_adult_01",
-     "n": 36
+     "id": "era_econ_tyk_office_01",
+     "n": 37
     },
     {
      "id": "debt_cash_short_01",
-     "n": 29
+     "n": 35
     },
     {
-     "id": "lot_underground_mid_01",
-     "n": 29
+     "id": "era_city_mobile_adult_01",
+     "n": 33
+    },
+    {
+     "id": "career_midlife_restart_01",
+     "n": 31
     },
     {
      "id": "fraud_whistle_01",
-     "n": 25
-    },
-    {
-     "id": "work_influencer_01",
-     "n": 25
-    },
-    {
-     "id": "midh_cancer_early_01",
-     "n": 24
-    },
-    {
-     "id": "social_freeze_01",
      "n": 22
     },
     {
-     "id": "midh_heart_after_01",
+     "id": "work_influencer_01",
+     "n": 22
+    },
+    {
+     "id": "midh_cancer_early_01",
+     "n": 20
+    },
+    {
+     "id": "lot_underground_mid_01",
+     "n": 17
+    },
+    {
+     "id": "meme_slow_life_01",
      "n": 16
     },
     {
+     "id": "midh_heart_after_01",
+     "n": 14
+    },
+    {
+     "id": "social_freeze_01",
+     "n": 12
+    },
+    {
      "id": "fraud_audit_back_01",
-     "n": 15
-    },
-    {
-     "id": "social_oldchat_01",
-     "n": 12
-    },
-    {
-     "id": "meme_cham_01",
-     "n": 12
-    },
-    {
-     "id": "show_karaoke_01",
      "n": 11
     },
     {
      "id": "risky_cert_caught_01",
-     "n": 11
-    },
-    {
-     "id": "meme_old_speech_01",
-     "n": 9
-    },
-    {
-     "id": "kp_agency_01",
-     "n": 8
+     "n": 10
     },
     {
      "id": "young_boss_room_01",
+     "n": 9
+    },
+    {
+     "id": "show_karaoke_01",
+     "n": 8
+    },
+    {
+     "id": "workday_gift_swap_01",
      "n": 7
     },
     {
-     "id": "echo_debt_payroll_01",
+     "id": "meme_old_speech_01",
+     "n": 7
+    },
+    {
+     "id": "kp_agency_01",
+     "n": 6
+    },
+    {
+     "id": "midh_liver_01",
+     "n": 6
+    },
+    {
+     "id": "career_poach_cornered_01",
      "n": 5
     },
     {
-     "id": "sport_pitch_split_01",
+     "id": "social_oldchat_01",
      "n": 5
     },
     {
-     "id": "tech_night_raid_01",
-     "n": 5
-    },
-    {
-     "id": "kru_exam_01",
-     "n": 5
-    },
-    {
-     "id": "meme_slow_life_01",
+     "id": "workday_weekend_ot_01",
      "n": 5
     },
     {
@@ -2481,19 +2478,15 @@
      "n": 5
     },
     {
-     "id": "food_somtam_contest_01",
+     "id": "echo_debt_payroll_01",
      "n": 4
     },
     {
-     "id": "career_poach_cornered_01",
+     "id": "meme_cham_01",
      "n": 4
     },
     {
-     "id": "midh_liver_01",
-     "n": 4
-    },
-    {
-     "id": "sport_office_bet_01",
+     "id": "tech_night_raid_01",
      "n": 4
     },
     {
@@ -2501,15 +2494,19 @@
      "n": 3
     },
     {
-     "id": "workday_self_review_01",
+     "id": "nurse_license_01",
      "n": 3
     },
     {
-     "id": "workday_chili_pickup_01",
+     "id": "workh_bone_healer_call_01",
      "n": 3
     },
     {
-     "id": "workday_gift_swap_01",
+     "id": "kru_exam_01",
+     "n": 3
+    },
+    {
+     "id": "echo_debt_slip_audit_01",
      "n": 3
     },
     {
@@ -2517,15 +2514,15 @@
      "n": 3
     },
     {
-     "id": "nurse_license_01",
-     "n": 3
-    },
-    {
-     "id": "workday_late_chat_01",
+     "id": "career_lead_mutiny_01",
      "n": 2
     },
     {
-     "id": "career_lead_mutiny_01",
+     "id": "tour_company_trip_01",
+     "n": 2
+    },
+    {
+     "id": "food_khanomkrok_leave_01",
      "n": 2
     },
     {
@@ -2533,15 +2530,19 @@
      "n": 2
     },
     {
+     "id": "workday_self_review_01",
+     "n": 2
+    },
+    {
+     "id": "sport_pitch_split_01",
+     "n": 2
+    },
+    {
      "id": "workday_sick_cert_01",
      "n": 2
     },
     {
-     "id": "workday_leave_left_01",
-     "n": 2
-    },
-    {
-     "id": "workday_car_break_01",
+     "id": "mid_online_empire_01",
      "n": 2
     },
     {
@@ -2549,23 +2550,55 @@
      "n": 2
     },
     {
+     "id": "workday_leave_left_01",
+     "n": 2
+    },
+    {
+     "id": "workday_freelance_wait_01",
+     "n": 2
+    },
+    {
+     "id": "workday_car_break_01",
+     "n": 1
+    },
+    {
+     "id": "work_biz_bust_01",
+     "n": 1
+    },
+    {
+     "id": "sky_crew_01",
+     "n": 1
+    },
+    {
+     "id": "workday_boss_order_01",
+     "n": 1
+    },
+    {
+     "id": "workday_desk_clear_01",
+     "n": 1
+    },
+    {
      "id": "tech_post_viral_01",
      "n": 1
     },
     {
-     "id": "tour_company_trip_01",
+     "id": "work_biz_boom_01",
      "n": 1
     },
     {
-     "id": "money_app_fee_01",
+     "id": "workday_chili_pickup_01",
      "n": 1
     },
     {
-     "id": "school_loan_slip_01",
+     "id": "sky_hire_01",
      "n": 1
     },
     {
-     "id": "workday_errand_leave_01",
+     "id": "food_price_sign_01",
+     "n": 1
+    },
+    {
+     "id": "sport_wc_night_01",
      "n": 1
     }
    ],
@@ -2574,200 +2607,191 @@
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 133
+     "n": 118
+    },
+    {
+     "kind": "retire",
+     "n": 44
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_sign_bribe_01",
-     "n": 48
-    },
-    {
-     "kind": "death",
-     "n": 35
-    },
-    {
-     "kind": "move",
-     "to": "trade|farmer",
-     "id": "work_layoff_01",
-     "n": 33
-    },
-    {
-     "kind": "retire",
-     "n": 33
-    },
-    {
-     "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_pressure_01",
-     "n": 33
-    },
-    {
-     "kind": "early_retire",
-     "n": 28
-    },
-    {
-     "kind": "move",
-     "to": "army|officer",
-     "id": "recruit_gov",
-     "n": 27
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "career_midlife_restart_01",
-     "n": 23
+     "n": 44
     },
     {
      "kind": "move",
      "to": "police|officer",
      "id": "recruit_gov",
-     "n": 22
+     "n": 36
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "work_layoff_01",
+     "n": 30
+    },
+    {
+     "kind": "early_retire",
+     "n": 27
+    },
+    {
+     "kind": "move",
+     "to": "army|officer",
+     "id": "recruit_gov",
+     "n": 25
+    },
+    {
+     "kind": "death",
+     "n": 24
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "midh_pressure_01",
+     "n": 23
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "fraud_wage_squeeze_01",
+     "n": 21
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "career_midlife_restart_01",
+     "n": 14
+    },
+    {
+     "kind": "move",
+     "to": "private|clerk",
+     "id": "career_midlife_restart_01",
+     "n": 12
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "fraud_whistle_01",
-     "n": 14
-    },
-    {
-     "kind": "move",
-     "to": "trade|craft",
-     "id": "career_midlife_restart_01",
-     "n": 10
+     "n": 11
     },
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_private_3",
+     "id": "promo_private_2",
      "n": 9
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "early_retire",
-     "n": 9
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_wage_squeeze_01",
-     "n": 9
-    },
-    {
-     "kind": "move",
-     "to": "trade|service",
-     "id": "career_transfer_01",
      "n": 8
     },
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_private_2",
-     "n": 7
-    },
-    {
-     "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_heart_after_01",
+     "id": "promo_private_3",
      "n": 6
     },
     {
      "kind": "move",
-     "to": "private|clerk",
+     "to": "trade|service",
+     "id": "career_transfer_01",
+     "n": 6
+    },
+    {
+     "kind": "move",
+     "to": "trade|craft",
      "id": "career_midlife_restart_01",
-     "n": 6
+     "n": 5
     },
     {
      "kind": "move",
-     "to": "gov|officer",
-     "id": "kp_agency_01",
+     "to": "trade|labor",
+     "id": "fraud_audit_back_01",
      "n": 4
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "midh_heart_after_01",
-     "n": 4
+     "n": 3
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "midh_heart_after_01",
+     "n": 3
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "work_biz_bust_01",
+     "n": 1
+    },
+    {
+     "kind": "move",
+     "to": "gov|officer",
+     "id": "kp_agency_01",
+     "n": 1
     },
     {
      "kind": "move",
      "to": "private|professional",
      "id": "med_license_01",
-     "n": 3
+     "n": 1
     },
     {
      "kind": "move",
      "to": "private|clerk",
      "id": "kru_exam_01",
-     "n": 2
+     "n": 1
     },
     {
      "kind": "move",
      "to": "private|professional",
      "id": "nurse_license_01",
-     "n": 2
+     "n": 1
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_audit_back_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "gov|officer",
-     "id": "kru_exam_01",
+     "to": "trade|service",
+     "id": "workh_bone_healer_call_01",
      "n": 1
     }
    ]
   },
   "private|professional": {
-   "lives": 315,
+   "lives": 313,
    "entries": [
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน วิชาชีพ",
-     "n": 146
+     "n": 148
     },
     {
      "id": "first_job",
      "text": "ฝากเส้นเข้าวิชาชีพ",
-     "n": 76
+     "n": 73
     },
     {
      "id": "first_job",
      "text": "สมัครงานวิชาชีพ",
-     "n": 44
+     "n": 51
     },
     {
      "id": "first_job",
      "text": "ขอพรก่อนไปสมัครวิชาชีพ",
-     "n": 22
+     "n": 20
     },
     {
      "id": "first_job",
      "text": "ทุ่มเงินติวสมัครวิชาชีพ",
-     "n": 13
-    },
-    {
-     "id": "med_license_01",
-     "text": "ติวกลุ่มกับเพื่อนจนเช้า",
-     "n": 4
+     "n": 15
     },
     {
      "id": "med_license_01",
      "text": "เข้าห้องสอบตามรอบ",
-     "n": 3
-    },
-    {
-     "id": "nurse_license_01",
-     "text": "เข้าห้องสอบตามรอบ",
-     "n": 2
-    },
-    {
-     "id": "nurse_license_01",
-     "text": "ติวกลุ่มทั้งหอจนเช้า",
      "n": 2
     },
     {
@@ -2776,235 +2800,236 @@
      "n": 1
     },
     {
-     "id": "nurse_license_01",
-     "text": "ไหว้ศาลก่อนเข้าห้องสอบ",
+     "id": "sky_hire_01",
+     "text": "สอบเข้าสายการบิน",
      "n": 1
     },
     {
-     "id": "sky_hire_01",
-     "text": "สอบเข้าสายการบิน",
+     "id": "med_license_01",
+     "text": "ติวกลุ่มกับเพื่อนจนเช้า",
+     "n": 1
+    },
+    {
+     "id": "nurse_license_01",
+     "text": "ติวกลุ่มทั้งหอจนเช้า",
      "n": 1
     }
    ],
    "cards": [
     {
      "id": "promo_private_0",
-     "n": 290
+     "n": 288
     },
     {
      "id": "promo_private_1",
-     "n": 225
+     "n": 228
     },
     {
      "id": "recruit_gov",
-     "n": 176
+     "n": 178
     },
     {
      "id": "promo_private_2",
-     "n": 167
+     "n": 168
     },
     {
      "id": "promo_private_3",
-     "n": 134
+     "n": 129
     },
     {
      "id": "young_abroad_01",
-     "n": 84
-    },
-    {
-     "id": "young_first_boss_01",
-     "n": 83
+     "n": 79
     },
     {
      "id": "fraud_sign_bribe_01",
-     "n": 77
+     "n": 79
     },
     {
      "id": "lot_vendor_01",
-     "n": 73
+     "n": 78
     },
     {
      "id": "career_poach_01",
-     "n": 72
+     "n": 75
     },
     {
-     "id": "stats_high_network_01",
-     "n": 67
+     "id": "court_meet_work_01",
+     "n": 73
     },
     {
      "id": "young_risky_cert_01",
-     "n": 65
-    },
-    {
-     "id": "era_dis_covid_office_01",
      "n": 64
     },
     {
-     "id": "career_lead_01",
-     "n": 58
+     "id": "work_promotion_01",
+     "n": 63
+    },
+    {
+     "id": "young_first_boss_01",
+     "n": 62
+    },
+    {
+     "id": "era_dis_covid_office_01",
+     "n": 60
+    },
+    {
+     "id": "stats_high_network_01",
+     "n": 59
     },
     {
      "id": "workh_office_syndrome_01",
+     "n": 58
+    },
+    {
+     "id": "career_lead_01",
      "n": 57
     },
     {
      "id": "dilemma_team_cut_01",
-     "n": 52
-    },
-    {
-     "id": "work_promotion_01",
-     "n": 50
-    },
-    {
-     "id": "workh_burnout_01",
-     "n": 46
-    },
-    {
-     "id": "workh_smoker_cough_01",
-     "n": 44
+     "n": 51
     },
     {
      "id": "fraud_village_fund_01",
-     "n": 43
-    },
-    {
-     "id": "midh_pressure_01",
-     "n": 40
-    },
-    {
-     "id": "mid_risky_bet_01",
-     "n": 38
-    },
-    {
-     "id": "work_checkup_offer_01",
-     "n": 37
+     "n": 41
     },
     {
      "id": "work_layoff_01",
-     "n": 34
-    },
-    {
-     "id": "mid_insurance_01",
-     "n": 34
-    },
-    {
-     "id": "career_transfer_01",
-     "n": 32
+     "n": 41
     },
     {
      "id": "work_risky_string_01",
-     "n": 31
+     "n": 38
     },
     {
-     "id": "midh_diabetes_01",
-     "n": 30
+     "id": "workh_smoker_cough_01",
+     "n": 36
+    },
+    {
+     "id": "work_checkup_offer_01",
+     "n": 36
     },
     {
      "id": "kp_exam_01",
-     "n": 29
+     "n": 36
     },
     {
-     "id": "work_influencer_01",
-     "n": 29
+     "id": "midh_pressure_01",
+     "n": 33
+    },
+    {
+     "id": "workh_burnout_01",
+     "n": 32
     },
     {
      "id": "midh_heart_01",
-     "n": 28
+     "n": 29
+    },
+    {
+     "id": "mid_insurance_01",
+     "n": 29
     },
     {
      "id": "work_online_shop_01",
      "n": 27
     },
     {
-     "id": "era_city_mobile_adult_01",
-     "n": 25
+     "id": "career_transfer_01",
+     "n": 26
     },
     {
-     "id": "midh_kidney_stone_01",
+     "id": "midh_diabetes_01",
      "n": 24
     },
     {
+     "id": "work_influencer_01",
+     "n": 24
+    },
+    {
+     "id": "midh_kidney_stone_01",
+     "n": 22
+    },
+    {
+     "id": "era_city_mobile_adult_01",
+     "n": 22
+    },
+    {
+     "id": "mid_risky_bet_01",
+     "n": 20
+    },
+    {
+     "id": "midh_cancer_early_01",
+     "n": 18
+    },
+    {
      "id": "era_econ_tyk_office_01",
-     "n": 23
+     "n": 18
     },
     {
      "id": "early_retire",
-     "n": 23
+     "n": 18
     },
     {
      "id": "career_midlife_restart_01",
-     "n": 20
+     "n": 18
     },
     {
      "id": "debt_cash_short_01",
-     "n": 20
-    },
-    {
-     "id": "fraud_whistle_01",
-     "n": 16
+     "n": 17
     },
     {
      "id": "lot_underground_mid_01",
      "n": 15
     },
     {
-     "id": "social_freeze_01",
+     "id": "meme_slow_life_01",
      "n": 14
     },
     {
-     "id": "young_boss_room_01",
-     "n": 13
-    },
-    {
-     "id": "midh_cancer_early_01",
-     "n": 13
-    },
-    {
-     "id": "meme_slow_life_01",
+     "id": "fraud_whistle_01",
      "n": 12
     },
     {
-     "id": "echo_debt_payroll_01",
+     "id": "social_freeze_01",
      "n": 11
     },
     {
      "id": "risky_cert_caught_01",
-     "n": 10
+     "n": 11
     },
     {
-     "id": "midh_heart_after_01",
+     "id": "echo_debt_payroll_01",
      "n": 8
     },
     {
-     "id": "fraud_audit_back_01",
-     "n": 7
-    },
-    {
-     "id": "social_oldchat_01",
-     "n": 7
-    },
-    {
-     "id": "midh_liver_01",
-     "n": 6
-    },
-    {
-     "id": "kp_agency_01",
-     "n": 5
-    },
-    {
-     "id": "career_poach_cornered_01",
-     "n": 4
+     "id": "meme_old_speech_01",
+     "n": 8
     },
     {
      "id": "meme_cham_01",
-     "n": 4
+     "n": 6
     },
     {
-     "id": "meme_old_speech_01",
-     "n": 4
+     "id": "midh_heart_after_01",
+     "n": 6
     },
     {
      "id": "show_karaoke_01",
+     "n": 5
+    },
+    {
+     "id": "social_oldchat_01",
+     "n": 5
+    },
+    {
+     "id": "tech_post_viral_01",
+     "n": 4
+    },
+    {
+     "id": "young_boss_room_01",
+     "n": 4
+    },
+    {
+     "id": "midh_liver_01",
      "n": 4
     },
     {
@@ -3012,19 +3037,15 @@
      "n": 4
     },
     {
-     "id": "sport_wc_night_01",
-     "n": 3
-    },
-    {
-     "id": "workh_bone_healer_call_01",
+     "id": "food_khanomkrok_leave_01",
      "n": 2
     },
     {
-     "id": "mid_online_empire_01",
+     "id": "money_coop_slip_01",
      "n": 2
     },
     {
-     "id": "sport_office_bet_01",
+     "id": "career_poach_cornered_01",
      "n": 2
     },
     {
@@ -3032,27 +3053,35 @@
      "n": 2
     },
     {
-     "id": "food_price_sign_01",
+     "id": "kp_agency_01",
+     "n": 2
+    },
+    {
+     "id": "sport_pitch_split_01",
+     "n": 2
+    },
+    {
+     "id": "fraud_audit_back_01",
+     "n": 2
+    },
+    {
+     "id": "food_somtam_contest_01",
      "n": 2
     },
     {
      "id": "debt_refinance_01",
+     "n": 2
+    },
+    {
+     "id": "swindle_office_sample_01",
+     "n": 2
+    },
+    {
+     "id": "sex_pay_gap_01",
      "n": 1
     },
     {
-     "id": "med_license_01",
-     "n": 1
-    },
-    {
-     "id": "tech_night_raid_01",
-     "n": 1
-    },
-    {
-     "id": "work_biz_bust_01",
-     "n": 1
-    },
-    {
-     "id": "tour_company_trip_01",
+     "id": "mid_online_empire_01",
      "n": 1
     },
     {
@@ -3060,19 +3089,23 @@
      "n": 1
     },
     {
-     "id": "school_term_delay_01",
+     "id": "workh_bone_healer_call_01",
      "n": 1
     },
     {
-     "id": "food_somtam_contest_01",
+     "id": "sky_crew_01",
      "n": 1
     },
     {
-     "id": "money_app_fee_01",
+     "id": "sport_office_bet_01",
      "n": 1
     },
     {
-     "id": "swindle_office_sample_01",
+     "id": "tour_company_trip_01",
+     "n": 1
+    },
+    {
+     "id": "tech_night_raid_01",
      "n": 1
     }
    ],
@@ -3081,84 +3114,78 @@
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 80
-    },
-    {
-     "kind": "retire",
-     "n": 32
+     "n": 78
     },
     {
      "kind": "move",
      "to": "police|officer",
      "id": "recruit_gov",
-     "n": 24
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_sign_bribe_01",
-     "n": 21
+     "n": 33
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "work_layoff_01",
-     "n": 21
+     "n": 29
+    },
+    {
+     "kind": "retire",
+     "n": 28
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 19
+     "n": 22
+    },
+    {
+     "kind": "death",
+     "n": 21
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "fraud_sign_bribe_01",
+     "n": 17
+    },
+    {
+     "kind": "early_retire",
+     "n": 14
     },
     {
      "kind": "move",
      "to": "army|officer",
      "id": "recruit_gov",
-     "n": 18
-    },
-    {
-     "kind": "early_retire",
-     "n": 16
-    },
-    {
-     "kind": "death",
-     "n": 16
+     "n": 13
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "career_midlife_restart_01",
-     "n": 11
-    },
-    {
-     "kind": "move",
-     "to": "private|manager",
-     "id": "career_lead_01",
-     "n": 10
+     "n": 13
     },
     {
      "kind": "move",
      "to": "private|manager",
      "id": "work_promotion_01",
-     "n": 8
-    },
-    {
-     "kind": "move",
-     "to": "trade|service",
-     "id": "fraud_whistle_01",
-     "n": 6
-    },
-    {
-     "kind": "move",
-     "to": "private|clerk",
-     "id": "career_midlife_restart_01",
-     "n": 6
+     "n": 9
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_private_1",
+     "n": 8
+    },
+    {
+     "kind": "move",
+     "to": "private|manager",
+     "id": "career_lead_01",
+     "n": 7
+    },
+    {
+     "kind": "move",
+     "to": "trade|service",
+     "id": "fraud_whistle_01",
      "n": 5
     },
     {
@@ -3170,32 +3197,20 @@
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_private_0",
-     "n": 4
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
      "id": "promo_private_3",
      "n": 3
     },
     {
      "kind": "move",
-     "to": "trade|craft",
-     "id": "career_midlife_restart_01",
-     "n": 3
-    },
-    {
-     "kind": "move",
-     "to": "gov|officer",
-     "id": "kp_agency_01",
+     "to": "trade|labor",
+     "id": "promo_private_2",
      "n": 2
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "workh_bone_healer_call_01",
-     "n": 1
+     "to": "private|clerk",
+     "id": "career_midlife_restart_01",
+     "n": 2
     },
     {
      "kind": "move",
@@ -3205,20 +3220,14 @@
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "work_biz_bust_01",
+     "to": "private|technician",
+     "id": "first_job",
      "n": 1
     },
     {
      "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_heart_after_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_private_2",
+     "to": "trade|service",
+     "id": "sky_crew_01",
      "n": 1
     },
     {
@@ -3226,275 +3235,278 @@
      "to": "trade|labor",
      "id": "fraud_audit_back_01",
      "n": 1
+    },
+    {
+     "kind": "move",
+     "to": "trade|craft",
+     "id": "career_midlife_restart_01",
+     "n": 1
     }
    ]
   },
   "private|technician": {
-   "lives": 328,
+   "lives": 329,
    "entries": [
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน ช่างเทคนิค",
-     "n": 170
+     "n": 165
     },
     {
      "id": "first_job",
      "text": "สมัครงานช่างเทคนิค",
-     "n": 61
+     "n": 76
     },
     {
      "id": "first_job",
      "text": "ฝากเส้นเข้าช่างเทคนิค",
-     "n": 41
+     "n": 42
     },
     {
      "id": "first_job",
      "text": "ขอพรก่อนไปสมัครช่างเทคนิค",
-     "n": 27
+     "n": 24
     },
     {
      "id": "first_job",
      "text": "ทุ่มเงินติวสมัครช่างเทคนิค",
-     "n": 22
-    },
-    {
-     "id": "career_factory_exam_01",
-     "text": "ใส่ซองให้กรรมการคุมสอบ",
-     "n": 4
+     "n": 16
     },
     {
      "id": "career_factory_exam_01",
      "text": "ขอช่างประจำสอนงานหลังเลิกกะ",
      "n": 3
+    },
+    {
+     "id": "career_factory_exam_01",
+     "text": "ใส่ซองให้กรรมการคุมสอบ",
+     "n": 2
+    },
+    {
+     "id": "career_factory_exam_01",
+     "text": "อ่านคู่มือเครื่องจักรทุกคืน",
+     "n": 1
     }
    ],
    "cards": [
     {
      "id": "promo_private_0",
-     "n": 312
+     "n": 315
     },
     {
      "id": "promo_private_1",
-     "n": 265
+     "n": 270
     },
     {
      "id": "promo_private_2",
-     "n": 202
+     "n": 207
     },
     {
      "id": "recruit_gov",
-     "n": 183
+     "n": 185
     },
     {
      "id": "promo_private_3",
-     "n": 162
+     "n": 154
     },
     {
-     "id": "lot_vendor_01",
-     "n": 98
+     "id": "court_meet_work_01",
+     "n": 105
     },
     {
      "id": "fraud_contract_01",
-     "n": 98
+     "n": 100
     },
     {
      "id": "career_poach_01",
-     "n": 96
+     "n": 92
+    },
+    {
+     "id": "lot_vendor_01",
+     "n": 86
     },
     {
      "id": "young_abroad_01",
-     "n": 91
-    },
-    {
-     "id": "era_dis_covid_office_01",
-     "n": 74
+     "n": 85
     },
     {
      "id": "young_first_boss_01",
-     "n": 69
-    },
-    {
-     "id": "fraud_village_fund_01",
-     "n": 66
-    },
-    {
-     "id": "stats_high_network_01",
-     "n": 66
-    },
-    {
-     "id": "dilemma_team_cut_01",
-     "n": 65
-    },
-    {
-     "id": "work_layoff_01",
-     "n": 62
-    },
-    {
-     "id": "career_lead_01",
-     "n": 59
-    },
-    {
-     "id": "young_risky_cert_01",
-     "n": 58
+     "n": 78
     },
     {
      "id": "workh_office_syndrome_01",
-     "n": 56
+     "n": 66
     },
     {
-     "id": "midh_pressure_01",
-     "n": 54
+     "id": "era_dis_covid_office_01",
+     "n": 65
     },
     {
-     "id": "work_online_shop_01",
-     "n": 54
+     "id": "fraud_village_fund_01",
+     "n": 63
+    },
+    {
+     "id": "work_layoff_01",
+     "n": 63
+    },
+    {
+     "id": "career_lead_01",
+     "n": 60
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 54
+     "n": 57
     },
     {
-     "id": "career_transfer_01",
+     "id": "stats_high_network_01",
+     "n": 57
+    },
+    {
+     "id": "workh_smoker_cough_01",
+     "n": 56
+    },
+    {
+     "id": "young_risky_cert_01",
+     "n": 55
+    },
+    {
+     "id": "dilemma_team_cut_01",
+     "n": 52
+    },
+    {
+     "id": "work_online_shop_01",
      "n": 52
     },
     {
      "id": "workh_burnout_01",
-     "n": 52
+     "n": 49
     },
     {
-     "id": "work_checkup_offer_01",
-     "n": 52
-    },
-    {
-     "id": "midh_kidney_stone_01",
-     "n": 48
+     "id": "career_transfer_01",
+     "n": 47
     },
     {
      "id": "kp_exam_01",
-     "n": 46
+     "n": 47
     },
     {
-     "id": "mid_insurance_01",
-     "n": 46
-    },
-    {
-     "id": "midh_heart_01",
+     "id": "midh_pressure_01",
      "n": 45
     },
     {
-     "id": "workh_smoker_cough_01",
-     "n": 43
+     "id": "work_risky_string_01",
+     "n": 45
     },
     {
-     "id": "work_risky_string_01",
-     "n": 42
+     "id": "work_checkup_offer_01",
+     "n": 45
+    },
+    {
+     "id": "mid_insurance_01",
+     "n": 40
+    },
+    {
+     "id": "midh_heart_01",
+     "n": 39
     },
     {
      "id": "era_city_mobile_adult_01",
      "n": 38
     },
     {
-     "id": "midh_diabetes_01",
+     "id": "early_retire",
      "n": 37
     },
     {
-     "id": "lot_underground_mid_01",
-     "n": 30
+     "id": "midh_kidney_stone_01",
+     "n": 36
     },
     {
-     "id": "midh_cancer_early_01",
-     "n": 28
-    },
-    {
-     "id": "early_retire",
-     "n": 28
-    },
-    {
-     "id": "work_influencer_01",
-     "n": 26
+     "id": "midh_diabetes_01",
+     "n": 32
     },
     {
      "id": "debt_cash_short_01",
-     "n": 26
+     "n": 31
+    },
+    {
+     "id": "work_influencer_01",
+     "n": 28
     },
     {
      "id": "career_midlife_restart_01",
-     "n": 25
+     "n": 27
+    },
+    {
+     "id": "midh_cancer_early_01",
+     "n": 23
+    },
+    {
+     "id": "lot_underground_mid_01",
+     "n": 22
     },
     {
      "id": "midh_heart_after_01",
-     "n": 16
+     "n": 13
     },
     {
      "id": "young_boss_room_01",
-     "n": 8
+     "n": 10
+    },
+    {
+     "id": "meme_old_speech_01",
+     "n": 10
     },
     {
      "id": "meme_slow_life_01",
+     "n": 9
+    },
+    {
+     "id": "meme_cham_01",
      "n": 8
     },
     {
      "id": "show_karaoke_01",
-     "n": 8
+     "n": 5
     },
     {
      "id": "kp_agency_01",
-     "n": 7
-    },
-    {
-     "id": "meme_cham_01",
-     "n": 7
-    },
-    {
-     "id": "midh_liver_01",
-     "n": 7
-    },
-    {
-     "id": "career_poach_cornered_01",
-     "n": 6
-    },
-    {
-     "id": "meme_old_speech_01",
-     "n": 6
-    },
-    {
-     "id": "echo_debt_payroll_01",
-     "n": 6
-    },
-    {
-     "id": "food_somtam_contest_01",
-     "n": 5
+     "n": 4
     },
     {
      "id": "risky_cert_caught_01",
-     "n": 5
+     "n": 4
     },
     {
-     "id": "workday_leave_left_01",
+     "id": "midh_liver_01",
+     "n": 4
+    },
+    {
+     "id": "fraud_audit_back_01",
      "n": 3
     },
     {
-     "id": "med_license_01",
+     "id": "sport_office_bet_01",
      "n": 3
     },
     {
-     "id": "debt_refinance_01",
+     "id": "echo_debt_payroll_01",
      "n": 3
     },
     {
-     "id": "workday_sick_cert_01",
+     "id": "workday_freelance_wait_01",
      "n": 3
     },
     {
-     "id": "show_molam_live_01",
-     "n": 3
-    },
-    {
-     "id": "workh_bone_healer_call_01",
+     "id": "sport_pitch_split_01",
      "n": 2
     },
     {
-     "id": "food_khanomkrok_leave_01",
+     "id": "tour_company_trip_01",
+     "n": 2
+    },
+    {
+     "id": "workday_self_review_01",
      "n": 2
     },
     {
@@ -3502,27 +3514,39 @@
      "n": 2
     },
     {
-     "id": "workday_weekend_ot_01",
+     "id": "workday_ot_dayoff_01",
      "n": 2
     },
     {
-     "id": "fraud_audit_back_01",
+     "id": "career_poach_cornered_01",
      "n": 2
     },
     {
-     "id": "sport_wc_night_01",
+     "id": "workh_bone_healer_call_01",
      "n": 2
     },
     {
-     "id": "workday_boss_order_01",
+     "id": "workday_chili_pickup_01",
+     "n": 2
+    },
+    {
+     "id": "workday_sick_cert_01",
      "n": 1
     },
     {
-     "id": "work_biz_bust_01",
+     "id": "mid_online_empire_01",
      "n": 1
     },
     {
-     "id": "sex_pay_gap_01",
+     "id": "work_biz_boom_01",
+     "n": 1
+    },
+    {
+     "id": "tech_post_viral_01",
+     "n": 1
+    },
+    {
+     "id": "school_loan_slip_01",
      "n": 1
     },
     {
@@ -3538,27 +3562,23 @@
      "n": 1
     },
     {
-     "id": "school_loan_slip_01",
+     "id": "workday_weekend_ot_01",
      "n": 1
     },
     {
-     "id": "kru_exam_01",
+     "id": "tech_night_raid_01",
      "n": 1
     },
     {
-     "id": "workday_chili_pickup_01",
+     "id": "money_app_fee_01",
      "n": 1
     },
     {
-     "id": "nurse_license_01",
+     "id": "food_somtam_contest_01",
      "n": 1
     },
     {
-     "id": "workday_payday_wait_01",
-     "n": 1
-    },
-    {
-     "id": "sport_office_bet_01",
+     "id": "workday_boss_order_01",
      "n": 1
     },
     {
@@ -3566,19 +3586,15 @@
      "n": 1
     },
     {
-     "id": "workday_self_review_01",
+     "id": "debt_refinance_01",
      "n": 1
     },
     {
-     "id": "swindle_office_sample_01",
+     "id": "sex_pay_gap_01",
      "n": 1
     },
     {
-     "id": "draftee_reserve_call_01",
-     "n": 1
-    },
-    {
-     "id": "tour_company_trip_01",
+     "id": "show_molam_live_01",
      "n": 1
     }
    ],
@@ -3587,55 +3603,49 @@
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 72
-    },
-    {
-     "kind": "retire",
-     "n": 49
+     "n": 69
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "work_layoff_01",
-     "n": 44
+     "n": 48
     },
     {
-     "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_pressure_01",
-     "n": 33
+     "kind": "retire",
+     "n": 46
     },
     {
      "kind": "move",
      "to": "police|officer",
      "id": "recruit_gov",
-     "n": 30
+     "n": 33
     },
     {
      "kind": "early_retire",
-     "n": 15
+     "n": 22
     },
     {
      "kind": "move",
-     "to": "army|officer",
-     "id": "recruit_gov",
-     "n": 13
+     "to": "trade|farmer",
+     "id": "midh_pressure_01",
+     "n": 20
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "career_midlife_restart_01",
-     "n": 13
+     "n": 14
     },
     {
      "kind": "death",
-     "n": 10
+     "n": 13
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "early_retire",
-     "n": 7
+     "to": "army|officer",
+     "id": "recruit_gov",
+     "n": 12
     },
     {
      "kind": "move",
@@ -3645,15 +3655,27 @@
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "career_transfer_01",
+     "to": "trade|craft",
+     "id": "career_midlife_restart_01",
      "n": 6
     },
     {
      "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_heart_after_01",
-     "n": 5
+     "to": "trade|labor",
+     "id": "promo_private_0",
+     "n": 6
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_private_1",
+     "n": 6
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_private_2",
+     "n": 6
     },
     {
      "kind": "move",
@@ -3663,83 +3685,59 @@
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_private_0",
+     "to": "trade|service",
+     "id": "early_retire",
      "n": 4
     },
     {
      "kind": "move",
-     "to": "trade|craft",
-     "id": "career_midlife_restart_01",
+     "to": "trade|service",
+     "id": "career_transfer_01",
      "n": 4
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_private_3",
-     "n": 3
-    },
-    {
-     "kind": "move",
-     "to": "private|professional",
-     "id": "med_license_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "work_influencer_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
-     "to": "private|professional",
-     "id": "nurse_license_01",
-     "n": 1
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "midh_heart_after_01",
-     "n": 1
+     "n": 2
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "workh_bone_healer_call_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_private_1",
-     "n": 1
+     "to": "gov|officer",
+     "id": "kp_agency_01",
+     "n": 2
     },
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "promo_private_2",
-     "n": 1
+     "id": "promo_private_3",
+     "n": 2
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "midh_heart_after_01",
+     "n": 2
     }
    ]
   },
   "trade|craft": {
-   "lives": 457,
+   "lives": 452,
    "entries": [
     {
      "id": "first_job",
      "text": "สมัครงานช่างฝีมือ",
-     "n": 216
+     "n": 214
     },
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน ช่างฝีมือ",
-     "n": 200
+     "n": 203
     },
     {
      "id": "career_midlife_restart_01",
      "text": "ไปเรียนช่างใหม่ตั้งแต่ศูนย์",
-     "n": 31
+     "n": 26
     },
     {
      "id": "first_job",
@@ -3755,146 +3753,150 @@
    "cards": [
     {
      "id": "promo_trade_0",
-     "n": 419
+     "n": 423
     },
     {
      "id": "promo_trade_1",
-     "n": 336
+     "n": 345
     },
     {
      "id": "recruit_gov",
-     "n": 249
-    },
-    {
-     "id": "young_abroad_01",
-     "n": 180
+     "n": 254
     },
     {
      "id": "workh_smoker_cough_01",
-     "n": 161
+     "n": 165
+    },
+    {
+     "id": "young_abroad_01",
+     "n": 159
     },
     {
      "id": "fraud_contract_01",
-     "n": 155
+     "n": 147
     },
     {
      "id": "lot_vendor_01",
-     "n": 138
-    },
-    {
-     "id": "biz_grocery_01",
-     "n": 116
+     "n": 145
     },
     {
      "id": "midh_pressure_01",
-     "n": 113
+     "n": 120
     },
     {
      "id": "young_shop_01",
-     "n": 109
+     "n": 114
     },
     {
-     "id": "work_online_shop_01",
-     "n": 105
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 104
+     "id": "biz_grocery_01",
+     "n": 113
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 100
+     "n": 113
     },
     {
      "id": "fraud_village_fund_01",
-     "n": 100
-    },
-    {
-     "id": "early_retire",
-     "n": 100
+     "n": 102
     },
     {
      "id": "mid_insurance_01",
-     "n": 94
+     "n": 101
     },
     {
-     "id": "midh_diabetes_01",
-     "n": 94
+     "id": "work_online_shop_01",
+     "n": 96
     },
     {
-     "id": "midh_kidney_stone_01",
+     "id": "early_retire",
+     "n": 91
+    },
+    {
+     "id": "midh_heart_01",
      "n": 87
     },
     {
+     "id": "midh_kidney_stone_01",
+     "n": 86
+    },
+    {
      "id": "biz_restaurant_01",
-     "n": 71
+     "n": 79
     },
     {
-     "id": "work_influencer_01",
-     "n": 66
-    },
-    {
-     "id": "fraud_materials_01",
-     "n": 65
-    },
-    {
-     "id": "lot_underground_mid_01",
-     "n": 65
-    },
-    {
-     "id": "biz_franchise_01",
-     "n": 62
-    },
-    {
-     "id": "career_nepotism_01",
-     "n": 60
+     "id": "midh_diabetes_01",
+     "n": 74
     },
     {
      "id": "debt_cash_short_01",
-     "n": 56
+     "n": 66
+    },
+    {
+     "id": "work_influencer_01",
+     "n": 61
+    },
+    {
+     "id": "fraud_materials_01",
+     "n": 61
+    },
+    {
+     "id": "lot_underground_mid_01",
+     "n": 58
     },
     {
      "id": "midh_cancer_early_01",
+     "n": 57
+    },
+    {
+     "id": "career_nepotism_01",
+     "n": 57
+    },
+    {
+     "id": "biz_franchise_01",
      "n": 53
     },
     {
      "id": "era_dis_tsunami_south_work_01",
-     "n": 34
-    },
-    {
-     "id": "midh_heart_after_01",
-     "n": 27
+     "n": 33
     },
     {
      "id": "era_acc_haze_adult_01",
-     "n": 22
+     "n": 24
+    },
+    {
+     "id": "midh_heart_after_01",
+     "n": 20
     },
     {
      "id": "midh_liver_01",
      "n": 16
     },
     {
-     "id": "fraud_audit_back_01",
-     "n": 11
+     "id": "era_econ_oil2_farm_01",
+     "n": 14
     },
     {
-     "id": "era_econ_oil2_farm_01",
-     "n": 11
+     "id": "fraud_audit_back_01",
+     "n": 9
     },
     {
      "id": "workh_bone_healer_call_01",
-     "n": 5
+     "n": 6
     },
     {
      "id": "gig_cross_soi_01",
-     "n": 4
+     "n": 5
+    },
+    {
+     "id": "money_daily_rate_01",
+     "n": 5
     },
     {
      "id": "mid_online_empire_01",
      "n": 3
     },
     {
-     "id": "work_biz_boom_01",
+     "id": "gig_foreman_pocket_01",
      "n": 3
     },
     {
@@ -3906,11 +3908,15 @@
      "n": 3
     },
     {
+     "id": "gig_win_entry_01",
+     "n": 3
+    },
+    {
      "id": "gig_return_late_01",
      "n": 2
     },
     {
-     "id": "gig_half_pay_01",
+     "id": "draftee_coworker_roll_01",
      "n": 2
     },
     {
@@ -3922,64 +3928,56 @@
      "n": 2
     },
     {
-     "id": "money_daily_rate_01",
-     "n": 2
+     "id": "gig_half_pay_01",
+     "n": 1
     },
     {
      "id": "gig_shift_mom_01",
-     "n": 1
-    },
-    {
-     "id": "draftee_coworker_roll_01",
-     "n": 1
-    },
-    {
-     "id": "gig_win_entry_01",
      "n": 1
     }
    ],
    "exits": [
     {
      "kind": "retire",
-     "n": 130
-    },
-    {
-     "kind": "early_retire",
-     "n": 64
+     "n": 122
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 60
+     "n": 68
     },
     {
      "kind": "move",
      "to": "police|officer",
      "id": "recruit_gov",
-     "n": 50
+     "n": 56
     },
     {
-     "kind": "death",
-     "n": 39
+     "kind": "early_retire",
+     "n": 47
     },
     {
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 34
+     "n": 38
+    },
+    {
+     "kind": "death",
+     "n": 38
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "early_retire",
-     "n": 17
+     "n": 24
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "era_econ_oil2_farm_01",
-     "n": 11
+     "n": 14
     },
     {
      "kind": "move",
@@ -3991,47 +3989,41 @@
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_trade_0",
-     "n": 10
+     "n": 8
     },
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "fraud_materials_01",
-     "n": 7
-    },
-    {
-     "kind": "move",
-     "to": "private|clerk",
-     "id": "career_nepotism_01",
+     "id": "fraud_audit_back_01",
      "n": 5
     },
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "career_nepotism_01",
-     "n": 4
-    },
-    {
-     "kind": "move",
-     "to": "army|officer",
-     "id": "recruit_gov",
-     "n": 4
+     "id": "fraud_materials_01",
+     "n": 5
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_heart_after_01",
+     "n": 5
+    },
+    {
+     "kind": "move",
+     "to": "private|clerk",
+     "id": "career_nepotism_01",
      "n": 3
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "midh_heart_after_01",
+     "to": "army|officer",
+     "id": "recruit_gov",
      "n": 3
     },
     {
      "kind": "move",
-     "to": "private|manager",
+     "to": "trade|labor",
      "id": "career_nepotism_01",
      "n": 2
     },
@@ -4043,45 +4035,51 @@
     },
     {
      "kind": "move",
+     "to": "trade|service",
+     "id": "midh_heart_after_01",
+     "n": 1
+    },
+    {
+     "kind": "move",
      "to": "gov|officer",
      "id": "kru_exam_01",
      "n": 1
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_audit_back_01",
+     "to": "private|manager",
+     "id": "career_nepotism_01",
      "n": 1
     }
    ]
   },
   "trade|factory": {
-   "lives": 781,
+   "lives": 796,
    "entries": [
     {
      "id": "first_job",
      "text": "สมัครงานพนักงานโรงงาน",
-     "n": 266
+     "n": 274
     },
     {
      "id": "career_farm_city_01",
      "text": "เข้าโรงงานนิคมกับเพื่อน",
-     "n": 211
+     "n": 220
     },
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน พนักงานโรงงาน",
-     "n": 207
+     "n": 202
     },
     {
      "id": "first_job",
      "text": "ขอพรก่อนไปสมัครพนักงานโรงงาน",
-     "n": 51
+     "n": 50
     },
     {
      "id": "first_job",
      "text": "ฝากเส้นเข้าพนักงานโรงงาน",
-     "n": 38
+     "n": 42
     },
     {
      "id": "first_job",
@@ -4092,191 +4090,183 @@
    "cards": [
     {
      "id": "promo_trade_0",
-     "n": 732
+     "n": 747
     },
     {
      "id": "promo_trade_1",
-     "n": 583
+     "n": 600
     },
     {
      "id": "recruit_gov",
-     "n": 438
+     "n": 454
     },
     {
      "id": "young_abroad_01",
-     "n": 302
+     "n": 286
     },
     {
      "id": "workh_smoker_cough_01",
-     "n": 268
+     "n": 267
+    },
+    {
+     "id": "court_meet_work_01",
+     "n": 257
     },
     {
      "id": "era_econ_gfc_factory_01",
-     "n": 227
-    },
-    {
-     "id": "young_shop_01",
-     "n": 218
-    },
-    {
-     "id": "career_factory_tech_01",
-     "n": 210
-    },
-    {
-     "id": "work_checkup_offer_01",
-     "n": 206
-    },
-    {
-     "id": "biz_grocery_01",
-     "n": 203
-    },
-    {
-     "id": "career_dream_01",
-     "n": 201
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 199
-    },
-    {
-     "id": "lot_vendor_01",
-     "n": 194
+     "n": 225
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 191
+     "n": 209
     },
     {
-     "id": "fraud_village_fund_01",
-     "n": 182
+     "id": "young_shop_01",
+     "n": 208
     },
     {
-     "id": "midh_heart_01",
-     "n": 176
+     "id": "work_checkup_offer_01",
+     "n": 201
     },
     {
-     "id": "midh_pressure_01",
-     "n": 174
+     "id": "biz_grocery_01",
+     "n": 190
     },
     {
-     "id": "mid_insurance_01",
-     "n": 167
+     "id": "career_factory_tech_01",
+     "n": 189
+    },
+    {
+     "id": "lot_vendor_01",
+     "n": 187
+    },
+    {
+     "id": "career_dream_01",
+     "n": 185
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 162
+     "n": 184
     },
     {
-     "id": "early_retire",
-     "n": 150
+     "id": "mid_insurance_01",
+     "n": 175
     },
     {
-     "id": "young_risky_cert_01",
-     "n": 146
+     "id": "midh_pressure_01",
+     "n": 173
+    },
+    {
+     "id": "work_online_shop_01",
+     "n": 168
     },
     {
      "id": "midh_diabetes_01",
-     "n": 144
+     "n": 163
+    },
+    {
+     "id": "midh_heart_01",
+     "n": 163
+    },
+    {
+     "id": "fraud_village_fund_01",
+     "n": 161
+    },
+    {
+     "id": "young_risky_cert_01",
+     "n": 145
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 138
+     "n": 145
+    },
+    {
+     "id": "early_retire",
+     "n": 143
     },
     {
      "id": "fraud_materials_01",
-     "n": 135
+     "n": 133
     },
     {
      "id": "career_nepotism_01",
-     "n": 123
+     "n": 117
     },
     {
      "id": "midh_cancer_early_01",
-     "n": 120
+     "n": 112
     },
     {
      "id": "debt_cash_short_01",
-     "n": 120
-    },
-    {
-     "id": "biz_franchise_01",
-     "n": 107
-    },
-    {
-     "id": "work_influencer_01",
-     "n": 99
+     "n": 112
     },
     {
      "id": "biz_restaurant_01",
-     "n": 95
+     "n": 102
+    },
+    {
+     "id": "work_influencer_01",
+     "n": 101
+    },
+    {
+     "id": "biz_franchise_01",
+     "n": 91
     },
     {
      "id": "era_dis_flood_factory_01",
-     "n": 39
+     "n": 43
     },
     {
      "id": "era_acc_haze_adult_01",
-     "n": 36
-    },
-    {
-     "id": "midh_heart_after_01",
      "n": 34
     },
     {
+     "id": "midh_heart_after_01",
+     "n": 23
+    },
+    {
      "id": "era_econ_oil2_farm_01",
-     "n": 19
+     "n": 23
+    },
+    {
+     "id": "sport_pitch_split_01",
+     "n": 15
     },
     {
      "id": "midh_liver_01",
-     "n": 16
+     "n": 13
     },
     {
      "id": "career_factory_exam_01",
-     "n": 14
-    },
-    {
-     "id": "show_molam_live_01",
-     "n": 12
+     "n": 13
     },
     {
      "id": "food_somtam_contest_01",
-     "n": 12
-    },
-    {
-     "id": "workday_car_break_01",
      "n": 11
     },
     {
-     "id": "mid_online_empire_01",
+     "id": "workday_car_break_01",
+     "n": 9
+    },
+    {
+     "id": "show_molam_live_01",
      "n": 9
     },
     {
      "id": "money_line_lender_01",
-     "n": 8
-    },
-    {
-     "id": "echo_debt_payroll_01",
-     "n": 8
-    },
-    {
-     "id": "food_price_sign_01",
-     "n": 7
-    },
-    {
-     "id": "workday_weekend_ot_01",
-     "n": 7
-    },
-    {
-     "id": "draftee_reserve_call_01",
-     "n": 6
-    },
-    {
-     "id": "sport_pitch_split_01",
-     "n": 6
+     "n": 9
     },
     {
      "id": "workh_bone_healer_call_01",
-     "n": 5
+     "n": 7
+    },
+    {
+     "id": "food_price_sign_01",
+     "n": 6
+    },
+    {
+     "id": "workday_weekend_ot_01",
+     "n": 6
     },
     {
      "id": "workday_payday_wait_01",
@@ -4287,24 +4277,28 @@
      "n": 3
     },
     {
-     "id": "work_biz_boom_01",
-     "n": 2
+     "id": "workday_errand_leave_01",
+     "n": 3
     },
     {
      "id": "workday_sick_cert_01",
-     "n": 2
+     "n": 3
+    },
+    {
+     "id": "echo_debt_payroll_01",
+     "n": 3
+    },
+    {
+     "id": "draftee_reserve_call_01",
+     "n": 3
     },
     {
      "id": "sky_crew_01",
      "n": 2
     },
     {
-     "id": "workday_errand_leave_01",
-     "n": 2
-    },
-    {
      "id": "fraud_audit_back_01",
-     "n": 2
+     "n": 1
     },
     {
      "id": "med_license_01",
@@ -4314,39 +4308,45 @@
    "exits": [
     {
      "kind": "retire",
-     "n": 197
+     "n": 205
     },
     {
-     "kind": "move",
-     "to": "police|officer",
-     "id": "recruit_gov",
-     "n": 110
+     "kind": "early_retire",
+     "n": 101
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 102
+     "n": 98
     },
     {
-     "kind": "early_retire",
-     "n": 99
-    },
-    {
-     "kind": "death",
-     "n": 80
+     "kind": "move",
+     "to": "police|officer",
+     "id": "recruit_gov",
+     "n": 97
     },
     {
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 73
+     "n": 84
+    },
+    {
+     "kind": "death",
+     "n": 78
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "era_econ_oil2_farm_01",
+     "n": 23
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "early_retire",
-     "n": 24
+     "n": 20
     },
     {
      "kind": "move",
@@ -4356,9 +4356,9 @@
     },
     {
      "kind": "move",
-     "to": "trade|farmer",
-     "id": "era_econ_oil2_farm_01",
-     "n": 19
+     "to": "trade|labor",
+     "id": "promo_trade_0",
+     "n": 17
     },
     {
      "kind": "move",
@@ -4368,15 +4368,15 @@
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_trade_0",
-     "n": 11
+     "to": "private|clerk",
+     "id": "career_nepotism_01",
+     "n": 8
     },
     {
      "kind": "move",
-     "to": "trade|farmer",
+     "to": "trade|service",
      "id": "midh_heart_after_01",
-     "n": 9
+     "n": 7
     },
     {
      "kind": "move",
@@ -4386,38 +4386,32 @@
     },
     {
      "kind": "move",
-     "to": "private|technician",
-     "id": "career_factory_exam_01",
+     "to": "trade|farmer",
+     "id": "midh_heart_after_01",
      "n": 7
     },
     {
      "kind": "move",
+     "to": "private|technician",
+     "id": "career_factory_exam_01",
+     "n": 6
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "career_nepotism_01",
+     "n": 4
+    },
+    {
+     "kind": "move",
      "to": "trade|service",
-     "id": "midh_heart_after_01",
-     "n": 5
-    },
-    {
-     "kind": "move",
-     "to": "private|manager",
-     "id": "career_nepotism_01",
-     "n": 3
-    },
-    {
-     "kind": "move",
-     "to": "private|clerk",
-     "id": "career_nepotism_01",
-     "n": 3
+     "id": "workh_bone_healer_call_01",
+     "n": 4
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "work_influencer_01",
-     "n": 2
-    },
-    {
-     "kind": "move",
-     "to": "private|manager",
-     "id": "mid_online_empire_01",
      "n": 1
     },
     {
@@ -4428,34 +4422,34 @@
     },
     {
      "kind": "move",
-     "to": "trade|labor",
+     "to": "private|manager",
      "id": "career_nepotism_01",
      "n": 1
     }
    ]
   },
   "trade|farmer": {
-   "lives": 1919,
+   "lives": 1895,
    "entries": [
     {
      "id": "midh_pressure_01",
      "text": "ทิ้งงานเครียด หันไปปลูกผักขาย",
-     "n": 945
+     "n": 930
     },
     {
      "id": "first_job",
      "text": "สมัครงานเกษตรกร",
-     "n": 272
+     "n": 271
     },
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน เกษตรกร",
-     "n": 214
+     "n": 203
     },
     {
      "id": "work_layoff_01",
      "text": "กลับบ้านเกิดไปทำสวน",
-     "n": 183
+     "n": 172
     },
     {
      "id": "first_job",
@@ -4465,12 +4459,12 @@
     {
      "id": "midh_heart_after_01",
      "text": "ปลูกผักเงียบ ๆ อยู่กับบ้าน",
-     "n": 109
+     "n": 115
     },
     {
      "id": "era_econ_oil2_farm_01",
      "text": "ทิ้งงานเมือง ทำนาเต็มตัว",
-     "n": 104
+     "n": 111
     },
     {
      "id": "first_job",
@@ -4486,158 +4480,154 @@
    "cards": [
     {
      "id": "promo_trade_0",
-     "n": 1594
+     "n": 1563
     },
     {
      "id": "promo_trade_1",
-     "n": 806
+     "n": 827
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 723
+     "n": 714
     },
     {
      "id": "fraud_village_fund_01",
-     "n": 671
+     "n": 698
     },
     {
      "id": "mid_insurance_01",
-     "n": 571
-    },
-    {
-     "id": "mid_risky_bet_01",
-     "n": 567
+     "n": 600
     },
     {
      "id": "midh_heart_01",
-     "n": 552
+     "n": 546
+    },
+    {
+     "id": "mid_risky_bet_01",
+     "n": 545
     },
     {
      "id": "midh_diabetes_01",
-     "n": 510
+     "n": 500
     },
     {
      "id": "midh_cancer_early_01",
-     "n": 452
+     "n": 485
     },
     {
      "id": "biz_restaurant_01",
-     "n": 449
+     "n": 463
     },
     {
      "id": "biz_franchise_01",
-     "n": 397
+     "n": 399
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 371
+     "n": 394
     },
     {
      "id": "recruit_gov",
-     "n": 335
+     "n": 348
     },
     {
      "id": "career_farm_city_01",
-     "n": 324
+     "n": 330
     },
     {
      "id": "fraud_scale_01",
-     "n": 271
+     "n": 266
     },
     {
      "id": "biz_farm_expand_01",
-     "n": 262
+     "n": 264
     },
     {
      "id": "workh_smoker_cough_01",
-     "n": 258
-    },
-    {
-     "id": "biz_grocery_01",
-     "n": 240
+     "n": 249
     },
     {
      "id": "young_abroad_01",
-     "n": 239
+     "n": 238
+    },
+    {
+     "id": "biz_grocery_01",
+     "n": 228
     },
     {
      "id": "lot_vendor_01",
-     "n": 225
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 181
+     "n": 215
     },
     {
      "id": "midh_pressure_01",
-     "n": 178
+     "n": 176
     },
     {
-     "id": "debt_cash_short_01",
-     "n": 141
+     "id": "work_online_shop_01",
+     "n": 173
     },
     {
      "id": "career_nepotism_01",
-     "n": 134
+     "n": 133
+    },
+    {
+     "id": "debt_cash_short_01",
+     "n": 130
     },
     {
      "id": "midh_heart_after_01",
-     "n": 126
-    },
-    {
-     "id": "era_econ_oil2_farmer_01",
-     "n": 108
-    },
-    {
-     "id": "midh_liver_01",
-     "n": 101
+     "n": 124
     },
     {
      "id": "work_influencer_01",
-     "n": 94
+     "n": 116
     },
     {
-     "id": "era_acc_haze_adult_01",
-     "n": 43
+     "id": "era_econ_oil2_farmer_01",
+     "n": 100
+    },
+    {
+     "id": "midh_liver_01",
+     "n": 76
     },
     {
      "id": "fraud_audit_back_01",
-     "n": 40
+     "n": 46
     },
     {
-     "id": "money_daily_rate_01",
-     "n": 24
-    },
-    {
-     "id": "mid_debt_spiral_01",
-     "n": 21
+     "id": "era_acc_haze_adult_01",
+     "n": 45
     },
     {
      "id": "money_paddy_tree_01",
+     "n": 27
+    },
+    {
+     "id": "mid_debt_spiral_01",
+     "n": 23
+    },
+    {
+     "id": "money_daily_rate_01",
      "n": 19
     },
     {
      "id": "era_dis_typhoon_south_farm_01",
-     "n": 18
-    },
-    {
-     "id": "fraud_scale_rumor_01",
      "n": 16
     },
     {
-     "id": "workh_bone_healer_call_01",
-     "n": 11
+     "id": "fraud_scale_rumor_01",
+     "n": 15
     },
     {
-     "id": "show_molam_night_01",
-     "n": 9
+     "id": "workh_bone_healer_call_01",
+     "n": 12
     },
     {
      "id": "mid_online_empire_01",
-     "n": 6
+     "n": 9
     },
     {
-     "id": "work_biz_boom_01",
+     "id": "show_molam_night_01",
      "n": 4
     },
     {
@@ -4645,54 +4635,54 @@
      "n": 1
     },
     {
-     "id": "nurse_license_01",
+     "id": "work_biz_boom_01",
      "n": 1
     }
    ],
    "exits": [
     {
      "kind": "retire",
-     "n": 1497
+     "n": 1492
     },
     {
      "kind": "death",
-     "n": 173
+     "n": 154
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "career_farm_city_01",
-     "n": 67
+     "n": 73
     },
     {
      "kind": "move",
      "to": "trade|factory",
      "id": "career_farm_city_01",
-     "n": 41
+     "n": 40
     },
     {
      "kind": "move",
      "to": "police|officer",
      "id": "recruit_gov",
-     "n": 40
+     "n": 39
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "career_farm_city_01",
-     "n": 39
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "promo_trade_0",
-     "n": 35
+     "n": 36
     },
     {
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 25
+     "n": 31
+    },
+    {
+     "kind": "move",
+     "to": "trade|labor",
+     "id": "promo_trade_0",
+     "n": 28
     },
     {
      "kind": "move",
@@ -4704,35 +4694,25 @@
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_scale_01",
-     "n": 15
+     "n": 16
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "midh_heart_after_01",
-     "n": 11
-    },
-    {
-     "kind": "move",
-     "to": "trade|labor",
-     "id": "fraud_audit_back_01",
-     "n": 7
+     "n": 13
     },
     {
      "kind": "move",
      "to": "private|clerk",
      "id": "career_nepotism_01",
-     "n": 6
+     "n": 8
     },
     {
      "kind": "move",
-     "to": "private|manager",
-     "id": "career_nepotism_01",
-     "n": 5
-    },
-    {
-     "kind": "early_retire",
-     "n": 5
+     "to": "trade|labor",
+     "id": "fraud_audit_back_01",
+     "n": 6
     },
     {
      "kind": "move",
@@ -4741,6 +4721,16 @@
      "n": 4
     },
     {
+     "kind": "early_retire",
+     "n": 3
+    },
+    {
+     "kind": "move",
+     "to": "private|manager",
+     "id": "career_nepotism_01",
+     "n": 3
+    },
+    {
      "kind": "move",
      "to": "trade|labor",
      "id": "career_nepotism_01",
@@ -4748,8 +4738,8 @@
     },
     {
      "kind": "move",
-     "to": "trade|service",
-     "id": "workh_bone_healer_call_01",
+     "to": "trade|labor",
+     "id": "work_influencer_01",
      "n": 2
     },
     {
@@ -4760,91 +4750,95 @@
     },
     {
      "kind": "move",
-     "to": "private|professional",
-     "id": "nurse_license_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
      "to": "trade|labor",
      "id": "fraud_scale_rumor_01",
      "n": 1
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "work_influencer_01",
+     "to": "trade|service",
+     "id": "workh_bone_healer_call_01",
      "n": 1
     }
    ]
   },
   "trade|labor": {
-   "lives": 2440,
+   "lives": 2516,
    "entries": [
     {
      "id": "first_job",
      "text": "รับจ้างทั่วไปไปก่อน",
-     "n": 714
+     "n": 711
     },
     {
      "id": "fraud_sign_bribe_01",
      "text": "ขอเพิ่มเป็นสองเท่า",
-     "n": 257
-    },
-    {
-     "id": "first_job",
-     "text": "สมัครงานเกษตรกร",
-     "n": 120
+     "n": 245
     },
     {
      "id": "first_job",
      "text": "สมัครงานค้าขายและบริการ",
-     "n": 113
+     "n": 124
     },
     {
      "id": "first_job",
      "text": "สมัครงานพนักงานโรงงาน",
-     "n": 108
+     "n": 118
     },
     {
      "id": "first_job",
-     "text": "สมัครงานช่างฝีมือ",
-     "n": 104
+     "text": "สมัครงานเกษตรกร",
+     "n": 112
     },
     {
      "id": "echo_gov_audit_01",
      "text": "ทำบันทึกการทำงานย้อนหลัง",
-     "n": 93
+     "n": 104
     },
     {
      "id": "first_job",
-     "text": "ขอพรก่อนไปสมัครค้าขายและบริการ",
-     "n": 80
+     "text": "สมัครงานช่างฝีมือ",
+     "n": 103
     },
     {
      "id": "promo_trade_0",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 78
+     "n": 74
     },
     {
      "id": "career_farm_city_01",
      "text": "รับจ้างไซต์ก่อสร้าง",
-     "n": 67
+     "n": 73
+    },
+    {
+     "id": "first_job",
+     "text": "ขอพรก่อนไปสมัครค้าขายและบริการ",
+     "n": 73
     },
     {
      "id": "promo_trade_1",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 66
-    },
-    {
-     "id": "fraud_sign_bribe_01",
-     "text": "รับซอง เซ็นให้เงียบ ๆ",
-     "n": 54
+     "n": 63
     },
     {
      "id": "fraud_scale_01",
      "text": "ผสมของเกรดต่ำลงไปด้วย",
-     "n": 50
+     "n": 49
+    },
+    {
+     "id": "fraud_audit_back_01",
+     "text": "ซัดทอดว่าคนอื่นสั่งให้ทำ",
+     "n": 48
+    },
+    {
+     "id": "first_job",
+     "text": "ฝากเส้นเข้าผู้บริหาร",
+     "n": 45
+    },
+    {
+     "id": "fraud_sign_bribe_01",
+     "text": "รับซอง เซ็นให้เงียบ ๆ",
+     "n": 44
     },
     {
      "id": "first_job",
@@ -4853,38 +4847,38 @@
     },
     {
      "id": "first_job",
-     "text": "ฝากเส้นเข้าผู้บริหาร",
-     "n": 40
+     "text": "สมัครงานพนักงานสำนักงาน",
+     "n": 29
     },
     {
-     "id": "police_swap_driver_01",
-     "text": "เปลี่ยนตัวคนขับตามที่ขอ",
-     "n": 34
+     "id": "career_midlife_restart_01",
+     "text": "ไปเรียนช่างใหม่ตั้งแต่ศูนย์",
+     "n": 29
+    },
+    {
+     "id": "first_job",
+     "text": "สอบ ก.พ. เข้ารับราชการ",
+     "n": 28
     },
     {
      "id": "career_midlife_restart_01",
      "text": "ขับรถรับจ้างไปก่อน",
-     "n": 29
+     "n": 27
     },
     {
-     "id": "fraud_audit_back_01",
-     "text": "ซัดทอดว่าคนอื่นสั่งให้ทำ",
-     "n": 29
-    },
-    {
-     "id": "promo_gov_1",
+     "id": "promo_gov_2",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 27
+     "n": 24
+    },
+    {
+     "id": "service_procure_01",
+     "text": "เขียนสเปกให้ รับส่วนแบ่ง",
+     "n": 24
     },
     {
      "id": "first_job",
-     "text": "ฝากเส้นเข้าค้าขายและบริการ",
-     "n": 27
-    },
-    {
-     "id": "first_job",
-     "text": "สมัครงานพนักงานสำนักงาน",
-     "n": 26
+     "text": "สมัครงานช่างเทคนิค",
+     "n": 24
     },
     {
      "id": "promo_gov_3",
@@ -4893,7 +4887,7 @@
     },
     {
      "id": "first_job",
-     "text": "สมัครงานช่างเทคนิค",
+     "text": "ฝากเส้นเข้าค้าขายและบริการ",
      "n": 23
     },
     {
@@ -4902,34 +4896,29 @@
      "n": 22
     },
     {
-     "id": "promo_gov_2",
+     "id": "promo_gov_1",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 22
-    },
-    {
-     "id": "first_job",
-     "text": "สอบ ก.พ. เข้ารับราชการ",
-     "n": 22
-    },
-    {
-     "id": "career_midlife_restart_01",
-     "text": "ไปเรียนช่างใหม่ตั้งแต่ศูนย์",
      "n": 20
     },
     {
-     "id": "promo_police_2",
-     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 19
+     "id": "fraud_materials_01",
+     "text": "แอบใช้ของเกรดต่ำแทนสเปก",
+     "n": 20
     },
     {
-     "id": "service_procure_01",
-     "text": "เขียนสเปกให้ รับส่วนแบ่ง",
-     "n": 18
+     "id": "police_swap_driver_01",
+     "text": "เปลี่ยนตัวคนขับตามที่ขอ",
+     "n": 20
     },
     {
-     "id": "promo_private_3",
+     "id": "promo_private_2",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 18
+     "n": 20
+    },
+    {
+     "id": "first_job",
+     "text": "ฝากเส้นเข้าวิชาชีพ",
+     "n": 20
     },
     {
      "id": "career_midlife_restart_01",
@@ -4937,44 +4926,59 @@
      "n": 18
     },
     {
-     "id": "fraud_audit_back_01",
-     "text": "จ้างทนายสู้คดีเต็มที่",
+     "id": "promo_private_1",
+     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
+     "n": 18
+    },
+    {
+     "id": "first_job",
+     "text": "สมัครงานวิชาชีพ",
      "n": 16
     },
     {
      "id": "first_job",
-     "text": "ฝากเส้นเข้าวิชาชีพ",
+     "text": "ขอพรก่อนไปสมัครผู้บริหาร",
+     "n": 16
+    },
+    {
+     "id": "fraud_wage_squeeze_01",
+     "text": "ใส่ชื่อลูกน้องผีเบิกเงินเดือน",
+     "n": 16
+    },
+    {
+     "id": "fraud_audit_back_01",
+     "text": "จ้างทนายสู้คดีเต็มที่",
      "n": 15
     },
     {
-     "id": "work_influencer_01",
-     "text": "ลาออก ทำคอนเทนต์เต็มเวลา",
+     "id": "echo_gov_audit_01",
+     "text": "ยอมรับ คืนเงินทั้งหมด",
+     "n": 15
+    },
+    {
+     "id": "promo_private_3",
+     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
      "n": 14
     },
     {
-     "id": "fraud_materials_01",
-     "text": "แอบใช้ของเกรดต่ำแทนสเปก",
+     "id": "promo_police_2",
+     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
      "n": 14
     },
     {
-     "id": "promo_private_2",
+     "id": "career_nepotism_01",
+     "text": "รับตำแหน่งที่ญาติฝาก",
+     "n": 13
+    },
+    {
+     "id": "promo_police_3",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
      "n": 13
     },
     {
-     "id": "fraud_materials_01",
-     "text": "เซ็นให้ รับส่วนแบ่ง",
+     "id": "echo_police_ledger_01",
+     "text": "วิ่งเต้นให้เรื่องเงียบ",
      "n": 13
-    },
-    {
-     "id": "first_job",
-     "text": "ขอพรก่อนไปสมัครพนักงานสำนักงาน",
-     "n": 12
-    },
-    {
-     "id": "promo_private_0",
-     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 12
     },
     {
      "id": "first_job",
@@ -4982,69 +4986,29 @@
      "n": 12
     },
     {
-     "id": "promo_private_1",
-     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 12
+     "id": "work_influencer_01",
+     "text": "ลาออก ทำคอนเทนต์เต็มเวลา",
+     "n": 10
     },
     {
      "id": "first_job",
      "text": "สมัครงานผู้บริหาร",
-     "n": 11
+     "n": 10
     },
     {
      "id": "first_job",
-     "text": "ขอพรก่อนไปสมัครผู้บริหาร",
-     "n": 11
+     "text": "ขอพรก่อนไปสมัครพนักงานสำนักงาน",
+     "n": 10
     },
     {
-     "id": "promo_gov_0",
+     "id": "promo_private_0",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 10
-    },
-    {
-     "id": "promo_police_3",
-     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 10
-    },
-    {
-     "id": "first_job",
-     "text": "ขอพรก่อนไปสมัครวิชาชีพ",
-     "n": 10
-    },
-    {
-     "id": "first_job",
-     "text": "สมัครงานวิชาชีพ",
      "n": 9
-    },
-    {
-     "id": "career_nepotism_01",
-     "text": "รับตำแหน่งที่ญาติฝาก",
-     "n": 9
-    },
-    {
-     "id": "fraud_wage_squeeze_01",
-     "text": "ใส่ชื่อลูกน้องผีเบิกเงินเดือน",
-     "n": 9
-    },
-    {
-     "id": "first_job",
-     "text": "ขอพรก่อนไปสมัครช่างเทคนิค",
-     "n": 8
-    },
-    {
-     "id": "echo_gov_audit_01",
-     "text": "ยอมรับ คืนเงินทั้งหมด",
-     "n": 7
     },
     {
      "id": "promo_police_0",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 7
-    },
-    {
-     "id": "echo_police_ledger_01",
-     "text": "วิ่งเต้นให้เรื่องเงียบ",
-     "n": 7
+     "n": 8
     },
     {
      "id": "promo_police_1",
@@ -5052,34 +5016,44 @@
      "n": 7
     },
     {
-     "id": "echo_police_ledger_01",
-     "text": "ยอมรับ คืนเงินทั้งหมด",
-     "n": 5
+     "id": "first_job",
+     "text": "ขอพรก่อนไปสมัครช่างเทคนิค",
+     "n": 7
     },
     {
      "id": "first_job",
-     "text": "ฝากเส้นเข้าช่างเทคนิค",
-     "n": 5
+     "text": "ขอพรก่อนไปสมัครวิชาชีพ",
+     "n": 7
     },
     {
      "id": "police_envelope_01",
      "text": "เก็บส่งตามระบบ",
-     "n": 4
-    },
-    {
-     "id": "echo_police_ledger_01",
-     "text": "ชี้ไปที่คนสั่งเก็บ",
-     "n": 4
+     "n": 6
     },
     {
      "id": "first_job",
-     "text": "ทุ่มเงินติวสมัครผู้บริหาร",
-     "n": 3
+     "text": "ฝากเส้นเข้าช่างเทคนิค",
+     "n": 6
     },
     {
-     "id": "promo_army_0",
+     "id": "promo_gov_0",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
-     "n": 3
+     "n": 6
+    },
+    {
+     "id": "fraud_wage_squeeze_01",
+     "text": "ตัดโอที เก็บโบนัสไว้",
+     "n": 5
+    },
+    {
+     "id": "fraud_materials_01",
+     "text": "เซ็นให้ รับส่วนแบ่ง",
+     "n": 5
+    },
+    {
+     "id": "echo_police_ledger_01",
+     "text": "ยอมรับ คืนเงินทั้งหมด",
+     "n": 4
     },
     {
      "id": "first_job",
@@ -5087,13 +5061,13 @@
      "n": 3
     },
     {
-     "id": "fraud_scale_rumor_01",
-     "text": "เลิกค้า ไปรับจ้างที่อื่น",
+     "id": "first_job",
+     "text": "ทุ่มเงินติวสมัครผู้บริหาร",
      "n": 2
     },
     {
-     "id": "promo_army_2",
-     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
+     "id": "echo_police_ledger_01",
+     "text": "ชี้ไปที่คนสั่งเก็บ",
      "n": 2
     },
     {
@@ -5102,8 +5076,18 @@
      "n": 2
     },
     {
+     "id": "fraud_scale_rumor_01",
+     "text": "เลิกค้า ไปรับจ้างที่อื่น",
+     "n": 2
+    },
+    {
      "id": "first_job",
      "text": "ทุ่มเงินติวสมัครวิชาชีพ",
+     "n": 2
+    },
+    {
+     "id": "first_job",
+     "text": "ฝากเส้นเข้าพนักงานสำนักงาน",
      "n": 2
     },
     {
@@ -5117,8 +5101,8 @@
      "n": 1
     },
     {
-     "id": "first_job",
-     "text": "ทุ่มเงินติวสมัครพนักงานสำนักงาน",
+     "id": "promo_army_0",
+     "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
      "n": 1
     },
     {
@@ -5133,11 +5117,11 @@
     },
     {
      "id": "first_job",
-     "text": "ฝากเส้นเข้าพนักงานสำนักงาน",
+     "text": "ทุ่มเงินติวสมัครพนักงานสำนักงาน",
      "n": 1
     },
     {
-     "id": "promo_army_3",
+     "id": "promo_army_2",
      "text": "วิ่งเต้น ฝากซองผู้ใหญ่",
      "n": 1
     }
@@ -5145,170 +5129,166 @@
    "cards": [
     {
      "id": "promo_trade_0",
-     "n": 2214
+     "n": 2232
     },
     {
      "id": "promo_trade_1",
-     "n": 1732
+     "n": 1705
     },
     {
      "id": "recruit_gov",
-     "n": 948
+     "n": 964
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 831
-    },
-    {
-     "id": "fraud_village_fund_01",
-     "n": 806
+     "n": 864
     },
     {
      "id": "midh_heart_01",
-     "n": 798
+     "n": 797
     },
     {
-     "id": "midh_pressure_01",
-     "n": 762
-    },
-    {
-     "id": "young_abroad_01",
-     "n": 739
+     "id": "fraud_village_fund_01",
+     "n": 769
     },
     {
      "id": "mid_insurance_01",
-     "n": 737
+     "n": 766
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 716
+     "n": 747
     },
     {
-     "id": "biz_grocery_01",
-     "n": 642
+     "id": "young_abroad_01",
+     "n": 723
     },
     {
-     "id": "lot_underground_mid_01",
-     "n": 607
+     "id": "midh_pressure_01",
+     "n": 709
     },
     {
      "id": "midh_diabetes_01",
+     "n": 631
+    },
+    {
+     "id": "biz_grocery_01",
      "n": 593
     },
     {
-     "id": "workh_smoker_cough_01",
-     "n": 568
+     "id": "lot_underground_mid_01",
+     "n": 561
     },
     {
      "id": "career_farm_city_01",
-     "n": 566
+     "n": 551
+    },
+    {
+     "id": "workh_smoker_cough_01",
+     "n": 534
     },
     {
      "id": "biz_restaurant_01",
-     "n": 508
+     "n": 518
     },
     {
      "id": "lot_vendor_01",
-     "n": 506
-    },
-    {
-     "id": "debt_cash_short_01",
-     "n": 474
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 462
-    },
-    {
-     "id": "midh_cancer_early_01",
-     "n": 431
+     "n": 481
     },
     {
      "id": "biz_franchise_01",
-     "n": 426
+     "n": 459
+    },
+    {
+     "id": "work_online_shop_01",
+     "n": 452
+    },
+    {
+     "id": "midh_cancer_early_01",
+     "n": 449
+    },
+    {
+     "id": "debt_cash_short_01",
+     "n": 438
     },
     {
      "id": "career_nepotism_01",
-     "n": 383
+     "n": 387
     },
     {
      "id": "work_influencer_01",
-     "n": 260
+     "n": 281
     },
     {
      "id": "midh_heart_after_01",
-     "n": 186
+     "n": 194
     },
     {
      "id": "midh_liver_01",
-     "n": 122
+     "n": 123
     },
     {
      "id": "era_dis_tsunami_south_work_01",
-     "n": 91
+     "n": 89
     },
     {
      "id": "era_acc_haze_adult_01",
-     "n": 77
+     "n": 81
     },
     {
      "id": "era_econ_oil2_farm_01",
-     "n": 54
+     "n": 53
     },
     {
      "id": "workh_bone_healer_call_01",
-     "n": 38
+     "n": 33
     },
     {
      "id": "show_molam_live_01",
-     "n": 29
-    },
-    {
-     "id": "money_daily_rate_01",
-     "n": 23
+     "n": 27
     },
     {
      "id": "mid_online_empire_01",
+     "n": 25
+    },
+    {
+     "id": "money_daily_rate_01",
      "n": 22
     },
     {
-     "id": "gig_foreman_pocket_01",
-     "n": 16
+     "id": "gig_half_pay_01",
+     "n": 22
     },
     {
      "id": "mid_debt_spiral_01",
      "n": 16
     },
     {
-     "id": "gig_win_entry_01",
-     "n": 15
-    },
-    {
-     "id": "gig_half_pay_01",
-     "n": 11
-    },
-    {
      "id": "gig_cross_soi_01",
-     "n": 11
-    },
-    {
-     "id": "gig_return_late_01",
-     "n": 10
+     "n": 12
     },
     {
      "id": "draftee_reserve_call_01",
-     "n": 10
+     "n": 11
+    },
+    {
+     "id": "gig_win_entry_01",
+     "n": 11
+    },
+    {
+     "id": "gig_foreman_pocket_01",
+     "n": 9
+    },
+    {
+     "id": "gig_return_late_01",
+     "n": 7
     },
     {
      "id": "gig_shift_mom_01",
-     "n": 8
+     "n": 7
     },
     {
-     "id": "gig_queue_turn_01",
-     "n": 6
-    },
-    {
-     "id": "work_biz_boom_01",
+     "id": "fraud_audit_back_01",
      "n": 6
     },
     {
@@ -5316,7 +5296,11 @@
      "n": 6
     },
     {
-     "id": "fraud_audit_back_01",
+     "id": "gig_queue_turn_01",
+     "n": 5
+    },
+    {
+     "id": "work_biz_boom_01",
      "n": 5
     },
     {
@@ -5324,365 +5308,361 @@
      "n": 4
     },
     {
-     "id": "gig_shift_start_01",
-     "n": 4
-    },
-    {
      "id": "med_license_01",
      "n": 2
-    },
-    {
-     "id": "nurse_license_01",
-     "n": 1
-    },
-    {
-     "id": "kru_exam_01",
-     "n": 1
     },
     {
      "id": "sky_crew_01",
      "n": 1
     },
     {
+     "id": "sky_hire_01",
+     "n": 1
+    },
+    {
      "id": "early_retire",
+     "n": 1
+    },
+    {
+     "id": "gig_shift_start_01",
      "n": 1
     }
    ],
    "exits": [
     {
      "kind": "retire",
-     "n": 1265
+     "n": 1297
+    },
+    {
+     "kind": "death",
+     "n": 306
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 316
-    },
-    {
-     "kind": "death",
-     "n": 310
+     "n": 301
     },
     {
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 181
+     "n": 188
     },
     {
      "kind": "move",
      "to": "trade|factory",
      "id": "career_farm_city_01",
-     "n": 170
+     "n": 180
     },
     {
      "kind": "move",
      "to": "police|officer",
      "id": "recruit_gov",
-     "n": 134
+     "n": 138
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "career_farm_city_01",
-     "n": 65
+     "n": 61
+    },
+    {
+     "kind": "move",
+     "to": "trade|farmer",
+     "id": "midh_heart_after_01",
+     "n": 56
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "era_econ_oil2_farm_01",
-     "n": 49
+     "n": 50
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "midh_heart_after_01",
-     "n": 44
-    },
-    {
-     "kind": "move",
-     "to": "trade|farmer",
-     "id": "midh_heart_after_01",
-     "n": 38
+     "n": 30
     },
     {
      "kind": "move",
      "to": "private|manager",
      "id": "career_nepotism_01",
-     "n": 28
-    },
-    {
-     "kind": "move",
-     "to": "private|clerk",
-     "id": "career_nepotism_01",
-     "n": 20
+     "n": 30
     },
     {
      "kind": "move",
      "to": "army|officer",
      "id": "recruit_gov",
-     "n": 20
+     "n": 26
+    },
+    {
+     "kind": "move",
+     "to": "private|clerk",
+     "id": "career_nepotism_01",
+     "n": 19
     },
     {
      "kind": "move",
      "to": "trade|service",
      "id": "workh_bone_healer_call_01",
-     "n": 6
+     "n": 5
     },
     {
      "kind": "early_retire",
-     "n": 3
-    },
-    {
-     "kind": "move",
-     "to": "private|professional",
-     "id": "med_license_01",
-     "n": 1
+     "n": 4
     },
     {
      "kind": "move",
      "to": "private|manager",
      "id": "mid_online_empire_01",
-     "n": 1
+     "n": 2
     },
     {
      "kind": "move",
      "to": "private|professional",
-     "id": "nurse_license_01",
-     "n": 1
+     "id": "med_license_01",
+     "n": 2
     }
    ]
   },
   "trade|service": {
-   "lives": 1276,
+   "lives": 1232,
    "entries": [
     {
      "id": "first_job",
      "text": "สมัครงานค้าขายและบริการ",
-     "n": 297
+     "n": 291
     },
     {
      "id": "first_job",
      "text": "ขอพรก่อนไปสมัครค้าขายและบริการ",
-     "n": 207
+     "n": 202
     },
     {
      "id": "first_job",
      "text": "ฝากเส้นเข้าค้าขายและบริการ",
-     "n": 183
+     "n": 178
     },
     {
      "id": "first_job",
      "text": "สืบต่องานบ้าน ค้าขายและบริการ",
-     "n": 171
+     "n": 163
     },
     {
      "id": "career_farm_city_01",
      "text": "ตั้งแผงส้มตำหน้าตลาด",
-     "n": 104
+     "n": 97
     },
     {
      "id": "fraud_whistle_01",
      "text": "ลาออก ไปเปิดร้านขายของ",
-     "n": 83
-    },
-    {
-     "id": "midh_heart_after_01",
-     "text": "ลาออก เปิดร้านข้าวต้มหน้าบ้าน",
-     "n": 81
+     "n": 78
     },
     {
      "id": "early_retire",
      "text": "รับเงินก้อน ไปเปิดกิจการเอง",
-     "n": 63
+     "n": 74
+    },
+    {
+     "id": "midh_heart_after_01",
+     "text": "ลาออก เปิดร้านข้าวต้มหน้าบ้าน",
+     "n": 71
     },
     {
      "id": "first_job",
      "text": "ทุ่มเงินติวสมัครค้าขายและบริการ",
-     "n": 53
+     "n": 55
     },
     {
      "id": "career_transfer_01",
      "text": "ลาออก หางานใหม่ใกล้บ้าน",
-     "n": 32
+     "n": 24
     },
     {
      "id": "workh_bone_healer_call_01",
      "text": "ลาออกมาเป็นหมอพื้นบ้าน",
      "n": 16
+    },
+    {
+     "id": "sky_hire_01",
+     "text": "เลิกรอ ไปทำงานภาคพื้นดิน",
+     "n": 1
+    },
+    {
+     "id": "sky_crew_01",
+     "text": "ไปสัมภาษณ์ตามรอบ",
+     "n": 1
     }
    ],
    "cards": [
     {
      "id": "promo_trade_0",
-     "n": 1149
+     "n": 1132
     },
     {
      "id": "promo_trade_1",
-     "n": 828
+     "n": 808
     },
     {
      "id": "recruit_gov",
-     "n": 598
+     "n": 573
     },
     {
      "id": "mid_risky_bet_01",
-     "n": 371
+     "n": 358
     },
     {
      "id": "fraud_scale_01",
-     "n": 361
+     "n": 346
     },
     {
      "id": "fraud_contract_01",
-     "n": 355
-    },
-    {
-     "id": "young_abroad_01",
-     "n": 325
+     "n": 310
     },
     {
      "id": "era_dis_sars_service_01",
-     "n": 319
+     "n": 305
     },
     {
-     "id": "biz_grocery_01",
-     "n": 299
+     "id": "young_abroad_01",
+     "n": 298
     },
     {
-     "id": "young_shop_01",
-     "n": 294
+     "id": "court_meet_work_01",
+     "n": 296
     },
     {
      "id": "midh_pressure_01",
-     "n": 289
-    },
-    {
-     "id": "fraud_village_fund_01",
-     "n": 276
-    },
-    {
-     "id": "lot_vendor_01",
-     "n": 275
-    },
-    {
-     "id": "work_online_shop_01",
-     "n": 273
-    },
-    {
-     "id": "career_dream_01",
-     "n": 268
-    },
-    {
-     "id": "early_retire",
-     "n": 266
+     "n": 281
     },
     {
      "id": "midh_kidney_stone_01",
-     "n": 264
-    },
-    {
-     "id": "workh_smoker_cough_01",
-     "n": 262
-    },
-    {
-     "id": "midh_heart_01",
-     "n": 261
+     "n": 277
     },
     {
      "id": "mid_insurance_01",
-     "n": 243
+     "n": 275
+    },
+    {
+     "id": "biz_grocery_01",
+     "n": 271
+    },
+    {
+     "id": "young_shop_01",
+     "n": 267
+    },
+    {
+     "id": "work_online_shop_01",
+     "n": 267
     },
     {
      "id": "midh_diabetes_01",
-     "n": 236
+     "n": 264
+    },
+    {
+     "id": "fraud_village_fund_01",
+     "n": 262
+    },
+    {
+     "id": "lot_vendor_01",
+     "n": 245
+    },
+    {
+     "id": "career_dream_01",
+     "n": 245
+    },
+    {
+     "id": "early_retire",
+     "n": 242
+    },
+    {
+     "id": "midh_heart_01",
+     "n": 239
+    },
+    {
+     "id": "workh_smoker_cough_01",
+     "n": 231
     },
     {
      "id": "work_checkup_offer_01",
-     "n": 232
+     "n": 219
     },
     {
      "id": "lot_underground_mid_01",
-     "n": 218
+     "n": 210
     },
     {
      "id": "biz_restaurant_01",
-     "n": 196
-    },
-    {
-     "id": "young_risky_cert_01",
      "n": 187
     },
     {
      "id": "biz_franchise_01",
-     "n": 187
-    },
-    {
-     "id": "career_nepotism_01",
-     "n": 173
+     "n": 182
     },
     {
      "id": "midh_cancer_early_01",
-     "n": 173
+     "n": 178
+    },
+    {
+     "id": "young_risky_cert_01",
+     "n": 171
+    },
+    {
+     "id": "career_nepotism_01",
+     "n": 162
     },
     {
      "id": "debt_cash_short_01",
-     "n": 155
+     "n": 117
     },
     {
      "id": "work_influencer_01",
-     "n": 104
+     "n": 114
     },
     {
      "id": "era_acc_haze_adult_01",
      "n": 67
     },
     {
-     "id": "midh_heart_after_01",
-     "n": 63
+     "id": "work_biz_boom_01",
+     "n": 55
     },
     {
-     "id": "work_biz_boom_01",
-     "n": 53
+     "id": "midh_heart_after_01",
+     "n": 50
     },
     {
      "id": "era_dis_tsunami_south_work_01",
-     "n": 44
+     "n": 39
     },
     {
      "id": "midh_liver_01",
-     "n": 37
-    },
-    {
-     "id": "show_karaoke_01",
-     "n": 33
-    },
-    {
-     "id": "era_econ_oil2_farm_01",
      "n": 30
     },
     {
+     "id": "era_econ_oil2_farm_01",
+     "n": 28
+    },
+    {
      "id": "fraud_audit_back_01",
+     "n": 25
+    },
+    {
+     "id": "show_karaoke_01",
      "n": 24
     },
     {
-     "id": "show_molam_live_01",
-     "n": 20
+     "id": "fraud_scale_rumor_01",
+     "n": 14
     },
     {
      "id": "workh_bone_healer_call_01",
      "n": 14
     },
     {
-     "id": "money_daily_rate_01",
-     "n": 14
-    },
-    {
-     "id": "fraud_scale_rumor_01",
-     "n": 13
-    },
-    {
-     "id": "mid_online_empire_01",
+     "id": "show_molam_live_01",
      "n": 13
     },
     {
@@ -5690,63 +5670,75 @@
      "n": 13
     },
     {
-     "id": "draftee_coworker_roll_01",
+     "id": "money_daily_rate_01",
+     "n": 12
+    },
+    {
+     "id": "mid_online_empire_01",
      "n": 11
+    },
+    {
+     "id": "workday_payday_wait_01",
+     "n": 9
     },
     {
      "id": "gig_cross_soi_01",
      "n": 7
     },
     {
+     "id": "gig_queue_turn_01",
+     "n": 6
+    },
+    {
      "id": "gig_shift_mom_01",
      "n": 5
+    },
+    {
+     "id": "echo_debt_payroll_01",
+     "n": 5
+    },
+    {
+     "id": "workday_sick_cert_01",
+     "n": 5
+    },
+    {
+     "id": "draftee_coworker_roll_01",
+     "n": 4
     },
     {
      "id": "food_price_sign_01",
      "n": 4
     },
     {
-     "id": "echo_debt_payroll_01",
-     "n": 4
-    },
-    {
-     "id": "gig_no_show_01",
-     "n": 4
-    },
-    {
-     "id": "kru_exam_01",
-     "n": 4
+     "id": "gig_half_pay_01",
+     "n": 3
     },
     {
      "id": "draftee_reserve_call_01",
-     "n": 4
-    },
-    {
-     "id": "gig_half_pay_01",
-     "n": 4
-    },
-    {
-     "id": "gig_queue_turn_01",
      "n": 3
     },
     {
-     "id": "gig_win_entry_01",
+     "id": "kru_exam_01",
      "n": 3
     },
     {
-     "id": "workday_payday_wait_01",
+     "id": "gig_no_show_01",
      "n": 2
     },
     {
-     "id": "workday_sick_cert_01",
+     "id": "gig_shift_start_01",
      "n": 2
-    },
-    {
-     "id": "sky_hire_01",
-     "n": 1
     },
     {
      "id": "sky_crew_01",
+     "n": 2
+    },
+    {
+     "id": "mid_debt_spiral_01",
+     "n": 1
+    },
+    {
+     "id": "gig_win_entry_01",
      "n": 1
     },
     {
@@ -5754,7 +5746,11 @@
      "n": 1
     },
     {
-     "id": "gig_shift_start_01",
+     "id": "sky_hire_01",
+     "n": 1
+    },
+    {
+     "id": "sky_paytofly_01",
      "n": 1
     },
     {
@@ -5765,57 +5761,57 @@
    "exits": [
     {
      "kind": "retire",
-     "n": 472
+     "n": 450
     },
     {
      "kind": "move",
      "to": "gov|officer",
      "id": "recruit_gov",
-     "n": 168
+     "n": 157
+    },
+    {
+     "kind": "death",
+     "n": 134
     },
     {
      "kind": "early_retire",
-     "n": 145
-    },
-    {
-     "kind": "move",
-     "to": "police|officer",
-     "id": "recruit_gov",
-     "n": 122
+     "n": 124
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_pressure_01",
-     "n": 122
+     "n": 121
     },
     {
-     "kind": "death",
-     "n": 101
+     "kind": "move",
+     "to": "police|officer",
+     "id": "recruit_gov",
+     "n": 113
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_scale_01",
-     "n": 35
+     "n": 33
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_trade_1",
-     "n": 27
+     "n": 24
     },
     {
      "kind": "move",
      "to": "trade|farmer",
      "id": "era_econ_oil2_farm_01",
-     "n": 25
+     "n": 24
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "promo_trade_0",
-     "n": 22
+     "n": 21
     },
     {
      "kind": "move",
@@ -5827,31 +5823,37 @@
      "kind": "move",
      "to": "trade|farmer",
      "id": "midh_heart_after_01",
-     "n": 13
+     "n": 15
     },
     {
      "kind": "move",
      "to": "private|clerk",
      "id": "career_nepotism_01",
-     "n": 9
+     "n": 7
     },
     {
      "kind": "move",
      "to": "trade|labor",
-     "id": "work_influencer_01",
+     "id": "career_nepotism_01",
      "n": 4
     },
     {
      "kind": "move",
      "to": "trade|labor",
      "id": "fraud_audit_back_01",
-     "n": 4
+     "n": 3
     },
     {
      "kind": "move",
-     "to": "gov|officer",
-     "id": "kru_exam_01",
+     "to": "trade|labor",
+     "id": "work_influencer_01",
      "n": 2
+    },
+    {
+     "kind": "move",
+     "to": "private|technician",
+     "id": "first_job",
+     "n": 1
     },
     {
      "kind": "move",
@@ -5861,20 +5863,14 @@
     },
     {
      "kind": "move",
-     "to": "trade|labor",
-     "id": "career_nepotism_01",
-     "n": 1
-    },
-    {
-     "kind": "move",
      "to": "private|clerk",
      "id": "kru_exam_01",
      "n": 1
     },
     {
      "kind": "move",
-     "to": "private|manager",
-     "id": "career_nepotism_01",
+     "to": "gov|officer",
+     "id": "kru_exam_01",
      "n": 1
     }
    ]
