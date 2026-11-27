@@ -47,7 +47,12 @@ if (process.env.OVERLAP_ISK_CTL === '1') for (const e of ISK_STAGED) e.overlap_s
 const ISK_STAGED_IDS = new Set(ISK_STAGED.map((e) => e.id));
 // OVERLAP_MUT=<ชื่อ> ตัวควบคุมแบบ mutant ของด่าน (9)(10)(11) — ยัดบั๊กลงเนื้อหาในหน่วยความจำ ด่านที่ชื่อนั้นต้องตก
 //   anc = ผีบรรพบุรุษออกได้ทุกขั้น · hunt = การ์ดรับสมัครนักล่าออกได้ทุกขั้น · dun = ใบเข้าดันเจียนออกได้ทุกขั้น · die = ถอดทางตาย (die) ห้องบอสออก
+//   flat = เกณฑ์ขั้น 1 ขึ้นไปเป็น ∞ (ทุกชีวิตขั้น 0 · ด่านขั้นที่ชาติต่างโลกเห็นต้องตก) · borrow = ทายาทวัดผีบรรพบุรุษยืมแค่ขั้น 2 แบบเดิม (ด่านทายาทได้ขั้น 2 ต้องตก)
 const MUT = process.env.OVERLAP_MUT;
+if (MUT === 'flat') {
+  const { OVERLAP_STAGE_MIN: STAGE } = await import('../src/engine/index.mjs');
+  for (let k = 1; k < STAGE.length; k++) STAGE[k] = Infinity;
+}
 const evOf = (id) => content.events.find((e) => e.id === id);
 if (MUT === 'anc') for (const e of content.events) if (e.id.startsWith('overlap_ancestor_')) e.when = { ...e.when, overlap_stage: [0, 4] };
 if (MUT === 'hunt') evOf('overlap_hunter_recruit_01').when.overlap_stage = [0, 4];
@@ -237,7 +242,8 @@ for (const [name, base] of Object.entries(BOTS)) {
         p.cards[oc] = (p.cards[oc] ?? 0) + 1;
         const noTrip = !(state.trips ?? []).length;
         if (!born.stage && noTrip && oc) r.planBad++;
-        if (noTrip && oc > q[1]) r.planBad++;        // ไม่มีทริปและอยู่เลยอายุนัดสุดท้ายของตารางตัวเอง = ทุกนัดถึงกำหนดแล้ว ต้องออกครบตาราง และตารางต้องไม่ต่ำกว่าโควตาล่าง
+        if (noTrip && oc > q[1]) r.planBad++;
+        // ไม่มีทริปและอยู่เลยอายุนัดสุดท้ายของตารางตัวเอง = ทุกนัดถึงกำหนดแล้ว ต้องออกครบตาราง และตารางต้องไม่ต่ำกว่าโควตาล่าง
         const due = JSON.parse(born.plan);
         if (noTrip && born.stage && state.age > Math.max(PLAN_AGES[0], ...due.map(([, a]) => a))) {
           p.full++;
@@ -439,7 +445,7 @@ for (const [name, base] of Object.entries(BOTS)) {
     if (!row) anc.noRow++;
     const keep = OVERLAP_STAGE_MIN.slice();
     OVERLAP_STAGE_MIN[2] = 2;
-    for (let k = 3; k < OVERLAP_STAGE_MIN.length; k++) OVERLAP_STAGE_MIN[k] = Infinity;
+    if (MUT !== 'borrow') for (let k = 3; k < OVERLAP_STAGE_MIN.length; k++) OVERLAP_STAGE_MIN[k] = Infinity;
     try {
       const heir = nextLife(af);
       if (overlapStageOf(heir) !== 2) {
@@ -534,7 +540,10 @@ if (fails.length) {
       life.recruit = true;
       if (under) life.recruitLow = true;
     }
-    if (card.id === FIRST) life.first++;
+    if (card.id === FIRST) {
+      life.first++;
+      if (under) life.firstLow = true;
+    }
     if (s.occupation === 'service') life.service = true;
     if (s.ladder?.id !== 'hunter') return;
     life.hunter = true;
@@ -571,11 +580,11 @@ if (fails.length) {
     for (let i = 0; i < n; i++) {
       let st;
       for (let g = 0; g < gens; g++) {
-        const life = { recruit: false, recruitLow: false, first: 0, service: false, hunter: false, hunterLow: false, rank: 0 };
+        const life = { recruit: false, recruitLow: false, first: 0, firstLow: false, service: false, hunter: false, hunterLow: false, rank: 0 };
         const { state } = playLife(mixSeed(seed ^ 0x4e1a, i * 7919 + g), content, applier(crosser(base)), watch(life, true), st ?? undefined);
         hunt.lowLives++;
         if (life.recruitLow) hunt.lowRecruit++;
-        if (life.hunterLow) hunt.low++;
+        if (life.hunterLow || life.firstLow) hunt.low++;
         if (life.recruit && !life.recruitLow) hunt.realRecruit++;
         if (life.service && overlapOf(state) === 0) hunt.lowService++;
         st = nextLife(playAfterlife(state, crosser(base)));
