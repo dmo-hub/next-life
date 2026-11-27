@@ -650,6 +650,8 @@ function makeHeir(af, r) {
   if (OVERLAP_STAGE_MIN.findLastIndex((m) => overlap >= m) >= 1) dlcEarn(st, 'dungeon');
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
+  // นัดรอได้ที่ยังค้าง (ใบ 145) ตกถึงทายาทในตระกูลเป็นการ์ดฝั่งทายาท (heir) · นัดที่ไม่มีการ์ดฝั่งทายาทจบไปกับผู้ตาย
+  const pending = tier ? [...new Set(st.scheduled.filter((x) => x.wait && x.heir && !st.done[x.event]).map((x) => x.heir))] : [];
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -693,6 +695,7 @@ function makeHeir(af, r) {
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),
+    ...(pending.length && { pending }),
   };
 }
 

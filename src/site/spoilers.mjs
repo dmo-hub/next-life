@@ -255,7 +255,7 @@ function extras(node, L, byId) {
   for (const f of node.family ?? []) out.push(family(f, L));
   // ป้าย nature: บนตัวเลือกวัยเด็กสะสมแต้มนิสัย (B41) — หน้าเฉลยบอกว่าตัวเลือกไหนปั้นนิสัยอะไร
   if (node.nature) out.push(`แต้มนิสัย${esc(L.nature(node.nature))} +1`);
-  for (const s of node.schedules ?? []) out.push(`นัดการ์ด ${cardRef(s.event, byId)} อีก ${range(s.after_years, ' ปี')}${s.chance < 1 ? ` (โอกาส ${Math.round(s.chance * 100)}%)` : ''}`);
+  for (const s of node.schedules ?? []) out.push(`นัดการ์ด ${cardRef(s.event, byId)} อีก ${range(s.after_years, ' ปี')}${s.chance < 1 ? ` (โอกาส ${Math.round(s.chance * 100)}%)` : ''}${s.wait ? ' · ถ้ายังออกไม่ได้จะรอจนออกได้' : ''}${s.closed ? ` · คนในนัดจากไปก่อน ออกการ์ด ${cardRef(s.closed, byId)} แทน` : ''}${s.heir ? ` · ตายก่อนถึงนัด ทายาทได้การ์ด ${cardRef(s.heir, byId)}` : ''}`);
   if (node.next) out.push(`ต่อด้วยการ์ด ${cardRef(node.next, byId)}`);
   if (node.redeem) out.push(`แก้บน: ${REDEEM_TH[node.redeem] ?? esc(node.redeem)}`);
   if (node.intent) out.push(`เจตนา: ${node.intent === 'sincere' ? 'ทำด้วยใจ' : 'หวังผลตอบแทน'}`);

@@ -40,7 +40,7 @@ function referencedEvents() {
   for (const e of content.events) {
     if (e.era) ref.add(e.id);
     for (const { node } of effectSites(e)) {
-      for (const s of node.schedules ?? []) if (s?.event) ref.add(s.event);
+      for (const s of node.schedules ?? []) for (const id of [s?.event, s?.closed, s?.heir]) if (id) ref.add(id);
       if (typeof node.next === 'string') ref.add(node.next);
     }
   }

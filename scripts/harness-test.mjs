@@ -648,6 +648,71 @@ const f2 = (v) => v.toFixed(2);
   check('ไอเทม: เซฟก่อนมีระบบโหลดได้ ช่องว่าง', !!old && !('items' in old) && Object.values(E.itemsOf(old).wear).every((x) => x === null));
 }
 
+// นัดรอได้ (ใบ 145): ถึงปีแต่เงื่อนไขไม่ครบ = ค้างคิวจนครบ · คนในนัดตาย = การ์ดปิดสาย · ตายก่อนกำหนด = ทายาทรับการ์ดฝั่งทายาท
+// การ์ดทดสอบต่อท้ายสำเนากองเนื้อหา (ไม่มี weight/at_age จึงออกได้ทางนัดอย่างเดียว) · ตัวควบคุม = นัดเดียวกันไม่ติด wait
+{
+  const E = await import('../src/engine/index.mjs');
+  const { addMember } = await import('../src/engine/family.mjs');
+  const base = loadContent();
+  const card = (id, when) => ({ id, type: 'A', stage: 'ทำงาน', text: id, ...(when && { when }), choices: [0, 1, 2, 3].map((i) => ({ id: `c${i}`, text: `ทาง ${i}`, merit: [{ cat: 'neutral' }] })) });
+  const content = { ...base, events: [...base.events, card('t145_due', { flags: { has: ['t145_ready'] } }), card('t145_closed'), card('t145_heir')] };
+  const run = (entry, { years = 6, readyAt = null, dieAt = null } = {}) => {
+    const st = newLife(mixSeed(1, 14500), content);
+    st.age = 30;
+    st.advance = true;
+    st.due = [];
+    st.queue = [];
+    st.health = 100;
+    const who = entry.who === 'spouse' ? addMember(st, 'spouse', { born: st.birthYear, sex: 'ชาย' }) : null;
+    st.scheduled = [{ from: 30, pick: 'ทดสอบ', ...entry, age: 31, ...(who && { who: who.id }) }];
+    const seen = [];
+    while (st.age < 30 + years) {
+      if (readyAt !== null && st.age >= readyAt - 1) st.flags.t145_ready = true;
+      if (dieAt !== null && st.age >= dieAt - 1 && who) who.alive = false;
+      st.health = 100;
+      const c = nextCard(st);
+      if (!c || c.kind === 'death') break;
+      if (c.id?.startsWith('t145_')) seen.push(`${c.id}@${c.age}`);
+      if (c.choices?.length) choose(st, Math.max(0, (c.locked ?? []).findIndex((x) => !x)));
+    }
+    return { st, seen };
+  };
+  const waited = run({ event: 't145_due', wait: true }, { readyAt: 34 });
+  const lost = run({ event: 't145_due' }, { readyAt: 34 });
+  check('ใบ 145 นัดรอได้: เงื่อนไขครบตอนอายุ 34 การ์ดออกที่ 34 · ตัวควบคุมไม่ติด wait หายเงียบ', waited.seen.join() === 't145_due@34' && lost.seen.length === 0 && !lost.st.scheduled.some((x) => x.event === 't145_due'), `รอ ${waited.seen} · ควบคุม ${lost.seen}`);
+  const pending = run({ event: 't145_due', wait: true });
+  check('ใบ 145 เงื่อนไขไม่ครบตลอด: นัดยังค้างคิว (นัดหายเงียบ = 0)', pending.seen.length === 0 && pending.st.scheduled.filter((x) => x.event === 't145_due' && x.wait && x.age >= pending.st.age).length === 1, JSON.stringify(pending.st.scheduled));
+  const closed = run({ event: 't145_due', wait: true, who: 'spouse', closed: 't145_closed' }, { dieAt: 33 });
+  check('ใบ 145 คนในนัดตายระหว่างรอ: ออกการ์ดปิดสายแทน ครั้งเดียว · การ์ดนัดเดิมไม่ออก', closed.seen.length === 1 && closed.seen[0].startsWith('t145_closed@'), closed.seen.join());
+  const heirOf = (pathId, entry) => {
+    const { state: p } = playLife(mixSeed(1, 2525), content, BOTS.สุ่ม);
+    if (!p.kin.some((m) => m.role === 'child' && m.alive)) addMember(p, 'child', { born: p.birthYear + p.age - 20 });
+    p.flags.has_kids = true;
+    p.scheduled = [entry];
+    const af = E.startAfterlife(p);
+    const P = E.PATHS.findIndex((x) => x.id === pathId);
+    for (let c = E.nextAfterCard(af); !c.done; c = E.nextAfterCard(af)) {
+      if (c.kind === 'path') E.chooseAfter(af, P);
+      else if (c.choices?.length) E.chooseAfter(af, Math.max(0, (c.locked ?? []).findIndex((x) => !x)));
+    }
+    const heir = af.heir;
+    return { heir, st: nextLife(af) };
+  };
+  const owed = { event: 't145_due', age: 200, wait: true, heir: 't145_heir' };
+  const kid = heirOf('child', owed), other = heirOf('reborn', owed), plain = heirOf('child', { event: 't145_due', age: 200, wait: true });
+  check('ใบ 145 ตายก่อนกำหนด: ทายาทในตระกูลมีนัดการ์ดฝั่งทายาท (รอได้) · เกิดใหม่ตามกรรม/นัดไม่มี heir = ไม่ตก', kid.st.scheduled.some((x) => x.event === 't145_heir' && x.wait && x.age === 1) && !('pending' in other.heir) && !('pending' in plain.heir) && !other.st.scheduled.some((x) => x.event === 't145_heir'), `${JSON.stringify(kid.heir.pending)} · ${JSON.stringify(other.heir.pending)}`);
+  const first = [];
+  for (let i = 0; i < 40 && !first.length; i++) {
+    const c = nextCard(kid.st);
+    if (!c || c.kind === 'death') break;
+    if (c.id === 't145_heir') first.push(c.age);
+    if (c.choices?.length) choose(kid.st, Math.max(0, (c.locked ?? []).findIndex((x) => !x)));
+  }
+  check('ใบ 145 ทายาทเจอการ์ดฝั่งทายาทจริง', first.length === 1, `อายุ ${first}`);
+  const back = E.restore(E.snapshot({ st: pending.st }, content), content).st;
+  check('ใบ 145 เซฟที่มีนัดค้างแล้วโหลด นัดยังรออยู่', back.scheduled.some((x) => x.event === 't145_due' && x.wait));
+}
+
 // ใบ B99a ประตูทางมืด: ใบ fixture dark_gate ในกองจริง · สายบาปที่จนต้องถูกชวน · ทุกครั้งที่ออกต้องเงินตึง + เลือกบาปเองถึงเกณฑ์
 // ตัวควบคุม: ถอด dark_gate จากใบเดียวกัน ⇒ ต้องออกกับคนที่ประตูปิดด้วย ไม่งั้นข้อ "ทุกครั้งประตูเปิด" ผ่านเพราะใบไม่ออกเลย
 {

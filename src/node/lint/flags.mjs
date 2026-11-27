@@ -7,6 +7,8 @@ import { isObj, isRange, list, effectSites, choicesOf } from './util.mjs';
 
 // รอบหลายใบที่ผู้เล่นต้องเดินจนจบ (ดันเจียนไทย)
 const RUNS = ['dungeon'];
+// บทในบ้านที่แกนจำคนที่การ์ดพูดถึงได้ (focusOf) — พ่อแม่/เพื่อนรุ่นไม่อยู่ในชุดนี้
+const WAIT_WHO = ['partner', 'spouse', 'child', 'grandchild', 'pet'];
 
 function flagRefs(e) {
   const out = [];
@@ -91,6 +93,12 @@ export const rules = [
             const p = `${path}.schedules[${i}]`;
             if (s.event !== undefined && !ids.has(s.event)) r(x, p, `นัดเหตุการณ์ "${s.event}" ที่ไม่มีอยู่`);
             if (s.after_years !== undefined && !isRange(s.after_years, 0, 100)) r(x, p, 'after_years ต้องเป็น [จาก, ถึง] 0–100');
+            // นัดรอได้ (ใบ 145): คีย์เสริมที่ไม่มี wait จะไม่ถูกอ่าน · who ไม่มี closed = คนตายแล้วสายหายเงียบ
+            if (s.wait !== undefined && s.wait !== true) r(x, p, 'wait ใส่ได้ค่าเดียวคือ true');
+            for (const k of ['who', 'closed', 'heir']) if (s[k] !== undefined && !s.wait) r(x, p, `${k} ใช้ได้เฉพาะนัดที่มี wait: true`);
+            if (s.who !== undefined && !WAIT_WHO.includes(s.who)) r(x, p, `who ต้องเป็น ${WAIT_WHO.join('|')} ได้ ${s.who}`);
+            if ((s.who === undefined) !== (s.closed === undefined)) r(x, p, 'who กับ closed ต้องมาคู่กัน');
+            for (const k of ['closed', 'heir']) if (s[k] !== undefined && !ids.has(s[k])) r(x, p, `${k} ชี้เหตุการณ์ "${s[k]}" ที่ไม่มีอยู่`);
           });
         }
       }

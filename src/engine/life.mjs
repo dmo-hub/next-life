@@ -358,7 +358,8 @@ export function newLife(seed, content, heir = null) {
     ...(heir?.spare && { spare: heir.spare }),
     // ข้อห้ามตระกูล {ชนิด: ระยะรุ่น} (dynasty-3) — แยกจาก parentFlags เพราะถือได้ไกลกว่าเพดาน tier · เซฟเก่าไม่มีช่องนี้ อ่านแบบ ?.
     taboos: heir?.taboos ?? {},
-    scheduled: [],
+    // นัดรอได้ที่ค้างตอนรุ่นก่อนตาย (ใบ 145) ออกการ์ดฝั่งทายาทตั้งแต่ปีถัดจากที่เริ่มเล่น แล้วรอจนเงื่อนไขครบ
+    scheduled: (heir?.pending ?? []).map((event) => ({ event, age: (heir.start?.age ?? 0) + 1, wait: true })),
     baseHappiness: s.happiness,
     // ราคาปีนี้เป็นกี่เท่าของปีเกิด
     price: 1,
@@ -1919,6 +1920,7 @@ function drawCard(st) {
     const year = st.birthYear + st.age;
     arcDefer(st);
     awayDefer(st);
+    waitDefer(st, year);
     let ev = dueAt(st).find((e) => !st.done[e.id] && inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && awayOk(st, e));
     // ผลย้อนที่นัดไว้ปีนี้กินโควตาแบบเรื่องต่อ — หลักไมล์ที่ออกจาก dueAt เหมือนกันไม่หัก
     if (ev && st.scheduled.some((x) => x.event === ev.id && x.age === st.age && !x.milestone)) takeYearQuota(st, ev.id.startsWith('cadet_') ? 0.5 : 1);
@@ -1995,6 +1997,24 @@ function arcDefer(st) {
   for (const x of st.scheduled) {
     const e = x.age === st.age && ix.pos.has(x.event) && st.content.events[ix.pos.get(x.event)];
     if (e?.arc && !st.done[e.id]) x.age = Math.max(x.age, arcFrom(st, e.arc));
+  }
+}
+
+// นัดชนิดรอได้ (ใบ 145): ถึงปีแต่การ์ดยังออกไม่ได้ = เลื่อนทีละปีจนออกได้ ไม่ถูกกรองทิ้งเงียบ · ไม่ดึงเลขสุ่ม
+// คนในนัด (who) จากไปก่อน = สลับเป็นการ์ดปิดสาย ซึ่งรอเงื่อนไขของมันเองต่อ · นัดที่ไม่มี wait ไม่ถูกแตะ
+function waitDefer(st, year) {
+  if (!st.scheduled.length) return;
+  const ix = lifeEventIndex(st.content.events);
+  for (const x of st.scheduled) {
+    if (!x.wait || x.age !== st.age) continue;
+    if (x.who !== undefined && !st.kin?.some((m) => m.id === x.who && m.alive)) {
+      x.event = x.closed;
+      delete x.who;
+      delete x.closed;
+      delete x.heir;
+    }
+    const e = ix.pos.has(x.event) && st.content.events[ix.pos.get(x.event)];
+    if (e && !st.done[e.id] && !(inYears(e, year) && whenOk(st, e.when) && beliefOk(st, e) && awayOk(st, e))) x.age = st.age + 1;
   }
 }
 
@@ -2400,7 +2420,11 @@ function applyChoice(st, ev, c, text) {
     if (chance < 1 && st.rng.next() >= chance) {
       const target = st.content.events.find((e) => e.id === s.event);
       (st.echoes ??= []).push({ from: st.age, age, pick: text, title: target?.title ? fill(target.title, st) : null, missed: true });
-    } else st.scheduled.push({ event: s.event, age, from: st.age, pick: text });
+    } else {
+      // คนในนัดจดเป็น id ของคนที่การ์ดใบนี้พูดถึง · บทนั้นยังไม่มีใคร = นัดไม่ผูกคน
+      const who = s.who && focusOf(st, s.who)?.id;
+      st.scheduled.push({ event: s.event, age, from: st.age, pick: text, ...(s.wait && { wait: true }), ...(who !== undefined && who !== null && { who, closed: s.closed }), ...(s.heir && { heir: s.heir }) });
+    }
   }
   // ปิดสายเรื่องรายคน: หน้าจบบอกว่าจบแล้ว · กองสุ่มเลิกหยิบตอนใหม่ของสายนี้
   if (c.arc_end && ev.arc) st.arcs[ev.arc].end = true;
