@@ -4822,6 +4822,8 @@ function newLife(seed, content, heir = null) {
     ...(pastTalent(heir?.past) && { talent: pastTalent(heir.past) }),
     // คนตายที่ตระกูลจำได้ (deadKinOf) — มีเฉพาะตระกูลค่าซ้อน > 0 · เซฟเก่าไม่มีช่อง = ยังไม่มีผีญาติ
     ...(heir?.deadKin && { deadKin: heir.deadKin }),
+    // ของตกทอดจากรุ่นก่อน (ใบ 25) · ไม่มีของ = ไม่มีช่อง items เหมือนชีวิตที่ยังไม่เคยได้ของ
+    ...(heir?.heirloom && { items: heirItems(content.items, heir.heirloom.id) }),
     lineage: heir?.lineage ?? [],
     legacy: heir?.legacy ?? null,
     // จดหมายคำฝากของรุ่นก่อน (afterfall-3) {age, from, cause, by} — ออกหลังมรดกถึงมือเท่านั้น
@@ -5416,7 +5418,14 @@ function applyEffects(st, fx = {}, s = 1, ss = s, hurt = 1, nat = null) {
 }
 
 // ไอเทมติดตัว (B78): state สร้างตอนได้ชิ้นแรก — ชีวิตที่ไม่เคยได้ของและเซฟก่อนมีระบบจึงไม่มีช่องนี้ ผู้อ่านใช้ itemsOf ได้ช่องว่าง
-const itemsOf = (st) => st.items ?? { wear: Object.fromEntries(Object.keys(st.content.items.slots).map((k) => [k, null])), bag: [], cap: st.content.items.cap };
+const emptyItems = (reg) => ({ wear: Object.fromEntries(Object.keys(reg.slots).map((k) => [k, null])), bag: [], cap: reg.cap });
+const itemsOf = (st) => st.items ?? emptyItems(st.content.items);
+// ของตกทอด (ใบ 25): ทายาทเกิดมาพร้อมชิ้นเดียวที่รุ่นก่อนส่งให้ ลงช่องชนิดของมัน
+function heirItems(reg, id) {
+  const it = emptyItems(reg);
+  it.wear[reg.list[id].slot] = id;
+  return it;
+}
 // จอโชว์ช่องไอเทมเมื่อโลกซ้อนทับถึงขั้น 3 หรือมีของแล้ว — ก่อนนั้นช่องว่างเปล่าบอกใบ้ระบบที่ผู้เล่นยังไปไม่ถึง
 const itemsVisible = (st) => overlapStageOf(st) >= 3 || (st.items ? Object.values(st.items.wear).some(Boolean) || st.items.bag.length > 0 : false);
 
@@ -10681,6 +10690,14 @@ function kinGoneOf(st, blood) {
   return out.sort((a, b) => a.year - b.year).slice(-CHRONICLE_GONE).map((g) => ({ word: g.word, name: g.name, at: g.year - blood.born }));
 }
 
+// ของตกทอด 1 ชิ้น (ใบ 25 · decisions 43 57): ของของบ้านจากธงก่อน (ลำดับในทะเบียน) แล้วค่อยของที่สวมอยู่ตามลำดับช่อง · ของในเป้ไม่ส่ง
+// ไม่ดึงเลขสุ่ม ⇒ ทายาทที่รุ่นก่อนไม่มีของได้ทุกไบต์เท่าเดิม
+function heirloomOf(st) {
+  const reg = st.content.items;
+  const kept = Object.entries(reg.list).find(([, it]) => it.from_flag && st.flags[it.from_flag])?.[0];
+  return kept ?? Object.keys(reg.slots).map((k) => st.items?.wear[k]).find(Boolean) ?? null;
+}
+
 // พ่อ/แม่ของรุ่นถัดไปที่ชะตารู้แล้ว (diesAt) พาสาเหตุไปด้วย (B110 ชิ้น 2) — ลูกได้ประวัติครอบครัวและการ์ดรู้ว่าป่วยปีเดียวกับที่ชาติก่อนรู้
 // ผู้เล่นรุ่นก่อนหายไปต่างโลก = ไม่มีศพ ไม่มีสาเหตุ · เซฟเก่าไม่มีอายุที่รู้ ใช้ปีก่อนตาย
 const illOf = (cause, age, from) => (CHRONIC.includes(cause) ? { ill: { cause, age, from } } : {});
@@ -10820,6 +10837,8 @@ function makeHeir(af, r) {
   // ตระกูลเริ่มจำคนตายตั้งแต่ชาติที่ทำให้ค่าซ้อนขึ้นจาก 0 · ค่า 0 ไม่มีช่อง ⇒ ทายาทเท่าเดิมทุกไบต์ · ไม่จำกัดจำนวน (ล้างตอนรอบใหม่)
   const deadKin = overlap ? [...(st.deadKin ?? []), ...deadKinOf(st)] : [];
   const kinGone = blood ? kinGoneOf(st, blood) : [];
+  // ของตกทอดถึงเฉพาะทายาทในตระกูล (เฝ้าลูกหลาน · สายเลือด) — เกิดใหม่ตามกรรมไปเกิดบ้านอื่น ของไม่ตามไป
+  const heirloom = tier && legacy ? heirloomOf(st) : null;
   return {
     seed: mixSeed(st.seed, 0x5eed + gen),
     gen: gen + 1 + af.isekaiLives.length,
@@ -10865,6 +10884,7 @@ function makeHeir(af, r) {
     // ความจำข้ามชาติไปกับทุกทางเกิด · ภูมิ = ภูมิที่ปรโลกชี้ให้ชาติไทย (แบบแถวผังตระกูล)
     past: pastOf(st, thai.realm.id, isGone(st)),
     ...(deadKin.length && { deadKin }),
+    ...(heirloom && { heirloom: { id: heirloom, from: `${legacy.from}${st.name ?? ''}` } }),
   };
 }
 
@@ -10992,6 +11012,9 @@ function inheritText(st, heir) {
   else out.push(d ? `ฐานะ ${d > 0 ? '↑' : '↓'} — เกิดในบ้านที่ฐานะ${d > 0 ? 'ดีกว่า' : 'ด้อยกว่า'}ชาติก่อน (ชาติก่อนฐานะ${prev.cls})` : `ฐานะ — ใกล้เคียงชาติก่อน (ฐานะ${prev.cls})`);
   if (who && heir.legacy) {
     out.push(legacyText(heir.legacy, who));
+    // ของตกทอด (ใบ 25): ชื่อของ + เจ้าของเดิม + เรื่องเล่าติดของจากทะเบียน
+    const loom = heir.heirloom && st.content.items.list[heir.heirloom.id];
+    if (loom) out.push(`ของตกทอด — ${loom.name}ของ${heir.heirloom.from} อยู่ในช่อง${st.content.items.slots[loom.slot]}ของคุณ · ${loom.text}`);
     for (const k of ['relations', 'network']) {
       const line = kinText(k, heir.kin?.[k] ?? 0, who);
       if (line) out.push(line);
