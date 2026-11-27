@@ -2091,7 +2091,7 @@ const f2 = (v) => v.toFixed(2);
   const born = (nature) => newLife(mixSeed(1, 327), content, { ...heir, nature, start: undefined });
   const chip = (st) => st.due.find((c) => c.kind === 'intro')?.heirNature;
   const got = born('bold');
-  check('ใบ 326 ทายาทที่ได้แต้มนิสัย: การ์ดเปิดชีวิตมีป้ายคำระดับ ไม่มีเลข', chip(got)?.startsWith(`${content.nature.natures.bold.name} · จาง ๆ`) && !/\d/.test(chip(got)), String(chip(got)));
+  check('ใบ 326 ทายาทที่ได้แต้มนิสัย: การ์ดเปิดชีวิตมีป้ายคำระดับ ไม่มีเลข', chip(got)?.startsWith(`นิสัยที่ติดมา: ${content.nature.natures.bold.name} · จาง ๆ`) && got.naturePts?.bold > 0 && !/\d/.test(chip(got)), String(chip(got)));
   check('ใบ 326 ตัวควบคุม: พ่อแม่ไม่มีนิสัย = ไม่มีช่องป้าย', !('heirNature' in born(undefined).due.find((c) => c.kind === 'intro')));
   const late = { ...got, age: content.nature.nature_age + 1 };
   check('ใบ 326 ตัวควบคุม: เริ่มเกินอายุล็อกนิสัย (ไม่ได้แต้ม) = ไม่มีป้าย', introCard(late, { ...heir, nature: 'bold' }).heirNature === undefined);
