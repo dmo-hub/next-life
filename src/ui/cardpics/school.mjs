@@ -1,0 +1,175 @@
+// ภาพการ์ดหมวด school_* (เรื่องโรงเรียนตั้งแต่ ป.1 ถึงโรงเรียนผู้สูงอายุ) — ใบ 210 ขั้น ② · ผืน 200×125 พื้น y=108 · บทบาทชิ้นดู parts.mjs
+// จุดเด่นแดงหนึ่งจุดต่อภาพ = สิ่งที่การ์ดถามผู้เล่น
+import { gl, s, a, al, k, l, f, n, circ, rect, GROUND } from './parts.mjs';
+
+// คน: หัว + ตัวทรงโค้ง · x กลางตัว · top = ไหล่ · foot = พื้น · w = ครึ่งความกว้างตัว
+const torso = (x, top, foot, w) => `M${x - w} ${foot}V${top + w}q0-${w} ${w}-${w}t${w} ${w}V${foot}z`;
+const person = (x, top = 66, foot = 108, w = 12, dark = false) => [(dark ? n : s)(circ(x, top - 9, 8) + torso(x, top, foot, w))];
+// คนนั่งพื้นหันหน้าเข้าคนดู · หัวสูงจากพื้น 24
+const sit = (x, r = 5, foot = 108) => `${circ(x, foot - 24, r)}M${x - r - 2} ${foot}V${foot - 12}q0-${r} ${r + 2}-${r}t${r + 2} ${r}V${foot}z`;
+const row = (x0, step, cnt, r = 5) => Array.from({ length: cnt }, (_, i) => sit(x0 + i * step, r)).join('');
+// เสื้อนักเรียนแขนสั้นทรงแบน · x ซ้ายบน · w กว้างตัว
+const shirt = (x, y, w, h) => `M${x} ${y}l-12 10l6 8l6-4V${y + h}h${w}V${y + 14}l6 4l6-8l-12-10h-${w / 2 - 6}l-${6} 6l-6-6z`;
+const school = (x, w) => `M${x} 108V60h${w}V108M${x - 4} 60l${w / 2 + 4}-16l${w / 2 + 4} 16M${x + 8} 72h12v10h-12zM${x + w - 20} 72h12v10h-12z`;
+const desk = (x, w, y = 78) => [s(rect(x, y, w, 6)), f(`M${x + 4} ${y + 6}V108M${x + w - 4} ${y + 6}V108`, 2)];
+const sheet = (x, y, w, h, lines) => [s(rect(x, y, w, h)), k(Array.from({ length: lines }, (_, i) => rect(x + 4, y + 6 + i * 7, w - 8, 2)).join(''))];
+
+export default {
+  school_name_stitch_01: [
+    GROUND,
+    s(shirt(52, 22, 56, 70)),
+    l('M80 28v64', 1),
+    a(rect(88, 42, 16, 4)),
+    ...desk(124, 60, 82),
+    s('M134 82V60h40v10h-28v12z'),
+    f('M160 70v8', 2),
+  ],
+  school_scout_scarf_01: [
+    GROUND,
+    ...person(30, 66, 108, 10, true),
+    ...person(58, 66, 108, 10, true),
+    ...person(86, 66, 108, 10),
+    k('M24 66l6 8l6-8zM52 66l6 8l6-8z'),
+    gl('M118 40H186M118 40V108M186 40V108', 1),
+    a('M140 40l12 16l12-16z'),
+    gl(rect(172, 40, 8, 14), 1),
+  ],
+  school_hair_ruler_01: [
+    GROUND,
+    s(circ(70, 54, 18) + torso(70, 76, 108, 18)),
+    n('M52 54q0-24 18-24t18 24l-4 10h-6v-12q-8 4-16 0v12h-6z'),
+    k(circ(84, 60, 3)),
+    a(rect(96, 30, 6, 46)),
+    k('M96 38h3M96 46h3M96 54h3M96 62h3'),
+    ...person(150, 64, 108, 12, true),
+    s(rect(166, 70, 16, 20)),
+    l('M168 76h12M168 82h8', 1),
+  ],
+  school_bank_queue_01: [
+    GROUND,
+    gl('M12 108V34h96V108M6 34l54-20l54 20', 1),
+    n(rect(28, 56, 64, 52)),
+    k('M28 66h64M28 76h64M28 86h64M28 96h64'),
+    a(rect(46, 40, 28, 10)),
+    s(row(120, 16, 5)),
+    k(rect(117, 92, 6, 4) + rect(133, 92, 6, 4) + rect(149, 92, 6, 4) + rect(165, 92, 6, 4) + rect(181, 92, 6, 4)),
+  ],
+  school_new_system_01: [
+    GROUND,
+    s(rect(14, 14, 120, 76)),
+    k(rect(22, 22, 26, 14) + rect(60, 22, 26, 14) + rect(98, 22, 26, 14) + rect(22, 52, 26, 14) + rect(98, 52, 26, 14)),
+    l('M48 29h12M86 29h12M35 36v16M111 36v16', 1),
+    al('M54 62q19-14 38 0q-19 14-38 0z', 2),
+    ...person(160, 64),
+    f('M150 74l-14-10', 2),
+  ],
+  school_fresher_list_01: [
+    GROUND,
+    ...person(44, 64),
+    s(rect(60, 70, 18, 24)),
+    l('M64 76h10M64 82h10M64 88h6', 1),
+    a(rect(84, 60, 10, 22)),
+    f('M32 76l-4 10', 2),
+    ...person(136, 68, 108, 11, true),
+    ...person(164, 66, 108, 11, true),
+    s(circ(112, 72, 6) + torso(112, 80, 108, 8)),
+  ],
+  school_free_list_01: [
+    GROUND,
+    gl(school(140, 44), 1),
+    ...person(40, 66),
+    f('M52 76l12-8', 2),
+    a(rect(62, 36, 34, 46)),
+    k(rect(66, 42, 26, 3) + rect(66, 50, 22, 3) + rect(66, 58, 26, 3) + rect(66, 66, 18, 3) + rect(66, 74, 24, 3)),
+    n(circ(112, 72, 7) + torso(112, 80, 108, 10)),
+  ],
+  school_loan_slip_01: [
+    GROUND,
+    gl(rect(14, 16, 64, 44) + 'M20 24h40M20 32h50M20 40h30', 1),
+    ...person(118, 64),
+    f('M106 74l-8-6', 2),
+    s(rect(80, 40, 24, 40)),
+    k(rect(84, 46, 16, 2) + rect(84, 52, 16, 2) + rect(84, 58, 12, 2)),
+    a(rect(84, 64, 16, 4)),
+    gl('M160 50h26l-4-10h-18zM164 50v6M182 50v6', 1),
+  ],
+  school_term_delay_01: [
+    GROUND,
+    gl('M14 108V22h58V108M43 22V108', 1),
+    s(shirt(26, 32, 24, 34)),
+    s(circ(110, 44, 8)),
+    a(shirt(98, 54, 24, 30)),
+    s('M98 84h24V108H98z'),
+    gl('M160 108V20h26V108M164 80h8M164 70h8M164 60h8M164 50h8', 1),
+  ],
+  school_parade_costume_01: [
+    GROUND,
+    gl(circ(170, 30, 14) + 'M170 30V22M170 30h8', 1.2),
+    ...desk(20, 110, 80),
+    n('M30 80l6-26h22l6 26z'),
+    s(rect(72, 58, 26, 22)),
+    k(circ(114, 74, 6)),
+    s('M108 74a6 6 0 1 0 12 0a6 6 0 1 0-12 0zM111 74a3 3 0 1 0 6 0a3 3 0 1 0-6 0z'),
+    a('M146 76q18-14 32 0q-14 14-32 0zM178 76l8-8v16z'),
+    k(circ(154, 74, 1.6)),
+  ],
+  school_empty_envelope_01: [
+    GROUND,
+    ...desk(30, 140, 76),
+    a('M58 60h42v16H58zM58 60l21 10l21-10'),
+    k('M60 62l19 9l19-9'),
+    s(rect(116, 50, 34, 26)),
+    k(rect(120, 56, 26, 3) + rect(120, 63, 26, 3) + rect(120, 70, 26, 3)),
+    gl('M32 54h12M30 44h16', 1),
+  ],
+  school_reunion_button_01: [
+    GROUND,
+    gl('M110 108V48h76V108M104 48l44-20l44 20M118 60h12v12h-12zM142 60h12v12h-12zM166 60h12v12h-12zM142 86h12V108h-12z', 1),
+    s(circ(56, 36, 8)),
+    s(shirt(44, 46, 24, 62)),
+    l('M56 52v56', 1),
+    k(circ(59, 60, 2) + circ(59, 70, 2)),
+    a(circ(59, 80, 3)),
+    l('M62 54h4', 1.2),
+  ],
+  school_hair_news_01: [
+    GROUND,
+    gl(rect(20, 16, 40, 28) + 'M26 26h28M26 34h18', 1),
+    s(rect(70, 14, 50, 56)),
+    k(rect(74, 18, 42, 48)),
+    s(circ(96, 62, 8) + 'M80 108V82q0-12 16-12t16 12V108z'),
+    s(rect(76, 94, 40, 6)),
+    ...person(150, 60),
+    f('M138 70l-14-8', 2),
+    a(circ(122, 56, 3) + circ(122, 70, 3) + 'M124 58l14 6l-14-1zM124 68l14-4l-14 1z'),
+  ],
+  school_wai_flower_01: [
+    GROUND,
+    gl('M12 70H130M20 70V108M50 70V108M80 70V108M110 70V108M12 86H130', 1),
+    s(circ(90, 48, 7) + torso(90, 56, 70, 9)),
+    f('M80 62l-4 10', 2),
+    s('M140 108V84h12v24zM132 84q14-16 28 0z'),
+    a(circ(144, 64, 4) + circ(152, 62, 4) + circ(148, 56, 4) + circ(156, 56, 4) + circ(140, 58, 4)),
+    f('M148 66v14', 1.6),
+    ...person(178, 66, 108, 10, true),
+  ],
+  school_elder_roll_01: [
+    GROUND,
+    gl('M20 108V50M180 108V50M10 50l90-26l90 26z', 1.2),
+    gl('M40 60h20v12H40zM50 72v8M60 66l8-4', 1),
+    a(rect(72, 74, 56, 6)),
+    f('M76 80V108M124 80V108', 2),
+    s(sit(86, 6, 108) + sit(114, 6, 108)),
+    n(sit(150, 6, 108) + sit(170, 6, 108)),
+    f('M162 96h4v12', 1.6),
+  ],
+  school_start: [
+    GROUND,
+    gl(school(116, 66), 1),
+    gl('M150 44V28h18v6h-18', 1),
+    s(circ(60, 58, 8) + torso(60, 68, 108, 10)),
+    a('M70 70h10v22h-10z'),
+    ...person(30, 56, 108, 11, true),
+    f('M42 74l8 0', 2),
+  ],
+};
