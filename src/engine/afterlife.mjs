@@ -680,7 +680,7 @@ function makeHeir(af, r) {
     ...(blood && heirSibs(st, blood).length && { sibs: heirSibs(st, blood) }),
     // แขนงหลักของพ่อแม่ → ทายาทได้ต้นแขนงนั้นฟรี (ข้อ 38 99) · พ่อแม่ไม่เคยแตะต้นไม้ = ไม่มีช่อง
     ...(tier && lifeTreeMain(st) && { treeParent: lifeTreeMain(st) }),
-    // นิสัยพ่อแม่ → แต้มเงียบตอนเกิดของทายาท (ft15 · heir_nature) · ไม่โชว์คำระดับ · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
+    // นิสัยพ่อแม่ → แต้มตอนเกิดของทายาท (ft15 · heir_nature) · การ์ดเปิดชีวิตโชว์เป็นคำระดับ ไม่โชว์เลข · พ่อแม่ไม่มีนิสัย = ไม่ส่ง
     ...(tier && st.nature && { nature: st.nature }),
     // ประตูเข้าสายที่รุ่นก่อนเปิดไว้ ส่งต่อเฉพาะทายาทในตระกูล
     ...(tier && lifeGatesOpen(st).length && { gates: lifeGatesOpen(st) }),
