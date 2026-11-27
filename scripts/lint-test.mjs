@@ -611,6 +611,10 @@ try {
     ['bad: ตารางจุดเกิดขาดแขนง', doc({ a: node() }, { start: { ...START, class: { ...START.class, mid: {} } } }), 1],
     ['bad: ตารางจุดเกิดชี้แขนงที่ไม่มี', doc({ a: node() }, { start: { ...START, job: { clerk: { ghost: 1 } } } }), 1],
     ['bad: ตารางจุดเกิดแต้มติดลบ', doc({ a: node() }, { start: { ...START, class: { ...START.class, low: { occ: -1 } } } }), 1],
+    ['good: meet พร้อม meet_mul', doc({ a: node({ meet: ['x_01'] }) }, { meet_mul: 1.5 }), 0],
+    ['bad: meet ไม่มี meet_mul', doc({ a: node({ meet: ['x_01'] }) }), 1],
+    ['bad: meet ว่าง', doc({ a: node({ meet: [] }) }, { meet_mul: 1.5 }), 1],
+    ['bad: meet_mul ต่ำกว่า 1', doc({ a: node() }, { meet_mul: 0.5 }), 1],
     ['bad: keystone สองตัวในแขนงเดียว', doc({ a: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }), b: node({ size: 'k', keystone: true, warn: 'ข้อเสีย', cost: { health: -1 } }) }), 1],
   ];
   for (const [name, d, want] of treeCases) {
@@ -619,6 +623,9 @@ try {
   }
   const real = checkTree(parse(readFileSync(new URL('content/rules/tree.yaml', root), 'utf8')));
   if (real.length) fails.push(`content/rules/tree.yaml ไม่ผ่าน: ${real.join(' | ')}`);
+  const meetDoc = doc({ a: node({ meet: ['x_01'] }) }, { meet_mul: 1.5 });
+  if (checkTree(meetDoc, null, new Set(['x_01'])).length) fails.push('tree meet: การ์ดที่มีจริงต้องผ่าน');
+  if (!checkTree(meetDoc, null, new Set(['y_01'])).length) fails.push('tree meet: ชี้การ์ดที่ไม่มีต้องตก');
   rows.push(['ต้นไม้โฟกัส ทะเบียนตก/ผ่าน', `${treeCases.length} เคส + ของจริง`]);
   // โหนดนิสัยวัยเด็ก (ใบ ft07): natures.<id>.nodes ต้องชี้โหนดจริง · โหนดเดียวผูกนิสัยเดียว · node_pts จำนวนเต็ม ≥ 1
   const focusDoc = () => parse(readFileSync(new URL('content/rules/nature.yaml', root), 'utf8'));

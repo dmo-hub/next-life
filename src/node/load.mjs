@@ -467,14 +467,14 @@ function loadNature() {
 }
 
 // ต้นไม้โฟกัส (ใบ 03): ทะเบียนผิดรูป = หยุด build
-function loadTree() {
+function loadTree(events) {
   const doc = parse(read('content/rules/tree.yaml'));
-  const bad = checkTree(doc, JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id));
+  const bad = checkTree(doc, JSON.parse(read('data/finance.json')).occupations.list.map((o) => o.id), new Set(events.map((e) => e.id)));
   if (bad.length) throw new Error(`content/rules/tree.yaml ไม่ผ่าน ${bad.length} ข้อ\n${bad.join('\n')}`);
   const pace = parse(read('content/rules/tree-pace.yaml'));
   const badPace = checkTreePace(pace);
   if (badPace.length) throw new Error(`content/rules/tree-pace.yaml ไม่ผ่าน ${badPace.length} ข้อ\n${badPace.join('\n')}`);
-  return { year_scale: doc.year_scale, goal_joy: doc.goal_joy, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }), ...(doc.budget_ref && { budget_ref: doc.budget_ref }), ...(doc.gates && { gates: doc.gates }) };
+  return { year_scale: doc.year_scale, goal_joy: doc.goal_joy, light_unit: doc.light_unit, roll_k: doc.roll_k, card_mul: doc.card_mul, ...(doc.meet_mul !== undefined && { meet_mul: doc.meet_mul }), budget: doc.budget, start: doc.start, nodes: doc.nodes, pace, ...(doc.rust && { rust: doc.rust }), ...(doc.budget_ref && { budget_ref: doc.budget_ref }), ...(doc.gates && { gates: doc.gates }) };
 }
 
 // สกิลตอนจบชีวิตไทย (06s): id แหล่งหรือ id สกิลพิมพ์ผิด = สกิลไม่เคยออกเงียบ ๆ จึงหยุด build
@@ -610,5 +610,5 @@ export function loadContent() {
   const cadet = loadCadet();
   checkCadetEraCards(cadet, events);
   checkCadetHeirText(cadet);
-  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), taboo: loadTaboo(events), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
+  return { events, era: loadEra(), heir: loadHeir(), home: loadHome(), taboo: loadTaboo(events), nearHints: loadNearHints(), resultReacts: loadResultReacts(), nature: loadNature(), tree: loadTree(events), isekai: loadIsekaiCards(), items: loadItems(), skillMap: loadSkillMap(), away: loadAway(), arcs: loadArcs(events), cadet, spending: loadSpending() };
 }

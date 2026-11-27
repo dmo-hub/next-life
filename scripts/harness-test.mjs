@@ -1517,6 +1517,26 @@ const f2 = (v) => v.toFixed(2);
   }
 }
 
+// ใบ 336: โหนดที่มี meet ถ่วงการ์ดเจอคนถูกใจรายใบ · ไม่คูณซ้อนกับ card_mul ของแขนง
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const T = content.tree;
+  const ids = T.nodes.r3.meet;
+  const cards = ids.map((id) => content.events.find((e) => e.id === id));
+  const family = { id: 'fam_t336', category: 'family' };
+  const other = Object.keys(T.nodes).filter((id) => T.nodes[id].branch !== 'rel' && !T.nodes[id].and);
+  const rival = other.filter((id) => T.nodes[id].branch === T.nodes[other[0]].branch).slice(0, 3);
+  const mul = (done, e, tree = T) => E.lifeFocusMul({ content: { tree }, tree: { done: Object.fromEntries(done.map((id) => [id, 20])) } }, e);
+  const rel = ['r1', 'r2', 'r3'];
+  check('ใบ 336 การ์ดใน meet ออกจากกองสุ่มได้ (มี weight ไม่ล็อกอายุ) ตัวคูณจึงมีผล', cards.every((e) => e?.weight > 0 && e.age === undefined && !e.era), ids.join(' '));
+  check('ใบ 336 ยังไม่ปลด r3 = เท่าเดิม', cards.every((e) => mul([], e) === 1 && mul(['r1', 'r2'], e) === T.card_mul));
+  check('ใบ 336 rel นำแขนงเดียว + ปลด r3 = ใช้ตัวที่มากกว่า ไม่คูณซ้อน', cards.every((e) => mul(rel, e) === T.meet_mul) && T.meet_mul === 1.5, `${mul(rel, cards[0])}`);
+  check('ใบ 336 การ์ดครอบครัวใบอื่นได้แค่ card_mul', mul(rel, family) === T.card_mul);
+  check('ใบ 336 แขนงอื่นปลดเท่ากัน: การ์ดเจอยังได้ตัวคูณ ใบอื่นไม่ได้', rival.length === 3 && cards.every((e) => mul([...rel, ...rival], e) === T.meet_mul) && mul([...rel, ...rival], family) === 1, rival.join(' '));
+  check('ใบ 336 ตัวควบคุม meet_mul 1 = เหลือ card_mul เดิม', cards.every((e) => mul(rel, e, { ...T, meet_mul: 1 }) === T.card_mul));
+}
+
 // จดพ่อ/แม่บนตัวลูก (ใบ 91 B114 ข้อ 149 154 166): ลูกจด by = คู่ปัจจุบันตอนเกิด · พ่อ/แม่ของลูกคือคู่คนนั้นแม้หย่าไปแล้ว · เซฟเก่าไม่มี by คิดย้อนจากปีเกิด
 {
   const content = loadContent();
