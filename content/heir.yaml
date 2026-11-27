@@ -444,7 +444,7 @@ events:
         text: "โทรแจ้งตำรวจทันที"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 2, ok: true, text: "สายตรวจมาถึงก่อนเขาไป ถูกพาตัวไปโรงพัก หลังจากนั้นไม่มีใครมาอีก", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, ok: true, text: "สายตรวจมาถึงก่อนเขาจะทันสตาร์ตรถ สองคนนั้นถูกพาขึ้นกระบะไปโรงพักทั้งที่บุหรี่ยังคาปาก", effects: {relations: 1}, merit: [{cat: neutral}]}
           - {weight: 1, text: "ตำรวจมาถึงหลังเขาไปแล้ว เหลือแต่รอยสีบนรั้วกับก้นบุหรี่หน้าบ้าน", effects: {happiness: -2}, merit: [{cat: neutral}]}
       - id: damrongdham
         text: "ไปร้องเรียนที่ศูนย์ดำรงธรรม"
