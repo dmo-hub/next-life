@@ -53,6 +53,22 @@ function currentBranch(dir) {
   }
 }
 
+function commonDir(dir) {
+  try {
+    const out = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return process.platform === 'win32' ? out.toLowerCase() : out;
+  } catch {
+    return '';
+  }
+}
+
+// กฎ main เป็นของ repo เกม: repo อื่นบนเครื่องเดียวกันทำงานบน main ได้ · อ่านไม่ออกว่า repo ไหน = ยังกัน
+function isOtherRepo(dir) {
+  const target = commonDir(dir);
+  const own = commonDir(import.meta.dirname);
+  return target !== '' && own !== '' && target !== own;
+}
+
 function checkGit(tokens) {
   let i = 1;
   let dir = cwd;
@@ -73,9 +89,9 @@ function checkGit(tokens) {
   }
   if (sub === 'commit') {
     if (rest.includes('--all') || shortFlag('a')) return 'ห้าม git commit -a ใช้ git add <path> ทีละไฟล์ก่อน commit';
-    if (currentBranch(dir) === 'main') return 'ห้าม commit บน main สร้าง branch lane-<ชื่อคุณ>/<ชื่อใบ> ก่อน';
+    if (currentBranch(dir) === 'main' && !isOtherRepo(dir)) return 'ห้าม commit บน main สร้าง branch lane-<ชื่อคุณ>/<ชื่อใบ> ก่อน';
   }
-  if (sub === 'push') {
+  if (sub === 'push' && !isOtherRepo(dir)) {
     if (currentBranch(dir) === 'main') return 'ห้าม push จาก main ส่งงานผ่าน branch และ PR';
     const refs = rest.filter((t) => !t.startsWith('-')).slice(1);
     if (refs.some((r) => /^\+?(?:[^:]*:)?(?:refs\/heads\/)?main$/.test(r))) return 'ห้าม push เข้า main ส่งงานผ่าน branch และ PR';
