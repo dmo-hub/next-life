@@ -1064,8 +1064,12 @@ function receiveLetter(st) {
 // พี่น้องแย่งมรดก: บังคับออกครั้งเดียวในปีแรกของทายาท (กองสุ่มรับประกันไม่ได้) · ไม่มีพี่น้องที่ยังอยู่ = ไม่มีใครให้แย่ง
 // ไม่กินโควตาปี ไม่ดึงเลขสุ่ม
 const SIB_FEUD = 'sib_feud_';
+const CHILD_SIB = 10, ADULT_SIB = 18;
 function receiveSibFeud(st) {
-  if (!st.parentFlags?.sib_feud || !st.kin.some((m) => m.role === 'sibling' && m.alive)) return;
+  if (!st.parentFlags?.sib_feud) return;
+  // ข้อความให้พี่น้องกระซิบ/ยื่นกระดาษ — คนโตสุดต้องโตพอจะทำได้ ยังเล็กก็รอปีที่ถึงวัย
+  const sib = feudSib(st);
+  if (!sib || st.birthYear + st.age - sib.born < (st.age < ADULT_SIB ? CHILD_SIB : ADULT_SIB)) return;
   const cards = st.content.events.filter((e) => e.id.startsWith(SIB_FEUD));
   if (cards.some((e) => st.done[e.id])) return;
   const ev = cards.find((e) => whenOk(st, e.when));
@@ -1076,8 +1080,9 @@ function receiveSibFeud(st) {
 }
 
 // pickFocus ไม่เลือกพี่น้อง และ focusOf สำรองตัดคนย้ายออก — พี่น้องรุ่นโตส่วนใหญ่ย้ายแล้ว ผลความผูกพันจะหายเงียบถ้าไม่ตั้งคนเป้าเอง (คนโตสุดที่ยังอยู่ ไม่ดึงเลขสุ่ม)
+const feudSib = (st) => st.kin.filter((k) => k.role === 'sibling' && k.alive).sort((a, b) => a.born - b.born)[0];
 function focusFeudSib(st) {
-  const m = st.kin.filter((k) => k.role === 'sibling' && k.alive).sort((a, b) => a.born - b.born)[0];
+  const m = feudSib(st);
   if (m) st.kinFocus.sibling = m.id;
 }
 
