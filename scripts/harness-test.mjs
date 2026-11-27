@@ -2082,6 +2082,25 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 100 data/first-marriage-age.json: 4 ช่วงยุคต่อกันไม่ทับ ครอบ 2500–2650 · ชายแต่งช้ากว่าหญิงทุกช่วง · 2560+ ยืมค่า 2550–59 (carry)', wd.bands.length === 4 && wd.bands[0].from === 2500 && wd.bands.at(-1).to === 2650 && wd.bands.every((b, i, a) => b.male > b.female && (i === 0 || b.from === a[i - 1].to + 1)) && wd.bands[3].carry === true && wd.bands[3].male === wd.bands[2].male && wd.bands[3].female === wd.bands[2].female);
 }
 
+// ใบ 326: ป้ายนิสัยที่สืบมาบนการ์ดเปิดชีวิต · ขึ้นเฉพาะทายาทที่ได้แต้มจริง (ตัวควบคุม: พ่อแม่ไม่มีนิสัย · เริ่มเกินอายุล็อก · แต้ม 0)
+{
+  const { introCard } = await import('../src/engine/intro.mjs');
+  const content = loadContent();
+  const bot = Object.values(BOTS)[0];
+  const { heir } = playAfterlife(playLife(mixSeed(1, 326), content, bot).state, bot);
+  const born = (nature) => newLife(mixSeed(1, 327), content, { ...heir, nature, start: undefined });
+  const chip = (st) => st.due.find((c) => c.kind === 'intro')?.heirNature;
+  const got = born('bold');
+  check('ใบ 326 ทายาทที่ได้แต้มนิสัย: การ์ดเปิดชีวิตมีป้ายคำระดับ ไม่มีเลข', chip(got)?.startsWith(`${content.nature.natures.bold.name} · จาง ๆ`) && !/\d/.test(chip(got)), String(chip(got)));
+  check('ใบ 326 ตัวควบคุม: พ่อแม่ไม่มีนิสัย = ไม่มีช่องป้าย', !('heirNature' in born(undefined).due.find((c) => c.kind === 'intro')));
+  const late = { ...got, age: content.nature.nature_age + 1 };
+  check('ใบ 326 ตัวควบคุม: เริ่มเกินอายุล็อกนิสัย (ไม่ได้แต้ม) = ไม่มีป้าย', introCard(late, { ...heir, nature: 'bold' }).heirNature === undefined);
+  const keep = content.nature.heir_nature;
+  content.nature.heir_nature = 0;
+  check('ใบ 326 ตัวควบคุม: heir_nature 0 = ไม่มีป้าย', chip(born('bold')) === undefined);
+  content.nature.heir_nature = keep;
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 // ตัวเลือกฝืนใจ (dynasty-4): ขาดแค่ค่าสถานะไม่เกิน RELUCT.gap ทุกตัว = กดได้ + ป้าย · ขาดเกินเพดาน/ขาดธงด้วย/ไม่ติด reluctant = ล็อกเหมือนเดิม

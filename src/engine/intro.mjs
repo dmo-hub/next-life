@@ -96,6 +96,18 @@ function lineageBrief(lineage) {
   return lines;
 }
 
+// คำระดับของนิสัยที่ทายาทได้มา (ใบ 326) · ตอนนี้ระดับคงที่ขั้นแรก — ขั้นที่เหลือรอกลไก "คู่มีนิสัย"
+export const HEIR_NATURE_WORDS = ['จาง ๆ', 'ชัด', 'เต็มตัว'];
+// เงื่อนไขตรงกับ naturePoint: ทายาทที่เริ่มเกินอายุล็อกไม่ได้แต้ม จึงไม่บอกว่าได้อะไรมา
+function heirNatureText(st, heir) {
+  const c = st.content?.nature;
+  const n = heir?.nature && c?.natures?.[heir.nature];
+  if (!n || !c.heir_nature || st.age > c.nature_age || !st.lineage.length) return null;
+  const ancestor = st.parents.find((p) => p.ancestor);
+  const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
+  return `${n.name} · ${HEIR_NATURE_WORDS[0]}${who ? ` (จาก${who})` : ''}`;
+}
+
 // การ์ดใบแรกของทุกชีวิต — เล่าเรื่อง ไม่มีตัวเลือก (หน้าจอให้ปุ่ม "ต่อไป")
 // ค่าเริ่มที่แลกจากช่องพกสกิลที่ไม่ใช้ (ใบ 201 · decisions 359): บอกเป็นคำว่าค่าไหนเด่น ไม่มีตัวเลข · เส้นสายเป็นค่าซ่อน จึงเล่าเป็นคำคนพูด
 const SPARE_WORDS = { health: 'ร่างกายแข็งแรงกว่าเด็กรุ่นเดียวกัน', happiness: 'อารมณ์ดี เลี้ยงง่าย', knowledge: 'หัวไว เรียนรู้เร็ว', relations: 'เป็นที่รักของคนรอบตัว', network: 'มีผู้ใหญ่เอ็นดูคอยช่วยเหลือ' };
@@ -156,6 +168,7 @@ function chronicleLines(st, heir) {
 }
 
 export function introCard(st, heir) {
+  const heirNature = heirNatureText(st, heir);
   return {
     kind: 'intro',
     age: st.age,
@@ -169,6 +182,7 @@ export function introCard(st, heir) {
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),
+    ...(heirNature && { heirNature }),
     choices: [],
   };
 }

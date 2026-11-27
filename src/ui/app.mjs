@@ -2613,6 +2613,11 @@ function render(card) {
       // ผู้สืบสายเลือด (B76) เริ่มกลางวัย ไม่ได้เกิดใหม่
       body.append(el('span', 'stamp', card.age > 0 ? 'รับช่วงชีวิต' : 'แรกเกิด'));
       body.append(el('h3', 'lead', card.text));
+      if (card.heirNature) {
+        const chips = el('div', 'ichips');
+        chips.append(el('span', 'ichip', card.heirNature));
+        body.append(chips);
+      }
       body.append(el('p', 'horo', horoscope(st)));
       const odds = birthOddsLine();
       if (odds) body.append(sourced(el('p', 'sub', odds), birthOddsSrc()));
