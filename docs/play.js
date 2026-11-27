@@ -1894,13 +1894,24 @@ PROMO.police = [
 // ผู้ใหญ่บ้าน/กำนันอยู่ได้ถึงอายุ 60 ตามกฎหมาย — ชวนลงสมัครครั้งแรกจึงหยุดก่อนนั้น (ซ้ำค่า RETIRE_AGE ของ life.mjs เพื่อไม่ import วน)
 const RETIRE_AT = 60;
 // net = ส่วนของค่าตอบแทนท้องถิ่นที่เหลือจริง · ติดลบ = ควักเนื้อเกินค่าตอบแทน (−0.25 = ขาดทุนหนึ่งในสี่ของค่าตอบแทน · −0.5 ขึ้นไปล้มละลายเกิน 8% บนฐานที่มีเงินสัตว์ B44) — ผู้ใหญ่บ้าน/กำนันต้องช่วยงานบวช งานศพ ค่าน้ำมันวิ่งงานชาวบ้าน (ค่าตั้ง)
-// campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × (ขั้น+1)
-const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, fame: 0.5, odds: [2, 1.2, 0.8, 0.5, 0.018] };
+// campaign = ค่าหาเสียงต่อการลงสมัคร เป็นเท่าของเงินเก็บต่อปี × tier ของขั้น
+// tier = น้ำหนักขั้นที่ค่าหาเสียง/งบกลางวาระ/ระดับยั่วทุจริตคูณ — คงค่าของบันไดก่อนรวบผู้ใหญ่บ้านกับกำนัน (05a) ขั้นเดิมจึงหนักเท่าเดิม
+// ขั้น 3 หัวหน้าพรรค = ช่องว่าง (vacant) จองเลขไว้ให้ 05b ไม่ต้องแปลงเลขเซฟซ้ำ — ยังไม่มีใครชิง odds/tier ของช่องนี้จึงยังไม่ใช้
+const OFFICE = { net: -0.25, campaign: 1.5, term: 4, entry: 0.2, minNet: 45, ageFrom: 25, ageTo: RETIRE_AT - 1, keep: 2.5, fame: 0.5, odds: [2, 0.8, 0.5, 0.5, 0.018], tier: [1, 3, 4, 4, 5] };
+// เลขขั้นเซฟก่อนรวบ (ผู้ใหญ่บ้าน 0 · กำนัน 1 · นายก อบต. 2 · ส.ส. 3 · นายกฯ 4) → เลขขั้นตอนนี้ · save.mjs แปลงตอนโหลด
+const OFFICE_V1 = [0, 0, 1, 2, 4];
 
 const ladderOf = (st) => st.ladder && st.content.era.careers.ladders[st.ladder.id];
 const stepOf = (st) => ladderOf(st).steps[st.ladder.rank];
 const officeStep = (st) => st.office && st.content.era.careers.office.steps[st.office.rank];
 const officeFull = (st) => !!officeStep(st)?.full;
+// ขั้นผู้นำท้องถิ่นชนะแล้วเป็นผู้ใหญ่บ้านหรือกำนัน: ทอยจาก seed + อายุ ไม่ดึง stream ใด ๆ — ชีวิตที่ไม่ชนะเลขสุ่มไม่ขยับ · การ์ดกับผลได้ชื่อเดียวกัน
+const subOf = (step, st) => step.subs && step.subs[((Math.imul(st.seed ^ 0x2545f491, 0x9e3779b1) ^ st.age) >>> 0) % step.subs.length];
+const officeSub = (st) => officeStep(st)?.subs?.find((s) => s.name === st.office.sub);
+// ชื่อตำแหน่งบนจอ: ขั้นที่มีชื่อย่อย = "ผู้นำท้องถิ่น (กำนัน)"
+const officeName = (st) => (officeSub(st) ? `${officeStep(st).name} (${st.office.sub})` : officeStep(st).name);
+// ขั้นถัดไปที่ชิงได้ (ข้ามช่องว่าง) · ไม่มี = -1
+const officeNext = (steps, r) => steps.findIndex((s, i) => i > r && !s.vacant);
 
 // ค่าจ้างตามบัญชีเงินเดือน (บาท/เดือน ของปีอ้างอิงค่าจ้าง) ปรับตามดัชนีค่าแรงขั้นต่ำแบบเดียวกับอาชีพ — บัญชีเป็นของทั้งประเทศ จึงไม่คูณสัดส่วนภาค
 const scaled = (st, baht, year) => baht * (minWage(st.content.era, st.seed, year) / minWage(st.content.era, st.seed, st.content.era.finance.refYear));
@@ -1915,7 +1926,7 @@ function jobWage(st, year) {
 }
 
 // ค่าตอบแทนตำแหน่งการเมือง/เดือน: ขั้นท้องถิ่นบวกเพิ่มจากงาน · ขั้นเต็มเวลาผู้เรียกใช้แทนงาน
-const officePay = (st, year) => (st.office ? scaled(st, officeStep(st).pay, year) * (officeFull(st) ? 1 : OFFICE.net) : 0);
+const officePay = (st, year) => (st.office ? scaled(st, (officeSub(st) ?? officeStep(st)).pay, year) * (officeFull(st) ? 1 : OFFICE.net) : 0);
 
 // ชื่อขั้น: ขั้นที่มีชื่อแทนชื่ออาชีพ · ขั้นไม่มีชื่อ = ชื่ออาชีพ (+คำต่อท้ายของสายอาชีพ)
 const stepName = (st, rank) => {
@@ -1927,7 +1938,7 @@ const stepName = (st, rank) => {
 function rankName(st) {
   const job = st.ladder ? stepName(st, st.ladder.rank) : st.occupationName;
   if (!st.office) return job;
-  return officeFull(st) ? officeStep(st).name : `${job} · ${officeStep(st).name}`;
+  return officeFull(st) ? officeName(st) : `${job} · ${officeName(st)}`;
 }
 
 // B5 (เจ้าของเคาะ Q3 2026-11-10): เข้าสายยศทหาร/ตำรวจ = ตั้งธงทายาทให้ลูก (army_family / police_family · flags.yaml heir: tier 1)
@@ -1975,7 +1986,11 @@ function promote(st, n) {
 
 // ผลของการ์ดเลือกตั้ง: เลขขั้นที่ได้ · -1 = หลุดจากตำแหน่ง
 function setOffice(st, rank) {
+  const prev = st.office;
   st.office = rank < 0 ? null : { rank, since: st.age, next: st.age + OFFICE.term };
+  // ชนะรักษาตำแหน่งเดิม = ชื่อย่อยเดิม · ชนะเข้าขั้นใหม่ = ทอยชื่อย่อย (ผลเดียวกับที่การ์ดบอก)
+  const step = st.office && st.content.era.careers.office.steps[rank];
+  if (step?.subs) st.office.sub = prev?.rank === rank && prev.sub ? prev.sub : subOf(step, st).name;
   // ตำแหน่งสูงสุดที่เคยได้ — ชื่อเสียงตระกูล/เป้าตระกูลการเมืองอ่านตอนตาย (ตำแหน่งปัจจุบันหายเมื่อแพ้)
   if (rank >= 0) st.officeTop = Math.max(st.officeTop ?? -1, rank);
 }
@@ -2054,44 +2069,49 @@ function officeDue(st) {
 // คนกรุงเทพฯ ไม่มีหมู่บ้าน เริ่มที่ขั้นแรกที่เป็นงานเต็มเวลา
 function officeCard(st) {
   const steps = st.content.era.careers.office.steps;
-  const first = st.ses === 'bkk' ? steps.findIndex((s) => s.full) : 0;
+  const first = st.ses === 'bkk' ? steps.findIndex((s) => s.full && !s.vacant) : 0;
   const cur = st.office ? st.office.rank : -1;
-  const up = cur < 0 ? first : cur + 1;
-  const canUp = up < steps.length;
+  const next = cur < 0 ? first : officeNext(steps, cur);
+  const canUp = next >= 0;
+  // ยอดบันได: id คงเลขท้ายบันไดแบบเดิม
+  const up = canUp ? next : steps.length;
+  // ขั้นที่มีชื่อย่อย ผลชนะบอกชื่อย่อยที่จะได้ (setOffice ทอยด้วยค่าเดียวกัน)
+  const won = (r) => subOf(steps[r], st)?.name ?? steps[r].name;
+  const curName = cur >= 0 && officeName(st);
   const odds = (r) => OFFICE.odds[r] ?? OFFICE.odds.at(-1);
   const lift = { stats: { network: 1.6, relations: 1.4 } };
-  const run = (r, w, multipliers = lift, text = `ชนะ ได้เป็น${steps[r].name}`) => [
+  const run = (r, w, multipliers = lift, text = `ชนะ ได้เป็น${won(r)}`) => [
     { weight: w, ok: true, multipliers, text, effects: { office: r, network: 1 } },
-    { weight: 1, text: cur < 0 ? 'แพ้เลือกตั้ง คะแนนห่างคนที่ชนะไม่มาก' : `แพ้ หลุดจากตำแหน่ง${steps[cur].name}`, effects: { office: -1, happiness: -1 } },
+    { weight: 1, text: cur < 0 ? 'แพ้เลือกตั้ง คะแนนห่างคนที่ชนะไม่มาก' : `แพ้ หลุดจากตำแหน่ง${curName}`, effects: { office: -1, happiness: -1 } },
   ];
   const choices = [];
   if (canUp) {
-    const cost = rankCash(OFFICE.campaign * (up + 1));
+    const cost = rankCash(OFFICE.campaign * OFFICE.tier[up]);
     choices.push({ text: `ลงสมัคร${steps[up].name} หาเสียงด้วยผลงาน`, requires: { money: cost, reason: 'เงินไม่พอค่าหาเสียง' }, effects: { money: { ...cost, amount: -cost.amount } }, outcomes: run(up, odds(up)) });
     choices.push({
       text: `ลงสมัคร${steps[up].name} แจกเงินซื้อเสียง`,
-      requires: { money: rankCash(1 + up), reason: 'เงินไม่พอแจก' },
-      effects: { money: rankCash(-(1 + up)) },
+      requires: { money: rankCash(OFFICE.tier[up]), reason: 'เงินไม่พอแจก' },
+      effects: { money: rankCash(-OFFICE.tier[up]) },
       merit: VOTE_BUY,
       outcomes: [
-        { weight: odds(up) * 2.5, ok: true, text: `ชนะ ได้เป็น${steps[up].name}`, effects: { office: up } },
+        { weight: odds(up) * 2.5, ok: true, text: `ชนะ ได้เป็น${won(up)}`, effects: { office: up } },
         { weight: 1, text: 'กกต. แจกใบแดง ถูกตัดสิทธิ์ลงสมัครไปอีกหลายปี', effects: { office: -1, happiness: -2, relations: -1 }, sets_flags: ['caught_fraud'] },
       ],
     });
     choices.push({ text: `ไหว้ขอพรก่อนลงสมัคร${steps[up].name}`, outcomes: run(up, odds(up), { ...lift, wish: RANK_WISH }) });
   }
-  if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
+  if (cur >= 0) choices.push({ text: `ลงรักษาตำแหน่ง${curName}`, outcomes: run(cur, OFFICE.keep, lift, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
   choices.push(cur < 0 ? { text: 'ขอบคุณ แต่ไม่ลงสมัคร', effects: { office: -1 } } : { text: 'วางมือ ไม่ลงอีกแล้ว', effects: { office: -1, happiness: 1 } });
   // ตำแหน่งบนสุดไม่มีขั้นให้ลงต่อ เหลือแค่ลงรักษากับวางมือ ทางที่เติมจึงแยกเป็นเส้นขอพรกับส่งไม้ต่อ
   if (!canUp && cur >= 0) {
-    choices.push({ text: `ไหว้ขอพรก่อนลงรักษาตำแหน่ง${steps[cur].name}`, outcomes: run(cur, OFFICE.keep, { ...lift, wish: RANK_WISH }, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
+    choices.push({ text: `ไหว้ขอพรก่อนลงรักษาตำแหน่ง${curName}`, outcomes: run(cur, OFFICE.keep, { ...lift, wish: RANK_WISH }, `ชาวบ้านเลือกกลับมาอีกสมัย`) });
     choices.push({ text: 'ดันคนสนิทลงแทน คุมอยู่เบื้องหลัง', effects: { office: -1, network: 1 } });
   }
   return {
     id: `office_${up}`,
     category: 'society',
     type: 'A',
-    text: cur < 0 ? `อายุ ${st.age} ปี คนในพื้นที่มาชวนให้ลงสมัคร${steps[up].name}` : `อายุ ${st.age} ปี ครบวาระ${steps[cur].name}แล้ว จะเอายังไงต่อ`,
+    text: cur < 0 ? `อายุ ${st.age} ปี คนในพื้นที่มาชวนให้ลงสมัคร${steps[up].name}` : `อายุ ${st.age} ปี ครบวาระ${curName}แล้ว จะเอายังไงต่อ`,
     choices,
   };
 }
@@ -2143,7 +2163,7 @@ function severanceDays(st) {
 }
 
 // ขั้นยศ + ตำแหน่งการเมืองรวมเป็นระดับเดียว — การ์ดยั่วทุจริตออกถี่ขึ้นตามระดับ (multipliers.rank)
-const rankLevel = (st) => (st.ladder?.rank ?? 0) + (st.office ? st.office.rank + 1 : 0);
+const rankLevel = (st) => (st.ladder?.rank ?? 0) + (st.office ? OFFICE.tier[st.office.rank] : 0);
 
 // โครงการเกษียณก่อนกำหนด (B40): ลูกจ้างอายุ EARLY.from–EARLY.to ทอยจาก rankRng ครั้งเดียวต่อปี ออกได้ครั้งเดียวในชีวิต
 // ราชการ/ทหาร/ตำรวจไม่มีโครงการนี้ · ตำแหน่งการเมืองเต็มเวลาไม่ใช่ลูกจ้าง
@@ -2191,8 +2211,8 @@ const ladderStartPay = (st, id, year) => scaled(st, st.content.era.careers.ladde
 // ออกปีที่นั่งตำแหน่งครบครึ่งวาระ ไม่ดึงเลขสุ่ม
 const budgetDue = (st) => !!st.office && st.age === st.office.since + OFFICE.term / 2;
 function budgetCard(st) {
-  const name = officeStep(st).name;
-  const k = 1 + st.office.rank;
+  const name = officeName(st);
+  const k = OFFICE.tier[st.office.rank];
   return {
     id: `office_budget_${st.office.rank}`,
     category: 'society',
@@ -5742,7 +5762,7 @@ function stepYear(st) {
     if (promoDue(st)) st.due.push({ kind: 'eraEvent', ev: promoCard(st), age: st.age });
   }
   if (st.office && !officeFull(st) && st.age >= RETIRE_AGE) {
-    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeStep(st).name}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง`, tag: 'retire' });
+    st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: `อายุครบ ${RETIRE_AGE} พ้นตำแหน่ง${officeName(st)}ตามกฎหมาย ชาวบ้านจัดงานเลี้ยงส่ง` });
     st.office = null;
   }
   if (budgetDue(st)) officeDueCard(budgetCard(st));
@@ -7399,7 +7419,7 @@ function schoolGoal(st) {
 // ครบวาระเมื่อไร + ขั้นที่ลุ้นต่อ · ยอดสาย = ไม่ขึ้น · ท้องถิ่นที่พ้นตำแหน่งตามอายุก่อนครบวาระ = ไม่ขึ้น
 function officeGoal(st) {
   const steps = st.content.era.careers.office.steps;
-  const up = steps[st.office.rank + 1];
+  const up = steps[officeNext(steps, st.office.rank)];
   if (!up) return null;
   if (!officeFull(st) && st.office.next > OFFICE.ageTo + 1) return null;
   const n = st.office.next - st.age;
@@ -10186,8 +10206,8 @@ const FATE = { sd: 1.2, childStep: 3, stat: 10, bonusCap: 12, kin: 0.3 };
 const STAND_MIX = 0.5;
 const deathStanding = (st) => ((st.estate?.money ?? 0) < 0 ? 0 : standingOf(st));
 // ชื่อเสียงตระกูล (B95b · เจ้าของเคาะ 4 ขั้น) — แต้มของรุ่นที่เพิ่งจบ บวกกับครึ่งหนึ่งของขั้นเดิม ปัดครึ่งลง (ปัดขึ้นแล้วขั้น 1 ไม่จางเลย) ⇒ ไม่ทำอะไรต่อสองสามรุ่นก็จางเอง
-// office = แต้มตามตำแหน่งสูงสุดที่เคยได้ (ผู้ใหญ่บ้าน กำนัน นายก อบต. ส.ส. นายกฯ) · rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
-const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5, office: [0, 0, 1, 2, 3] };
+// office = แต้มตามตำแหน่งสูงสุดที่เคยได้ (ผู้นำท้องถิ่น นายก อบต. ส.ส. หัวหน้าพรรค นายกฯ) · rich = ฐานะตอนตายตั้งแต่ระดับ 8 (index 7) · guests = แขกงานศพที่นับว่างานใหญ่ · network = คอนเน็คชั่นตั้งต้นของทายาทต่อขั้น
+const FAME = { names: ['ไร้ชื่อ', 'มีหน้ามีตา', 'ผู้มีบารมีในถิ่น', 'ตระกูลใหญ่'], decay: 0.5, rich: 7, guests: 300, network: 5, office: [0, 1, 2, 2, 3] };
 const famePoints = (st, death) => (FAME.office[st.officeTop ?? -1] ?? 0) - (st.flags?.caught_fraud ? 1 : 0) + (death >= FAME.rich ? 1 : 0) + (funeralGuests(st) >= FAME.guests ? 1 : 0) - (st.bankruptcies > 0 ? 1 : 0) - ((st.estate?.money ?? 0) < 0 ? 1 : 0);
 const nextFame = (st, death) => Math.max(0, Math.min(FAME.names.length - 1, Math.ceil((st.fame ?? 0) * FAME.decay + famePoints(st, death) - 0.5)));
 const mixStanding = (death, fate) => clampIdx(Math.round(STAND_MIX * death + (1 - STAND_MIX) * fate));
@@ -11285,14 +11305,14 @@ const lastN = (xs, n, ok) => xs.length >= n && xs.slice(-n).every(ok);
 // เป้าตระกูล (B95b · เจ้าของเคาะ) — ได้ฉายาทุกรุ่นที่ยังเข้าเงื่อนไข · ชื่อเสียง +1 ครั้งเดียวต่อตระกูล (afterlife.mjs นับจาก lineage[].goals)
 // ฐานะตอนตายอ่านจากจุดท้ายของ standing · rags = เกิดชั้น 1–2 แล้วภายในสามรุ่น (นับรุ่นนั้นด้วย) มีคนตายในฐานะ 9–10
 const deathCls = (l) => l.standing?.at(-1)?.cls ?? CLASSES.indexOf(l.cls);
-// service = รับราชการสายที่มีบำนาญ (พลเรือน ทหาร ตำรวจ) · office 2 = นายก อบต.
+// service = รับราชการสายที่มีบำนาญ (พลเรือน ทหาร ตำรวจ) · office 1 = นายก อบต.
 const RAGS = { from: 1, to: 8, within: 3 };
 const runOf = (ch, n, ok) => ch.some((_, i) => i + n <= ch.length && ch.slice(i, i + n).every(ok));
 const rags = (ch) => ch.some((l, i) => CLASSES.indexOf(l.cls) <= RAGS.from && ch.slice(i, i + RAGS.within).some((m) => deathCls(m) >= RAGS.to));
 const FAMILY_GOALS = [
   { id: 'goal_rags', name: 'จากยากไร้สู่มั่งคั่ง', hint: 'รุ่นที่เกิดมายากไร้ ภายในสามรุ่นมีคนจากไปอย่างมั่งคั่ง', test: (ch) => rags(ch) },
   { id: 'goal_service', name: 'สามรุ่นรับราชการ', hint: 'สามรุ่นติดกันรับราชการจนมีบำนาญ', test: (ch) => runOf(ch, 3, (l) => l.service) },
-  { id: 'goal_politics', name: 'ตระกูลการเมือง', hint: 'สองรุ่นได้ตำแหน่งตั้งแต่นายก อบต. ขึ้นไป', test: (ch) => ch.filter((l) => (l.office ?? -1) >= 2).length >= 2 },
+  { id: 'goal_politics', name: 'ตระกูลการเมือง', hint: 'สองรุ่นได้ตำแหน่งตั้งแต่นายก อบต. ขึ้นไป', test: (ch) => ch.filter((l) => (l.office ?? -1) >= 1).length >= 2 },
   { id: 'goal_great', name: 'ตระกูลใหญ่', hint: 'ชื่อเสียงตระกูลขึ้นถึงขั้นสูงสุด', test: (ch) => ch.some((l) => (l.fame ?? 0) >= 3) },
 ];
 // ผังตระกูลรวมชีวิตนี้ตอนตาย — แถวท้ายมีฐานะตอนตาย (ตายพร้อมหนี้ = 0) กับชื่อเสียงที่รับมา
@@ -11332,7 +11352,11 @@ function titlesOf(st) {
 
 
 
+
 const SNAP_V = 1;
+// o = รุ่นเลขขั้นการเมืองในภาพถ่าย · ภาพถ่ายไม่มี o = เลขขั้นก่อนรวบผู้ใหญ่บ้าน/กำนัน (05a) — แปลงตอนโหลด ไม่ขึ้น SNAP_V เพราะโครงภาพถ่ายเหมือนเดิม
+const OFFICE_SCHEME = 2;
+const OFFICE_V1_SUB = ['ผู้ใหญ่บ้าน', 'กำนัน'];
 const isRng = (v) => typeof v.next === 'function' && typeof v.int === 'function';
 
 function snapshot(root, content) {
@@ -11358,7 +11382,7 @@ function snapshot(root, content) {
     const body = Array.isArray(v) ? v.map(enc) : Object.fromEntries(Object.entries(v).map(([k, x]) => [k, enc(x)]));
     return shared ? { $id: ids.get(v), $v: body } : body;
   };
-  return JSON.stringify({ v: SNAP_V, root: enc(root) });
+  return JSON.stringify({ v: SNAP_V, o: OFFICE_SCHEME, root: enc(root) });
 }
 
 // การ์ดเนื้อหาที่ id หายจากเนื้อหาใหม่ = null (ผู้เรียกทิ้งแล้วจั่วใหม่) · ตัวสุ่มคืนเป็นตัวใหม่ที่เดินต่อจากเลขเดิม
@@ -11384,7 +11408,30 @@ function restore(text, content) {
     }
     return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, dec(x)]));
   };
-  return dec(snap.root);
+  const root = dec(snap.root);
+  if (snap.o !== OFFICE_SCHEME) officeV1(root, content);
+  return root;
+}
+
+// เลขขั้นการเมืองของเซฟเก่าอยู่ 3 ที่: ตำแหน่งตอนนี้ (office.rank) · ตำแหน่งสูงสุด (officeTop) · ผังตระกูล/ผลการ์ดเลือกตั้งที่ค้าง (office เป็นเลข)
+// เดินทั้งก้อนครั้งเดียว ข้ามเนื้อหาเกม — object ที่อ้างซ้ำ (af.st = st) แปลงครั้งเดียว · กำนัน/ผู้ใหญ่บ้านเดิมเก็บเป็นชื่อย่อยของผู้นำท้องถิ่น
+function officeV1(root, content) {
+  const skip = new Set([content, ...content.events]);
+  const seen = new Set();
+  const map = (r) => (r >= 0 ? OFFICE_V1[r] ?? r : r);
+  const walk = (v) => {
+    if (v === null || typeof v !== 'object' || skip.has(v) || seen.has(v) || typeof v.next === 'function') return;
+    seen.add(v);
+    if (typeof v.officeTop === 'number') v.officeTop = map(v.officeTop);
+    if (typeof v.office === 'number') v.office = map(v.office);
+    else if (typeof v.office?.rank === 'number' && !seen.has(v.office)) {
+      seen.add(v.office);
+      if (OFFICE_V1_SUB[v.office.rank]) v.office.sub = OFFICE_V1_SUB[v.office.rank];
+      v.office.rank = map(v.office.rank);
+    }
+    for (const x of Array.isArray(v) ? v : Object.values(v)) walk(x);
+  };
+  walk(root);
 }
 
 // ซ่อมสถานะชีวิตหลังโหลดบนเนื้อหาใหม่: ของที่อ้าง id แล้ว id หาย ให้ทางปลอดภัยแทนการพัง
