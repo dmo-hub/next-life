@@ -2001,11 +2001,12 @@ const f2 = (v) => v.toFixed(2);
     { age: 40, text: 'เรื่องหลัง', bad: false, weight: 2 },
   ];
   // เดินจาก from จนพ้นอายุ to หรือเจอการ์ดที่ต้องเลือก · seed แรกที่ไม่ตายกลางทาง
-  const taleRun = ({ gk = true, deeds = DEEDS, from = E.TALE_AGE - 1, to = E.TALE_AGE } = {}) => {
+  // gkAge = อายุหลานตอนชีวิตอายุ TALE_AGE · ค่าเริ่ม = TALE_LISTENER พอดี
+  const taleRun = ({ gk = true, gkAge = E.TALE_LISTENER, deeds = DEEDS, from = E.TALE_AGE - 1, to = E.TALE_AGE } = {}) => {
     for (let s = 1; s < 40; s++) {
       const st = newLife(mixSeed(23, s), content);
       Object.assign(st, { age: from, health: 100, due: [], queue: [], advance: true, deeds: deeds.map((d) => ({ ...d })) });
-      if (gk) addKin(st, 'grandchild', { born: st.birthYear + from - 5 });
+      if (gk) addKin(st, 'grandchild', { born: st.birthYear + E.TALE_AGE - gkAge });
       const cards = [];
       for (let c = E.nextCard(st); c.kind !== 'death' && !c.choices?.length && st.age <= to; c = E.nextCard(st)) cards.push(c);
       if (!st.dead && st.age >= to) return { st, tales: cards.filter((c) => c.tag === 'tale') };
@@ -2014,8 +2015,8 @@ const f2 = (v) => v.toFixed(2);
   };
   const yes = taleRun();
   check('ใบ 23 อายุ TALE_AGE + มีหลาน: การ์ดนิทาน 1 ใบ · เล่าบุญน้ำหนักสูงสุด (เท่ากันเอาเรื่องแรก) ไม่ใช่บาปที่หนักกว่า · ข้อความไม่มีคำบุญ/บาป', yes?.tales.length === 1 && yes.st.tale?.text === 'เรื่องแรก' && yes.st.tale.age === 20 && yes.st.tale.told === E.TALE_AGE && yes.tales[0].text.includes('เรื่องแรก') && !/บุญ|บาป/.test(yes.tales[0].text), JSON.stringify(yes?.st.tale ?? null));
-  const noGk = taleRun({ gk: false }), onlyBad = taleRun({ deeds: DEEDS.filter((d) => d.bad) }), young = taleRun({ from: E.TALE_AGE - 3, to: E.TALE_AGE - 2 });
-  check('ใบ 23 ไม่มีหลาน / มีแต่บาป / อายุยังไม่ถึง: ไม่มีการ์ด ไม่มีช่อง tale', [noGk, onlyBad, young].every((r) => r && !r.tales.length && !('tale' in r.st)));
+  const noGk = taleRun({ gk: false }), onlyBad = taleRun({ deeds: DEEDS.filter((d) => d.bad) }), young = taleRun({ from: E.TALE_AGE - 3, to: E.TALE_AGE - 2 }), baby = taleRun({ gkAge: E.TALE_LISTENER - 1 });
+  check('ใบ 23 ไม่มีหลาน / มีแต่บาป / อายุยังไม่ถึง / หลานยังเล็กกว่า TALE_LISTENER: ไม่มีการ์ด ไม่มีช่อง tale', [noGk, onlyBad, young, baby].every((r) => r && !r.tales.length && !('tale' in r.st)));
   // ผังตระกูล: ชีวิตที่เล่า = ช่อง tale {age,text} · ไม่ได้เล่า = ไม่มี key (lineage ถูก hash)
   const lineageOf = (p) => {
     const af = E.startAfterlife(p);
@@ -2033,7 +2034,7 @@ const f2 = (v) => v.toFixed(2);
     else if (!p.tale && !quiet) quiet = p;
   }
   const lt = told && lineageOf(told), lq = quiet && lineageOf(quiet);
-  check('ใบ 23 ผังตระกูล: ชีวิตที่เล่านิทานมีช่อง tale ตรงเรื่อง · ชีวิตที่ไม่ได้เล่าไม่มี key', lt?.tale?.text === told.tale.text && lt.tale.age === told.tale.age && lq && !('tale' in lq), JSON.stringify(lt?.tale ?? null));
+  check('ใบ 23 ผังตระกูล: ชีวิตที่เล่านิทานมีช่อง tale ตรงเรื่อง · ชีวิตที่ไม่ได้เล่าไม่มี key', Boolean(told) && lt?.tale?.text === told.tale.text && lt.tale.age === told.tale.age && lq && !('tale' in lq), JSON.stringify(lt?.tale ?? null));
 }
 
 const w = Math.max(...rows.map((r) => r[0].length));

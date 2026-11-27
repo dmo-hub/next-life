@@ -1063,11 +1063,13 @@ function receiveLetter(st) {
 // นิทานวัยชรา (B96 · thai-life-deep ใบ 23): อายุถึงแล้วมีหลานอยู่ด้วย = เล่าเรื่องใหญ่สุดที่ไม่ใช่บาปครั้งเดียวต่อชีวิต
 // เรื่องใหญ่สุด = บุญน้ำหนักมากสุดใน deeds · เท่ากันเอาเรื่องแรก (ตรงกับที่หน้าปรโลกเลือกโชว์) · ไม่ดึงเลขสุ่ม การ์ดไม่มีผล
 // ไม่มีบุญสักเรื่อง/ไม่มีหลาน = ไม่มีการ์ด ไม่มีช่อง st.tale · ข้อความไม่บอกว่าเป็นบุญ
+// หลานต้องโตพอขอฟังและจำได้ (TALE_LISTENER) — หลานทารกไม่นับ
 export const TALE_AGE = 58;
+export const TALE_LISTENER = 6;
 export const bestTale = (deeds = []) => deeds.filter((d) => !d.bad).reduce((a, d) => (a && a.weight >= d.weight ? a : d), null);
 const taleText = (d) => `หลานมาขอฟังเรื่องสมัยก่อน คุณเล่าตอนอายุ ${d.age} ที่ “${d.text}” ซ้ำจนหลานจำได้ทุกคำ`;
 function tellTale(st, stage) {
-  if (st.tale || st.age < TALE_AGE || !st.kin?.some((m) => m.role === 'grandchild' && m.alive && !m.left)) return;
+  if (st.tale || st.age < TALE_AGE || !st.kin?.some((m) => m.role === 'grandchild' && m.alive && !m.left && st.birthYear + st.age - m.born >= TALE_LISTENER)) return;
   const d = bestTale(st.deeds);
   if (!d) return;
   st.tale = { age: d.age, text: d.text, told: st.age };
@@ -1196,7 +1198,8 @@ function dueJob(st) {
 const HEIR_UNI_KNOW = 55;
 
 // เดินหนึ่งปี: ทุกอย่างไหลเป็นรายปีในลูปนี้ที่เดียว การกระโดดหลายปีจึงได้ผลเท่ากับเดินทีละปีเสมอ
-function stepYear(st) {
+// catchUp = วนปีที่หายไประหว่างทริปต่างโลก (ผู้เล่นไม่อยู่บ้าน) — ไม่เล่านิทานในปีพวกนั้น ปีแรกหลังกลับเล่าแทน
+function stepYear(st, catchUp = false) {
   const prevStage = stageOf(st.age);
   lifeTreeYear(st);
   natureLock(st);
@@ -1282,7 +1285,7 @@ function stepYear(st) {
     st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
     st.stageMark = markStage(st);
   }
-  tellTale(st, stage);
+  if (!catchUp) tellTale(st, stage);
   finishTrack(st, year);
   // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
   // การ์ดงบ/ครบวาระของคนมีตำแหน่งการเมืองกินโควตากองสุ่มแบบเรื่องต่อ — เจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)
@@ -2830,7 +2833,7 @@ function tripBack(st) {
   const c = tripCarry(isk);
   st.network = clamp(st.network + c.network);
   st.knowledge = clamp(st.knowledge + c.knowledge);
-  for (let i = 0; i < isk.trip.thai; i++) stepYear(st);
+  for (let i = 0; i < isk.trip.thai; i++) stepYear(st, true);
   overlapPlan(st, st.trips.length);
   driftPlan(st, st.trips.length);
   // ใบตัดสินใจที่ถึงกำหนดทุกปี (เลื่อนขั้น ทบทวนเงิน ช่วงวัย) ซ้อนกันหลายใบ — เก็บใบล่าสุดของแต่ละเรื่อง ใบเก่าสร้างจากสถานะที่ไม่ใช่แล้ว
