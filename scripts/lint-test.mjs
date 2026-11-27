@@ -406,7 +406,8 @@ const CADET_FLAG_KEYS = ['setFlags', 'clearFlags', 'setFlagsPoor', 'flagsHas', '
 // ธง mark ของทะเบียน taboo: แกนตั้งตอนการ์ดตามหนี้ออก และแกนอ่านเป็นต้นเหตุข้อห้ามตระกูล
 // army_family / police_family (B5): แกนตั้งตอนเข้าสายยศ army/police (rank.mjs markService)
 // tree_teacher (ใบ 08): ด่านจบประถมของแกนตั้ง · treePace ในแกนอ่าน
-const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family', 'tree_teacher', ...Object.values(nameContent.taboo).flatMap((t) => (t.mark ? [t.mark.flag] : []))];
+// sib_feud: แกนตั้งใน parentFlags ของทายาทตอนเลือกปุ่มสายเลือด (afterlife.mjs)
+const ENGINE_FLAGS = ['vow_broken', 'bankrupt', 'isekai_call', 'cheat_death', 'army_family', 'police_family', 'tree_teacher', 'sib_feud', ...Object.values(nameContent.taboo).flatMap((t) => (t.mark ? [t.mark.flag] : []))];
 const stale = [...ctx.flags.flags, ...ctx.flags.prefixes].filter((f) => !used.has(f) && !ENGINE_FLAGS.includes(f));
 rows.push(['ทะเบียนธง', `${ctx.flags.flags.size} ธง · ${ctx.flags.prefixes.size} ชื่อหน้า · ค้าง ${stale.length}`]);
 // ธงมีพารามิเตอร์ยังไม่มีเนื้อหาจริงใช้ (มีแค่ใน fixture สายลี้ลับ) จึงไม่นับว่าค้าง

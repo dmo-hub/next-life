@@ -492,6 +492,9 @@ export function carryLedger(ledger, net, r) {
   return out;
 }
 
+// ไม่มีพินัยกรรมและมีลูกพอจะแบ่งกันเอง (ตายตอนเด็ก/ลูกคนเดียวไม่นับ) — ส่วนที่หักจากมรดกกับการ์ดพี่น้องแย่งมรดกของทายาทใช้เงื่อนไขเดียวกัน
+const willFeud = (st) => !!st.funeral && !st.flags?.wish_will && disputes(st);
+
 // มรดกต่อลูกหนึ่งคน เป็นจำนวนเท่าของรายได้ครัวเรือนทั้งปีของทั้งประเทศตอนตาย — ชีวิตลูกเดินเงินเฟ้อคนละชุด (seed ต่างกัน)
 // จึงส่งต่อเป็นสัดส่วนของรายได้ แล้วแปลงกลับเป็นบาทในปีที่ลูกได้รับ · ทรัพย์สุทธิติดลบ = หนี้ไม่ตกถึงลูก (ป.พ.พ. ม.1601)
 // kids = จำนวนลูกที่ยังอยู่จริง (B36a) · ไม่รู้จำนวน (harness/state เก่า) ใช้ LEGACY.kids
@@ -499,8 +502,7 @@ export function legacyUnits(st, kids = LEGACY.kids) {
   const e = st.estate;
   if (!e || e.money <= 0) return 0;
   let share = e.money / Math.max(1, kids);
-  // ผ่านฉากงานศพแล้วไม่ได้ทำพินัยกรรม และมีลูกพอจะแบ่งกันเอง — ตายตอนเด็ก/ลูกคนเดียวไม่หัก
-  if (st.funeral && !st.flags?.wish_will && disputes(st)) share *= 1 - LEGACY.dispute;
+  if (willFeud(st)) share *= 1 - LEGACY.dispute;
   if (e.year >= LEGACY.taxYear && share > LEGACY.taxFrom) share -= (share - LEGACY.taxFrom) * LEGACY.tax;
   return share / (nationalIncome(st.content.era, st.seed, e.year) * 12);
 }
@@ -593,6 +595,8 @@ function makeHeir(af, r) {
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
     taboos = heirTaboos(st, tier.tier);
+    // ธงนี้ไม่มาจาก st.flags ของรุ่นก่อน: เฉพาะลูกสายเลือดที่มีพี่น้องตามมาและมีกองให้แย่ง (หลานเป็นคนละรุ่นกับคนแบ่งมรดก)
+    if (blood?.role === 'child' && st.estate?.money > 0 && willFeud(st) && heirSibs(st, blood).length) parentFlags.sib_feud = tier.tier;
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
