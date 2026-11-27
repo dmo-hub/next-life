@@ -6821,6 +6821,8 @@ function whenOk(st, when) {
   // ผีญาติ: ขั้นซ้อนทับ ≥ 1 ถึงจะมีผีญาติ · สีหน้าของคนที่ถูกเลือกต้องตรงกับที่การ์ดขอ (haunt | warn)
   if (when.kin_ghost && !(overlapStageOf(st) >= 1 && when.kin_ghost.includes(pickKinGhost(st)?.mood))) return false;
   if (when.ancestor && !ancestorOf(st)) return false;
+  // ทายาทปุ่มสายเลือด (B76) อ่านทางของแถวผังล่าสุด — ไม่เพิ่มช่อง state ใหม่ ชีวิตทางอื่นจึงเท่าเดิมทุกไบต์
+  if (when.blood_heir && st.lineage?.at(-1)?.path !== 'blood') return false;
   for (const [k, b] of Object.entries(when.stats ?? {})) if (!inBound(st[k], b)) return false;
   // อาชีพนับเมื่อมีงานของตัวเองแล้ว — อาชีพครอบครัวก่อนทำงานไม่ทำให้การ์ดที่ทำงานออก
   if (when.occupation && !(st.workFrom !== null && when.occupation.includes(st.occupation))) return false;
