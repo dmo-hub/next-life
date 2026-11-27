@@ -1060,6 +1060,20 @@ function receiveLetter(st) {
   st.due.push({ kind: 'eraEvent', ev, age: st.age });
 }
 
+// นิทานวัยชรา (B96 · thai-life-deep ใบ 23): อายุถึงแล้วมีหลานอยู่ด้วย = เล่าเรื่องใหญ่สุดที่ไม่ใช่บาปครั้งเดียวต่อชีวิต
+// เรื่องใหญ่สุด = บุญน้ำหนักมากสุดใน deeds · เท่ากันเอาเรื่องแรก (ตรงกับที่หน้าปรโลกเลือกโชว์) · ไม่ดึงเลขสุ่ม การ์ดไม่มีผล
+// ไม่มีบุญสักเรื่อง/ไม่มีหลาน = ไม่มีการ์ด ไม่มีช่อง st.tale · ข้อความไม่บอกว่าเป็นบุญ
+export const TALE_AGE = 58;
+export const bestTale = (deeds = []) => deeds.filter((d) => !d.bad).reduce((a, d) => (a && a.weight >= d.weight ? a : d), null);
+const taleText = (d) => `หลานมานั่งล้อมขอให้เล่าเรื่องสมัยก่อน คุณเล่าเรื่องตอนอายุ ${d.age} ที่ตัดสินใจ “${d.text}” หลานฟังจนจำได้ขึ้นใจ`;
+function tellTale(st, stage) {
+  if (st.tale || st.age < TALE_AGE || !st.kin?.some((m) => m.role === 'grandchild' && m.alive && !m.left)) return;
+  const d = bestTale(st.deeds);
+  if (!d) return;
+  st.tale = { age: d.age, text: d.text, told: st.age };
+  st.due.push({ kind: 'result', type: 'A', age: st.age, stage, text: taleText(d), tag: 'tale' });
+}
+
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
 function invest(st, { asset, share }) {
   if (!assetOpen(st.content.era, asset, st.birthYear + st.age)) throw new Error(`${assetName(asset)} ยังไม่มีในปี ${st.birthYear + st.age}`);
@@ -1268,6 +1282,7 @@ function stepYear(st) {
     st.due.push({ kind: 'stage', age: st.age, stage, text: `เข้าสู่ช่วง${stage}`, recap: stageRecap(st, st.age - 1) });
     st.stageMark = markStage(st);
   }
+  tellTale(st, stage);
   finishTrack(st, year);
   // สายยศ (B40): ปีในขั้นนับตามความสุข ถึงคิวแล้วการ์ดเลื่อนขั้น · ผู้ใหญ่บ้าน/กำนันพ้นตำแหน่งตอนเกษียณ · ครบวาระ/ถูกชวนลงสมัคร = การ์ดเลือกตั้ง
   // การ์ดงบ/ครบวาระของคนมีตำแหน่งการเมืองกินโควตากองสุ่มแบบเรื่องต่อ — เจอทุกวาระ ชีวิตจึงยาวขึ้นเฉพาะสายนี้ (หางด่าน 4)

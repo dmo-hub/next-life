@@ -1989,6 +1989,53 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 100 data/first-marriage-age.json: 4 ช่วงยุคต่อกันไม่ทับ ครอบ 2500–2650 · ชายแต่งช้ากว่าหญิงทุกช่วง · 2560+ ยืมค่า 2550–59 (carry)', wd.bands.length === 4 && wd.bands[0].from === 2500 && wd.bands.at(-1).to === 2650 && wd.bands.every((b, i, a) => b.male > b.female && (i === 0 || b.from === a[i - 1].to + 1)) && wd.bands[3].carry === true && wd.bands[3].male === wd.bands[2].male && wd.bands[3].female === wd.bands[2].female);
 }
 
+// นิทานวัยชรา (thai-life-deep ใบ 23 · B96): ยัดเคสเองที่อายุ TALE_AGE−1 แล้วเดินขึ้นปีจริง — ไม่พึ่งว่าบอทได้หลาน/บุญเรื่องไหน
+// ตัวควบคุม: บุญเท่ากันเอาเรื่องแรก · บาปหนักกว่าไม่ถูกเล่า · ไม่มีหลาน/มีแต่บาป/อายุไม่ถึง = ไม่มีการ์ด ไม่มีช่อง
+{
+  const E = await import('../src/engine/index.mjs');
+  const { addMember: addKin } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  const DEEDS = [
+    { age: 20, text: 'เรื่องแรก', bad: false, weight: 2 },
+    { age: 30, text: 'เรื่องบาป', bad: true, weight: 9 },
+    { age: 40, text: 'เรื่องหลัง', bad: false, weight: 2 },
+  ];
+  // เดินจาก from จนพ้นอายุ to หรือเจอการ์ดที่ต้องเลือก · seed แรกที่ไม่ตายกลางทาง
+  const taleRun = ({ gk = true, deeds = DEEDS, from = E.TALE_AGE - 1, to = E.TALE_AGE } = {}) => {
+    for (let s = 1; s < 40; s++) {
+      const st = newLife(mixSeed(23, s), content);
+      Object.assign(st, { age: from, health: 100, due: [], queue: [], advance: true, deeds: deeds.map((d) => ({ ...d })) });
+      if (gk) addKin(st, 'grandchild', { born: st.birthYear + from - 5 });
+      const cards = [];
+      for (let c = E.nextCard(st); c.kind !== 'death' && !c.choices?.length && st.age <= to; c = E.nextCard(st)) cards.push(c);
+      if (!st.dead && st.age >= to) return { st, tales: cards.filter((c) => c.tag === 'tale') };
+    }
+    return null;
+  };
+  const yes = taleRun();
+  check('ใบ 23 อายุ TALE_AGE + มีหลาน: การ์ดนิทาน 1 ใบ · เล่าบุญน้ำหนักสูงสุด (เท่ากันเอาเรื่องแรก) ไม่ใช่บาปที่หนักกว่า · ข้อความไม่มีคำบุญ/บาป', yes?.tales.length === 1 && yes.st.tale?.text === 'เรื่องแรก' && yes.st.tale.age === 20 && yes.st.tale.told === E.TALE_AGE && yes.tales[0].text.includes('เรื่องแรก') && !/บุญ|บาป/.test(yes.tales[0].text), JSON.stringify(yes?.st.tale ?? null));
+  const noGk = taleRun({ gk: false }), onlyBad = taleRun({ deeds: DEEDS.filter((d) => d.bad) }), young = taleRun({ from: E.TALE_AGE - 3, to: E.TALE_AGE - 2 });
+  check('ใบ 23 ไม่มีหลาน / มีแต่บาป / อายุยังไม่ถึง: ไม่มีการ์ด ไม่มีช่อง tale', [noGk, onlyBad, young].every((r) => r && !r.tales.length && !('tale' in r.st)));
+  // ผังตระกูล: ชีวิตที่เล่า = ช่อง tale {age,text} · ไม่ได้เล่า = ไม่มี key (lineage ถูก hash)
+  const lineageOf = (p) => {
+    const af = E.startAfterlife(p);
+    const P = E.PATHS.findIndex((x) => x.id === 'reborn');
+    for (let card = E.nextAfterCard(af); !card.done; card = E.nextAfterCard(af)) {
+      if (card.kind === 'path') E.chooseAfter(af, P);
+      else if (card.choices?.length) E.chooseAfter(af, Math.max(0, (card.locked ?? []).findIndex((x) => !x)));
+    }
+    return E.nextLife(af).lineage.findLast((l) => !l.isekai);
+  };
+  let told = null, quiet = null;
+  for (let i = 0; i < 300 && !(told && quiet); i++) {
+    const { state: p } = playLife(mixSeed(1, i), content, BOTS.สุ่ม);
+    if (p.tale && !told) told = p;
+    else if (!p.tale && !quiet) quiet = p;
+  }
+  const lt = told && lineageOf(told), lq = quiet && lineageOf(quiet);
+  check('ใบ 23 ผังตระกูล: ชีวิตที่เล่านิทานมีช่อง tale ตรงเรื่อง · ชีวิตที่ไม่ได้เล่าไม่มี key', lt?.tale?.text === told.tale.text && lt.tale.age === told.tale.age && lq && !('tale' in lq), JSON.stringify(lt?.tale ?? null));
+}
+
 const w = Math.max(...rows.map((r) => r[0].length));
 for (const [a, b] of rows) console.log(`${a.padEnd(w)}  ${b}`);
 // ตัวเลือกฝืนใจ (dynasty-4): ขาดแค่ค่าสถานะไม่เกิน RELUCT.gap ทุกตัว = กดได้ + ป้าย · ขาดเกินเพดาน/ขาดธงด้วย/ไม่ติด reluctant = ล็อกเหมือนเดิม
