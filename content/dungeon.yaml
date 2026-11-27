@@ -6,9 +6,10 @@
 # (แกนลงสาเหตุบาดแผลตามทางตายของตัวเลือกนั้น) — ใบเข้า/ใบกลาง/สายถูกดึงห้ามลดสุขภาพ ไม่งั้นชีวิตหมดในดันเจียนแล้วลงสาเหตุเป็นโรค
 # ทุกใบในรอบมี run: dungeon — สุขภาพหมดอยู่ก่อนเปิดใบ (โรคถึงคิว) แกนให้เดินจนจบรอบแล้วตายด้วยโรคที่ใบสุดท้าย
 # ไม่ใช่ทริปต่างโลก: ไม่แตะ st.trip และไม่ขึ้นค่าซ้อนทับ
+# ใบเข้าบล็อกพระเท่าใบกลาง/บอส — ไม่งั้นพระนำทีมเข้าเกตได้แต่ใบกลางไม่ออก รอบจบที่ใบเข้า และโรคที่ถึงคิวตัดรอบกลางทาง
 events:
   - id: overlap_dungeon_01
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -51,7 +52,7 @@ events:
         merit: [{cat: neutral}]
 
   - id: overlap_dungeon_02
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -63,7 +64,7 @@ events:
     choices: *gate_choices
 
   - id: overlap_dungeon_03
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
@@ -75,7 +76,7 @@ events:
     choices: *gate_choices
 
   - id: overlap_dungeon_04
-    away_block: [abroad]
+    away_block: [abroad, monk]
     type: A
     category: society
     stage: ทำงาน
