@@ -367,26 +367,26 @@ events:
     years: [2500, 2650]
     weight: 12
     when: {age: [19, 25], blood_heir: true, parent_flags: {has: [caught_fraud]}}
-    title: "คนที่ยังรอเงินคืน"
-    text: "ผู้หญิงคนหนึ่งมานั่งรอหน้าบ้านตั้งแต่เช้า บอกว่าตอนที่คนในบ้านมีเรื่องโกง เงินของเธอหายไปด้วยและยังไม่ได้คืน วันนี้อยากรู้แค่ว่าทายาทจะว่าอย่างไร"
+    title: "ชื่อที่ติดมากับบ้าน"
+    text: "กลางวงงานบุญ มีคนยกเรื่องทุจริตของคนในบ้านขึ้นมาพูด แล้วหันมาถาม{ชื่อ}ต่อหน้าทุกคนว่าจะเป็นแบบนั้นด้วยไหม"
     choices:
-      - id: repay
-        text: "ทยอยคืนส่วนที่ยังขาด"
-        effects: {money: {unit: income_x, amount: -0.5}, relations: 1}
+      - id: own_up
+        text: "ยอมรับว่าเรื่องนั้นเกิดขึ้นจริง"
+        effects: {happiness: -1, relations: 1}
         merit: [{cat: sila, level: 1}]
       - id: not_mine
         text: "บอกว่าเรื่องจบแล้ว ไม่เกี่ยวกัน"
         effects: {relations: -1}
         merit: [{cat: neutral}]
-      - id: ask_lawyer
-        text: "ขอให้ทนายช่วยดูว่ายังติดอะไรอยู่"
+      - id: explain
+        text: "อธิบายว่าเราเป็นคนละคนกัน"
         merit: [{cat: neutral}]
         outcomes:
-          - {weight: 1, ok: true, text: "ทนายบอกว่าทายาทรับผิดไม่เกินมรดกที่ได้ ตกลงคืนเป็นก้อนเล็กแล้วเซ็นจบกันที่สำนักงาน", effects: {knowledge: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
-          - {weight: 1, text: "ค่าทนายแพงกว่าที่คิด เรื่องยังไม่จบ ผู้หญิงคนนั้นยังมาที่บ้านทุกเดือน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
-      - id: just_listen
-        text: "นั่งฟังจนจบ ไม่สัญญาอะไร"
-        effects: {happiness: -1, relations: 1}
+          - {weight: 1, ok: true, text: "คนในวงพยักหน้าตาม คนถามเงียบไปแล้วเปลี่ยนเรื่องคุย", effects: {knowledge: 1, relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ยิ่งอธิบายคนยิ่งหันมาฟัง เลิกงานแล้วเรื่องนี้ยังถูกพูดต่อทั้งซอย", effects: {happiness: -1, relations: -1}, merit: [{cat: neutral}]}
+      - id: stay_quiet
+        text: "ตักกับข้าวต่อ ไม่ตอบอะไร"
+        effects: {happiness: -1}
         merit: [{cat: neutral}]
 
   # loan_shark — ทุกทางรวมกันเสียเงินไม่เกิน 1.5 เท่าเงินเก็บต่อปี (ต่อรอง 0.5 + ใบกลับมา 1) · ทวงได้ 2 ใบสูงสุด
@@ -464,8 +464,8 @@ events:
     years: [2500, 2650]
     weight: 12
     when: {age: [19, 25], blood_heir: true, parent_flags: {has: [guarantor]}}
-    title: "หมายถึงทายาทผู้ค้ำ"
-    text: "จดหมายจากศาลจ่าหน้าถึงทายาทของผู้ค้ำประกัน คนในบ้านเคยค้ำประกันเงินกู้ให้คนอื่น ตอนนี้คนกู้ค้างจ่าย เจ้าหนี้ขอให้ทายาทรับผิดแทนไม่เกินมรดกที่ได้"
+    title: "หมายศาลถึงทายาท"
+    text: "จดหมายจากศาลจ่าหน้าถึงทายาทของผู้ค้ำประกัน คนในบ้านเคยค้ำประกันเงินกู้ให้คนอื่น เจ้าหนี้อ้างว่ายังมียอดค้าง และขอให้ทายาทรับผิดแทนไม่เกินมรดกที่ได้"
     choices:
       - id: mediate
         text: "ไปศาล ขอไกล่เกลี่ย"
