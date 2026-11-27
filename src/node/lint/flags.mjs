@@ -1,4 +1,6 @@
 // กติกาธง + นัดเหตุการณ์ต่อเนื่อง + เรื่องต่อหลังผล: ธงที่เงื่อนไขขอใช้ต้องมีคนตั้ง · นัด/เรื่องต่อต้องชี้เหตุการณ์ที่มีจริง
+import { readFileSync, readdirSync } from 'node:fs';
+import { parse } from 'yaml';
 import { FLAG_RE, meritCat, STAGE_AGES, AFTERLIFE_STAGE } from './vocab.mjs';
 import { EXAM_PASS, BOND_FLAG } from '../../engine/career.mjs';
 import { DEBT_FLAGS } from '../../engine/life.mjs';
@@ -41,6 +43,60 @@ export function homeRefs(e) {
   for (const [m, at] of parentMults(e)) if (isObj(m) && isObj(m.home_flags)) for (const f of Object.keys(m.home_flags)) out.push({ f, k: 'mult', path: `${at}.home_flags.${f}` });
   return out;
 }
+// ── flag-unread (เตือนอย่างเดียว ไม่อยู่ใน rules จึงไม่หยุด build): ธงที่ตัวเลือกตั้งแต่ไม่มีใครอ่าน
+// ผู้อ่าน = เงื่อนไข/ตัวคูณในการ์ด · กติกา content/rules · ชื่อธงตรงตัวในแกน — เนื้อเรื่องตั้งธงปูอนาคตได้ จึงมีทะเบียนยกเว้น unread_ok ใน flags.yaml
+const EVENT_READERS = new Set(['flags', 'parent_flags', 'home_flags']);
+const RULE_READERS = new Set(['flags', 'flagsHas', 'flagsNot', 'anyFlags', 'ifFlags', 'riskFlags', 'from_life_flags', 'pool_focus_flag']);
+// ค่าใต้คีย์ผู้อ่านมีสามรูป: ชื่อเดียว · รายการ (หรือ {has, not}) · ตาราง {ธง: ตัวคูณ}
+function readNames(v, add) {
+  if (typeof v === 'string') add(v);
+  else if (Array.isArray(v)) v.forEach((x) => readNames(x, add));
+  else if (isObj(v)) {
+    if (v.has !== undefined || v.not !== undefined) for (const x of [v.has, v.not]) readNames(x, add);
+    else Object.keys(v).forEach(add);
+  }
+}
+function walkReaders(node, keys, add) {
+  if (Array.isArray(node)) node.forEach((x) => walkReaders(x, keys, add));
+  else if (isObj(node)) for (const [k, v] of Object.entries(node)) {
+    if (keys.has(k)) readNames(v, add);
+    else walkReaders(v, keys, add);
+  }
+}
+// ตัดคอมเมนต์ก่อนค้น ไม่งั้นธงที่แค่ถูกเอ่ยถึงนับเป็นมีคนอ่าน
+const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '$1');
+export function flagUnreadContext(root = new URL('../../../', import.meta.url)) {
+  const files = (d, ext) => readdirSync(new URL(d, root)).filter((n) => n.endsWith(ext)).sort().map((n) => [n, readFileSync(new URL(`${d}${n}`, root), 'utf8')]);
+  const engineSrc = files('src/engine/', '.mjs').map(([, src]) => stripComments(src)).join('\n');
+  const rules = files('content/rules/', '.yaml').map(([n, src]) => [n, parse(src) ?? {}]);
+  const reg = rules.find(([n]) => n === 'flags.yaml')?.[1] ?? {};
+  // หมวด flags:/prefixes: ของทะเบียนธงคือรายชื่อธง ไม่ใช่ผู้อ่าน
+  const ruleDocs = rules.map(([n, doc]) => (n === 'flags.yaml' ? { home: doc.home, taboo: doc.taboo } : doc));
+  return { engineSrc, ruleDocs, ok: reg.unread_ok ?? {} };
+}
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// ธงมีพารามิเตอร์ (ชื่อ:ค่า) ที่แกนประกอบชื่อเองนับจากคำนำหน้า
+function engineReads(src, f) {
+  const [base, param] = f.split(':');
+  if (param !== undefined && new RegExp(`['"\`]${escapeRe(base)}:`).test(src)) return true;
+  return new RegExp(`['"\`]${escapeRe(f)}['"\`]|\\.${escapeRe(f)}(?!\\w)`).test(src);
+}
+// events = [{file, e}] รูปเดียวกับที่ lintDocs ส่งให้กติกา · คืน [{flag, sites: [{file, id, path}]}] เรียงตามชื่อธง
+export function unreadFlags(events, { engineSrc = '', ruleDocs = [], ok = {} } = {}) {
+  const read = new Set();
+  const set = new Map();
+  for (const { file, e } of events) {
+    walkReaders(e, EVENT_READERS, (f) => read.add(f));
+    for (const x of flagRefs(e)) {
+      if (!x.set || typeof x.f !== 'string') continue;
+      if (!set.has(x.f)) set.set(x.f, []);
+      set.get(x.f).push({ file, id: e.id, path: x.path });
+    }
+  }
+  walkReaders(ruleDocs, RULE_READERS, (f) => read.add(f));
+  return [...set.keys()].filter((f) => !read.has(f) && !Object.hasOwn(ok, f) && !engineReads(engineSrc, f)).sort().map((flag) => ({ flag, sites: set.get(flag) }));
+}
+
 // ธงพ่อแม่ไม่มีพารามิเตอร์ — ทะเบียน heir: มีแต่ชื่อเต็ม
 const parentFlagName = (f) => typeof f === 'string' && FLAG_RE.test(f) && !f.includes(':');
 const positive = (v) => typeof v === 'number' && Number.isFinite(v) && v > 0;

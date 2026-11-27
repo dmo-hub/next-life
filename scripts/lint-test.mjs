@@ -5,7 +5,7 @@ import { parse } from 'yaml';
 import { RULES, DOC_SHAPE, lintContext, lintDocs, formatProblem } from '../src/node/lint/index.mjs';
 import { OK_DIRECTION_SKIP } from '../src/node/lint/shape.mjs';
 import { strings, isObj } from '../src/node/lint/util.mjs';
-import { parentRefs, homeRefs } from '../src/node/lint/flags.mjs';
+import { parentRefs, homeRefs, unreadFlags, flagUnreadContext } from '../src/node/lint/flags.mjs';
 import { loadEvents, loadEra, loadContent, checkNames } from '../src/node/load.mjs';
 import { allocOptions, DISCLAIMER } from '../src/engine/finance.mjs';
 import { schoolGate, jobCard, TRACKS, EDU, BOND_EVENT, CHILD_UNTIL, SCHOOL_FROM } from '../src/engine/career.mjs';
@@ -635,6 +635,43 @@ try {
     if ((ps.length > 0) !== (want > 0)) fails.push(`focus nature "${name}": ต้อง${want ? 'ตก' : 'ผ่าน'} ได้ [${ps.join(' | ') || 'ผ่าน'}]`);
   }
   rows.push(['นิสัยวัยเด็ก nodes ตก/ผ่าน', `${focusCases.length} เคส`]);
+}
+
+// ใบ 19: ธงตั้งแล้วไม่มีใครอ่าน = เตือน ไม่ตกด่าน · เคสล็อกว่าผู้อ่านแต่ละชนิดนับจริง
+{
+  const card = (extra) => ({ file: 'unread-case', e: { id: 'unread_01', choices: [{ id: 'a', sets_flags: ['zz_flag'] }], ...extra } });
+  const names = (events, c = {}) => unreadFlags(events, c).map((x) => x.flag);
+  const reader = (extra) => ({ file: 'unread-case', e: { id: 'unread_02', ...extra } });
+  const cases = [
+    ['เตือน: ไม่มีใครอ่าน', [card()], {}, true],
+    ['เตือน: ตั้งในผลสุ่ม', [card({ choices: [{ id: 'a', outcomes: [{ sets_flags: ['zz_flag'] }] }] })], {}, true],
+    ['เตือน: แค่ล้างธง', [card(), reader({ choices: [{ id: 'a', clears_flags: ['zz_flag'] }] })], {}, true],
+    ['เตือน: ชื่อยาวกว่าในแกน', [card()], { engineSrc: "st.flags.zz_flag_two || has('zz_flag_two')" }, true],
+    ['ไม่เตือน: when.flags', [card(), reader({ when: { flags: { has: ['zz_flag'] } } })], {}, false],
+    ['ไม่เตือน: requires.flags.not', [card(), reader({ choices: [{ id: 'a', requires: { flags: { not: ['zz_flag'] } } }] })], {}, false],
+    ['ไม่เตือน: hide_if.flags', [card(), reader({ choices: [{ id: 'a', hide_if: { flags: { not: ['zz_flag'] } } }] })], {}, false],
+    ['ไม่เตือน: ตัวคูณของผลสุ่ม', [card(), reader({ choices: [{ id: 'a', outcomes: [{ multipliers: { flags: { zz_flag: 2 } } }] }] })], {}, false],
+    ['ไม่เตือน: parent_flags', [card(), reader({ when: { parent_flags: { has: ['zz_flag'] } } })], {}, false],
+    ['ไม่เตือน: แกนอ่านด้วยชื่อในเครื่องหมายคำพูด', [card()], { engineSrc: "const WATCH = ['zz_flag'];" }, false],
+    ['ไม่เตือน: แกนอ่านด้วย .ชื่อ', [card()], { engineSrc: 'if (st.flags.zz_flag) go();' }, false],
+    ['ไม่เตือน: กติกา content/rules', [card()], { ruleDocs: [{ interludes: [{ cond: { flagsHas: ['zz_flag'] } }] }] }, false],
+    ['ไม่เตือน: อยู่ทะเบียนยกเว้น', [card()], { ok: { zz_flag: 'ปูเรื่องไว้' } }, false],
+  ];
+  for (const [name, events, c, want] of cases) {
+    const got = names(events, c);
+    if (got.includes('zz_flag') !== want) fails.push(`flag-unread "${name}": ต้อง${want ? 'เตือน' : 'ไม่เตือน'} ได้ [${got.join(', ')}]`);
+  }
+  const prefixed = [{ file: 'unread-case', e: { id: 'unread_03', choices: [{ id: 'a', sets_flags: ['zz_pre:x_01'] }] } }];
+  if (names(prefixed, { engineSrc: 'has(`zz_pre:${id}`)' }).length) fails.push('flag-unread: ธงมีคำนำหน้าที่แกนประกอบเองต้องไม่เตือน');
+  const real = flagUnreadContext();
+  // ตัวควบคุมบนของจริง: ธงที่แกนอ่านเองต้องไม่ติดรายการ แม้ไม่มีการ์ดไหนอ่าน
+  if (names([{ file: 'unread-case', e: { id: 'unread_04', choices: [{ id: 'a', sets_flags: ['married'] }] } }], real).length) fails.push('flag-unread: married แกนอ่านอยู่ ต้องไม่เตือน');
+  const docs = dir('content/').map((f) => load('content/', f));
+  const events = docs.flatMap(({ file, doc }) => (doc.events ?? []).map((e) => ({ file, e })));
+  const unread = unreadFlags(events, real);
+  rows.push(['flag-unread เคสเตือน/ไม่เตือน', `${cases.length + 2} เคส`]);
+  console.log(`เตือน: flag-unread ธงตั้งแล้วไม่มีใครอ่าน ${unread.length} ธง (ไม่ตก · ตั้งใจปูไว้ = ใส่ unread_ok ใน content/rules/flags.yaml พร้อมเหตุผล)`);
+  for (const { flag, sites } of unread) console.log(`  ${flag} · ตั้ง ${sites.length} จุด · เช่น ${sites[0].file} ${sites[0].id}`);
 }
 
 // ชื่อที่ src/ui import ต้องมีจริงในไฟล์ปลายทาง — build ต่อไฟล์เป็นสคริปต์เดียวแล้วตัด import ทิ้ง ชื่อหายจึงไม่พังตอน build แต่พังทั้งเกมตอนกด (bookAdd v0.6.55)
