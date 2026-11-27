@@ -7247,10 +7247,13 @@ function overlapPlan(st, run = 0, stage = overlapStageOf(st)) {
   const rng = makeRng(mixSeed(st.seed ^ OVERLAP_PLAN.salt, run));
   const [lo, hi] = OVERLAP_PLAN.quota[stage];
   const from = Math.max(st.age + 1, OVERLAP_PLAN.ages[0]);
-  const pool = st.content.events.filter((e) => e.id.startsWith(OVERLAP_PLAN.prefix) && !st.done[e.id] && inRange(stage, e.when?.overlap_stage));
+  // นัดนอก when.age ของใบ = ใบไม่มีวันออก ช่องนัดเสียเปล่า (ใบดันเจียน 18+ นัดตอน 15) ⇒ ช่วงนัดต่อใบตัดกับ when.age · ตัดแล้วว่าง = ไม่เข้ากอง
+  // ใบไม่มี when.age ได้ช่วงเดิม เลขสุ่มเท่าเดิมทุกหลัก
+  const span = (e) => [Math.max(from, e.when?.age?.[0] ?? from), Math.min(OVERLAP_PLAN.ages[1], e.when?.age?.[1] ?? OVERLAP_PLAN.ages[1])];
+  const pool = st.content.events.filter((e) => e.id.startsWith(OVERLAP_PLAN.prefix) && !st.done[e.id] && inRange(stage, e.when?.overlap_stage) && span(e)[0] <= span(e)[1]);
   for (let left = rng.int(lo, hi); left > 0 && pool.length && from <= OVERLAP_PLAN.ages[1]; left--) {
     const [ev] = pool.splice(rng.int(0, pool.length - 1), 1);
-    st.scheduled.push({ event: ev.id, age: rng.int(from, OVERLAP_PLAN.ages[1]), overlap: true });
+    st.scheduled.push({ event: ev.id, age: rng.int(...span(ev)), overlap: true });
   }
 }
 
