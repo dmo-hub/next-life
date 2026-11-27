@@ -50,7 +50,7 @@ export const STAT_LABELS = { health: 'ชีวิต', happiness: 'ความ
 // ทิศนับเฉพาะค่าที่ลูกศรบนแถบโชว์ (network เป็นค่าซ่อน) และไม่ถูก hidden ของการ์ด/ตัวเลือกปิดไว้ — ป้ายห้ามเผยค่าที่ซ่อน
 // ไม่มีป้าย (การ์ดค้างในเซฟเก่า · repairLife ไม่เติม) = หมวดกลาง ⇒ จออ่านผ่าน resultTag เท่านั้น
 export const TAG_MID = 'mid';
-export const RESULT_TAGS = ['good', 'bad', TAG_MID, 'loot', 'loss', 'sick', 'pet', 'inherit', 'retire', 'bankrupt', 'nature', 'search', 'survive', 'trip', 'belief', 'afterlife'];
+export const RESULT_TAGS = ['good', 'bad', TAG_MID, 'loot', 'loss', 'sick', 'pet', 'inherit', 'retire', 'bankrupt', 'nature', 'search', 'survive', 'trip', 'belief', 'afterlife', 'tale'];
 export const resultTag = (card) => card.tag ?? TAG_MID;
 const TAG_STATS = STAT_KEYS.filter((k) => k !== 'network');
 export function fxTag(fx, hidden = []) {
@@ -1065,7 +1065,7 @@ function receiveLetter(st) {
 // ไม่มีบุญสักเรื่อง/ไม่มีหลาน = ไม่มีการ์ด ไม่มีช่อง st.tale · ข้อความไม่บอกว่าเป็นบุญ
 export const TALE_AGE = 58;
 export const bestTale = (deeds = []) => deeds.filter((d) => !d.bad).reduce((a, d) => (a && a.weight >= d.weight ? a : d), null);
-const taleText = (d) => `หลานมานั่งล้อมขอให้เล่าเรื่องสมัยก่อน คุณเล่าเรื่องตอนอายุ ${d.age} ที่ตัดสินใจ “${d.text}” หลานฟังจนจำได้ขึ้นใจ`;
+const taleText = (d) => `หลานมาขอฟังเรื่องสมัยก่อน คุณเล่าตอนอายุ ${d.age} ที่ “${d.text}” ซ้ำจนหลานจำได้ทุกคำ`;
 function tellTale(st, stage) {
   if (st.tale || st.age < TALE_AGE || !st.kin?.some((m) => m.role === 'grandchild' && m.alive && !m.left)) return;
   const d = bestTale(st.deeds);
