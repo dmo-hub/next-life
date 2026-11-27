@@ -570,6 +570,10 @@ function courtDue(st, m, after = COURT_STEP_YEARS) {
 }
 // เดินขั้นคนจีบปีละครั้ง (เรียกใน ageKin): ครบกำหนด met→courting→แฟน (becomePartner · เข้าบ้านตอนเป็นแฟนตามข้อ 305) · ขอแต่งเป็นของการ์ด/ใบ 173
 function stepCourtship(st) {
+  // มีแฟนหรือคู่ตามกฎหมายแล้ว คนจีบหลุด — แต่งผ่านการ์ดอื่นระหว่างจีบ ต้องไม่ได้แฟนซ้อน (แฟน 1 คน)
+  if (st.kin.some((m) => m.alive && ((m.role === 'spouse' && !isDivorced(m)) || (m.role === 'partner' && !m.left)))) {
+    for (const m of livingOf(st, 'courter')) dropCourter(st, m);
+  }
   for (const m of st.kin) {
     if (m.role !== 'courter' || !m.alive || m.left || m.due === undefined || st.age < m.due) continue;
     if (m.stage === 'met') {
@@ -588,7 +592,7 @@ function stepCourtship(st) {
 function becomePartner(st, m) {
   if (!m || !m.alive || m.role === 'partner' || m.role === 'spouse') return null;
   // เลือกคนเดียวเป็นแฟน คนจีบที่เหลือหลุด (ข้อ 307) · ออกจากรายชื่อคนจีบแต่ชื่อยังอยู่ในบันทึก
-  for (const o of st.kin) if (o !== m && o.role === 'courter' && o.alive && !o.left) { o.left = true; o.leftAge = st.age; o.status = 'dropped'; }
+  for (const o of livingOf(st, 'courter')) if (o !== m) dropCourter(st, o);
   m.role = 'partner';
   m.since = st.age;
   m.bond = m.bond ?? BOND_START.partner;
@@ -596,6 +600,11 @@ function becomePartner(st, m) {
   delete m.leftAge;
   delete m.status;
   return m;
+}
+function dropCourter(st, m) {
+  m.left = true;
+  m.leftAge = st.age;
+  m.status = 'dropped';
 }
 function marryPartner(st, m) {
   m.born = Math.min(m.born, kinYearOf(st) - COURT_MIN.spouse);
@@ -626,6 +635,12 @@ function pickFocus(st) {
   // คนจีบ (ใบ 172): จีบพร้อมกัน ≥2 คน เลือกคนเป้าจาก seed+ปีของเรา ไม่ดึง kinRng — ชีวิตที่ไม่มีคนจีบไม่มีอะไรขยับ
   const courting = livingOf(st, 'courter');
   if (courting.length) st.kinFocus.courter = (courting.length > 1 ? courting[makeRng(mixSeed(st.seed ^ 0xc0e7, st.age)).int(0, courting.length - 1)] : courting[0]).id;
+}
+// การ์ดที่ระบุขั้นจีบ (when.family courter + stage) ต้องเรียกคนที่อยู่ขั้นนั้น · คนที่ pickFocus สุ่มได้ตรงขั้นอยู่แล้ว = คงไว้ · ไม่ดึงเลขสุ่ม
+function focusCourter(st, conds) {
+  const stages = conds.filter((f) => f.role === 'courter' && f.stage !== undefined).flatMap((f) => f.stage);
+  const fit = livingOf(st, 'courter').filter((m) => stages.includes(m.stage));
+  if (fit.length && !fit.some((m) => m.id === st.kinFocus.courter)) st.kinFocus.courter = fit[0].id;
 }
 // คนเป้าของการ์ดใบปัจจุบัน (ยังคืนคนเดิมแม้ผลการ์ดใบนี้ทำให้เขาจากไป — การ์ดผลจะได้เรียกชื่อถูกคน) · นอกการ์ด = คนล่าสุดที่ยังอยู่
 function focusOf(st, role) {
@@ -689,6 +704,11 @@ function applyFamily(st, c, care = 0) {
     if (op.add === 'pet' && livingOf(st, 'pet').length) continue;
     if (op.add) for (let i = 0; i < (op.n ?? 1); i++) addMember(st, op.add, ANIMAL.includes(op.add) ? { kind: op.kind, life: op.life, name: op.name } : op.adopted ? { adopted: true, age: op.age } : {});
     if (op.bond) bondAdd(st, bondTargets(st, op.bond), op.d);
+    // คนจีบหลุด (โดนปฏิเสธ/เราปฏิเสธ): เฉพาะคนเป้าของการ์ด — สั่งซ้ำบนใบเดียวไม่ลามไปอีกคน
+    if (op.drop) {
+      const m = focusOf(st, op.drop);
+      if (m?.alive && !m.left) dropCourter(st, m);
+    }
     if (op.leave) for (const m of livingOf(st, op.leave)) {
       m.left = true;
       m.leftAge = st.age;
@@ -5179,6 +5199,9 @@ const FILL = {
   ชื่อคู่: (st) => focusOf(st, 'spouse')?.name ?? 'คู่ชีวิต',
   ชื่อแฟน: (st) => focusOf(st, 'partner')?.name ?? 'แฟน',
   ชื่อแฟนเก่า: (st) => exPartnerOf(st)?.name ?? 'แฟนเก่า',
+  ชื่อคนจีบ: (st) => focusOf(st, 'courter')?.name ?? 'คนที่คุยอยู่',
+  // จีบพร้อมกัน 2 คน: อีกคนที่ไม่ใช่คนเป้าของการ์ดใบนี้
+  ชื่อคนจีบอีกคน: (st) => st.kin?.find((m) => m.role === 'courter' && m.alive && !m.left && m.id !== focusOf(st, 'courter')?.id)?.name ?? 'อีกคน',
   ชื่อหลาน: (st) => focusOf(st, 'grandchild')?.name ?? 'หลาน',
   // ผีญาติ (ใบ 26): คนที่การ์ดผีญาติเลือกจากรายชื่อคนตายของตระกูล — ว่างเมื่อไม่มีรายชื่อ (การ์ดไม่ออกอยู่แล้วเพราะ when.kin_ghost)
   ผีญาติ: (st) => pickKinGhost(st)?.name ?? 'ญาติ',
@@ -6052,6 +6075,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
   if (ev.when?.child_far) focusChildFar(st, ev.when.child_far);
   if (ev.when?.child_not_mine) focusChildNotMine(st, ev.when.child_not_mine);
   if (ev.when?.ex_spouse) focusExSpouse(st, ev.when.ex_spouse);
+  if (ev.when?.family) focusCourter(st, ev.when.family);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
