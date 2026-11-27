@@ -4287,6 +4287,17 @@ function topCats(t, defs) {
   return cats;
 }
 const treeCardMul = (h, defs, mul, cat) => (treeCtl.passive && h?.tree?.done && mul > 1 && topCats(h.tree, defs).has(cat) ? mul : 1);
+// ถ่วงการ์ดรายใบที่โหนดระบุไว้ใน meet (ใบ 336) — จำค่าแบบเดียวกับ topCats ไม่เขียนลง st.tree จึงไม่เข้าเซฟ
+const meetCache = new WeakMap();
+function meetIds(t, defs) {
+  const n = Object.keys(t.done).length;
+  const hit = meetCache.get(t);
+  if (hit && hit.n === n && hit.defs === defs) return hit.ids;
+  const ids = new Set(Object.keys(t.done).flatMap((id) => defs[id]?.meet ?? []));
+  meetCache.set(t, { n, defs, ids });
+  return ids;
+}
+const treeMeetMul = (h, defs, mul, eventId) => (treeCtl.passive && h?.tree?.done && mul > 1 && meetIds(h.tree, defs).has(eventId) ? mul : 1);
 const treeTopCats = (h, defs) => (h?.tree?.done ? [...topCats(h.tree, defs)] : []);
 
 // ตายสงบย้อนความทรงจำ (B168): ตายตอนขึ้นปีด้วยวัยชราหรือโรคเรื้อรังที่หมอบอกไว้ อายุ 60 ขึ้นไป → การ์ดย้อนชีวิตใบเดียวก่อนคำสั่งเสีย
@@ -6710,8 +6721,9 @@ const GATE_LOCK = 'ยังไม่เคยทุ่มเทกับทา�
 const sexShut = (st, c) => !!c.only_sex && !c.only_sex.includes(st.sex);
 const SEX_LOCK = 'ไม่ใช่ทางของคุณ';
 function lifeFocusMul(st, e) {
-  const t = st.tree && st.content.tree ? treeCardMul(st, st.content.tree.nodes, st.content.tree.card_mul, e.category) : 1;
-  return t;
+  const T = st.tree && st.content.tree;
+  if (!T) return 1;
+  return Math.max(treeCardMul(st, T.nodes, T.card_mul, e.category), treeMeetMul(st, T.nodes, T.meet_mul, e.id));
 }
 
 // ไล่ทั้งกองเหตุการณ์ทุกปีกินเวลา harness ราวหนึ่งในห้า — จัดกลุ่มครั้งเดียวต่อชุดเนื้อหา (ผูกกับตัวอาเรย์ แทนทั้งอาเรย์ = กลุ่มใหม่)
