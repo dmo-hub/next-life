@@ -10966,7 +10966,7 @@ function heirNatureText(st, heir) {
   if (!n || !c.heir_nature || st.age > c.nature_age || !st.lineage.length) return null;
   const ancestor = st.parents.find((p) => p.ancestor);
   const who = heir.legacy?.from ?? (ancestor ? parentWord(ancestor) : null);
-  return `${n.name} · ${HEIR_NATURE_WORDS[0]}${who ? ` (จาก${who})` : ''}`;
+  return `นิสัยที่ติดมา: ${n.name} · ${HEIR_NATURE_WORDS[0]}${who ? ` (จาก${who})` : ''}`;
 }
 
 // การ์ดใบแรกของทุกชีวิต — เล่าเรื่อง ไม่มีตัวเลือก (หน้าจอให้ปุ่ม "ต่อไป")
