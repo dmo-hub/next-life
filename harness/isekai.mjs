@@ -490,6 +490,22 @@ for (let i = 0; i < lives; i++) {
 check('การ์ดชวนในชีวิต กดรับ: ตาย = งานศพ · หายตัว = ใบตามหา + วาร์ปข้ามโลก', entryBad + (entryGone && entryGone < entryLives ? 0 : 1), `${entryLives} ชีวิต · หายตัว ${entryGone} · นัด ${ENTRY.bands.length} ช่วงวัย`);
 check('บอทที่ไม่ประกาศ isekai ไม่เคยกดรับ', declineBad);
 
+// อายุไทยจากการ์ดชวน (decisions isekai ข้อ 2): บอทกดรับทุกใบตายเร็วกว่าบอทปฏิเสธเฉลี่ยไม่เกิน N ปี
+// คู่ seed ชีวิตเดียวกัน — บอทรับไม่ดึงเลขสุ่มกับการ์ดชวน ชีวิตจึงเดินเท่ากันจนถึงใบที่กดรับ ส่วนต่างมาจากการ์ดชวนล้วน
+// N=60 เจ้าของเลือกจากค่าวัดบนตัวเกม 53.7–56.8 (เผื่อ ~3 ปี) · ชีวิตน้อยกว่านี้ seed เดียวแกว่งเกิน N ได้เอง
+// --age-gap ตั้งเพดานชั่วคราวไว้ลองว่าด่านตกจริงเมื่อเพดานต่ำกว่าส่วนต่าง
+const ENTRY_AGE_GAP = opt('age-gap', 60);
+const ENTRY_AGE_LIVES = opt('age-lives', 300);
+let accSum = 0, decSum = 0;
+for (let i = 0; i < ENTRY_AGE_LIVES; i++) {
+  const s = mixSeed(seed, 12000 + i);
+  decSum += playLife(s, content, BOTS.สุ่ม).age;
+  accSum += playLife(s, content, isekaiBot).age;
+}
+const entryAgeGap = (decSum - accSum) / ENTRY_AGE_LIVES;
+console.log(`อายุไทยตอนจบ ${ENTRY_AGE_LIVES} คู่: ปฏิเสธการ์ดชวน ${(decSum / ENTRY_AGE_LIVES).toFixed(2)} · กดรับ ${(accSum / ENTRY_AGE_LIVES).toFixed(2)} · ส่วนต่าง ${entryAgeGap.toFixed(2)} ปี`);
+check(`การ์ดชวน: บอทกดรับอายุไทยเฉลี่ยลดไม่เกิน ${ENTRY_AGE_GAP} ปี`, entryAgeGap > ENTRY_AGE_GAP ? 1 : 0, `ส่วนต่าง ${entryAgeGap.toFixed(2)} ปี`);
+
 // ไปกลับกลางชีวิต (B68m): การ์ดประตูได้กลับทุกครั้ง · การ์ดหายตัวได้กลับบางที · การ์ดตายไม่เคย
 // ทริปจบแบบกลับบ้าน = ชีวิตไทยเดินต่อ อายุร่างกายนับปีต่างโลก · ตายในต่างโลก = หายตัว ไม่มีงานศพ มีใบตามหา (B137) · เวลาไทยผ่านไปตามที่ทอย
 // seed เดิมผลเดิม + เล่นซ้ำจากลำดับปุ่ม (แบบเซฟ) ได้การ์ดเดิม · การ์ดทริปไม่เผยบุญบาป · โลกจำจากทริปลงผังตระกูลชาติไทย
