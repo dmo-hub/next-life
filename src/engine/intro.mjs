@@ -3,7 +3,7 @@
 import { infantMortality, protoYear } from './era.mjs';
 import { makeRng } from './rng.mjs';
 import { CLASSES, STAT_LABELS, provinceLabel, areaLabel, stageOf } from './life.mjs';
-import { LEGACY, lineageText, carryAmount, kinTier } from './afterlife.mjs';
+import { LEGACY, lineageText, carryAmount, kinTier, HEIR_AGE } from './afterlife.mjs';
 
 // สัดส่วนจำนวนเกิดปีนั้นเทียบปีที่เกิดมากที่สุดในข้อมูล — แบ่งบรรยากาศรุ่นเป็น 3 ขั้น (ค่าตั้งของเกม)
 const COHORT = [
@@ -106,6 +106,55 @@ const spareText = (keys) => (keys.length ? `ติดตัวมาแต่เ
 // ธงบ้านเกิด (ใบ 105): บรรทัดเดียวต่อธงตามลำดับทะเบียน · ไม่มีธง/เซฟเก่า = ไม่มีบรรทัด · ข้อความอยู่ content/rules/flags.yaml home:
 const homeLines = (st) => Object.entries(st.content?.home ?? {}).filter(([f]) => st.homeFlags?.[f]).map(([, h]) => h.tell);
 
+// จดหมายเหตุย้อนหลังของทายาทสายเลือด (ใบ 22 · B76 ข้อ 5): รับช่วงกลางวัยแล้วไม่โหวง — อดีตสุ่ม + ฉากกับรุ่นก่อน/ครู 3 ฉาก + ญาติที่จากไปก่อน
+// อดีตเป็นสีสันล้วน ไม่อ้างการเรียน งาน ศาสนา ที่อยู่ พี่น้อง หรือสุขภาพ (ค่าพวกนั้นมีระบบของมันเอง) · สุ่มจาก stream แยก ไม่กินเลขสุ่มของโลก
+// จำนวนบรรทัดอดีตโตตามอายุที่รับช่วง: อายุต่ำสุดของปุ่ม = 2 บรรทัด ปีละ 1 บรรทัด ไม่เกิน 10
+export const CHRONICLE_PAST = [
+  'ตอนเด็กเคยหลงทางในตลาด กว่าจะมีคนพากลับถึงบ้านก็มืดแล้ว',
+  'เคยตกจากที่สูงจนแขนหัก ต้องใส่เฝือกอยู่เดือนกว่า',
+  'ตอนประถมเคยได้รางวัลเรียงความ ใบประกาศยังเก็บอยู่ในลิ้นชัก',
+  'เพื่อนสนิทคนแรกย้ายบ้านไปตอนคุณสิบขวบ แล้วก็ไม่ได้ข่าวกันอีกเลย',
+  'ตอนเด็กกลัวความมืดมาก ต้องเปิดไฟนอนอยู่หลายปี',
+  'เคยแอบเก็บค่าขนมอยู่หลายเดือนเพื่อซื้อของเล่นชิ้นเดียว',
+  'ตอนมัธยมเคยโดดเรียนไปกับเพื่อน แล้วโดนจับได้ทั้งกลุ่ม',
+  'เคยทะเลาะกับเพื่อนจนไม่พูดกันทั้งเทอม แล้วกลับมาดีกันเพราะต้องทำงานกลุ่มด้วยกัน',
+  'ตอนเด็กชอบนั่งดูผู้ใหญ่ทำงานจนเลยเวลานอน',
+  'เคยเกือบจมน้ำตอนเด็ก ตั้งแต่นั้นก็ไม่ค่อยกล้าลงน้ำลึก',
+  'เคยวิ่งล้มกลางสนามวันกีฬาสีต่อหน้าคนทั้งโรงเรียน',
+  'ช่วงวัยรุ่นเคยแอบชอบคนในห้องอยู่ปีกว่า ไม่เคยกล้าบอก',
+  'เคยหนีออกจากบ้านไปค้างบ้านเพื่อนคืนหนึ่ง กลับมาโดนดุยกใหญ่',
+  'ตอนสิบสองขวบได้ค่าขนมเพิ่มจากการช่วยงานบ้านเป็นครั้งแรก',
+];
+// {e} = รุ่นก่อนตามที่ทายาทเรียก + ชื่อ ("พ่อสมชาย" · "ปู่สมชาย")
+export const CHRONICLE_ELDER = [
+  '{e}เคยพาคุณไปเที่ยวไกลบ้าน คุณหลับตลอดทางทั้งขาไปและขากลับ',
+  '{e}สอนคุณขี่จักรยาน ปล่อยมือไปตอนไหนคุณก็ไม่รู้ตัว',
+  'คืนหนึ่งคุณไข้ขึ้นสูง {e}นั่งเช็ดตัวให้จนเช้า',
+  '{e}เคยตีคุณครั้งเดียว เพราะคุณโกหกเรื่องเงิน',
+  'วันรับใบประกาศ {e}มาสายแต่ก็มาจนได้ ยังใส่ชุดทำงานอยู่เลย',
+  '{e}ชอบเล่าเรื่องสมัยตัวเองยังหนุ่มยังสาวให้ฟังก่อนนอน',
+];
+export const CHRONICLE_TEACHER = [
+  'ครูประจำชั้นตอนประถมเคยเรียกคุณไปคุยหลังเลิกเรียน บอกว่าคุณทำได้ดีกว่าที่ตัวเองคิด',
+  'ครูคนหนึ่งเคยให้คุณยืมหนังสือ ป่านนี้คุณยังไม่ได้เอาไปคืน',
+  'ครูพละเคยสั่งให้คุณวิ่งรอบสนามจนหมดคาบ เพราะมาสาย',
+];
+export const CHRONICLE_ELDER_SCENES = 2;
+export const CHRONICLE_PAST_MAX = 10;
+const pickSome = (rng, xs, n) => {
+  const left = [...xs];
+  return Array.from({ length: Math.min(n, left.length) }, () => left.splice(rng.int(0, left.length - 1), 1)[0]);
+};
+const goneAt = (at) => (at < 0 ? 'ก่อนคุณเกิด' : at === 0 ? 'ปีที่คุณเกิด' : `ตอนคุณอายุ ${at}`);
+function chronicleLines(st, heir) {
+  const rng = makeRng(st.seed ^ 0x22c4b76d);
+  const elder = `${heir.legacy.from}${st.lineage.findLast((l) => !l.isekai).name ?? ''}`;
+  const past = pickSome(rng, CHRONICLE_PAST, Math.min(CHRONICLE_PAST_MAX, 2 + st.age - HEIR_AGE[0]));
+  const scenes = [...pickSome(rng, CHRONICLE_ELDER, CHRONICLE_ELDER_SCENES).map((s) => s.replace('{e}', elder)), ...pickSome(rng, CHRONICLE_TEACHER, 1)];
+  const gone = heir.kinGone?.length ? [`ญาติที่จากไปก่อน: ${heir.kinGone.map((g) => `${g.word}${g.name} (${goneAt(g.at)})`).join(' · ')}`] : [];
+  return [...past, ...scenes, ...gone];
+}
+
 export function introCard(st, heir) {
   return {
     kind: 'intro',
@@ -116,7 +165,7 @@ export function introCard(st, heir) {
     text: st.age > 0
       ? `คุณเล่นต่อเป็น “${st.name}” วัย ${st.age} ปี ที่${provinceLabel(st)} ชื่อจริงว่า “${st.realName}”`
       : `คุณลืมตาดูโลกเป็นลูก${sexWord(st.sex)}ที่${provinceLabel(st)} ได้ชื่อจริงว่า “${st.realName}” ชื่อเล่นว่า “${st.name}”`,
-    story: [familyText(st), eraText(st), ...homeLines(st), ...(st.spare ? [spareText(st.spare)] : [])],
+    story: [familyText(st), eraText(st), ...homeLines(st), ...(st.spare ? [spareText(st.spare)] : []), ...(heir?.start && heir.legacy && st.lineage?.length ? chronicleLines(st, heir) : [])],
     // heir ที่ไม่มีรุ่นก่อน (harness สร้างทับค่าเกิดเฉย ๆ) ไม่มีอะไรให้สืบทอด
     inherit: heir && st.lineage.length ? inheritText(st, heir) : [],
     lineage: lineageBrief(st.lineage),

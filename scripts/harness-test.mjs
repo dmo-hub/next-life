@@ -1722,6 +1722,38 @@ const f2 = (v) => v.toFixed(2);
   const pt = JSON.parse(readFileSync('data/paternity-test.json', 'utf8'));
   const ev95 = (id) => content.events.find((e) => e.id === id);
   check('ใบ 95 ปีตรวจพ่อ 2 ช่วง: การ์ดฐาน years[0] = pt.common · สำเนาหายาก years[0] = pt.from จบก่อน common และจำกัด กทม.', ['fam_not_mine_mid_01', 'fam_not_mine_old_01'].every((id) => ev95(id).years[0] === pt.common) && ['fam_not_mine_mid_rare_01', 'fam_not_mine_old_rare_01'].every((id) => ev95(id).years[0] === pt.from && ev95(id).years[1] === pt.common - 1 && ev95(id).when.province?.join() === 'กรุงเทพมหานคร') && pt.from < pt.common);
+
+  // ใบ 22 จดหมายเหตุทายาท: การ์ดเปิดปุ่มสายเลือดมีอดีตสุ่มตามอายุ + ฉากกับรุ่นก่อน 2 + ครู 1 + ญาติที่จากไปก่อนด้วยชื่อจริง · ปุ่มเดิมไม่มี
+  // ใส่ลูกอายุ 20 + พ่อ/แม่ของผู้เล่นตายพร้อมชื่อเอง ไม่ขึ้นกับว่า RNG ของชีวิตบอทให้อะไร
+  const chronicleLife = (pathId) => {
+    const { state: p } = playLife(mixSeed(1, 2222), content, BOTS.สุ่ม);
+    const kid = addKin(p, 'child', { born: p.birthYear + p.age - 20 });
+    const gp = p.parents[0];
+    Object.assign(gp, { alive: false, name: gp.name ?? 'ทองดี', diedAtYou: p.age - 25 });
+    Object.assign(p.parents[1], { alive: false, name: p.parents[1].name ?? 'บุญมา', diedAtYou: p.age - 10 });
+    const af = E.startAfterlife(p);
+    const P = E.PATHS.findIndex((x) => x.id === pathId);
+    for (let card = E.nextAfterCard(af); !card.done; card = E.nextAfterCard(af)) {
+      if (card.kind === 'path') E.chooseAfter(af, P, kid.id);
+      else if (card.choices?.length) E.chooseAfter(af, Math.max(0, (card.locked ?? []).findIndex((x) => !x)));
+    }
+    const heir = af.heir;
+    const st = E.nextLife(af);
+    return { p, gp, heir, st, intro: st.due.find((d) => d.kind === 'intro') };
+  };
+  const cb = chronicleLife('blood');
+  const inPool = (pool, s) => pool.some((x) => x === s || x.replace('{e}', `${cb.heir.legacy.from}${cb.p.name}`) === s);
+  const pastN = cb.intro.story.filter((s) => inPool(E.CHRONICLE_PAST, s)).length;
+  const elderN = cb.intro.story.filter((s) => inPool(E.CHRONICLE_ELDER, s)).length;
+  const teacherN = cb.intro.story.filter((s) => inPool(E.CHRONICLE_TEACHER, s)).length;
+  check('ใบ 22 ปุ่มสายเลือด: อดีต 2+(อายุ−16) บรรทัดไม่ซ้ำ · ฉากรุ่นก่อนเรียกชื่อจริง 2 · ครู 1', cb.st.age === 20 && pastN === 2 + cb.st.age - E.HEIR_AGE[0] && elderN === E.CHRONICLE_ELDER_SCENES && teacherN === 1 && new Set(cb.intro.story).size === cb.intro.story.length, `อายุ ${cb.st.age} · อดีต ${pastN} · ฉาก ${elderN} · ครู ${teacherN}`);
+  const gpWord = (g) => (cb.p.sex === 'หญิง' ? (g.sex === 'หญิง' ? 'ยาย' : 'ตา') : g.sex === 'หญิง' ? 'ย่า' : 'ปู่');
+  const goneLine = cb.intro.story.find((s) => s.startsWith('ญาติที่จากไปก่อน: '));
+  check('ใบ 22 ญาติที่จากไปก่อน: พ่อ/แม่ของรุ่นก่อนเรียกตามฝั่ง (ปู่ย่า/ตายาย) + ชื่อจริง + อายุทายาทตอนเขาจากไป', goneLine?.includes(`${gpWord(cb.gp)}${cb.gp.name} (ก่อนคุณเกิด)`) && goneLine.includes(`${gpWord(cb.p.parents[1])}${cb.p.parents[1].name} (ตอนคุณอายุ 10)`), goneLine ?? 'ไม่มีบรรทัด');
+  check('ใบ 22 การ์ดเปิดซ้ำได้ผลเดิม (stream แยกจาก seed ชีวิต)', JSON.stringify(E.introCard(cb.st, cb.heir).story) === JSON.stringify(cb.intro.story));
+  const cc = chronicleLife('child');
+  const pools = [...E.CHRONICLE_PAST, ...E.CHRONICLE_TEACHER];
+  check('ใบ 22 ปุ่มเดิม (เฝ้าลูกหลาน): ไม่มีจดหมายเหตุ · heir ไม่มีช่อง kinGone', !cc.intro.story.some((s) => pools.includes(s) || s.startsWith('ญาติที่จากไปก่อน')) && !('kinGone' in cc.heir));
 }
 
 // คืนดีกับคู่เก่าหลังหย่า (ใบ 97 B114 ข้อ 158 161 162): when.ex_spouse · op remarry · ครั้งเดียวต่อชีวิต
