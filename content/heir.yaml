@@ -295,3 +295,195 @@ events:
         text: "จดไว้ ชีวิตนี้ไม่ค้ำให้ใคร"
         effects: {knowledge: 1}
         merit: [{cat: neutral}]
+
+  # เรื่องค้างจากรุ่นก่อน (ใบ 17 · reigns-6 · 65-21): ทายาทปุ่มสายเลือดเริ่ม 16–22 ปีที่รุ่นก่อนเพิ่งจากไป พ้นช่วงการ์ดวัยรุ่นข้างบน
+  # ⇒ ธงส่งทายาท 5 ตัวมีใบรุ่นโตของตัวเอง · blood_heir กั้นให้ทางเป็นลูก/เกิดใหม่ไม่เจอ (ชีวิตบอทไม่เคยกดปุ่มนี้ จึงเท่าเดิมทุกไบต์)
+  # own_business
+  - id: heir_blood_shop_left_01
+    away_block: [monk]
+    type: A
+    category: work_money
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 12
+    when: {age: [19, 25], blood_heir: true, parent_flags: {has: [own_business]}}
+    title: "ร้านที่ไม่มีคนเปิด"
+    text: "หลังงานศพ ร้านของที่บ้านปิดมาเกือบเดือน ลูกค้าประจำแวะมาถามทุกวันว่าจะเปิดอีกไหม กุญแจร้านกับสมุดบัญชีเล่มเก่าวางรอ{ชื่อ}อยู่บนโต๊ะ"
+    choices:
+      - id: take_over
+        text: "เปิดร้านต่อเอง"
+        merit: [{cat: care_parents, level: 1}]
+        outcomes:
+          - {weight: 2, ok: true, multipliers: {stats: {network: 2}}, text: "ลูกค้าเก่ากลับมาเกือบครบ บางคนเล่าเรื่องคนที่จากไปให้ฟังระหว่างรอทอนเงิน", effects: {network: 2, money: {unit: income_x, amount: 1}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เปิดได้ครึ่งปี ต้นทุนขึ้นทุกเดือน สมุดบัญชีเล่มใหม่มีแต่ตัวแดง", effects: {happiness: -1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+      - id: sell_shop
+        text: "ขายกิจการ เอาเงินไปตั้งตัว"
+        effects: {money: {unit: income_x, amount: 1}, relations: -1}
+        merit: [{cat: neutral}]
+      - id: kin_runs
+        text: "ให้ญาติที่ช่วยงานอยู่ดูแทน"
+        effects: {relations: 1}
+        merit: [{cat: neutral}]
+      - id: close_shop
+        text: "ปิดร้าน ไปหางานของตัวเอง"
+        effects: {happiness: -1, knowledge: 1}
+        merit: [{cat: neutral}]
+
+  # home_owner
+  - id: heir_blood_home_deed_01
+    away_block: [monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 12
+    when: {age: [19, 25], blood_heir: true, parent_flags: {has: [home_owner]}}
+    title: "โฉนดชื่อคนที่จากไป"
+    text: "เจ้าหน้าที่ที่ดินบอกว่าบ้านหลังนี้ยังเป็นชื่อคนที่เพิ่งจากไป ต้องยื่นเรื่องโอนมรดกให้จบ ญาติผู้ใหญ่หลายคนเริ่มโทรมาถามว่าจะทำอย่างไรกับบ้าน"
+    choices:
+      - id: transfer_stay
+        text: "โอนเป็นชื่อตัวเอง อยู่ต่อ"
+        effects: {happiness: 1, money: {unit: income_x, amount: -0.2}}
+        merit: [{cat: neutral}]
+      - id: sell_home
+        text: "ขายบ้าน แบ่งให้ญาติที่ช่วยดูแล"
+        effects: {money: {unit: income_x, amount: 0.5}, relations: 1}
+        merit: [{cat: neutral}]
+      - id: rent_home
+        text: "ปล่อยเช่า ย้ายไปอยู่ห้องเล็ก"
+        effects: {money: {unit: income_x, amount: 0.5}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: elder_stays
+        text: "ให้ญาติผู้ใหญ่ที่ไร้บ้านมาอยู่"
+        effects: {relations: 2}
+        merit: [{cat: help_others, level: 1}]
+
+  # caught_fraud
+  - id: heir_blood_fraud_victim_01
+    away_block: [monk]
+    type: A
+    category: society
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 12
+    when: {age: [19, 25], blood_heir: true, parent_flags: {has: [caught_fraud]}}
+    title: "คนที่ยังรอเงินคืน"
+    text: "ผู้หญิงคนหนึ่งมานั่งรอหน้าบ้านตั้งแต่เช้า ถือสำเนาคำพิพากษาคดีโกงที่คนในบ้านเคยโดน บอกว่าเงินที่เสียไปยังได้คืนไม่ถึงครึ่ง วันนี้อยากรู้แค่ว่าทายาทจะว่าอย่างไร"
+    choices:
+      - id: repay
+        text: "ทยอยคืนส่วนที่ยังขาด"
+        effects: {money: {unit: income_x, amount: -0.5}, relations: 1}
+        merit: [{cat: sila, level: 1}]
+      - id: not_mine
+        text: "บอกว่าคดีจบแล้ว ไม่เกี่ยวกับเรา"
+        effects: {relations: -1}
+        merit: [{cat: neutral}]
+      - id: ask_lawyer
+        text: "ขอให้ทนายช่วยดูว่ายังติดอะไรอยู่"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ทนายบอกว่าทายาทรับผิดไม่เกินมรดกที่ได้ ตกลงคืนเป็นก้อนเล็กแล้วเซ็นจบกันที่สำนักงาน", effects: {knowledge: 1, money: {unit: income_x, amount: -0.2}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ค่าทนายแพงกว่าที่คิด เรื่องยังไม่จบ ผู้หญิงคนนั้นยังมาที่บ้านทุกเดือน", effects: {happiness: -1, money: {unit: income_x, amount: -0.3}}, merit: [{cat: neutral}]}
+      - id: just_listen
+        text: "นั่งฟังจนจบ ไม่สัญญาอะไร"
+        effects: {happiness: -1, relations: 1}
+        merit: [{cat: neutral}]
+
+  # loan_shark — ทุกทางรวมกันเสียเงินไม่เกิน 1.5 เท่าเงินเก็บต่อปี (ต่อรอง 0.5 + ใบกลับมา 1) · ทวงได้ 2 ใบสูงสุด
+  - id: heir_blood_collector_01
+    away_block: [monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 12
+    when: {age: [19, 25], blood_heir: true, parent_flags: {has: [loan_shark]}}
+    title: "เจ้าหนี้มาถึงบ้าน"
+    text: "ยังไม่ทันพ้นเจ็ดวัน ผู้ชายสองคนขี่มอเตอร์ไซค์มาจอดหน้าบ้าน ยื่นกระดาษยอดหนี้ที่คนในบ้านกู้ไว้ แล้วบอกว่าคนตายไปแล้ว หนี้ไม่ได้ตายตาม"
+    choices:
+      - id: pay_some
+        text: "จ่ายให้ก้อนหนึ่ง ขอให้จบแค่นี้"
+        effects: {money: {unit: income_x, amount: -1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: refuse
+        text: "บอกว่าไม่ได้เป็นคนกู้ ไม่จ่าย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, text: "เขาหัวเราะ เก็บกระดาษใส่กระเป๋า แล้วบอกว่าจะกลับมาใหม่", effects: {happiness: -1}, next: heir_blood_collector_again_01, merit: [{cat: neutral}]}
+          - {weight: 1, ok: true, text: "เขายืนด่าอยู่พักหนึ่งแล้วขี่รถออกไป หลังจากนั้นไม่เห็นหน้าอีก", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: call_police
+        text: "แจ้งตำรวจ"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ตำรวจเรียกสองคนนั้นไปคุยที่โรงพัก ตั้งแต่นั้นซอยหน้าบ้านก็เงียบ", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจรับเรื่องไว้ บอกว่าต้องมีหลักฐานมากกว่านี้ อีกไม่กี่เดือนสองคนนั้นก็กลับมา", effects: {happiness: -1}, next: heir_blood_collector_again_01, merit: [{cat: neutral}]}
+      - id: bargain
+        text: "ขอต่อรองผ่อนเฉพาะเงินต้น"
+        effects: {money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "เขายอมรับเงินก้อนแรกแล้วฉีกกระดาษยอดหนี้ต่อหน้า", merit: [{cat: neutral}]}
+          - {weight: 1, text: "เขารับเงินไป แต่บอกว่าดอกเบี้ยยังเดินอยู่", next: heir_blood_collector_again_01, merit: [{cat: neutral}]}
+
+  # ใบต่อของเจ้าหนี้ — มาจาก next เท่านั้น ไม่อยู่ในกอง
+  - id: heir_blood_collector_again_01
+    away_block: [monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    when: {blood_heir: true, parent_flags: {has: [loan_shark]}}
+    title: "มาตามที่บอกไว้"
+    text: "สองคนเดิมกลับมาตอนกลางคืน คราวนี้พ่นสีไว้ที่ประตูรั้ว แล้วยืนสูบบุหรี่รอจนไฟในบ้านเปิด"
+    choices:
+      - id: pay_now
+        text: "จ่ายตามที่เขาขอ"
+        effects: {money: {unit: income_x, amount: -1}, happiness: -1}
+        merit: [{cat: neutral}]
+      - id: police_now
+        text: "โทรแจ้งตำรวจทันที"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 2, ok: true, text: "สายตรวจมาถึงก่อนเขาไป ถูกพาตัวไปโรงพัก หลังจากนั้นไม่มีใครมาอีก", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "ตำรวจมาถึงหลังเขาไปแล้ว เหลือแต่รอยสีบนรั้วกับก้นบุหรี่หน้าบ้าน", effects: {happiness: -2}, merit: [{cat: neutral}]}
+      - id: damrongdham
+        text: "ไปร้องเรียนที่ศูนย์ดำรงธรรม"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.5}}
+        merit: [{cat: neutral}]
+      - id: move_out
+        text: "ย้ายไปอยู่กับญาติชั่วคราว"
+        effects: {happiness: -1, relations: -1}
+        merit: [{cat: neutral}]
+
+  # guarantor
+  - id: heir_blood_guarantor_01
+    away_block: [monk]
+    type: A
+    category: family
+    stage: หนุ่มสาว
+    years: [2500, 2650]
+    weight: 12
+    when: {age: [19, 25], blood_heir: true, parent_flags: {has: [guarantor]}}
+    title: "หมายถึงทายาทผู้ค้ำ"
+    text: "จดหมายจากศาลจ่าหน้าถึงทายาทของผู้ค้ำประกัน หนี้ที่คนในบ้านเคยไปค้ำให้เพื่อนยังไม่จบ เจ้าหนี้ขอให้ทายาทรับผิดแทนไม่เกินมรดกที่ได้"
+    choices:
+      - id: mediate
+        text: "ไปศาล ขอไกล่เกลี่ย"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, text: "ศาลให้ผ่อนเป็นงวดเล็กเท่าที่มรดกพอจ่าย เจ้าหนี้ยอมเซ็นในห้องไกล่เกลี่ย", effects: {knowledge: 1, money: {unit: income_x, amount: -0.5}}, merit: [{cat: neutral}]}
+          - {weight: 1, text: "เจ้าหนี้ไม่ยอมลดสักบาท นั่งรอทั้งวันได้แค่วันนัดใหม่", effects: {happiness: -1, money: {unit: income_x, amount: -1}}, merit: [{cat: neutral}]}
+      - id: pay_all
+        text: "จ่ายตามหมายให้จบเรื่อง"
+        effects: {money: {unit: income_x, amount: -1}, happiness: 1}
+        merit: [{cat: neutral}]
+      - id: find_borrower
+        text: "ตามหาคนที่กู้"
+        merit: [{cat: neutral}]
+        outcomes:
+          - {weight: 1, ok: true, multipliers: {stats: {network: 1.5}}, text: "เจอเขาทำงานอยู่ต่างจังหวัด เขาขอโทษแล้วรับไปผ่อนต่อเอง", effects: {relations: 1}, merit: [{cat: neutral}]}
+          - {weight: 2, text: "บ้านเก่าของเขาเปลี่ยนเจ้าของไปแล้ว ไม่มีใครรู้ว่าย้ายไปไหน", effects: {happiness: -1}, merit: [{cat: neutral}]}
+      - id: debt_clinic
+        text: "ปรึกษาคลินิกแก้หนี้"
+        effects: {knowledge: 1, money: {unit: income_x, amount: -0.3}}
+        merit: [{cat: neutral}]

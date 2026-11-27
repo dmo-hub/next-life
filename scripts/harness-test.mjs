@@ -756,6 +756,24 @@ const f2 = (v) => v.toFixed(2);
   }
   check('วงปรโลก: ปุ่มผู้สืบสายเลือด (ทายาทอายุจริง) ไม่เข้าวง', blood?.path === 'blood' && blood.loop === null && !blood.sawLoop, blood ? `ทาง ${blood.path}` : 'หาชีวิตที่มีรายชื่อไม่เจอ');
 
+  // ใบ tld17 เรื่องค้างจากรุ่นก่อน: when.blood_heir อ่านทางของแถวผังล่าสุด · ตัวควบคุม = ชีวิตเดียวกันแต่แถวล่าสุดเป็นทางเป็นลูก
+  const heir = blood && E.nextLife(blood);
+  const asPath = (st, path) => ({ ...st, lineage: [...st.lineage.slice(0, -1), { ...st.lineage.at(-1), path }] });
+  check('ใบ tld17 blood_heir: ทายาทปุ่มสายเลือดผ่าน · แถวผังเดียวกันทางเป็นลูก/เกิดใหม่ไม่ผ่าน · ชีวิตแรก (ผังว่าง) ไม่ผ่าน',
+    !!heir && E.whenOk(heir, { blood_heir: true }) && !E.whenOk(asPath(heir, 'child'), { blood_heir: true }) && !E.whenOk(asPath(heir, 'reborn'), { blood_heir: true }) && !E.whenOk(life(3), { blood_heir: true }),
+    heir ? `ทางแถวล่าสุด ${heir.lineage.at(-1)?.path}` : 'ไม่มีทายาท');
+  const evs = content.events.filter((e) => e.when?.blood_heir);
+  const LEFT = ['own_business', 'home_owner', 'caught_fraud', 'loan_shark', 'guarantor'];
+  const at = (st, age, flag) => ({ ...st, age, parentFlags: { [flag]: 1 } });
+  const opens = (flag) => evs.filter((e) => e.weight && e.when.parent_flags?.has?.includes(flag) && heir && E.whenOk(at(heir, e.when.age[0], flag), e.when) && !E.whenOk(asPath(at(heir, e.when.age[0], flag), 'child'), e.when));
+  check('ใบ tld17 ธงส่งทายาท 5 ตัวมีใบรุ่นโตที่ออกในชาติทายาทสายเลือด และไม่ออกในทางเป็นลูก', LEFT.every((f) => opens(f).length >= 1), LEFT.filter((f) => !opens(f).length).join(' '));
+  // เพดานเงินที่เจ้าหนี้เอาไปได้: ทางที่เสียมากสุดรวมใบต่อ (next) ไม่เกิน 1.5 เท่าเงินเก็บต่อปี
+  const byId = new Map(content.events.map((e) => [e.id, e]));
+  const lose = (fx) => Math.max(0, -(fx?.money?.amount ?? 0));
+  const worst = (e) => Math.max(...e.choices.map((c) => lose(c.effects) + Math.max(0, ...(c.outcomes ?? []).map((o) => lose(o.effects) + (o.next ? worst(byId.get(o.next)) : 0)))));
+  const collector = byId.get('heir_blood_collector_01');
+  check('ใบ tld17 เจ้าหนี้นอกระบบทวง: มีทางแจ้งตำรวจ · ทางที่เสียมากสุดรวมใบต่อ ≤ 1.5 เท่าเงินเก็บต่อปี', !!collector && collector.choices.some((c) => c.id === 'call_police') && worst(collector) <= 1.5, collector ? `เสียมากสุด ${worst(collector)}` : 'ไม่มีการ์ด');
+
   // วงไม่ดึงเลขสุ่มของปรโลก/ไม่แตะบัญชี ⇒ ทายาทเท่าการเล่นแบบไม่มีวงทุกไบต์
   const old = drive(begin(life(0), true));
   check('วงปรโลก: ทายาทเท่าการเล่นแบบไม่มีวง · เซฟเก่า (steps เดิม) ไม่เข้าวง', heirOf(old.af) === heirOf(a.af) && old.af.loop === null && old.loop.length === 0);
