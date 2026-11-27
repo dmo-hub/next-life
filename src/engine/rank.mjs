@@ -148,7 +148,7 @@ export function setOffice(st, rank) {
   const prev = st.office;
   st.office = rank < 0 ? null : { rank, since: st.age, next: st.age + OFFICE.term };
   // ชนะรักษาตำแหน่งเดิม = ชื่อย่อยเดิม · ชนะเข้าขั้นใหม่ = ทอยชื่อย่อย (ผลเดียวกับที่การ์ดบอก)
-  const step = st.office && st.content.era.careers.office.steps[rank];
+  const step = officeStep(st);
   if (step?.subs) st.office.sub = prev?.rank === rank && prev.sub ? prev.sub : subOf(step, st).name;
   // ตำแหน่งสูงสุดที่เคยได้ — ชื่อเสียงตระกูล/เป้าตระกูลการเมืองอ่านตอนตาย (ตำแหน่งปัจจุบันหายเมื่อแพ้)
   if (rank >= 0) st.officeTop = Math.max(st.officeTop ?? -1, rank);
