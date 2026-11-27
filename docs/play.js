@@ -4897,6 +4897,7 @@ function newLife(seed, content, heir = null) {
   // ทางเป็นลูก legacy.age >= 0 ⇒ อายุ 0 ได้ผลเท่าเดิม · เริ่มกลางวัย มรดกถึงมือปีที่เริ่ม (รุ่นก่อนตายปีนี้)
   if (st.legacy && st.legacy.age <= st.age) receiveLegacy(st, birthYear + st.age, stageOf(st.age));
   if (st.age > 0 && st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
+  receiveSibFeud(st);
   if (heir?.start) startSchool(st, birthYear + st.age);
   st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
@@ -5544,6 +5545,31 @@ function receiveLetter(st) {
   st.due.push({ kind: 'eraEvent', ev, age: st.age });
 }
 
+// พี่น้องแย่งมรดก: บังคับออกครั้งเดียวในปีแรกของทายาท (กองสุ่มรับประกันไม่ได้) · ไม่มีพี่น้องที่ยังอยู่ = ไม่มีใครให้แย่ง
+// ไม่กินโควตาปี ไม่ดึงเลขสุ่ม
+const SIB_FEUD = 'sib_feud_';
+const CHILD_SIB = 10, ADULT_SIB = 18;
+function receiveSibFeud(st) {
+  if (!st.parentFlags?.sib_feud) return;
+  // ข้อความให้พี่น้องกระซิบ/ยื่นกระดาษ — คนโตสุดต้องโตพอจะทำได้ ยังเล็กก็รอปีที่ถึงวัย
+  const sib = feudSib(st);
+  if (!sib || st.birthYear + st.age - sib.born < (st.age < ADULT_SIB ? CHILD_SIB : ADULT_SIB)) return;
+  const cards = st.content.events.filter((e) => e.id.startsWith(SIB_FEUD));
+  if (cards.some((e) => st.done[e.id])) return;
+  const ev = cards.find((e) => whenOk(st, e.when));
+  if (!ev) return;
+  st.done[ev.id] = true;
+  st.fired[ev.id] = { n: 1, age: st.age };
+  st.due.push({ kind: 'eraEvent', ev, age: st.age });
+}
+
+// pickFocus ไม่เลือกพี่น้อง และ focusOf สำรองตัดคนย้ายออก — พี่น้องรุ่นโตส่วนใหญ่ย้ายแล้ว ผลความผูกพันจะหายเงียบถ้าไม่ตั้งคนเป้าเอง (คนโตสุดที่ยังอยู่ ไม่ดึงเลขสุ่ม)
+const feudSib = (st) => st.kin.filter((k) => k.role === 'sibling' && k.alive).sort((a, b) => a.born - b.born)[0];
+function focusFeudSib(st) {
+  const m = feudSib(st);
+  if (m) st.kinFocus.sibling = m.id;
+}
+
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
 function invest(st, { asset, share }) {
   if (!assetOpen(st.content.era, asset, st.birthYear + st.age)) throw new Error(`${assetName(asset)} ยังไม่มีในปี ${st.birthYear + st.age}`);
@@ -5733,6 +5759,7 @@ function stepYear(st) {
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
   if (st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
+  receiveSibFeud(st);
   st.trail.push({ year, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
 
@@ -6076,6 +6103,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
   if (ev.when?.child_not_mine) focusChildNotMine(st, ev.when.child_not_mine);
   if (ev.when?.ex_spouse) focusExSpouse(st, ev.when.ex_spouse);
   if (ev.when?.family) focusCourter(st, ev.when.family);
+  if (ev.id.startsWith(SIB_FEUD)) focusFeudSib(st);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
@@ -10637,6 +10665,9 @@ function carryLedger(ledger, net, r) {
   return out;
 }
 
+// ไม่มีพินัยกรรมและมีลูกพอจะแบ่งกันเอง (ตายตอนเด็ก/ลูกคนเดียวไม่นับ) — ส่วนที่หักจากมรดกกับการ์ดพี่น้องแย่งมรดกของทายาทใช้เงื่อนไขเดียวกัน
+const willFeud = (st) => !!st.funeral && !st.flags?.wish_will && disputes(st);
+
 // มรดกต่อลูกหนึ่งคน เป็นจำนวนเท่าของรายได้ครัวเรือนทั้งปีของทั้งประเทศตอนตาย — ชีวิตลูกเดินเงินเฟ้อคนละชุด (seed ต่างกัน)
 // จึงส่งต่อเป็นสัดส่วนของรายได้ แล้วแปลงกลับเป็นบาทในปีที่ลูกได้รับ · ทรัพย์สุทธิติดลบ = หนี้ไม่ตกถึงลูก (ป.พ.พ. ม.1601)
 // kids = จำนวนลูกที่ยังอยู่จริง (B36a) · ไม่รู้จำนวน (harness/state เก่า) ใช้ LEGACY.kids
@@ -10644,8 +10675,7 @@ function legacyUnits(st, kids = LEGACY.kids) {
   const e = st.estate;
   if (!e || e.money <= 0) return 0;
   let share = e.money / Math.max(1, kids);
-  // ผ่านฉากงานศพแล้วไม่ได้ทำพินัยกรรม และมีลูกพอจะแบ่งกันเอง — ตายตอนเด็ก/ลูกคนเดียวไม่หัก
-  if (st.funeral && !st.flags?.wish_will && disputes(st)) share *= 1 - LEGACY.dispute;
+  if (willFeud(st)) share *= 1 - LEGACY.dispute;
   if (e.year >= LEGACY.taxYear && share > LEGACY.taxFrom) share -= (share - LEGACY.taxFrom) * LEGACY.tax;
   return share / (nationalIncome(st.content.era, st.seed, e.year) * 12);
 }
@@ -10738,6 +10768,8 @@ function makeHeir(af, r) {
     parentFlags = heirFlags(st, tier.tier);
     homeFlags = heirHome(st, tier.tier);
     taboos = heirTaboos(st, tier.tier);
+    // ธงนี้ไม่มาจาก st.flags ของรุ่นก่อน: เฉพาะลูกสายเลือดที่มีพี่น้องตามมาและมีกองให้แย่ง (หลานเป็นคนละรุ่นกับคนแบ่งมรดก)
+    if (blood?.role === 'child' && st.estate?.money > 0 && willFeud(st) && heirSibs(st, blood).length) parentFlags.sib_feud = tier.tier;
     const kidAge = me?.role === 'child' ? me.born - st.birthYear : link ? link.born - st.birthYear : Math.min(st.age, st.flagAge?.has_kids ?? KID_AGE_DEFAULT);
     region = { name: st.region, ses: st.ses };
     province = st.province;
