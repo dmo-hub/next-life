@@ -941,6 +941,49 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ 278 ตัวควบคุม: ไม่ส่ง heirId ⇒ throw', ok(last) && last.threw);
 }
 
+// ใบ tld15 พื้นมรดกทางสายเลือด: ทายาทที่ส่วนเดิมต่ำกว่าส่วนเท่าบ้านลูก LEGACY.floorKids คน ได้เท่าพื้น · ส่วนที่สูงกว่าอยู่แล้วไม่ขยับ
+{
+  const { startAfterlife, nextAfterCard, chooseAfter, legacyUnits, HEIR_AGE } = await import('../src/engine/index.mjs');
+  const { LEGACY } = await import('../src/engine/afterlife.mjs');
+  const { addMember } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  const bot = BOTS['สายครอบครัว'];
+  const run = (kidCount, grandCount) => {
+    let st = null;
+    for (let i = 0; i < 50 && !st; i++) {
+      const { state } = playLife(mixSeed(0x15f, i), content, bot);
+      if (state.kin && !state.tripLost) st = state;
+    }
+    if (!st) return { err: 'ไม่มีชีวิตที่มีครอบครัว' };
+    for (const m of st.kin.filter((k) => k.role === 'child' || k.role === 'grandchild')) { m.alive = false; m.diedAge = 1; }
+    st.estate.money = 50e6;
+    const year = st.birthYear + st.age;
+    // เกิดแหล่งเดียว: ทายาทคือหลานคนแรกของลูกคนแรก หรือลูกคนแรกเมื่อไม่มีหลาน
+    const kids = Array.from({ length: kidCount }, (_, i) => addMember(st, 'child', { born: year - HEIR_AGE[0] - i }));
+    const grand = Array.from({ length: grandCount }, (_, i) => addMember(st, 'grandchild', { born: year - HEIR_AGE[0] - i, of: kids[0].id }));
+    const heir = grand[0] ?? kids[0];
+    const floor = legacyUnits(st, LEGACY.floorKids);
+    const share = legacyUnits(st, kidCount) / (grandCount || 1);
+    const af = startAfterlife(st);
+    for (let g = 0; g < 400 && !af.heir; g++) {
+      const card = nextAfterCard(af);
+      if (card.done) break;
+      if (af.pending?.path) {
+        const b = (card.manual ?? []).findIndex(Boolean);
+        if (b < 0) return { err: 'การ์ดทางเกิดไม่มีปุ่มสายเลือด' };
+        chooseAfter(af, b, heir.id);
+      } else if (card.choices?.length) chooseAfter(af, bot(card, af.botRng, af));
+    }
+    return af.heir ? { got: af.heir.legacy?.units ?? 0, share, floor } : { err: 'ไม่ถึงการ์ดส่งต่อ' };
+  };
+  const eq = (a, b) => Math.abs(a - b) <= 1e-9 * Math.max(1, Math.abs(b));
+  const show = (r) => r.err ?? `ได้ ${r.got.toFixed(3)} · ส่วนเดิม ${r.share.toFixed(3)} · พื้น ${r.floor.toFixed(3)}`;
+  const grand = run(2, 3), five = run(5, 0), one = run(1, 0);
+  check('ใบ tld15 หลานที่ส่วนเดิมต่ำกว่าพื้น ได้พื้น', !grand.err && grand.share < grand.floor && eq(grand.got, grand.floor), show(grand));
+  check('ใบ tld15 บ้านลูก 5 คน ทายาทเป็นลูกได้พื้น', !five.err && five.share < five.floor && eq(five.got, five.floor), show(five));
+  check('ใบ tld15 ลูกคนเดียว ส่วนสูงกว่าพื้นอยู่แล้วไม่ขยับ', !one.err && one.share > one.floor && eq(one.got, one.share), show(one));
+}
+
 // ใบ tld14 พี่น้องตามมาในชาติทายาท (เจ้าของเคาะ 11-23): ทายาทสายเลือด = ลูกคนอื่นที่ยังอยู่ตามมาเป็น sibling ชื่อเดิม · ไม่ดึง kinRng · ไม่เข้า KIN_HOUSEHOLD · ทางอื่นไม่มี
 {
   const { startAfterlife, nextAfterCard, chooseAfter, heirCandidates, HEIR_AGE } = await import('../src/engine/index.mjs');
