@@ -357,9 +357,10 @@ const deadForced = deadHeir.filter((id) => {
     const s = mixSeed(seed, 9900 + i);
     const p = newLife(s, content);
     let hit = false;
-    // ธง sib_feud มากับพี่น้องที่ตามมาเสมอ (บอทไม่กดปุ่มสายเลือด) — ทายาทที่ถือธงต้องมีพี่น้องด้วย การ์ดถึงออกได้
+    // ธง sib_feud มากับพี่น้องที่ตามมาเสมอ (บอทไม่กดปุ่มสายเลือด) — ทายาทที่ถือธงต้องมีพี่น้องที่โตกว่า และเริ่มอายุตามใบ
+    // ไม่งั้นใบวัยแรกออกก่อนแล้วปิดใบวัยหลังทุกชีวิต
     const sibs = parentFlags.sib_feud && [{ sex: 'หญิง', name: 'พี่น้อง', born: p.birthYear - 2 }];
-    playLife(s, content, forceChild, (card) => { if (card.id === id) hit = true; }, newLife(s, content, { birthYear: p.birthYear, sex: p.sex, region: { name: p.region, ses: p.ses }, cls: p.cls, bonus: {}, parentFlags, ...(sibs && { sibs }) }));
+    playLife(s, content, forceChild, (card) => { if (card.id === id) hit = true; }, newLife(s, content, { birthYear: p.birthYear, sex: p.sex, region: { name: p.region, ses: p.ses }, cls: p.cls, bonus: {}, parentFlags, ...(sibs && { sibs, start: { age: ev.when.age[0] } }) }));
     if (hit) return false;
   }
   return true;
