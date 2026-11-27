@@ -771,7 +771,7 @@ const f2 = (v) => v.toFixed(2);
   const byId = new Map(content.events.map((e) => [e.id, e]));
   const lose = (fx) => Math.max(0, -(fx?.money?.amount ?? 0));
   const worst = (e) => Math.max(...e.choices.map((c) => lose(c.effects) + Math.max(0, ...(c.outcomes ?? []).map((o) => lose(o.effects) + (o.next ? worst(byId.get(o.next)) : 0)))));
-  const collector = byId.get('heir_blood_collector_01');
+  const collector = byId.get('blood_collector_01');
   check('ใบ tld17 เจ้าหนี้นอกระบบทวง: มีทางแจ้งตำรวจ · ทางที่เสียมากสุดรวมใบต่อ ≤ 1.5 เท่าเงินเก็บต่อปี', !!collector && collector.choices.some((c) => c.id === 'call_police') && worst(collector) <= 1.5, collector ? `เสียมากสุด ${worst(collector)}` : 'ไม่มีการ์ด');
 
   // วงไม่ดึงเลขสุ่มของปรโลก/ไม่แตะบัญชี ⇒ ทายาทเท่าการเล่นแบบไม่มีวงทุกไบต์
