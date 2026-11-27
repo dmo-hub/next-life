@@ -1063,6 +1063,65 @@ const f2 = (v) => v.toFixed(2);
   check('ใบ tld14 ครบทาง: ตายมีลูก 3 → เลือกคนกลาง → ทายาทมีพี่ 1 น้อง 1 ชื่อเดิม', !e2e.err && e2e.name === e2e.mid && e2e.sibs === 2 && [...e2e.names].sort().join() === [...e2e.want].sort().join() && e2e.ranks.includes('elder') && e2e.ranks.includes('younger'), e2e.err ?? JSON.stringify(e2e));
 }
 
+// ใบ tld16 พี่น้องแย่งมรดก: ทายาทลูกสายเลือด + พี่น้อง + รุ่นก่อนไม่ทำพินัยกรรม + มีกอง = การ์ดออกช่วงแรกครั้งเดียว · ขาดข้อใดข้อหนึ่ง = ไม่ออก
+{
+  const { startAfterlife, nextAfterCard, chooseAfter, HEIR_AGE } = await import('../src/engine/index.mjs');
+  const { addMember } = await import('../src/engine/family.mjs');
+  const content = loadContent();
+  const bot = BOTS['สายครอบครัว'];
+  const cards = content.events.filter((e) => e.id.startsWith('sib_feud_'));
+  // mode: blood | child (ปุ่มเป็นลูก) | grand (หลานสายเลือด)
+  const run = ({ kidCount = 3, will = false, money = 50e6, age = HEIR_AGE[0] + 4, mode = 'blood' } = {}) => {
+    let st = null;
+    for (let i = 0; i < 50 && !st; i++) {
+      const { state } = playLife(mixSeed(0x16f, i), content, bot);
+      if (state.kin && state.funeral && !state.tripLost) st = state;
+    }
+    if (!st) return { err: 'ไม่มีชีวิตที่มีงานศพ' };
+    for (const m of st.kin.filter((k) => k.role === 'child' || k.role === 'grandchild')) { m.alive = false; m.diedAge = 1; }
+    st.estate.money = money;
+    if (will) st.flags.wish_will = true;
+    else delete st.flags.wish_will;
+    const year = st.birthYear + st.age;
+    const kids = Array.from({ length: kidCount }, (_, i) => addMember(st, 'child', { born: year - age - i * 2 }));
+    const grand = mode === 'grand' ? [0, 1].map((i) => addMember(st, 'grandchild', { born: year - HEIR_AGE[0] - i, of: kids[0].id })) : [];
+    for (const k of kids.slice(1)) k.left = true;
+    const af = startAfterlife(st);
+    for (let g = 0; g < 400 && !af.heir; g++) {
+      const card = nextAfterCard(af);
+      if (card.done) break;
+      if (af.pending?.path && mode !== 'child') {
+        const b = (card.manual ?? []).findIndex(Boolean);
+        if (b < 0) return { err: 'การ์ดทางเกิดไม่มีปุ่มสายเลือด' };
+        chooseAfter(af, b, (grand[0] ?? kids[0]).id);
+      } else if (af.pending?.path) chooseAfter(af, 1);
+      else if (card.choices?.length) chooseAfter(af, bot(card, af.botRng, af));
+    }
+    if (!af.heir) return { err: 'ไม่ถึงการ์ดส่งต่อ' };
+    const life = nextLife(af);
+    const start = life.age;
+    let hits = 0, at = null, bond = null;
+    playLife(life.seed, content, bot, (card, s) => {
+      if (!card.id?.startsWith('sib_feud_')) return;
+      hits++;
+      at = s.age;
+      bond = s.kinFocus.sibling;
+    }, nextLife(af));
+    return { flag: !!af.heir.parentFlags?.sib_feud, hits, at, start, bond };
+  };
+  const yes = run();
+  check('ใบ tld16 ไม่มีพินัยกรรม + พี่น้อง = การ์ดแย่งมรดกออกปีแรกของทายาทครั้งเดียว', !yes.err && yes.flag && yes.hits === 1 && yes.at - yes.start <= 1 && yes.bond >= 20000, JSON.stringify(yes));
+  const teen = run({ age: HEIR_AGE[0] });
+  check('ใบ tld16 ทายาทอายุต่ำสุดของปุ่มสายเลือดก็เจอการ์ดปีแรก', !teen.err && teen.hits === 1 && teen.at - teen.start <= 1, JSON.stringify(teen));
+  const none = { 'มีพินัยกรรม': run({ will: true }), 'ลูกคนเดียว': run({ kidCount: 1 }), 'ไม่มีทรัพย์': run({ money: 0 }), 'ปุ่มเป็นลูก': run({ mode: 'child' }), 'หลานสายเลือด': run({ mode: 'grand' }) };
+  const bad = Object.entries(none).filter(([, r]) => r.err || r.flag || r.hits);
+  check('ใบ tld16 มีพินัยกรรม/ลูกคนเดียว/ไม่มีทรัพย์/ปุ่มเป็นลูก/หลาน = ไม่มีธง ไม่มีการ์ด', bad.length === 0, bad.map(([k, r]) => `${k}: ${JSON.stringify(r)}`).join(' · '));
+  // เพดานผลของการ์ด: ความผูกพันพี่น้อง -15…+10 · เงิน ±0.5 เท่าเงินเก็บต่อปี · ไม่มีใบต่อ
+  const sites = cards.flatMap((e) => e.choices.flatMap((c) => [c, ...(c.outcomes ?? [])]));
+  const over = sites.filter((x) => Math.abs(x.effects?.money?.amount ?? 0) > 0.5 || (x.family ?? []).some((o) => o.d > 10 || o.d < -15) || x.next || x.schedules);
+  check('ใบ tld16 การ์ดแย่งมรดก 2 วัย · ผลอยู่ในเพดาน', cards.length === 2 && sites.length > 0 && over.length === 0, `${cards.length} ใบ · เกิน ${over.length}`);
+}
+
 // เฟส 3 เตรียมทหาร ช่วง 2 (เจ้าของสั่ง "เริ่มสร้าง" 2026-11-16): ตายระหว่างฝึก = สาเหตุ training ผ่านด่านตายเดียว
 // การ์ดฉากสุดท้ายที่รอในคิวต้องเล่าก่อนงานศพ · สัญญารอดตายยังกันได้ · คำบนการ์ดตายต้องมี
 {

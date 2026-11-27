@@ -413,6 +413,7 @@ export function newLife(seed, content, heir = null) {
   // ทางเป็นลูก legacy.age >= 0 ⇒ อายุ 0 ได้ผลเท่าเดิม · เริ่มกลางวัย มรดกถึงมือปีที่เริ่ม (รุ่นก่อนตายปีนี้)
   if (st.legacy && st.legacy.age <= st.age) receiveLegacy(st, birthYear + st.age, stageOf(st.age));
   if (st.age > 0 && st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
+  receiveSibFeud(st);
   if (heir?.start) startSchool(st, birthYear + st.age);
   st.trail.push({ year: birthYear + st.age, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
@@ -1060,6 +1061,26 @@ function receiveLetter(st) {
   st.due.push({ kind: 'eraEvent', ev, age: st.age });
 }
 
+// พี่น้องแย่งมรดก: บังคับออกครั้งเดียวในปีแรกของทายาท (กองสุ่มรับประกันไม่ได้) · ไม่มีพี่น้องที่ยังอยู่ = ไม่มีใครให้แย่ง
+// ไม่กินโควตาปี ไม่ดึงเลขสุ่ม
+const SIB_FEUD = 'sib_feud_';
+function receiveSibFeud(st) {
+  if (!st.parentFlags?.sib_feud || !st.kin.some((m) => m.role === 'sibling' && m.alive)) return;
+  const cards = st.content.events.filter((e) => e.id.startsWith(SIB_FEUD));
+  if (cards.some((e) => st.done[e.id])) return;
+  const ev = cards.find((e) => whenOk(st, e.when));
+  if (!ev) return;
+  st.done[ev.id] = true;
+  st.fired[ev.id] = { n: 1, age: st.age };
+  st.due.push({ kind: 'eraEvent', ev, age: st.age });
+}
+
+// pickFocus ไม่เลือกพี่น้อง และ focusOf สำรองตัดคนย้ายออก — พี่น้องรุ่นโตส่วนใหญ่ย้ายแล้ว ผลความผูกพันจะหายเงียบถ้าไม่ตั้งคนเป้าเอง (คนโตสุดที่ยังอยู่ ไม่ดึงเลขสุ่ม)
+function focusFeudSib(st) {
+  const m = st.kin.filter((k) => k.role === 'sibling' && k.alive).sort((a, b) => a.born - b.born)[0];
+  if (m) st.kinFocus.sibling = m.id;
+}
+
 // ย้ายสัดส่วน share ของเงินทั้งหมดเข้าสินทรัพย์เดียว · ด่าน build กั้นปีไว้แล้ว ถึงตรงนี้ปีผิด = เนื้อหาหลุดด่าน
 function invest(st, { asset, share }) {
   if (!assetOpen(st.content.era, asset, st.birthYear + st.age)) throw new Error(`${assetName(asset)} ยังไม่มีในปี ${st.birthYear + st.age}`);
@@ -1249,6 +1270,7 @@ function stepYear(st) {
   const stage = stageOf(st.age);
   if (st.legacy && st.age >= st.legacy.age) receiveLegacy(st, year, stage);
   if (st.letter && !st.letter.read && !st.legacy && st.age >= st.letter.age) receiveLetter(st);
+  receiveSibFeud(st);
   st.trail.push({ year, money: Math.round(st.money) });
   st.statTrail.push(statPoint(st));
 
@@ -1592,6 +1614,7 @@ function eventCard(st, ev, news = null, echoFrom = undefined) {
   if (ev.when?.child_not_mine) focusChildNotMine(st, ev.when.child_not_mine);
   if (ev.when?.ex_spouse) focusExSpouse(st, ev.when.ex_spouse);
   if (ev.when?.family) focusCourter(st, ev.when.family);
+  if (ev.id.startsWith(SIB_FEUD)) focusFeudSib(st);
   // การ์ดเล่าเรื่อง (choices: [] ใบ 07) ไม่มีอะไรให้เลือก — ไม่ตั้ง pending ไม่งั้นใบถัดไปเปิดไม่ได้
   st.pending = ev.choices.length ? ev : null;
   // ตัดสินแบบงานศพตอนการ์ดออก (หลังคำสั่งเสียครบ) ครั้งเดียว — lockReason อ่านค่านี้ทั้งตอนวาดและตอนกด
