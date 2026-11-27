@@ -1,6 +1,6 @@
 // build สร้าง (src/site/play-files.mjs) — ห้ามแก้มือ
 const CACHE = "nl-v0.6.178";
-const ART = "nl-art-90e3d7f08c";
+const ART = "nl-art-4e7770a1ce";
 const CORE = ["play.html","play-data.js?v=v0.6.178","play.js?v=v0.6.178","favicon.svg","fonts/Sarabun-Regular.woff2","fonts/Sarabun-SemiBold.woff2","fonts/Srisakdi-Bold.woff2","fonts/Maitree-SemiBold.woff2"];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
