@@ -583,6 +583,29 @@ const f2 = (v) => v.toFixed(2);
   }
 }
 
+// ตารางนัดซ้อนทับเคารพ when.age ของใบ (world-overlap ใบ 42): ยัดชีวิตขั้น 3–4 อายุ 14 หลาย seed · นัดนอกช่วงอายุของใบ = ใบไม่มีวันออก
+// ต้องมีนัดใบที่ติด when.age จริง (ใบดันเจียน 18+) ไม่งั้นด่านไม่ได้วัดอะไร
+{
+  const E = await import('../src/engine/index.mjs');
+  const content = loadContent();
+  const evOf = (id) => content.events.find((e) => e.id === id);
+  let out = 0, aged = 0, plans = 0;
+  for (const stage of [3, 4]) {
+    for (let i = 0; i < 150; i++) {
+      const st = newLife(mixSeed(42, stage * 1000 + i), content);
+      st.age = 14;
+      E.overlapPlan(st, 0, stage);
+      for (const x of st.scheduled.filter((y) => y.overlap)) {
+        plans++;
+        const r = evOf(x.event).when?.age;
+        if (r) aged++;
+        if (r && (x.age < r[0] || x.age > r[1])) out++;
+      }
+    }
+  }
+  check('ใบ 42 ตารางนัดซ้อนทับขั้น 3–4 อายุ 14: ทุกนัดอยู่ในช่วง when.age ของใบ · มีนัดใบที่ติด age จริง', out === 0 && aged > 0, `นัด ${plans} · ติด age ${aged} · นอกช่วง ${out}`);
+}
+
 // การ์ดจากโค้ดมีครบ 4 ปุ่ม และปุ่มที่เติมต่อท้าย: การ์ดชวนข้ามโลกกดปุ่มใหม่แล้วชีวิตเดินต่อเหมือนปฏิเสธ
 {
   const E = await import('../src/engine/index.mjs');
