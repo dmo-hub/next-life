@@ -83,7 +83,7 @@ for (const [bot, pick] of Object.entries(BOTS)) {
       for (const m of st.kin) {
         if (was.get(m.id) === false && m.alive) revive++;
         was.set(m.id, m.alive);
-        if (!joined.has(m.id)) joined.set(m.id, st.birthYear + st.age);
+        if (m.role !== 'courter' && !joined.has(m.id)) joined.set(m.id, st.birthYear + st.age);
       }
       if (card.loss) lossCards++;
       if (card.kind === 'eraEvent' || card.kind === 'event') {
@@ -131,12 +131,13 @@ for (const [bot, pick] of Object.entries(BOTS)) {
     for (const m of st.kin) {
       roles[m.role]++;
       // สัตว์ตายตามอายุขัยของชนิด ไม่ใช่ตารางชีพคน (B44)
-      if (m.role === 'pet' || m.role === 'herd') continue;
+      // คนจีบอยู่นอกบ้านและไม่ทอยตาย — นับปีเสี่ยงของเขาทำให้ค่าคาดบวม
+      if (m.role === 'pet' || m.role === 'herd' || m.role === 'courter') continue;
       // ความเสี่ยงสะสมปีต่อปีของช่วงที่สมาชิกอยู่ในบ้านระหว่างชีวิตผู้เล่น (ปีเข้าบ้านถึงปีตายหรือปีที่ผู้เล่นตาย)
       // คู่ครองเกิดก่อนเข้าบ้าน และต้องรอดมาถึงวันแต่ง — นับความเสี่ยงช่วงก่อนนั้นด้วยทำให้ค่าคาดเกินจริง ~8% (อัตราส่วนเคยค้างที่ 0.90)
-      // ปีเข้าบ้านของคู่ครอง = ปีของการ์ดแรกที่เห็นในบ้าน · ลูก/หลานเกิดปีที่เข้าบ้าน ใช้ born (หลานที่แกนเพิ่มระหว่างปีโผล่ในการ์ดถัดไป)
+      // ปีเข้าบ้านของคู่ครอง/แฟน = ปีของการ์ดแรกที่เห็นในบ้าน · ลูก/หลานเกิดปีที่เข้าบ้าน ใช้ born (หลานที่แกนเพิ่มระหว่างปีโผล่ในการ์ดถัดไป)
       const end = m.alive ? st.birthYear + st.age : m.born + m.diedAge + 1;
-      const entry = m.role === 'spouse' ? (joined.get(m.id) ?? end) : m.born;
+      const entry = m.role === 'spouse' || m.role === 'partner' ? (joined.get(m.id) ?? end) : m.born;
       for (let y = Math.max(m.born, st.birthYear, entry) + 1; y <= end; y++) {
         const a = y - m.born - 1;
         expected += lifeQx(era, st.seed, m.sex, y, a);
