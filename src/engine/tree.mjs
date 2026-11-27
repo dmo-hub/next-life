@@ -219,4 +219,15 @@ function topCats(t, defs) {
   return cats;
 }
 export const treeCardMul = (h, defs, mul, cat) => (treeCtl.passive && h?.tree?.done && mul > 1 && topCats(h.tree, defs).has(cat) ? mul : 1);
+// ถ่วงการ์ดรายใบที่โหนดระบุไว้ใน meet (ใบ 336) — จำค่าแบบเดียวกับ topCats ไม่เขียนลง st.tree จึงไม่เข้าเซฟ
+const meetCache = new WeakMap();
+function meetIds(t, defs) {
+  const n = Object.keys(t.done).length;
+  const hit = meetCache.get(t);
+  if (hit && hit.n === n && hit.defs === defs) return hit.ids;
+  const ids = new Set(Object.keys(t.done).flatMap((id) => defs[id]?.meet ?? []));
+  meetCache.set(t, { n, defs, ids });
+  return ids;
+}
+export const treeMeetMul = (h, defs, mul, eventId) => (treeCtl.passive && h?.tree?.done && mul > 1 && meetIds(h.tree, defs).has(eventId) ? mul : 1);
 export const treeTopCats = (h, defs) => (h?.tree?.done ? [...topCats(h.tree, defs)] : []);

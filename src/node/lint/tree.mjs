@@ -34,13 +34,14 @@ function checkTreeStart(st, nodes, jobs) {
   return out;
 }
 
-export function checkTree(doc, jobs = null) {
+export function checkTree(doc, jobs = null, eventIds = null) {
   const out = [];
   if (!isObj(doc)) return ['ทะเบียนต้นไม้ต้องเป็น object'];
   if (!(typeof doc.year_scale === 'number' && doc.year_scale > 0)) out.push('year_scale ต้องเป็นเลขบวก');
   for (const k of TREE_SIZES) if (!(typeof doc.light_unit?.[k] === 'number' && doc.light_unit[k] > 0)) out.push(`light_unit.${k} ต้องเป็นเลขบวก`);
   if (!(typeof doc.roll_k === 'number' && doc.roll_k >= 0)) out.push('roll_k ต้องเป็นเลข ≥ 0');
   if (!(typeof doc.card_mul === 'number' && doc.card_mul >= 1)) out.push('card_mul ต้องเป็นเลข ≥ 1');
+  if (doc.meet_mul !== undefined && !(typeof doc.meet_mul === 'number' && doc.meet_mul >= 1)) out.push('meet_mul ต้องเป็นเลข ≥ 1');
   if (!(typeof doc.budget === 'number' && doc.budget > 0)) out.push('budget ต้องเป็นเลขบวก');
   if (doc.budget_ref !== undefined && !(isObj(doc.budget_ref) && ['sum', 'one'].every((k) => typeof doc.budget_ref[k] === 'number' && doc.budget_ref[k] > 0))) out.push('budget_ref ต้องมี sum กับ one เป็นเลขบวก');
   // สนิม (ใบ 09): ไม่ใส่ = ไม่มีสนิม · ใส่ = years จำนวนเต็ม ≥ 1 · floor 0 < x < 1 (จางลง ไม่หายหมด ไม่เพิ่ม)
@@ -74,6 +75,12 @@ export function checkTree(doc, jobs = null) {
       else if (!(p in nodes)) out.push(`${at}.pre ชี้โหนด ${p} ที่ไม่มีในทะเบียน`);
     }
     if (!isInt(n.roll) || n.roll < 0) out.push(`${at}.roll ต้องเป็นจำนวนเต็ม ≥ 0`);
+    // id เต็มเท่านั้น: การ์ดถูกเปลี่ยนชื่อแล้วต้องหยุด build ไม่ใช่เลิกถ่วงเงียบ ๆ
+    if (n.meet !== undefined) {
+      if (!Array.isArray(n.meet) || !n.meet.length || n.meet.some((e) => typeof e !== 'string')) out.push(`${at}.meet ต้องเป็นรายการ id การ์ด`);
+      else if (eventIds) for (const e of n.meet) if (!eventIds.has(e)) out.push(`${at}.meet ไม่รู้จักการ์ด ${e}`);
+      if (doc.meet_mul === undefined) out.push(`${at}.meet ต้องมี meet_mul ที่ต้นทะเบียน`);
+    }
     if (n.jobs !== undefined && (!Array.isArray(n.jobs) || !n.jobs.length || n.jobs.some((j) => typeof j !== 'string'))) out.push(`${at}.jobs ต้องเป็นรายการ id อาชีพ`);
     if (n.job_roll !== undefined && (n.jobs === undefined || !isInt(n.job_roll) || n.job_roll < 1)) out.push(`${at}.job_roll ต้องเป็นจำนวนเต็ม ≥ 1 และต้องมี jobs`);
     if (jobs && Array.isArray(n.jobs)) for (const j of n.jobs) if (!jobs.includes(j)) out.push(`${at}.jobs ไม่รู้จักอาชีพ ${j}`);
